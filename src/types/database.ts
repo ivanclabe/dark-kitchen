@@ -338,6 +338,39 @@ export type Database = {
           },
         ]
       }
+      dk_customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+          whatsapp_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp_id?: string | null
+        }
+        Relationships: []
+      }
       dk_daily_availability: {
         Row: {
           available: boolean
@@ -608,6 +641,80 @@ export type Database = {
           },
         ]
       }
+      dk_inventory_reservations: {
+        Row: {
+          created_at: string
+          id: string
+          ingredient_id: string
+          order_item_id: string
+          quantity_base_unit: number
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["dk_reservation_status"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredient_id: string
+          order_item_id: string
+          quantity_base_unit: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["dk_reservation_status"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredient_id?: string
+          order_item_id?: string
+          quantity_base_unit?: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["dk_reservation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_inventory_reservations_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_inventory_reservations_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "dk_order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_kitchen_tickets: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          priority: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          priority?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          priority?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_tickets_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_menu_items: {
         Row: {
           active: boolean
@@ -685,6 +792,181 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      dk_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          kitchen_status: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          line_total: number | null
+          observation: string | null
+          order_id: string
+          product_id: string
+          quantity: number
+          recipe_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          line_total?: number | null
+          observation?: string | null
+          order_id: string
+          product_id: string
+          quantity: number
+          recipe_id?: string | null
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          line_total?: number | null
+          observation?: string | null
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          recipe_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_items_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_order_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          from_status: Database["public"]["Enums"]["dk_order_status"] | null
+          id: string
+          note: string | null
+          order_id: string
+          to_status: Database["public"]["Enums"]["dk_order_status"]
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          from_status?: Database["public"]["Enums"]["dk_order_status"] | null
+          id?: string
+          note?: string | null
+          order_id: string
+          to_status: Database["public"]["Enums"]["dk_order_status"]
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          from_status?: Database["public"]["Enums"]["dk_order_status"] | null
+          id?: string
+          note?: string | null
+          order_id?: string
+          to_status?: Database["public"]["Enums"]["dk_order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_order_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_orders: {
+        Row: {
+          channel: Database["public"]["Enums"]["dk_order_channel"]
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          delivery_fee: number
+          discount: number
+          external_reference: string | null
+          id: string
+          notes: string | null
+          payment_method: string | null
+          requires_review: boolean
+          status: Database["public"]["Enums"]["dk_order_status"]
+          subtotal: number
+          total: number | null
+          updated_at: string
+        }
+        Insert: {
+          channel?: Database["public"]["Enums"]["dk_order_channel"]
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          delivery_fee?: number
+          discount?: number
+          external_reference?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          requires_review?: boolean
+          status?: Database["public"]["Enums"]["dk_order_status"]
+          subtotal?: number
+          total?: number | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["dk_order_channel"]
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          delivery_fee?: number
+          discount?: number
+          external_reference?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          requires_review?: boolean
+          status?: Database["public"]["Enums"]["dk_order_status"]
+          subtotal?: number
+          total?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_orders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_product_categories: {
         Row: {
@@ -3795,6 +4077,11 @@ export type Database = {
         Args: { p_recipe_id: string }
         Returns: number
       }
+      dk_cancel_order: {
+        Args: { p_order_id: string; p_reason?: string }
+        Returns: undefined
+      }
+      dk_confirm_order: { Args: { p_order_id: string }; Returns: undefined }
       dk_confirm_purchase: {
         Args: { p_purchase_id: string }
         Returns: undefined
@@ -3832,8 +4119,19 @@ export type Database = {
         | "Conductor"
         | "Propietario"
         | "Administrador(a)"
+      dk_kitchen_item_status: "PENDIENTE" | "EN_PREPARACION" | "LISTO"
       dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
+      dk_order_channel: "MANUAL" | "WHATSAPP" | "PHONE"
+      dk_order_status:
+        | "NUEVO"
+        | "CONFIRMADO"
+        | "EN_PREPARACION"
+        | "LISTO"
+        | "DESPACHADO"
+        | "ENTREGADO"
+        | "CANCELADO"
       dk_purchase_status: "BORRADOR" | "CONFIRMADA" | "ANULADA"
+      dk_reservation_status: "ACTIVE" | "RELEASED" | "CONSUMED"
       dk_role:
         | "ADMIN"
         | "MANAGER"
@@ -3996,8 +4294,20 @@ export const Constants = {
         "Propietario",
         "Administrador(a)",
       ],
+      dk_kitchen_item_status: ["PENDIENTE", "EN_PREPARACION", "LISTO"],
       dk_movement_type: ["COMPRA", "MERMA", "AJUSTE", "CONSUMO", "DEVOLUCION"],
+      dk_order_channel: ["MANUAL", "WHATSAPP", "PHONE"],
+      dk_order_status: [
+        "NUEVO",
+        "CONFIRMADO",
+        "EN_PREPARACION",
+        "LISTO",
+        "DESPACHADO",
+        "ENTREGADO",
+        "CANCELADO",
+      ],
       dk_purchase_status: ["BORRADOR", "CONFIRMADA", "ANULADA"],
+      dk_reservation_status: ["ACTIVE", "RELEASED", "CONSUMED"],
       dk_role: [
         "ADMIN",
         "MANAGER",

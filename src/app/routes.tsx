@@ -12,6 +12,9 @@ import { MenusPage } from '@/modules/menus/pages/MenusPage'
 import { MenuDetailPage } from '@/modules/menus/pages/MenuDetailPage'
 import { TodayMenuPage } from '@/modules/menus/pages/TodayMenuPage'
 import { SuppliersPage } from '@/modules/suppliers/pages/SuppliersPage'
+import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
+import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
+import { OrderDetailPage } from '@/modules/orders/pages/OrderDetailPage'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
@@ -29,7 +32,8 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DashboardPage /> },
-      { path: 'orders', element: <PlaceholderPage title="Pedidos" phase="Fase 5" /> },
+      { path: 'orders', element: <OrdersPage /> },
+      { path: 'orders/:id', element: <OrderDetailPage /> },
       { path: 'kitchen', element: <PlaceholderPage title="Cocina" phase="Fase 6" /> },
       { path: 'delivery', element: <PlaceholderPage title="Despachos" phase="Fase 7" /> },
       { path: 'inventory', element: <InventoryPage /> },
@@ -43,7 +47,7 @@ export const router = createBrowserRouter([
       { path: 'menus', element: <MenusPage /> },
       { path: 'menus/dia', element: <TodayMenuPage /> },
       { path: 'menus/:id', element: <MenuDetailPage /> },
-      { path: 'customers', element: <PlaceholderPage title="Clientes" phase="Fase 5" /> },
+      { path: 'customers', element: <CustomersPage /> },
       { path: 'reports', element: <PlaceholderPage title="Reportes" phase="Fase 8" /> },
       { path: 'users', element: <PlaceholderPage title="Usuarios" phase="Fase 1" /> },
     ],
