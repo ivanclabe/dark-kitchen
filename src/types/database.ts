@@ -4073,6 +4073,10 @@ export type Database = {
       }
     }
     Functions: {
+      dk_advance_kitchen_item: {
+        Args: { p_order_item_id: string }
+        Returns: undefined
+      }
       dk_calculate_recipe_cost: {
         Args: { p_recipe_id: string }
         Returns: number

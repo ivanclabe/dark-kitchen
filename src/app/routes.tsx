@@ -15,6 +15,7 @@ import { SuppliersPage } from '@/modules/suppliers/pages/SuppliersPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
 import { OrderDetailPage } from '@/modules/orders/pages/OrderDetailPage'
+import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
@@ -34,7 +35,7 @@ export const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: 'orders', element: <OrdersPage /> },
       { path: 'orders/:id', element: <OrderDetailPage /> },
-      { path: 'kitchen', element: <PlaceholderPage title="Cocina" phase="Fase 6" /> },
+      { path: 'kitchen', element: <KitchenPage /> },
       { path: 'delivery', element: <PlaceholderPage title="Despachos" phase="Fase 7" /> },
       { path: 'inventory', element: <InventoryPage /> },
       { path: 'inventory/movimientos', element: <MovementsPage /> },
