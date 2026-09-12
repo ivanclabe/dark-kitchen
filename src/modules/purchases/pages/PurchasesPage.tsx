@@ -11,6 +11,7 @@ import {
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreatePurchase, usePurchases } from '../hooks/usePurchases'
+import { getErrorMessage } from '@/shared/utils/errors'
 
 const STATUS_LABEL: Record<string, string> = {
   BORRADOR: 'Borrador',
@@ -36,7 +37,7 @@ export function PurchasesPage() {
       const purchase = await createPurchase.mutateAsync({ supplierId, invoiceNumber, invoiceDate })
       navigate(`/purchases/${purchase.id}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear la compra')
+      setError(getErrorMessage(err, 'Error al crear la compra'))
     }
   }
 

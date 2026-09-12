@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom'
 import { useIngredients } from '../hooks/useIngredients'
 import { useMovements, useRegisterAdjustment, useRegisterWaste } from '../hooks/useMovements'
 import type { WasteReason } from '../types'
+import { getErrorMessage } from '@/shared/utils/errors'
 
 const WASTE_REASONS: { value: WasteReason; label: string }[] = [
   { value: 'VENCIMIENTO', label: 'Vencimiento' },
@@ -51,7 +52,7 @@ function WasteForm() {
       setQuantity('')
       setObservation('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrar la merma')
+      setError(getErrorMessage(err, 'Error al registrar la merma'))
     }
   }
 
@@ -124,7 +125,7 @@ function AdjustmentForm() {
       setQuantity('')
       setObservation('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrar el ajuste')
+      setError(getErrorMessage(err, 'Error al registrar el ajuste'))
     }
   }
 

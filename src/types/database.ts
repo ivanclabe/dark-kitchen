@@ -560,6 +560,84 @@ export type Database = {
           },
         ]
       }
+      dk_product_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      dk_products: {
+        Row: {
+          active: boolean
+          active_recipe_id: string | null
+          category_id: string | null
+          code: string | null
+          created_at: string
+          description: string | null
+          estimated_cost: number
+          id: string
+          image_path: string | null
+          name: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          active_recipe_id?: string | null
+          category_id?: string | null
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number
+          id?: string
+          image_path?: string | null
+          name: string
+          price?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          active_recipe_id?: string | null
+          category_id?: string | null
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number
+          id?: string
+          image_path?: string | null
+          name?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_products_active_recipe_fkey"
+            columns: ["active_recipe_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "dk_product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_purchase_items: {
         Row: {
           created_at: string
@@ -671,6 +749,87 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "dk_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_recipe_items: {
+        Row: {
+          created_at: string
+          id: string
+          ingredient_id: string
+          quantity: number
+          recipe_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredient_id: string
+          quantity: number
+          recipe_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredient_id?: string
+          quantity?: number
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_recipe_items_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_recipe_items_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_recipes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          product_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          product_id: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          product_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_recipes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_recipes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
             referencedColumns: ["id"]
           },
         ]
@@ -3506,9 +3665,17 @@ export type Database = {
       }
     }
     Functions: {
+      dk_calculate_recipe_cost: {
+        Args: { p_recipe_id: string }
+        Returns: number
+      }
       dk_confirm_purchase: {
         Args: { p_purchase_id: string }
         Returns: undefined
+      }
+      dk_create_recipe_version: {
+        Args: { p_items: Json; p_product_id: string }
+        Returns: string
       }
       dk_current_profile_id: { Args: never; Returns: string }
       dk_current_role: {

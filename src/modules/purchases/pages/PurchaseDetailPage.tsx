@@ -22,6 +22,7 @@ import {
   usePurchaseItems,
   useUploadAttachment,
 } from '../hooks/usePurchases'
+import { getErrorMessage } from '@/shared/utils/errors'
 
 export function PurchaseDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -64,7 +65,7 @@ export function PurchaseDetailPage() {
       setPurchaseUnitId('')
       setUnitCost('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al agregar la línea')
+      setError(getErrorMessage(err, 'Error al agregar la línea'))
     }
   }
 
@@ -73,7 +74,7 @@ export function PurchaseDetailPage() {
     try {
       await confirmPurchase.mutateAsync()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al confirmar la compra')
+      setError(getErrorMessage(err, 'Error al confirmar la compra'))
     }
   }
 
@@ -84,7 +85,7 @@ export function PurchaseDetailPage() {
     try {
       await uploadAttachment.mutateAsync(file)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al subir el archivo')
+      setError(getErrorMessage(err, 'Error al subir el archivo'))
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = ''
     }

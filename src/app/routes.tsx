@@ -5,6 +5,9 @@ import { InventoryPage } from '@/modules/inventory/pages/InventoryPage'
 import { MovementsPage } from '@/modules/inventory/pages/MovementsPage'
 import { PurchasesPage } from '@/modules/purchases/pages/PurchasesPage'
 import { PurchaseDetailPage } from '@/modules/purchases/pages/PurchaseDetailPage'
+import { ProductsPage } from '@/modules/products/pages/ProductsPage'
+import { RecipesPage } from '@/modules/recipes/pages/RecipesPage'
+import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { SuppliersPage } from '@/modules/suppliers/pages/SuppliersPage'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 import { createBrowserRouter } from 'react-router-dom'
@@ -31,8 +34,9 @@ export const router = createBrowserRouter([
       { path: 'purchases', element: <PurchasesPage /> },
       { path: 'purchases/:id', element: <PurchaseDetailPage /> },
       { path: 'suppliers', element: <SuppliersPage /> },
-      { path: 'recipes', element: <PlaceholderPage title="Recetas" phase="Fase 3" /> },
-      { path: 'products', element: <PlaceholderPage title="Platos" phase="Fase 3" /> },
+      { path: 'recipes', element: <RecipesPage /> },
+      { path: 'recipes/:productId', element: <RecipeEditorPage /> },
+      { path: 'products', element: <ProductsPage /> },
       { path: 'menus', element: <PlaceholderPage title="Menú" phase="Fase 4" /> },
       { path: 'customers', element: <PlaceholderPage title="Clientes" phase="Fase 5" /> },
       { path: 'reports', element: <PlaceholderPage title="Reportes" phase="Fase 8" /> },
