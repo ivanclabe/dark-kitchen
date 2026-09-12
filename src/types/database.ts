@@ -256,6 +256,47 @@ export type Database = {
           },
         ]
       }
+      dk_attachments: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          id: string
+          mime_type: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime_type?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime_type?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_attachments_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_audit_log: {
         Row: {
           action: string
@@ -296,6 +337,448 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dk_ingredient_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      dk_ingredient_purchase_units: {
+        Row: {
+          created_at: string
+          factor_to_base: number
+          id: string
+          ingredient_id: string
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          factor_to_base: number
+          id?: string
+          ingredient_id: string
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          factor_to_base?: number
+          id?: string
+          ingredient_id?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredient_purchase_units_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_purchase_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_ingredient_stock: {
+        Row: {
+          ingredient_id: string
+          stock_available: number | null
+          stock_on_hand: number
+          stock_reserved: number
+          updated_at: string
+        }
+        Insert: {
+          ingredient_id: string
+          stock_available?: number | null
+          stock_on_hand?: number
+          stock_reserved?: number
+          updated_at?: string
+        }
+        Update: {
+          ingredient_id?: string
+          stock_available?: number | null
+          stock_on_hand?: number
+          stock_reserved?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredient_stock_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: true
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_ingredients: {
+        Row: {
+          active: boolean
+          avg_cost: number
+          base_unit_id: string
+          category_id: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          max_stock: number | null
+          min_stock: number
+          name: string
+          perishable: boolean
+          primary_supplier_id: string | null
+          shelf_life_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          avg_cost?: number
+          base_unit_id: string
+          category_id?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_stock?: number | null
+          min_stock?: number
+          name: string
+          perishable?: boolean
+          primary_supplier_id?: string | null
+          shelf_life_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          avg_cost?: number
+          base_unit_id?: string
+          category_id?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_stock?: number | null
+          min_stock?: number
+          name?: string
+          perishable?: boolean
+          primary_supplier_id?: string | null
+          shelf_life_days?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredients_base_unit_id_fkey"
+            columns: ["base_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredients_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredient_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredients_primary_supplier_id_fkey"
+            columns: ["primary_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_inventory_movements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          ingredient_id: string
+          movement_type: Database["public"]["Enums"]["dk_movement_type"]
+          observation: string | null
+          quantity_base_unit: number
+          reason: Database["public"]["Enums"]["dk_waste_reason"] | null
+          reference_id: string | null
+          reference_type: string | null
+          unit_cost: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ingredient_id: string
+          movement_type: Database["public"]["Enums"]["dk_movement_type"]
+          observation?: string | null
+          quantity_base_unit: number
+          reason?: Database["public"]["Enums"]["dk_waste_reason"] | null
+          reference_id?: string | null
+          reference_type?: string | null
+          unit_cost?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ingredient_id?: string
+          movement_type?: Database["public"]["Enums"]["dk_movement_type"]
+          observation?: string | null
+          quantity_base_unit?: number
+          reason?: Database["public"]["Enums"]["dk_waste_reason"] | null
+          reference_id?: string | null
+          reference_type?: string | null
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_inventory_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_inventory_movements_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_purchase_items: {
+        Row: {
+          created_at: string
+          id: string
+          ingredient_id: string
+          line_total: number | null
+          purchase_id: string
+          purchase_unit_id: string
+          quantity: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredient_id: string
+          line_total?: number | null
+          purchase_id: string
+          purchase_unit_id: string
+          quantity: number
+          unit_cost: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredient_id?: string
+          line_total?: number | null
+          purchase_id?: string
+          purchase_unit_id?: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_purchase_items_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "dk_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_purchase_items_purchase_unit_id_fkey"
+            columns: ["purchase_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_purchases: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          notes: string | null
+          status: Database["public"]["Enums"]["dk_purchase_status"]
+          subtotal: number
+          supplier_id: string
+          tax: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["dk_purchase_status"]
+          subtotal?: number
+          supplier_id: string
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["dk_purchase_status"]
+          subtotal?: number
+          supplier_id?: string
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_purchases_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_supplier_ingredients: {
+        Row: {
+          agreed_cost: number | null
+          created_at: string
+          id: string
+          ingredient_id: string
+          supplier_id: string
+        }
+        Insert: {
+          agreed_cost?: number | null
+          created_at?: string
+          id?: string
+          ingredient_id: string
+          supplier_id: string
+        }
+        Update: {
+          agreed_cost?: number | null
+          created_at?: string
+          id?: string
+          ingredient_id?: string
+          supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_supplier_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_supplier_ingredients_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_suppliers: {
+        Row: {
+          active: boolean
+          address: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          tax_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dk_units: {
+        Row: {
+          code: string
+          created_at: string
+          factor_to_base: number
+          id: string
+          name: string
+          unit_type: Database["public"]["Enums"]["dk_unit_type"]
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          factor_to_base?: number
+          id?: string
+          name: string
+          unit_type: Database["public"]["Enums"]["dk_unit_type"]
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          factor_to_base?: number
+          id?: string
+          name?: string
+          unit_type?: Database["public"]["Enums"]["dk_unit_type"]
+        }
+        Relationships: []
       }
       dk_users: {
         Row: {
@@ -3023,10 +3506,31 @@ export type Database = {
       }
     }
     Functions: {
+      dk_confirm_purchase: {
+        Args: { p_purchase_id: string }
+        Returns: undefined
+      }
       dk_current_profile_id: { Args: never; Returns: string }
       dk_current_role: {
         Args: never
         Returns: Database["public"]["Enums"]["dk_role"]
+      }
+      dk_register_adjustment: {
+        Args: {
+          p_ingredient_id: string
+          p_observation?: string
+          p_quantity: number
+        }
+        Returns: string
+      }
+      dk_register_waste: {
+        Args: {
+          p_ingredient_id: string
+          p_observation?: string
+          p_quantity: number
+          p_reason: Database["public"]["Enums"]["dk_waste_reason"]
+        }
+        Returns: string
       }
     }
     Enums: {
@@ -3035,6 +3539,8 @@ export type Database = {
         | "Conductor"
         | "Propietario"
         | "Administrador(a)"
+      dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
+      dk_purchase_status: "BORRADOR" | "CONFIRMADA" | "ANULADA"
       dk_role:
         | "ADMIN"
         | "MANAGER"
@@ -3042,6 +3548,8 @@ export type Database = {
         | "INVENTORY"
         | "CASHIER"
         | "DELIVERY"
+      dk_unit_type: "WEIGHT" | "VOLUME" | "UNIT"
+      dk_waste_reason: "VENCIMIENTO" | "DANO" | "ERROR_PREPARACION" | "OTRO"
       estado_incidencia: "abierta" | "en_proceso" | "resuelta" | "cerrada"
       estado_liquidacion: "Pendiente" | "Pagada"
       estado_operativo:
@@ -3195,6 +3703,8 @@ export const Constants = {
         "Propietario",
         "Administrador(a)",
       ],
+      dk_movement_type: ["COMPRA", "MERMA", "AJUSTE", "CONSUMO", "DEVOLUCION"],
+      dk_purchase_status: ["BORRADOR", "CONFIRMADA", "ANULADA"],
       dk_role: [
         "ADMIN",
         "MANAGER",
@@ -3203,6 +3713,8 @@ export const Constants = {
         "CASHIER",
         "DELIVERY",
       ],
+      dk_unit_type: ["WEIGHT", "VOLUME", "UNIT"],
+      dk_waste_reason: ["VENCIMIENTO", "DANO", "ERROR_PREPARACION", "OTRO"],
       estado_incidencia: ["abierta", "en_proceso", "resuelta", "cerrada"],
       estado_liquidacion: ["Pendiente", "Pagada"],
       estado_operativo: [
