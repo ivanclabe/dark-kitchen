@@ -338,6 +338,54 @@ export type Database = {
           },
         ]
       }
+      dk_daily_availability: {
+        Row: {
+          available: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          menu_date: string
+          menu_item_id: string
+          special_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          menu_date: string
+          menu_item_id: string
+          special_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          menu_date?: string
+          menu_item_id?: string
+          special_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_daily_availability_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_daily_availability_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "dk_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_ingredient_categories: {
         Row: {
           created_at: string
@@ -559,6 +607,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dk_menu_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          end_time: string | null
+          id: string
+          menu_id: string
+          product_id: string
+          special_price: number | null
+          start_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          menu_id: string
+          product_id: string
+          special_price?: number | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          menu_id?: string
+          product_id?: string
+          special_price?: number | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_menu_items_menu_id_fkey"
+            columns: ["menu_id"]
+            isOneToOne: false
+            referencedRelation: "dk_menus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_menus: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       dk_product_categories: {
         Row: {
