@@ -17,6 +17,7 @@ import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
 import { OrderDetailPage } from '@/modules/orders/pages/OrderDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { DeliveryPage } from '@/modules/delivery/pages/DeliveryPage'
+import { ReportsPage } from '@/modules/reports/pages/ReportsPage'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
@@ -50,7 +51,7 @@ export const router = createBrowserRouter([
       { path: 'menus/dia', element: <TodayMenuPage /> },
       { path: 'menus/:id', element: <MenuDetailPage /> },
       { path: 'customers', element: <CustomersPage /> },
-      { path: 'reports', element: <PlaceholderPage title="Reportes" phase="Fase 8" /> },
+      { path: 'reports', element: <ReportsPage /> },
       { path: 'users', element: <PlaceholderPage title="Usuarios" phase="Fase 1" /> },
     ],
   },

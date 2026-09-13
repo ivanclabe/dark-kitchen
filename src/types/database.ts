@@ -4191,6 +4191,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["dk_role"]
       }
+      dk_dashboard_summary: { Args: never; Returns: Json }
       dk_dispatch_order: {
         Args: { p_notes?: string; p_order_id: string; p_rider_id: string }
         Returns: undefined
@@ -4212,6 +4213,60 @@ export type Database = {
           p_reason: Database["public"]["Enums"]["dk_waste_reason"]
         }
         Returns: string
+      }
+      dk_report_profitability: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          cogs: number
+          gross_margin: number
+          revenue: number
+        }[]
+      }
+      dk_report_purchases_by_supplier: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          purchase_count: number
+          supplier_id: string
+          supplier_name: string
+          total: number
+        }[]
+      }
+      dk_report_sales_by_day: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          day: string
+          order_count: number
+          total: number
+        }[]
+      }
+      dk_report_top_ingredients_purchased: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          ingredient_id: string
+          ingredient_name: string
+          quantity: number
+          total_cost: number
+        }[]
+      }
+      dk_report_top_products: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          estimated_cost: number
+          margin: number
+          product_id: string
+          product_name: string
+          qty_sold: number
+          revenue: number
+        }[]
+      }
+      dk_report_waste: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          estimated_value: number
+          ingredient_id: string
+          ingredient_name: string
+          quantity: number
+        }[]
       }
     }
     Enums: {
