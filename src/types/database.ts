@@ -419,6 +419,98 @@ export type Database = {
           },
         ]
       }
+      dk_deliveries: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          dispatched_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          rider_id: string | null
+          status: Database["public"]["Enums"]["dk_delivery_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          rider_id?: string | null
+          status?: Database["public"]["Enums"]["dk_delivery_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          rider_id?: string | null
+          status?: Database["public"]["Enums"]["dk_delivery_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_deliveries_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "dk_delivery_riders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_delivery_riders: {
+        Row: {
+          active: boolean
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_delivery_riders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_ingredient_categories: {
         Row: {
           created_at: string
@@ -4099,6 +4191,11 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["dk_role"]
       }
+      dk_dispatch_order: {
+        Args: { p_notes?: string; p_order_id: string; p_rider_id: string }
+        Returns: undefined
+      }
+      dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
       dk_register_adjustment: {
         Args: {
           p_ingredient_id: string
@@ -4123,6 +4220,7 @@ export type Database = {
         | "Conductor"
         | "Propietario"
         | "Administrador(a)"
+      dk_delivery_status: "EN_RUTA" | "ENTREGADO" | "FALLIDO"
       dk_kitchen_item_status: "PENDIENTE" | "EN_PREPARACION" | "LISTO"
       dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
       dk_order_channel: "MANUAL" | "WHATSAPP" | "PHONE"
@@ -4298,6 +4396,7 @@ export const Constants = {
         "Propietario",
         "Administrador(a)",
       ],
+      dk_delivery_status: ["EN_RUTA", "ENTREGADO", "FALLIDO"],
       dk_kitchen_item_status: ["PENDIENTE", "EN_PREPARACION", "LISTO"],
       dk_movement_type: ["COMPRA", "MERMA", "AJUSTE", "CONSUMO", "DEVOLUCION"],
       dk_order_channel: ["MANUAL", "WHATSAPP", "PHONE"],
