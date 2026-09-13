@@ -1,6 +1,6 @@
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
-import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage'
+import { SignUpStaffPage } from '@/modules/auth/pages/SignUpStaffPage'
 import { InventoryPage } from '@/modules/inventory/pages/InventoryPage'
 import { MovementsPage } from '@/modules/inventory/pages/MovementsPage'
 import { PurchasesPage } from '@/modules/purchases/pages/PurchasesPage'
@@ -17,15 +17,24 @@ import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
 import { OrderDetailPage } from '@/modules/orders/pages/OrderDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { DeliveryPage } from '@/modules/delivery/pages/DeliveryPage'
-import { ReportsPage } from '@/modules/reports/pages/ReportsPage'
-import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
+import { UsersPage } from '@/modules/users/pages/UsersPage'
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { ProtectedRoute } from './ProtectedRoute'
 
+// recharts (usado solo por Dashboard y Reportes) pesa bastante — se separa en
+// su propio chunk para que el resto de la app (cocina, pedidos, etc.) no
+// pague ese costo en la carga inicial.
+const DashboardPage = lazy(() =>
+  import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+)
+const ReportsPage = lazy(() => import('@/modules/reports/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })))
+
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/signup-admin', element: <SignUpAdminPage /> },
+  { path: '/signup-staff', element: <SignUpStaffPage /> },
   {
     path: '/',
     element: (
@@ -34,7 +43,14 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <DashboardPage /> },
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<p className="text-neutral-400">Cargando…</p>}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
       { path: 'orders', element: <OrdersPage /> },
       { path: 'orders/:id', element: <OrderDetailPage /> },
       { path: 'kitchen', element: <KitchenPage /> },
@@ -51,8 +67,15 @@ export const router = createBrowserRouter([
       { path: 'menus/dia', element: <TodayMenuPage /> },
       { path: 'menus/:id', element: <MenuDetailPage /> },
       { path: 'customers', element: <CustomersPage /> },
-      { path: 'reports', element: <ReportsPage /> },
-      { path: 'users', element: <PlaceholderPage title="Usuarios" phase="Fase 1" /> },
+      {
+        path: 'reports',
+        element: (
+          <Suspense fallback={<p className="text-neutral-400">Cargando…</p>}>
+            <ReportsPage />
+          </Suspense>
+        ),
+      },
+      { path: 'users', element: <UsersPage /> },
     ],
   },
 ])

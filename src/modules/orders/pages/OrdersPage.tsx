@@ -1,4 +1,5 @@
 import { useCustomers } from '@/modules/customers/hooks/useCustomers'
+import { Chip } from '@/shared/ui/Chip'
 import {
   cardClass,
   inputClass,
@@ -9,7 +10,8 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { useState, type FormEvent } from 'react'
+import { AlertTriangle, ArrowRight, Plus } from 'lucide-react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreateOrder, useOrders } from '../hooks/useOrders'
 import type { OrderStatus } from '../types'
@@ -24,15 +26,26 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   CANCELADO: 'Cancelado',
 }
 
-const STATUS_COLOR: Record<OrderStatus, string> = {
-  NUEVO: 'text-neutral-300',
-  CONFIRMADO: 'text-orange-400',
-  EN_PREPARACION: 'text-orange-400',
-  LISTO: 'text-emerald-400',
-  DESPACHADO: 'text-emerald-400',
-  ENTREGADO: 'text-emerald-500',
-  CANCELADO: 'text-red-400',
+const STATUS_BADGE: Record<OrderStatus, string> = {
+  NUEVO: 'bg-neutral-700 text-neutral-200',
+  CONFIRMADO: 'bg-brasa-500/20 text-brasa-400',
+  EN_PREPARACION: 'bg-brasa-500/20 text-brasa-400',
+  LISTO: 'bg-emerald-500/20 text-emerald-400',
+  DESPACHADO: 'bg-emerald-500/20 text-emerald-400',
+  ENTREGADO: 'bg-emerald-500/20 text-emerald-500',
+  CANCELADO: 'bg-red-500/20 text-red-400',
 }
+
+const FILTERS: { key: OrderStatus | 'TODOS'; label: string }[] = [
+  { key: 'TODOS', label: 'Todos' },
+  { key: 'NUEVO', label: 'Nuevo' },
+  { key: 'CONFIRMADO', label: 'Confirmado' },
+  { key: 'EN_PREPARACION', label: 'En preparación' },
+  { key: 'LISTO', label: 'Listo' },
+  { key: 'DESPACHADO', label: 'Despachado' },
+  { key: 'ENTREGADO', label: 'Entregado' },
+  { key: 'CANCELADO', label: 'Cancelado' },
+]
 
 export function OrdersPage() {
   const { data: orders, isLoading } = useOrders()
@@ -42,6 +55,16 @@ export function OrdersPage() {
 
   const [customerId, setCustomerId] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<OrderStatus | 'TODOS'>('TODOS')
+
+  const counts = useMemo(() => {
+    const map = new Map<OrderStatus | 'TODOS', number>()
+    map.set('TODOS', orders?.length ?? 0)
+    for (const o of orders ?? []) map.set(o.status, (map.get(o.status) ?? 0) + 1)
+    return map
+  }, [orders])
+
+  const filteredOrders = orders?.filter((o) => filter === 'TODOS' || o.status === filter)
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault()
@@ -72,11 +95,17 @@ export function OrdersPage() {
         </div>
         <div className="flex items-end">
           <button type="submit" disabled={createOrder.isPending} className={primaryButtonClass}>
-            Nuevo pedido
+            <Plus size={15} /> Nuevo pedido
           </button>
         </div>
         {error && <p className="text-sm text-red-400 sm:col-span-3">{error}</p>}
       </form>
+
+      <div className="flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <Chip key={f.key} label={f.label} count={counts.get(f.key) ?? 0} active={filter === f.key} onClick={() => setFilter(f.key)} />
+        ))}
+      </div>
 
       <div className={tableWrapperClass}>
         <table className="min-w-full divide-y divide-neutral-800">
@@ -97,21 +126,36 @@ export function OrdersPage() {
                 </td>
               </tr>
             )}
-            {orders?.map((order) => (
-              <tr key={order.id}>
+            {!isLoading && filteredOrders?.length === 0 && (
+              <tr>
+                <td className={tdClass} colSpan={5}>
+                  No hay pedidos en este estado.
+                </td>
+              </tr>
+            )}
+            {filteredOrders?.map((order) => (
+              <tr
+                key={order.id}
+                onClick={() => navigate(`/orders/${order.id}`)}
+                className="cursor-pointer transition-colors hover:bg-neutral-900"
+              >
                 <td className={tdClass}>{order.customerName}</td>
                 <td className={tdClass}>{new Date(order.createdAt).toLocaleString()}</td>
                 <td className={tdClass}>${order.total.toFixed(2)}</td>
-                <td className={`${tdClass} ${STATUS_COLOR[order.status]}`}>
-                  {STATUS_LABEL[order.status]}
+                <td className={tdClass}>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[order.status]}`}>
+                    {STATUS_LABEL[order.status]}
+                  </span>
                   {order.requiresReview && (
-                    <span className="ml-2 rounded bg-yellow-500/20 px-1.5 py-0.5 text-xs text-yellow-400">revisar</span>
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-1.5 py-0.5 text-xs text-yellow-400">
+                      <AlertTriangle size={11} /> revisar
+                    </span>
                   )}
                 </td>
                 <td className={`${tdClass} text-right`}>
-                  <button onClick={() => navigate(`/orders/${order.id}`)} className="text-orange-500 hover:underline">
-                    Ver
-                  </button>
+                  <span className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    Ver <ArrowRight size={13} />
+                  </span>
                 </td>
               </tr>
             ))}

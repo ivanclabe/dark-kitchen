@@ -1,5 +1,14 @@
 import { cardClass, inputClass, secondaryButtonClass, tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
+import {
+  BarChart3,
+  Boxes,
+  DollarSign,
+  ShoppingCart,
+  Trash2,
+  TrendingUp,
+} from 'lucide-react'
 import { useState } from 'react'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   usePurchasesBySupplier,
   useProfitability,
@@ -11,13 +20,13 @@ import {
 
 type ReportKey = 'ventas' | 'productos' | 'compras' | 'insumos' | 'mermas' | 'rentabilidad'
 
-const REPORT_TABS: { key: ReportKey; label: string }[] = [
-  { key: 'ventas', label: 'Ventas' },
-  { key: 'productos', label: 'Productos más vendidos' },
-  { key: 'compras', label: 'Compras por proveedor' },
-  { key: 'insumos', label: 'Insumos más comprados' },
-  { key: 'mermas', label: 'Mermas' },
-  { key: 'rentabilidad', label: 'Rentabilidad' },
+const REPORT_TABS: { key: ReportKey; label: string; icon: typeof TrendingUp }[] = [
+  { key: 'ventas', label: 'Ventas', icon: TrendingUp },
+  { key: 'productos', label: 'Productos más vendidos', icon: BarChart3 },
+  { key: 'compras', label: 'Compras por proveedor', icon: ShoppingCart },
+  { key: 'insumos', label: 'Insumos más comprados', icon: Boxes },
+  { key: 'mermas', label: 'Mermas', icon: Trash2 },
+  { key: 'rentabilidad', label: 'Rentabilidad', icon: DollarSign },
 ]
 
 function money(n: number) {
@@ -33,20 +42,34 @@ function SalesChart({ from, to }: { from: string; to: string }) {
   if (isLoading) return <p className="text-neutral-400">Cargando…</p>
   if (!data || data.length === 0) return <p className="text-neutral-400">Sin ventas en este rango.</p>
 
-  const max = Math.max(...data.map((d) => d.total), 1)
-
   return (
     <div className="space-y-4">
-      <div className={`${cardClass} flex items-end gap-1 overflow-x-auto`} style={{ height: 180 }}>
-        {data.map((d) => (
-          <div key={d.day} className="flex flex-col items-center justify-end" style={{ minWidth: 24 }}>
-            <div
-              className="w-4 rounded-t bg-orange-500"
-              style={{ height: `${Math.max(4, (d.total / max) * 140)}px` }}
-              title={`${d.day}: ${money(d.total)}`}
+      <div className={cardClass} style={{ height: 260 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
+            <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: '#737373', fontSize: 11 }}
+              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              width={48}
             />
-          </div>
-        ))}
+            <Tooltip
+              cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+              contentStyle={{
+                background: '#171717',
+                border: '1px solid #262626',
+                borderRadius: 8,
+                fontSize: 12,
+                color: '#e5e5e5',
+              }}
+              formatter={(value) => [money(Number(value)), 'Ventas']}
+            />
+            <Bar dataKey="total" radius={[6, 6, 0, 0]} fill="#f97316" maxBarSize={40} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
       <div className={tableWrapperClass}>
         <table className="min-w-full divide-y divide-neutral-800">
@@ -281,17 +304,21 @@ export function ReportsPage() {
       </div>
 
       <div className="flex flex-wrap gap-2 border-b border-neutral-800 pb-2">
-        {REPORT_TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`rounded-md px-3 py-1.5 text-sm ${
-              tab === t.key ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:bg-neutral-800'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {REPORT_TABS.map((t) => {
+          const Icon = t.icon
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors ${
+                tab === t.key ? 'bg-brasa-600 text-white' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+              }`}
+            >
+              <Icon size={14} />
+              {t.label}
+            </button>
+          )
+        })}
       </div>
 
       {tab === 'ventas' && <SalesChart from={from} to={to} />}

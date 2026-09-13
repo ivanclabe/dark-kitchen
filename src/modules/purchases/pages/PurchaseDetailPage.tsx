@@ -1,15 +1,17 @@
 import { useIngredients } from '@/modules/inventory/hooks/useIngredients'
 import { useUnits } from '@/shared/hooks/useUnits'
+import { ConfirmDialog } from '@/shared/ui/Modal'
 import {
   cardClass,
   inputClass,
   labelClass,
   primaryButtonClass,
-  secondaryButtonClass,
   tableWrapperClass,
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { useToast } from '@/shared/ui/Toast'
+import { ArrowLeft, CheckCircle2, Paperclip, Plus, Trash2 } from 'lucide-react'
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
@@ -27,6 +29,7 @@ import { getErrorMessage } from '@/shared/utils/errors'
 export function PurchaseDetailPage() {
   const { id } = useParams<{ id: string }>()
   const purchaseId = id ?? ''
+  const { show } = useToast()
 
   const { data: purchase, isLoading } = usePurchase(purchaseId)
   const { data: items } = usePurchaseItems(purchaseId)
@@ -45,6 +48,7 @@ export function PurchaseDetailPage() {
   const [purchaseUnitId, setPurchaseUnitId] = useState('')
   const [unitCost, setUnitCost] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isDraft = purchase?.status === 'BORRADOR'
@@ -73,8 +77,12 @@ export function PurchaseDetailPage() {
     setError(null)
     try {
       await confirmPurchase.mutateAsync()
+      setConfirmOpen(false)
+      show('Compra confirmada — inventario actualizado.')
     } catch (err) {
-      setError(getErrorMessage(err, 'Error al confirmar la compra'))
+      const message = getErrorMessage(err, 'Error al confirmar la compra')
+      setError(message)
+      show(message, 'error')
     }
   }
 
@@ -103,15 +111,21 @@ export function PurchaseDetailPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-50">Factura {purchase.invoiceNumber}</h1>
-          <p className="text-sm text-neutral-400">
-            {purchase.supplierName} · {purchase.invoiceDate} ·{' '}
-            <span className={purchase.status === 'CONFIRMADA' ? 'text-emerald-400' : 'text-neutral-300'}>
+          <p className="mt-1 flex items-center gap-2 text-sm text-neutral-400">
+            <span>
+              {purchase.supplierName} · {purchase.invoiceDate}
+            </span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                purchase.status === 'CONFIRMADA' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-700 text-neutral-200'
+              }`}
+            >
               {purchase.status}
             </span>
           </p>
         </div>
-        <Link to="/purchases" className="text-sm text-neutral-400 hover:text-neutral-200">
-          ← Volver a compras
+        <Link to="/purchases" className="inline-flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-200">
+          <ArrowLeft size={14} /> Volver a compras
         </Link>
       </div>
 
@@ -151,7 +165,7 @@ export function PurchaseDetailPage() {
           </div>
           <div className="flex items-end sm:col-span-5">
             <button type="submit" disabled={addItem.isPending} className={primaryButtonClass}>
-              Agregar línea
+              <Plus size={15} /> Agregar línea
             </button>
           </div>
         </form>
@@ -179,8 +193,11 @@ export function PurchaseDetailPage() {
                 <td className={tdClass}>${item.lineTotal.toFixed(2)}</td>
                 {isDraft && (
                   <td className={`${tdClass} text-right`}>
-                    <button onClick={() => deleteItem.mutate(item.id)} className="text-neutral-400 hover:underline">
-                      Quitar
+                    <button
+                      onClick={() => deleteItem.mutate(item.id)}
+                      className="inline-flex items-center gap-1 text-neutral-400 hover:text-red-400 hover:underline"
+                    >
+                      <Trash2 size={13} /> Quitar
                     </button>
                   </td>
                 )}
@@ -198,12 +215,14 @@ export function PurchaseDetailPage() {
       </div>
 
       <div className={`${cardClass} space-y-3`}>
-        <h2 className="font-medium text-neutral-100">Adjuntos (factura escaneada, fotos)</h2>
+        <h2 className="flex items-center gap-1.5 font-medium text-neutral-100">
+          <Paperclip size={15} /> Adjuntos (factura escaneada, fotos)
+        </h2>
         <input ref={fileInputRef} type="file" onChange={handleFileChange} className="text-sm text-neutral-300" />
         <ul className="space-y-1">
           {attachments?.map((a) => (
             <li key={a.id}>
-              <button onClick={() => handleOpenAttachment(a.filePath)} className="text-sm text-orange-500 hover:underline">
+              <button onClick={() => handleOpenAttachment(a.filePath)} className="text-sm text-brasa-500 hover:underline">
                 {a.fileName}
               </button>
             </li>
@@ -213,20 +232,32 @@ export function PurchaseDetailPage() {
 
       {isDraft && (
         <div className="flex justify-end">
-          <button
-            onClick={handleConfirm}
-            disabled={confirmPurchase.isPending || !items?.length}
-            className={primaryButtonClass}
-          >
-            Confirmar compra (genera movimientos de inventario)
+          <button onClick={() => setConfirmOpen(true)} disabled={!items?.length} className={primaryButtonClass}>
+            <CheckCircle2 size={15} /> Confirmar compra
           </button>
         </div>
       )}
       {!isDraft && (
-        <p className={secondaryButtonClass + ' inline-block cursor-default'}>
-          Compra confirmada — inventario actualizado.
+        <p className="inline-flex items-center gap-1.5 text-sm text-emerald-400">
+          <CheckCircle2 size={15} /> Compra confirmada — inventario actualizado.
         </p>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+        title="Confirmar compra"
+        confirmLabel="Sí, confirmar"
+        pending={confirmPurchase.isPending}
+        description={
+          <p>
+            Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea (${total.toFixed(2)} en
+            total) y actualiza el costo promedio de los insumos. No se puede deshacer — para corregir un error habría
+            que registrar un ajuste manual después.
+          </p>
+        }
+      />
     </div>
   )
 }

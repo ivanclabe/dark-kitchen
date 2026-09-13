@@ -8,7 +8,9 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
+import { Bike, CheckCircle2, MapPin, Plus, Truck } from 'lucide-react'
 import { useState } from 'react'
 import {
   useCreateRider,
@@ -24,6 +26,7 @@ import type { ReadyOrder } from '../types'
 function ReadyOrderRow({ order }: { order: ReadyOrder }) {
   const { data: riders } = useRiders()
   const dispatch = useDispatchOrder()
+  const { show } = useToast()
   const [riderId, setRiderId] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -35,15 +38,26 @@ function ReadyOrderRow({ order }: { order: ReadyOrder }) {
     setError(null)
     try {
       await dispatch.mutateAsync({ orderId: order.orderId, riderId })
+      show(`Pedido de ${order.customerName} despachado.`)
     } catch (err) {
-      setError(getErrorMessage(err, 'Error al despachar el pedido'))
+      const message = getErrorMessage(err, 'Error al despachar el pedido')
+      setError(message)
+      show(message, 'error')
     }
   }
 
   return (
     <tr>
       <td className={tdClass}>{order.customerName}</td>
-      <td className={tdClass}>{order.address ?? '—'}</td>
+      <td className={tdClass}>
+        {order.address ? (
+          <span className="inline-flex items-center gap-1">
+            <MapPin size={12} className="text-neutral-500" /> {order.address}
+          </span>
+        ) : (
+          '—'
+        )}
+      </td>
       <td className={tdClass}>${order.total.toFixed(2)}</td>
       <td className={tdClass}>
         <select value={riderId} onChange={(e) => setRiderId(e.target.value)} className={inputClass}>
@@ -58,7 +72,7 @@ function ReadyOrderRow({ order }: { order: ReadyOrder }) {
       </td>
       <td className={`${tdClass} text-right`}>
         <button onClick={handleDispatch} disabled={dispatch.isPending} className={primaryButtonClass}>
-          Despachar
+          <Bike size={15} /> Despachar
         </button>
       </td>
     </tr>
@@ -104,7 +118,7 @@ function RidersManager() {
         </div>
         <div className="flex items-end">
           <button onClick={handleAdd} disabled={createRider.isPending} className={secondaryButtonClass}>
-            Agregar domiciliario
+            <Plus size={15} /> Agregar domiciliario
           </button>
         </div>
       </div>
@@ -133,10 +147,23 @@ export function DeliveryPage() {
   const { data: readyOrders, isLoading: loadingReady } = useReadyOrders()
   const { data: dispatchedOrders, isLoading: loadingDispatched } = useDispatchedOrders()
   const markDelivered = useMarkDelivered()
+  const { show } = useToast()
+
+  async function handleMarkDelivered(orderId: string, customerName: string) {
+    try {
+      await markDelivered.mutateAsync(orderId)
+      show(`Pedido de ${customerName} entregado.`)
+    } catch (err) {
+      show(getErrorMessage(err, 'Error al marcar como entregado'), 'error')
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-neutral-50">Despachos</h1>
+      <div className="flex items-center gap-2">
+        <Truck size={22} className="text-brasa-500" />
+        <h1 className="text-2xl font-semibold text-neutral-50">Despachos</h1>
+      </div>
 
       <RidersManager />
 
@@ -207,16 +234,24 @@ export function DeliveryPage() {
               {dispatchedOrders?.map((order) => (
                 <tr key={order.orderId}>
                   <td className={tdClass}>{order.customerName}</td>
-                  <td className={tdClass}>{order.address ?? '—'}</td>
+                  <td className={tdClass}>
+                    {order.address ? (
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin size={12} className="text-neutral-500" /> {order.address}
+                      </span>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
                   <td className={tdClass}>${order.total.toFixed(2)}</td>
                   <td className={tdClass}>{order.riderName ?? '—'}</td>
                   <td className={`${tdClass} text-right`}>
                     <button
-                      onClick={() => markDelivered.mutate(order.orderId)}
+                      onClick={() => handleMarkDelivered(order.orderId, order.customerName)}
                       disabled={markDelivered.isPending}
                       className={primaryButtonClass}
                     >
-                      Marcar entregado
+                      <CheckCircle2 size={15} /> Marcar entregado
                     </button>
                   </td>
                 </tr>

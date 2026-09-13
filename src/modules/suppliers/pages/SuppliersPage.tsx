@@ -9,6 +9,7 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Pencil, Plus, Power, Truck } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -86,7 +87,10 @@ export function SuppliersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-neutral-50">Proveedores</h1>
+      <div className="flex items-center gap-2">
+        <Truck size={22} className="text-brasa-500" />
+        <h1 className="text-2xl font-semibold text-neutral-50">Proveedores</h1>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3`}>
         <div>
@@ -118,6 +122,7 @@ export function SuppliersPage() {
 
         <div className="flex items-end gap-2 lg:col-span-3">
           <button type="submit" disabled={submitting} className={primaryButtonClass}>
+            {editingId ? <Pencil size={15} /> : <Plus size={15} />}
             {editingId ? 'Guardar cambios' : 'Agregar proveedor'}
           </button>
           {editingId && (
@@ -154,16 +159,20 @@ export function SuppliersPage() {
                 <td className={tdClass}>{supplier.taxId ?? '—'}</td>
                 <td className={tdClass}>{supplier.phone ?? '—'}</td>
                 <td className={tdClass}>{supplier.email ?? '—'}</td>
-                <td className={tdClass}>{supplier.active ? 'Activo' : 'Inactivo'}</td>
+                <td className={tdClass}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${supplier.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-700 text-neutral-300'}`}>
+                    {supplier.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
                 <td className={`${tdClass} space-x-3 text-right`}>
-                  <button onClick={() => startEdit(supplier)} className="text-orange-500 hover:underline">
-                    Editar
+                  <button onClick={() => startEdit(supplier)} className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    <Pencil size={13} /> Editar
                   </button>
                   <button
                     onClick={() => setActive.mutate({ id: supplier.id, active: !supplier.active })}
-                    className="text-neutral-400 hover:underline"
+                    className="inline-flex items-center gap-1 text-neutral-400 hover:underline"
                   >
-                    {supplier.active ? 'Desactivar' : 'Activar'}
+                    <Power size={13} /> {supplier.active ? 'Desactivar' : 'Activar'}
                   </button>
                 </td>
               </tr>

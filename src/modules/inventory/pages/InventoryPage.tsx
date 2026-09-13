@@ -1,5 +1,6 @@
 import { useSuppliers } from '@/modules/suppliers/hooks/useSuppliers'
 import { useUnits } from '@/shared/hooks/useUnits'
+import { Chip } from '@/shared/ui/Chip'
 import {
   cardClass,
   inputClass,
@@ -11,7 +12,8 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { AlertTriangle, Boxes, ListChecks, Package, Pencil, Plus, Power } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
@@ -54,9 +56,17 @@ const emptyValues: FormValues = {
   shelfLifeDays: undefined,
 }
 
+function isLowStock(ingredient: Ingredient) {
+  return ingredient.stockAvailable <= ingredient.minStock
+}
+
 function stockBadge(ingredient: Ingredient) {
-  if (ingredient.stockAvailable <= ingredient.minStock) {
-    return <span className="rounded bg-red-500/20 px-2 py-0.5 text-xs text-red-400">Bajo mínimo</span>
+  if (isLowStock(ingredient)) {
+    return (
+      <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-400">
+        <AlertTriangle size={11} /> Bajo mínimo
+      </span>
+    )
   }
   return null
 }
@@ -73,6 +83,25 @@ export function InventoryPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategoryName, setNewCategoryName] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<'TODAS' | 'BAJO_MINIMO' | string>('TODAS')
+
+  const categoryCounts = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const ing of ingredients ?? []) {
+      const key = ing.categoryId ?? 'SIN_CATEGORIA'
+      map.set(key, (map.get(key) ?? 0) + 1)
+    }
+    return map
+  }, [ingredients])
+
+  const lowStockCount = ingredients?.filter(isLowStock).length ?? 0
+
+  const filteredIngredients = ingredients?.filter((ing) => {
+    if (categoryFilter === 'TODAS') return true
+    if (categoryFilter === 'BAJO_MINIMO') return isLowStock(ing)
+    if (categoryFilter === 'SIN_CATEGORIA') return !ing.categoryId
+    return ing.categoryId === categoryFilter
+  })
 
   const {
     register,
@@ -135,9 +164,12 @@ export function InventoryPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-50">Inventario — Insumos</h1>
+        <div className="flex items-center gap-2">
+          <Boxes size={22} className="text-brasa-500" />
+          <h1 className="text-2xl font-semibold text-neutral-50">Inventario — Insumos</h1>
+        </div>
         <Link to="/inventory/movimientos" className={secondaryButtonClass}>
-          Ver movimientos / registrar merma o ajuste
+          <ListChecks size={15} /> Movimientos / merma / ajuste
         </Link>
       </div>
 
@@ -213,6 +245,7 @@ export function InventoryPage() {
 
         <div className="flex items-end gap-2 lg:col-span-4">
           <button type="submit" disabled={submitting} className={primaryButtonClass}>
+            {editingId ? <Pencil size={15} /> : <Plus size={15} />}
             {editingId ? 'Guardar cambios' : 'Agregar insumo'}
           </button>
           {editingId && (
@@ -234,8 +267,37 @@ export function InventoryPage() {
           />
         </div>
         <button type="button" onClick={handleAddCategory} className={secondaryButtonClass}>
-          Agregar categoría
+          <Plus size={15} /> Agregar categoría
         </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Chip label="Todas" count={ingredients?.length ?? 0} active={categoryFilter === 'TODAS'} onClick={() => setCategoryFilter('TODAS')} />
+        {lowStockCount > 0 && (
+          <Chip
+            label="Bajo mínimo"
+            count={lowStockCount}
+            active={categoryFilter === 'BAJO_MINIMO'}
+            onClick={() => setCategoryFilter('BAJO_MINIMO')}
+          />
+        )}
+        {categories?.map((c) => (
+          <Chip
+            key={c.id}
+            label={c.name}
+            count={categoryCounts.get(c.id) ?? 0}
+            active={categoryFilter === c.id}
+            onClick={() => setCategoryFilter(c.id)}
+          />
+        ))}
+        {(categoryCounts.get('SIN_CATEGORIA') ?? 0) > 0 && (
+          <Chip
+            label="Sin categoría"
+            count={categoryCounts.get('SIN_CATEGORIA') ?? 0}
+            active={categoryFilter === 'SIN_CATEGORIA'}
+            onClick={() => setCategoryFilter('SIN_CATEGORIA')}
+          />
+        )}
       </div>
 
       <div className={tableWrapperClass}>
@@ -260,26 +322,44 @@ export function InventoryPage() {
                 </td>
               </tr>
             )}
-            {ingredients?.map((ingredient) => (
+            {!isLoading && filteredIngredients?.length === 0 && (
+              <tr>
+                <td className={tdClass} colSpan={8}>
+                  Sin insumos en este filtro.
+                </td>
+              </tr>
+            )}
+            {filteredIngredients?.map((ingredient) => (
               <tr key={ingredient.id} className={ingredient.active ? '' : 'opacity-50'}>
                 <td className={tdClass}>{ingredient.code}</td>
-                <td className={tdClass}>{ingredient.name}</td>
+                <td className={tdClass}>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Package size={13} className="text-neutral-600" /> {ingredient.name}
+                  </span>
+                </td>
                 <td className={tdClass}>{ingredient.categoryName ?? '—'}</td>
                 <td className={tdClass}>
                   {ingredient.stockAvailable} {ingredient.baseUnitCode} {stockBadge(ingredient)}
                 </td>
                 <td className={tdClass}>${ingredient.avgCost.toFixed(2)}</td>
                 <td className={tdClass}>{ingredient.primarySupplierName ?? '—'}</td>
-                <td className={tdClass}>{ingredient.active ? 'Activo' : 'Inactivo'}</td>
+                <td className={tdClass}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ingredient.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-700 text-neutral-300'}`}>
+                    {ingredient.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
                 <td className={`${tdClass} space-x-3 text-right`}>
-                  <button onClick={() => startEdit(ingredient)} className="text-orange-500 hover:underline">
-                    Editar
+                  <button
+                    onClick={() => startEdit(ingredient)}
+                    className="inline-flex items-center gap-1 text-brasa-500 hover:underline"
+                  >
+                    <Pencil size={13} /> Editar
                   </button>
                   <button
                     onClick={() => setActive.mutate({ id: ingredient.id, active: !ingredient.active })}
-                    className="text-neutral-400 hover:underline"
+                    className="inline-flex items-center gap-1 text-neutral-400 hover:underline"
                   >
-                    {ingredient.active ? 'Desactivar' : 'Activar'}
+                    <Power size={13} /> {ingredient.active ? 'Desactivar' : 'Activar'}
                   </button>
                 </td>
               </tr>

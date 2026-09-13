@@ -38,7 +38,7 @@ export function LoginPage() {
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-50 outline-none focus:border-orange-500"
+              className="mt-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-50 outline-none focus:border-brasa-500"
             />
           </div>
 
@@ -53,7 +53,7 @@ export function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-50 outline-none focus:border-orange-500"
+              className="mt-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-50 outline-none focus:border-brasa-500"
             />
           </div>
 
@@ -62,14 +62,14 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-orange-600 px-3 py-2 font-medium text-white transition hover:bg-orange-500 disabled:opacity-60"
+            className="w-full rounded-md bg-gradient-to-b from-brasa-500 to-brasa-600 px-3 py-2 font-medium text-white transition hover:from-brasa-400 hover:to-brasa-500 disabled:opacity-60"
           >
             {submitting ? 'Ingresando…' : 'Ingresar'}
           </button>
         </form>
 
-        <Link to="/signup-admin" className="mt-4 block text-center text-sm text-neutral-400 hover:text-neutral-200">
-          Primera vez — crear cuenta de administrador
+        <Link to="/signup-staff" className="mt-4 block text-center text-sm text-neutral-400 hover:text-neutral-200">
+          ¿Eres nuevo en el equipo? Crear cuenta
         </Link>
       </div>
     </div>

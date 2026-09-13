@@ -8,6 +8,7 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { ArrowRight, Plus } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreatePurchase, usePurchases } from '../hooks/usePurchases'
@@ -17,6 +18,12 @@ const STATUS_LABEL: Record<string, string> = {
   BORRADOR: 'Borrador',
   CONFIRMADA: 'Confirmada',
   ANULADA: 'Anulada',
+}
+
+const STATUS_BADGE: Record<string, string> = {
+  BORRADOR: 'bg-neutral-700 text-neutral-200',
+  CONFIRMADA: 'bg-emerald-500/20 text-emerald-400',
+  ANULADA: 'bg-red-500/20 text-red-400',
 }
 
 export function PurchasesPage() {
@@ -73,7 +80,7 @@ export function PurchasesPage() {
         </div>
         <div className="flex items-end">
           <button type="submit" disabled={createPurchase.isPending} className={primaryButtonClass}>
-            Crear borrador
+            <Plus size={15} /> Crear borrador
           </button>
         </div>
         {error && <p className="text-sm text-red-400 sm:col-span-4">{error}</p>}
@@ -100,16 +107,24 @@ export function PurchasesPage() {
               </tr>
             )}
             {purchases?.map((p) => (
-              <tr key={p.id}>
+              <tr
+                key={p.id}
+                onClick={() => navigate(`/purchases/${p.id}`)}
+                className="cursor-pointer transition-colors hover:bg-neutral-900"
+              >
                 <td className={tdClass}>{p.invoiceNumber}</td>
                 <td className={tdClass}>{p.supplierName}</td>
                 <td className={tdClass}>{p.invoiceDate}</td>
                 <td className={tdClass}>${p.total.toFixed(2)}</td>
-                <td className={tdClass}>{STATUS_LABEL[p.status]}</td>
+                <td className={tdClass}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[p.status]}`}>
+                    {STATUS_LABEL[p.status]}
+                  </span>
+                </td>
                 <td className={`${tdClass} text-right`}>
-                  <button onClick={() => navigate(`/purchases/${p.id}`)} className="text-orange-500 hover:underline">
-                    Ver
-                  </button>
+                  <span className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    Ver <ArrowRight size={13} />
+                  </span>
                 </td>
               </tr>
             ))}

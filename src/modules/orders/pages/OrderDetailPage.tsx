@@ -1,15 +1,18 @@
 import { useProducts } from '@/modules/products/hooks/useProducts'
+import { ConfirmDialog } from '@/shared/ui/Modal'
 import {
   cardClass,
+  dangerButtonClass,
   inputClass,
   labelClass,
   primaryButtonClass,
-  secondaryButtonClass,
   tableWrapperClass,
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
+import { AlertTriangle, ArrowLeft, CheckCircle2, Plus, Trash2, XCircle } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
@@ -33,9 +36,20 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   CANCELADO: 'Cancelado',
 }
 
+const STATUS_BADGE: Record<OrderStatus, string> = {
+  NUEVO: 'bg-neutral-700 text-neutral-200',
+  CONFIRMADO: 'bg-brasa-500/20 text-brasa-400',
+  EN_PREPARACION: 'bg-brasa-500/20 text-brasa-400',
+  LISTO: 'bg-emerald-500/20 text-emerald-400',
+  DESPACHADO: 'bg-emerald-500/20 text-emerald-400',
+  ENTREGADO: 'bg-emerald-500/20 text-emerald-500',
+  CANCELADO: 'bg-red-500/20 text-red-400',
+}
+
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const orderId = id ?? ''
+  const { show } = useToast()
 
   const { data: order, isLoading } = useOrder(orderId)
   const { data: items } = useOrderItems(orderId)
@@ -52,6 +66,8 @@ export function OrderDetailPage() {
   const [unitPrice, setUnitPrice] = useState('')
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
 
   const isNuevo = order?.status === 'NUEVO'
   const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status)
@@ -85,8 +101,11 @@ export function OrderDetailPage() {
     setError(null)
     try {
       await confirmOrder.mutateAsync()
+      setConfirmOpen(false)
+      show('Pedido confirmado — inventario reservado y comanda enviada a cocina.')
     } catch (err) {
       setError(getErrorMessage(err, 'Error al confirmar el pedido'))
+      show(getErrorMessage(err, 'Error al confirmar el pedido'), 'error')
     }
   }
 
@@ -94,8 +113,11 @@ export function OrderDetailPage() {
     setError(null)
     try {
       await cancelOrder.mutateAsync(undefined)
+      setCancelOpen(false)
+      show('Pedido cancelado.', 'info')
     } catch (err) {
       setError(getErrorMessage(err, 'Error al cancelar el pedido'))
+      show(getErrorMessage(err, 'Error al cancelar el pedido'), 'error')
     }
   }
 
@@ -106,17 +128,20 @@ export function OrderDetailPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-50">Pedido — {order.customerName}</h1>
-          <p className="text-sm text-neutral-400">
-            {new Date(order.createdAt).toLocaleString()} · {STATUS_LABEL[order.status]}
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-neutral-400">
+            <span>{new Date(order.createdAt).toLocaleString()}</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[order.status]}`}>
+              {STATUS_LABEL[order.status]}
+            </span>
             {order.requiresReview && (
-              <span className="ml-2 rounded bg-yellow-500/20 px-1.5 py-0.5 text-xs text-yellow-400">
-                revisar devolución
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-2 py-0.5 text-xs text-yellow-400">
+                <AlertTriangle size={12} /> revisar devolución
               </span>
             )}
-          </p>
+          </div>
         </div>
-        <Link to="/orders" className="text-sm text-neutral-400 hover:text-neutral-200">
-          ← Volver a pedidos
+        <Link to="/orders" className="inline-flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-200">
+          <ArrowLeft size={14} /> Volver a pedidos
         </Link>
       </div>
 
@@ -149,7 +174,7 @@ export function OrderDetailPage() {
           </div>
           <div className="flex items-end lg:col-span-5">
             <button type="submit" disabled={addItem.isPending} className={primaryButtonClass}>
-              Agregar plato
+              <Plus size={15} /> Agregar plato
             </button>
           </div>
         </form>
@@ -177,8 +202,11 @@ export function OrderDetailPage() {
                 <td className={tdClass}>{item.observation ?? '—'}</td>
                 {isNuevo && (
                   <td className={`${tdClass} text-right`}>
-                    <button onClick={() => removeItem.mutate(item.id)} className="text-neutral-400 hover:underline">
-                      Quitar
+                    <button
+                      onClick={() => removeItem.mutate(item.id)}
+                      className="inline-flex items-center gap-1 text-neutral-400 hover:text-red-400 hover:underline"
+                    >
+                      <Trash2 size={13} /> Quitar
                     </button>
                   </td>
                 )}
@@ -222,13 +250,13 @@ export function OrderDetailPage() {
 
       <div className={`${cardClass} flex flex-wrap gap-3`}>
         {isNuevo && (
-          <button onClick={handleConfirm} disabled={confirmOrder.isPending || !items?.length} className={primaryButtonClass}>
-            Confirmar pedido (reserva inventario y genera comanda)
+          <button onClick={() => setConfirmOpen(true)} disabled={!items?.length} className={primaryButtonClass}>
+            <CheckCircle2 size={15} /> Confirmar pedido
           </button>
         )}
         {canCancel && (
-          <button onClick={handleCancel} disabled={cancelOrder.isPending} className={secondaryButtonClass}>
-            Cancelar pedido
+          <button onClick={() => setCancelOpen(true)} className={dangerButtonClass}>
+            <XCircle size={15} /> Cancelar pedido
           </button>
         )}
       </div>
@@ -247,6 +275,37 @@ export function OrderDetailPage() {
           </ul>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+        title="Confirmar pedido"
+        confirmLabel="Sí, confirmar"
+        pending={confirmOrder.isPending}
+        description={
+          <p>
+            Esto reserva el inventario necesario para los {items?.length ?? 0} plato(s) del pedido y envía la comanda a
+            cocina. Si algún insumo no tiene stock suficiente, la confirmación se rechazará.
+          </p>
+        }
+      />
+
+      <ConfirmDialog
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        onConfirm={handleCancel}
+        title="Cancelar pedido"
+        confirmLabel="Sí, cancelar"
+        danger
+        pending={cancelOrder.isPending}
+        description={
+          <p>
+            Esta acción no se puede deshacer. Si el pedido ya reservó inventario, la reserva se libera; si algún plato ya
+            fue preparado (consumo registrado), se generará una devolución que quedará marcada para revisión.
+          </p>
+        }
+      />
     </div>
   )
 }

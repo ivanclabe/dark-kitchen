@@ -8,6 +8,7 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { Pencil, Plus, Users } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useCreateCustomer, useCustomers, useUpdateCustomer } from '../hooks/useCustomers'
 import type { Customer } from '../types'
@@ -57,7 +58,10 @@ export function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-neutral-50">Clientes</h1>
+      <div className="flex items-center gap-2">
+        <Users size={22} className="text-brasa-500" />
+        <h1 className="text-2xl font-semibold text-neutral-50">Clientes</h1>
+      </div>
 
       <form onSubmit={handleSubmit} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4`}>
         <div>
@@ -95,6 +99,7 @@ export function CustomersPage() {
         </div>
         <div className="flex items-end gap-2">
           <button type="submit" disabled={submitting} className={primaryButtonClass}>
+            {editingId ? <Pencil size={15} /> : <Plus size={15} />}
             {editingId ? 'Guardar cambios' : 'Agregar cliente'}
           </button>
           {editingId && (
@@ -129,8 +134,8 @@ export function CustomersPage() {
                 <td className={tdClass}>{customer.phone ?? '—'}</td>
                 <td className={tdClass}>{customer.address ?? '—'}</td>
                 <td className={`${tdClass} text-right`}>
-                  <button onClick={() => startEdit(customer)} className="text-orange-500 hover:underline">
-                    Editar
+                  <button onClick={() => startEdit(customer)} className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    <Pencil size={13} /> Editar
                   </button>
                 </td>
               </tr>

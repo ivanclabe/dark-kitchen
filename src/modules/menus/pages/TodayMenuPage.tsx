@@ -1,22 +1,38 @@
-import { primaryButtonClass, tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
+import { dangerButtonClass, primaryButtonClass, tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
+import { useToast } from '@/shared/ui/Toast'
+import { getErrorMessage } from '@/shared/utils/errors'
+import { ArrowLeft, CalendarDays, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useSetTodayAvailability, useTodayMenu } from '../hooks/useMenus'
 
 export function TodayMenuPage() {
   const { data: items, isLoading } = useTodayMenu()
   const setAvailability = useSetTodayAvailability()
+  const { show } = useToast()
 
   const today = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+
+  async function handleToggle(menuItemId: string, productName: string, currentlyAvailable: boolean) {
+    try {
+      await setAvailability.mutateAsync({ menuItemId, available: !currentlyAvailable })
+      show(currentlyAvailable ? `${productName} marcado como agotado por hoy.` : `${productName} disponible de nuevo.`)
+    } catch (err) {
+      show(getErrorMessage(err, 'Error al actualizar la disponibilidad'), 'error')
+    }
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-neutral-50">Menú del día</h1>
-          <p className="text-sm text-neutral-400">{today}</p>
+        <div className="flex items-center gap-2">
+          <CalendarDays size={22} className="text-brasa-500" />
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-50">Menú del día</h1>
+            <p className="text-sm text-neutral-400">{today}</p>
+          </div>
         </div>
-        <Link to="/menus" className="text-sm text-neutral-400 hover:text-neutral-200">
-          ← Volver a menús
+        <Link to="/menus" className="inline-flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-200">
+          <ArrowLeft size={14} /> Volver a menús
         </Link>
       </div>
 
@@ -50,20 +66,29 @@ export function TodayMenuPage() {
                 <td className={tdClass}>{item.menuName}</td>
                 <td className={tdClass}>${item.effectivePrice.toFixed(2)}</td>
                 <td className={tdClass}>
-                  {item.startTime && item.endTime ? `${item.startTime.slice(0, 5)}–${item.endTime.slice(0, 5)}` : 'Todo el día'}
+                  <span className="inline-flex items-center gap-1 text-neutral-400">
+                    <Clock size={12} />
+                    {item.startTime && item.endTime ? `${item.startTime.slice(0, 5)}–${item.endTime.slice(0, 5)}` : 'Todo el día'}
+                  </span>
                 </td>
                 <td className={tdClass}>
                   {item.effectiveAvailable ? (
-                    <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">Disponible</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
+                      <CheckCircle2 size={11} /> Disponible
+                    </span>
                   ) : (
-                    <span className="rounded bg-red-500/20 px-2 py-0.5 text-xs text-red-400">No disponible</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-400">
+                      <XCircle size={11} /> No disponible
+                    </span>
                   )}
                 </td>
                 <td className={`${tdClass} text-right`}>
                   <button
-                    onClick={() => setAvailability.mutate({ menuItemId: item.id, available: !item.effectiveAvailable })}
-                    className={primaryButtonClass}
+                    onClick={() => handleToggle(item.id, item.productName, item.effectiveAvailable)}
+                    disabled={setAvailability.isPending}
+                    className={item.effectiveAvailable ? dangerButtonClass : primaryButtonClass}
                   >
+                    {item.effectiveAvailable ? <XCircle size={15} /> : <CheckCircle2 size={15} />}
                     Marcar {item.effectiveAvailable ? 'agotado' : 'disponible'}
                   </button>
                 </td>

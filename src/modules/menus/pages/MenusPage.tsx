@@ -8,6 +8,7 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
+import { CalendarDays, Power, Soup, UtensilsCrossed } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useCreateMenu, useMenus, useSetMenuActive } from '../hooks/useMenus'
@@ -30,9 +31,12 @@ export function MenusPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-50">Menús</h1>
+        <div className="flex items-center gap-2">
+          <Soup size={22} className="text-brasa-500" />
+          <h1 className="text-2xl font-semibold text-neutral-50">Menús</h1>
+        </div>
         <Link to="/menus/dia" className={secondaryButtonClass}>
-          Menú del día
+          <CalendarDays size={15} /> Menú del día
         </Link>
       </div>
 
@@ -74,16 +78,20 @@ export function MenusPage() {
               <tr key={menu.id} className={menu.active ? '' : 'opacity-50'}>
                 <td className={tdClass}>{menu.name}</td>
                 <td className={tdClass}>{menu.description ?? '—'}</td>
-                <td className={tdClass}>{menu.active ? 'Activo' : 'Inactivo'}</td>
+                <td className={tdClass}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${menu.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-700 text-neutral-300'}`}>
+                    {menu.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
                 <td className={`${tdClass} space-x-3 text-right`}>
-                  <Link to={`/menus/${menu.id}`} className="text-orange-500 hover:underline">
-                    Platos
+                  <Link to={`/menus/${menu.id}`} className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    <UtensilsCrossed size={13} /> Platos
                   </Link>
                   <button
                     onClick={() => setActive.mutate({ id: menu.id, active: !menu.active })}
-                    className="text-neutral-400 hover:underline"
+                    className="inline-flex items-center gap-1 text-neutral-400 hover:underline"
                   >
-                    {menu.active ? 'Desactivar' : 'Activar'}
+                    <Power size={13} /> {menu.active ? 'Desactivar' : 'Activar'}
                   </button>
                 </td>
               </tr>

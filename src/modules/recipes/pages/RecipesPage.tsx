@@ -1,5 +1,6 @@
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import { tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
+import { BookOpen, Pencil, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function RecipesPage() {
@@ -7,7 +8,10 @@ export function RecipesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-neutral-50">Recetas</h1>
+      <div className="flex items-center gap-2">
+        <BookOpen size={22} className="text-brasa-500" />
+        <h1 className="text-2xl font-semibold text-neutral-50">Recetas</h1>
+      </div>
       <p className="text-sm text-neutral-400">
         Cada plato tiene su propia receta versionada. Selecciona un plato para ver o editar su receta actual.
       </p>
@@ -34,11 +38,20 @@ export function RecipesPage() {
               <tr key={product.id}>
                 <td className={tdClass}>{product.name}</td>
                 <td className={tdClass}>
-                  {product.activeRecipeVersion ? `v${product.activeRecipeVersion}` : 'Sin receta'}
+                  {product.activeRecipeVersion ? (
+                    <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-400">
+                      v{product.activeRecipeVersion}
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-neutral-700 px-2 py-0.5 text-xs font-medium text-neutral-300">
+                      Sin receta
+                    </span>
+                  )}
                 </td>
                 <td className={tdClass}>${product.estimatedCost.toFixed(2)}</td>
                 <td className={`${tdClass} text-right`}>
-                  <Link to={`/recipes/${product.id}`} className="text-orange-500 hover:underline">
+                  <Link to={`/recipes/${product.id}`} className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    {product.activeRecipeVersion ? <Pencil size={13} /> : <Plus size={13} />}
                     {product.activeRecipeVersion ? 'Editar receta' : 'Crear receta'}
                   </Link>
                 </td>

@@ -9,6 +9,7 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { BookOpen, ImagePlus, Pencil, Plus, Power, UtensilsCrossed } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -105,7 +106,10 @@ export function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-neutral-50">Platos</h1>
+      <div className="flex items-center gap-2">
+        <UtensilsCrossed size={22} className="text-brasa-500" />
+        <h1 className="text-2xl font-semibold text-neutral-50">Platos</h1>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4`}>
         <div>
@@ -139,6 +143,7 @@ export function ProductsPage() {
 
         <div className="flex items-end gap-2">
           <button type="submit" disabled={submitting} className={primaryButtonClass}>
+            {editingId ? <Pencil size={15} /> : <Plus size={15} />}
             {editingId ? 'Guardar cambios' : 'Agregar plato'}
           </button>
           {editingId && (
@@ -160,7 +165,7 @@ export function ProductsPage() {
           />
         </div>
         <button type="button" onClick={handleAddCategory} className={secondaryButtonClass}>
-          Agregar categoría
+          <Plus size={15} /> Agregar categoría
         </button>
       </div>
 
@@ -200,22 +205,26 @@ export function ProductsPage() {
                     <span className="text-neutral-500">Sin receta</span>
                   )}
                 </td>
-                <td className={tdClass}>{product.active ? 'Activo' : 'Inactivo'}</td>
+                <td className={tdClass}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${product.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-700 text-neutral-300'}`}>
+                    {product.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
                 <td className={`${tdClass} space-x-3 text-right`}>
-                  <Link to={`/recipes/${product.id}`} className="text-orange-500 hover:underline">
-                    Receta
+                  <Link to={`/recipes/${product.id}`} className="inline-flex items-center gap-1 text-brasa-500 hover:underline">
+                    <BookOpen size={13} /> Receta
                   </Link>
-                  <button onClick={() => startEdit(product)} className="text-neutral-300 hover:underline">
-                    Editar
+                  <button onClick={() => startEdit(product)} className="inline-flex items-center gap-1 text-neutral-300 hover:underline">
+                    <Pencil size={13} /> Editar
                   </button>
                   <button
                     onClick={() => setActive.mutate({ id: product.id, active: !product.active })}
-                    className="text-neutral-400 hover:underline"
+                    className="inline-flex items-center gap-1 text-neutral-400 hover:underline"
                   >
-                    {product.active ? 'Desactivar' : 'Activar'}
+                    <Power size={13} /> {product.active ? 'Desactivar' : 'Activar'}
                   </button>
-                  <label className="cursor-pointer text-neutral-400 hover:underline">
-                    Imagen
+                  <label className="inline-flex cursor-pointer items-center gap-1 text-neutral-400 hover:underline">
+                    <ImagePlus size={13} /> Imagen
                     <input
                       type="file"
                       accept="image/*"
