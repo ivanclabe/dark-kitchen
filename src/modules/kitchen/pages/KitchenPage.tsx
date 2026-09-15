@@ -6,6 +6,8 @@ import { useKitchenQueue } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import { ComingSoonView } from '../views/ComingSoonView'
 import { GridView } from '../views/GridView'
+import { KanbanView } from '../views/KanbanView'
+import { ListView } from '../views/ListView'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 
 type KitchenView = 'grid' | 'kanban' | 'list' | 'sla'
@@ -89,8 +91,12 @@ export function KitchenPage() {
       {view === 'grid' && (
         <GridView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
       )}
-      {view === 'kanban' && <ComingSoonView icon={Kanban} label="Kanban" />}
-      {view === 'list' && <ComingSoonView icon={List} label="Lista" />}
+      {view === 'kanban' && (
+        <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
+      )}
+      {view === 'list' && (
+        <ListView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
+      )}
       {view === 'sla' && <ComingSoonView icon={Gauge} label="SLA" />}
     </div>
   )

@@ -4,7 +4,7 @@ import type { KitchenTicket } from '../types'
 interface OrderRow {
   id: string
   order_number: number
-  status: 'CONFIRMADO' | 'EN_PREPARACION'
+  status: 'CONFIRMADO' | 'EN_PREPARACION' | 'LISTO'
   notes: string | null
   created_at: string
   dk_customers: { full_name: string } | null
@@ -32,7 +32,11 @@ export async function listKitchenQueue(): Promise<KitchenTicket[]> {
        dk_kitchen_tickets ( priority ),
        dk_order_items ( id, quantity, observation, kitchen_status, dk_products ( name ) )`,
     )
-    .in('status', ['CONFIRMADO', 'EN_PREPARACION'])
+    // LISTO se incluye a propósito: Cocina necesita ver qué pedidos ya están
+    // listos y esperando que Despachos los recoja (columna "Listo" del
+    // Kanban) — es una ampliación de lectura, no toca ningún RPC ni regla
+    // de negocio existente.
+    .in('status', ['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
     .order('created_at')
 
   if (error) throw error

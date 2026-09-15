@@ -1,4 +1,4 @@
-import { Clock, Flame } from 'lucide-react'
+import { CheckCircle2, Clock, Flame } from 'lucide-react'
 import type { ComponentType } from 'react'
 import type { KitchenItemStatus, KitchenTicket } from '../types'
 
@@ -27,6 +27,7 @@ export const ORDER_STATUS_CONFIG: Record<
 > = {
   CONFIRMADO: { label: 'Confirmado', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
   EN_PREPARACION: { label: 'En preparación', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
+  LISTO: { label: 'Listo', badge: 'bg-emerald-500/20 text-emerald-400', accent: 'border-l-emerald-500', icon: CheckCircle2 },
 }
 
 // Umbrales de urgencia por tiempo — configurables acá, sin necesidad de una

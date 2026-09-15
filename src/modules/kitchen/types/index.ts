@@ -1,5 +1,7 @@
 export type KitchenItemStatus = 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO'
 
+export type KitchenOrderStatus = 'CONFIRMADO' | 'EN_PREPARACION' | 'LISTO'
+
 export interface KitchenTicketItem {
   id: string
   productName: string
@@ -12,7 +14,7 @@ export interface KitchenTicket {
   orderId: string
   orderNumber: number
   customerName: string
-  orderStatus: 'CONFIRMADO' | 'EN_PREPARACION'
+  orderStatus: KitchenOrderStatus
   createdAt: string
   notes: string | null
   priority: number
