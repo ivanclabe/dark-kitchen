@@ -14,7 +14,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Boxes, ListChecks, Package, Pencil, Plus, Power } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
 import {
@@ -107,8 +107,11 @@ export function InventoryPage() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormValues, unknown, FormOutput>({ resolver: zodResolver(schema), defaultValues: emptyValues })
+
+  const perishable = useWatch({ control, name: 'perishable' })
 
   function startEdit(ingredient: Ingredient) {
     setEditingId(ingredient.id)
@@ -234,10 +237,12 @@ export function InventoryPage() {
             Perecedero
           </label>
         </div>
-        <div>
-          <label className={labelClass}>Vida útil (días)</label>
-          <input type="number" {...register('shelfLifeDays')} className={inputClass} />
-        </div>
+        {perishable && (
+          <div>
+            <label className={labelClass}>Vida útil (días)</label>
+            <input type="number" {...register('shelfLifeDays')} className={inputClass} autoFocus />
+          </div>
+        )}
         <div className="sm:col-span-2">
           <label className={labelClass}>Descripción</label>
           <input {...register('description')} className={inputClass} />

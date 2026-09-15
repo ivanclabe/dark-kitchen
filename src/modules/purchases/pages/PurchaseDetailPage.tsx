@@ -1,5 +1,6 @@
 import { useIngredients } from '@/modules/inventory/hooks/useIngredients'
 import { useUnits } from '@/shared/hooks/useUnits'
+import { Combobox } from '@/shared/ui/Combobox'
 import { ConfirmDialog } from '@/shared/ui/Modal'
 import {
   cardClass,
@@ -11,8 +12,8 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
-import { ArrowLeft, CheckCircle2, Paperclip, Plus, Trash2 } from 'lucide-react'
-import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { ArrowLeft, CheckCircle2, History, Paperclip, Plus, Trash2 } from 'lucide-react'
+import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   useAddPurchaseItem,
@@ -20,6 +21,7 @@ import {
   useAttachments,
   useConfirmPurchase,
   useDeletePurchaseItem,
+  useLastIngredientPrice,
   usePurchase,
   usePurchaseItems,
   useUploadAttachment,
@@ -51,8 +53,21 @@ export function PurchaseDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const { data: lastPrice } = useLastIngredientPrice(ingredientId)
+
   const isDraft = purchase?.status === 'BORRADOR'
   const total = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
+
+  const ingredientOptions = useMemo(
+    () => ingredients?.map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [],
+    [ingredients],
+  )
+
+  function applyLastPrice() {
+    if (!lastPrice) return
+    setUnitCost(String(lastPrice.unitCost))
+    setPurchaseUnitId(lastPrice.purchaseUnitId)
+  }
 
   async function handleAddItem(e: FormEvent) {
     e.preventDefault()
@@ -135,14 +150,24 @@ export function PurchaseDetailPage() {
         <form onSubmit={handleAddItem} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-5`}>
           <div className="sm:col-span-2">
             <label className={labelClass}>Insumo</label>
-            <select value={ingredientId} onChange={(e) => setIngredientId(e.target.value)} className={inputClass} required>
-              <option value="">Selecciona…</option>
-              {ingredients?.map((i) => (
-                <option key={i.id} value={i.id}>
-                  {i.name}
-                </option>
-              ))}
-            </select>
+            <Combobox
+              value={ingredientId}
+              onChange={setIngredientId}
+              options={ingredientOptions}
+              placeholder="Nombre o código…"
+              emptyMessage="Sin insumos con ese nombre o código"
+              required
+            />
+            {lastPrice && (
+              <button
+                type="button"
+                onClick={applyLastPrice}
+                className="mt-1.5 inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline"
+              >
+                <History size={11} /> Último: ${lastPrice.unitCost.toFixed(2)}/{lastPrice.purchaseUnitCode} ·{' '}
+                {lastPrice.supplierName} · usar
+              </button>
+            )}
           </div>
           <div>
             <label className={labelClass}>Cantidad</label>

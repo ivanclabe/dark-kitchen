@@ -2,6 +2,7 @@ import { useIngredients } from '@/modules/inventory/hooks/useIngredients'
 import type { Ingredient } from '@/modules/inventory/types'
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import type { Product } from '@/modules/products/types'
+import { Combobox } from '@/shared/ui/Combobox'
 import {
   cardClass,
   inputClass,
@@ -11,7 +12,7 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useActiveRecipe, useCreateRecipeVersion } from '../hooks/useRecipes'
 import type { ActiveRecipe, RecipeItemDraft } from '../types'
@@ -39,6 +40,11 @@ function RecipeForm({
     })),
   )
   const [error, setError] = useState<string | null>(null)
+
+  const ingredientOptions = useMemo(
+    () => ingredients.map((i) => ({ value: i.id, label: i.name, sublabel: `${i.code} · ${i.baseUnitCode}` })),
+    [ingredients],
+  )
 
   function addRow() {
     setRows((r) => [...r, { key: crypto.randomUUID(), ingredientId: '', quantity: 0 }])
@@ -103,19 +109,14 @@ function RecipeForm({
               const ingredient = ingredients.find((i) => i.id === row.ingredientId)
               return (
                 <tr key={row.key}>
-                  <td className={tdClass}>
-                    <select
+                  <td className={`${tdClass} min-w-56`}>
+                    <Combobox
                       value={row.ingredientId}
-                      onChange={(e) => updateRow(row.key, { ingredientId: e.target.value })}
-                      className={inputClass}
-                    >
-                      <option value="">Selecciona…</option>
-                      {ingredients.map((i) => (
-                        <option key={i.id} value={i.id}>
-                          {i.name} ({i.baseUnitCode})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => updateRow(row.key, { ingredientId: value })}
+                      options={ingredientOptions}
+                      placeholder="Nombre o código…"
+                      emptyMessage="Sin insumos con ese nombre o código"
+                    />
                   </td>
                   <td className={tdClass}>
                     <input

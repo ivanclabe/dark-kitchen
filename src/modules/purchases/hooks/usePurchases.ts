@@ -5,6 +5,7 @@ import {
   createPurchase,
   deletePurchaseItem,
   getAttachmentUrl,
+  getLastIngredientPrice,
   getPurchase,
   listAttachments,
   listPurchaseItems,
@@ -83,4 +84,12 @@ export function useUploadAttachment(purchaseId: string) {
 
 export function useAttachmentUrl() {
   return useMutation({ mutationFn: (filePath: string) => getAttachmentUrl(filePath) })
+}
+
+export function useLastIngredientPrice(ingredientId: string) {
+  return useQuery({
+    queryKey: ['last-ingredient-price', ingredientId],
+    queryFn: () => getLastIngredientPrice(ingredientId),
+    enabled: !!ingredientId,
+  })
 }

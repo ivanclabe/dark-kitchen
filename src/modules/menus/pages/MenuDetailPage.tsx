@@ -1,4 +1,5 @@
 import { useProducts } from '@/modules/products/hooks/useProducts'
+import { Combobox } from '@/shared/ui/Combobox'
 import {
   cardClass,
   inputClass,
@@ -9,7 +10,7 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAddMenuItem, useMenuItems, useMenus, useRemoveMenuItem, useSetMenuItemActive } from '../hooks/useMenus'
 
@@ -32,7 +33,15 @@ export function MenuDetailPage() {
   const [endTime, setEndTime] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  const availableProducts = products?.filter((p) => !items?.some((i) => i.productId === p.id))
+  const availableProducts = useMemo(
+    () => products?.filter((p) => !items?.some((i) => i.productId === p.id)),
+    [products, items],
+  )
+
+  const productOptions = useMemo(
+    () => availableProducts?.map((p) => ({ value: p.id, label: p.name, sublabel: `$${p.price.toFixed(2)}` })) ?? [],
+    [availableProducts],
+  )
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault()
@@ -65,14 +74,14 @@ export function MenuDetailPage() {
       <form onSubmit={handleAdd} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5`}>
         <div className="lg:col-span-2">
           <label className={labelClass}>Plato</label>
-          <select value={productId} onChange={(e) => setProductId(e.target.value)} className={inputClass} required>
-            <option value="">Selecciona…</option>
-            {availableProducts?.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} (${p.price.toFixed(2)})
-              </option>
-            ))}
-          </select>
+          <Combobox
+            value={productId}
+            onChange={setProductId}
+            options={productOptions}
+            placeholder="Buscar plato…"
+            emptyMessage="Sin platos disponibles con ese nombre"
+            required
+          />
         </div>
         <div>
           <label className={labelClass}>Precio especial</label>

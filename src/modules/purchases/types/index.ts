@@ -46,3 +46,11 @@ export interface Attachment {
   filePath: string
   createdAt: string
 }
+
+export interface LastIngredientPrice {
+  unitCost: number
+  purchaseUnitId: string
+  purchaseUnitCode: string
+  supplierName: string
+  invoiceDate: string
+}

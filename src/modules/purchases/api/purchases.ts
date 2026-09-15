@@ -1,5 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { Attachment, Purchase, PurchaseInput, PurchaseItem, PurchaseItemInput } from '../types'
+import type { Attachment, LastIngredientPrice, Purchase, PurchaseInput, PurchaseItem, PurchaseItemInput } from '../types'
 
 interface PurchaseRow {
   id: string
@@ -125,6 +125,35 @@ export async function addPurchaseItem(purchaseId: string, input: PurchaseItemInp
 export async function deletePurchaseItem(itemId: string): Promise<void> {
   const { error } = await supabase.from('dk_purchase_items').delete().eq('id', itemId)
   if (error) throw error
+}
+
+interface LastPriceRow {
+  unit_cost: number
+  purchase_unit_id: string
+  dk_units: { code: string } | null
+  dk_purchases: { invoice_date: string; dk_suppliers: { name: string } | null } | null
+}
+
+export async function getLastIngredientPrice(ingredientId: string): Promise<LastIngredientPrice | null> {
+  const { data, error } = await supabase
+    .from('dk_purchase_items')
+    .select('unit_cost, purchase_unit_id, dk_units ( code ), dk_purchases!inner ( invoice_date, status, dk_suppliers ( name ) )')
+    .eq('ingredient_id', ingredientId)
+    .eq('dk_purchases.status', 'CONFIRMADA')
+    .order('invoice_date', { ascending: false, referencedTable: 'dk_purchases' })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  if (!data) return null
+  const row = data as unknown as LastPriceRow
+  return {
+    unitCost: Number(row.unit_cost),
+    purchaseUnitId: row.purchase_unit_id,
+    purchaseUnitCode: row.dk_units?.code ?? '',
+    supplierName: row.dk_purchases?.dk_suppliers?.name ?? '—',
+    invoiceDate: row.dk_purchases?.invoice_date ?? '',
+  }
 }
 
 export async function listAttachments(purchaseId: string): Promise<Attachment[]> {
