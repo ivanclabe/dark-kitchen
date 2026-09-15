@@ -63,20 +63,25 @@ export async function listIngredients(): Promise<Ingredient[]> {
   return (data as unknown as IngredientRow[]).map(mapRow)
 }
 
-export async function createIngredient(input: IngredientInput): Promise<void> {
-  const { error } = await supabase.from('dk_ingredients').insert({
-    code: input.code,
-    name: input.name,
-    description: input.description ?? null,
-    category_id: input.categoryId ?? null,
-    base_unit_id: input.baseUnitId,
-    primary_supplier_id: input.primarySupplierId ?? null,
-    min_stock: input.minStock,
-    max_stock: input.maxStock ?? null,
-    perishable: input.perishable,
-    shelf_life_days: input.shelfLifeDays ?? null,
-  })
+export async function createIngredient(input: IngredientInput): Promise<Ingredient> {
+  const { data, error } = await supabase
+    .from('dk_ingredients')
+    .insert({
+      code: input.code,
+      name: input.name,
+      description: input.description ?? null,
+      category_id: input.categoryId ?? null,
+      base_unit_id: input.baseUnitId,
+      primary_supplier_id: input.primarySupplierId ?? null,
+      min_stock: input.minStock,
+      max_stock: input.maxStock ?? null,
+      perishable: input.perishable,
+      shelf_life_days: input.shelfLifeDays ?? null,
+    })
+    .select(SELECT)
+    .single()
   if (error) throw error
+  return mapRow(data as unknown as IngredientRow)
 }
 
 export async function updateIngredient(id: string, input: IngredientInput): Promise<void> {

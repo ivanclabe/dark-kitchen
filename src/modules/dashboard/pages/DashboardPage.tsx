@@ -1,5 +1,6 @@
 import { useSalesByDay } from '@/modules/reports/hooks/useReports'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { primaryButtonClass, secondaryButtonClass } from '@/shared/ui/formClasses'
 import { cardClass } from '@/shared/ui/formClasses'
 import {
   AlertTriangle,
@@ -9,6 +10,7 @@ import {
   ClipboardList,
   Flame,
   PackageSearch,
+  Plus,
   ShoppingCart,
   Trash2,
   TrendingUp,
@@ -16,6 +18,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { Link } from 'react-router-dom'
 import { useDashboardSummary } from '../hooks/useDashboard'
 
 function KpiCard({
@@ -110,9 +113,22 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-50">Hola, {profile?.fullName ?? 'usuario'}</h1>
-        <p className="mt-1 text-sm text-neutral-400">Rol: {profile?.role}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-neutral-50">Hola, {profile?.fullName ?? 'usuario'}</h1>
+          <p className="mt-1 text-sm text-neutral-400">Rol: {profile?.role}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/orders" className={primaryButtonClass}>
+            <Plus size={15} /> Nuevo pedido
+          </Link>
+          <Link to="/purchases" className={secondaryButtonClass}>
+            <ShoppingCart size={15} /> Nueva compra
+          </Link>
+          <Link to="/kitchen" className={secondaryButtonClass}>
+            <ChefHat size={15} /> Ver cocina
+          </Link>
+        </div>
       </div>
 
       {isLoading && <p className="text-neutral-400">Cargando…</p>}

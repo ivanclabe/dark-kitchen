@@ -1,4 +1,6 @@
+import { CreateIngredientModal } from '@/modules/inventory/components/CreateIngredientModal'
 import { useIngredients } from '@/modules/inventory/hooks/useIngredients'
+import type { Ingredient } from '@/modules/inventory/types'
 import { useUnits } from '@/shared/hooks/useUnits'
 import { Combobox } from '@/shared/ui/Combobox'
 import { ConfirmDialog } from '@/shared/ui/Modal'
@@ -51,6 +53,7 @@ export function PurchaseDetailPage() {
   const [unitCost, setUnitCost] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [createIngredientQuery, setCreateIngredientQuery] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: lastPrice } = useLastIngredientPrice(ingredientId)
@@ -67,6 +70,11 @@ export function PurchaseDetailPage() {
     if (!lastPrice) return
     setUnitCost(String(lastPrice.unitCost))
     setPurchaseUnitId(lastPrice.purchaseUnitId)
+  }
+
+  function handleIngredientCreated(ingredient: Ingredient) {
+    setCreateIngredientQuery(null)
+    setIngredientId(ingredient.id)
   }
 
   async function handleAddItem(e: FormEvent) {
@@ -156,6 +164,7 @@ export function PurchaseDetailPage() {
               options={ingredientOptions}
               placeholder="Nombre o código…"
               emptyMessage="Sin insumos con ese nombre o código"
+              onCreateNew={(query) => setCreateIngredientQuery(query)}
               required
             />
             {lastPrice && (
@@ -282,6 +291,13 @@ export function PurchaseDetailPage() {
             que registrar un ajuste manual después.
           </p>
         }
+      />
+
+      <CreateIngredientModal
+        open={createIngredientQuery !== null}
+        onClose={() => setCreateIngredientQuery(null)}
+        initialQuery={createIngredientQuery ?? ''}
+        onCreated={handleIngredientCreated}
       />
     </div>
   )

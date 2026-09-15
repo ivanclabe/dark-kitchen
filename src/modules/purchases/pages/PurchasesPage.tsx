@@ -1,4 +1,7 @@
+import { CreateSupplierModal } from '@/modules/suppliers/components/CreateSupplierModal'
 import { useSuppliers } from '@/modules/suppliers/hooks/useSuppliers'
+import type { Supplier } from '@/modules/suppliers/types'
+import { Combobox } from '@/shared/ui/Combobox'
 import {
   cardClass,
   inputClass,
@@ -9,7 +12,7 @@ import {
   thClass,
 } from '@/shared/ui/formClasses'
 import { ArrowRight, Plus } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreatePurchase, usePurchases } from '../hooks/usePurchases'
 import { getErrorMessage } from '@/shared/utils/errors'
@@ -36,6 +39,17 @@ export function PurchasesPage() {
   const [invoiceNumber, setInvoiceNumber] = useState('')
   const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = useState<string | null>(null)
+  const [createSupplierQuery, setCreateSupplierQuery] = useState<string | null>(null)
+
+  const supplierOptions = useMemo(
+    () => suppliers?.map((s) => ({ value: s.id, label: s.name, sublabel: s.phone ?? undefined })) ?? [],
+    [suppliers],
+  )
+
+  function handleSupplierCreated(supplier: Supplier) {
+    setCreateSupplierQuery(null)
+    setSupplierId(supplier.id)
+  }
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault()
@@ -55,14 +69,15 @@ export function PurchasesPage() {
       <form onSubmit={handleCreate} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-4`}>
         <div>
           <label className={labelClass}>Proveedor *</label>
-          <select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className={inputClass} required>
-            <option value="">Selecciona…</option>
-            {suppliers?.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <Combobox
+            value={supplierId}
+            onChange={setSupplierId}
+            options={supplierOptions}
+            placeholder="Buscar proveedor…"
+            emptyMessage="Sin proveedores con ese nombre"
+            onCreateNew={(query) => setCreateSupplierQuery(query)}
+            required
+          />
         </div>
         <div>
           <label className={labelClass}>N.º de factura *</label>
@@ -85,6 +100,13 @@ export function PurchasesPage() {
         </div>
         {error && <p className="text-sm text-red-400 sm:col-span-4">{error}</p>}
       </form>
+
+      <CreateSupplierModal
+        open={createSupplierQuery !== null}
+        onClose={() => setCreateSupplierQuery(null)}
+        initialQuery={createSupplierQuery ?? ''}
+        onCreated={handleSupplierCreated}
+      />
 
       <div className={tableWrapperClass}>
         <table className="min-w-full divide-y divide-neutral-800">
