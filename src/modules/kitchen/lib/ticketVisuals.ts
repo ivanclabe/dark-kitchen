@@ -23,7 +23,7 @@ export const ITEM_STATUS_LABEL: Record<KitchenItemStatus, string> = {
 
 export const ORDER_STATUS_CONFIG: Record<
   KitchenTicket['orderStatus'],
-  { label: string; badge: string; accent: string; icon: ComponentType<{ size?: number }> }
+  { label: string; badge: string; accent: string; icon: ComponentType<{ size?: number; className?: string }> }
 > = {
   CONFIRMADO: { label: 'Confirmado', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
   EN_PREPARACION: { label: 'En preparación', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
