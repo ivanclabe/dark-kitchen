@@ -3,33 +3,67 @@ import { cardClass, secondaryButtonClass } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import {
+  AlertTriangle,
   Bell,
   ChefHat,
   Check,
   CheckCheck,
   Clock,
   Flag,
+  Flame,
   MessageSquareText,
   PlayCircle,
   Volume2,
   VolumeX,
 } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, type ComponentType } from 'react'
 import { useAdvanceKitchenItem, useAdvanceTicketItems, useKitchenQueue, useSetTicketPriority } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import type { KitchenItemStatus, KitchenTicket, KitchenTicketItem } from '../types'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 
-const STATUS_BADGE: Record<KitchenItemStatus, string> = {
+// Paleta semántica sin colisiones: CONFIRMADO (azul, "esperando") y
+// EN_PREPARACION (ámbar, "en marcha") a nivel de pedido y de plato;
+// PRIORITARIO usa violeta — antes usaba ámbar, el mismo tono que
+// EN_PREPARACION, lo que hacía difícil distinguir un ticket prioritario de
+// uno simplemente en preparación de un vistazo.
+const ITEM_STATUS_BADGE: Record<KitchenItemStatus, string> = {
   PENDIENTE: 'bg-neutral-700 text-neutral-200',
-  EN_PREPARACION: 'bg-brasa-500/20 text-brasa-400',
+  EN_PREPARACION: 'bg-amber-500/20 text-amber-400',
   LISTO: 'bg-emerald-500/20 text-emerald-400',
 }
 
-const STATUS_LABEL: Record<KitchenItemStatus, string> = {
+const ITEM_STATUS_LABEL: Record<KitchenItemStatus, string> = {
   PENDIENTE: 'Pendiente',
   EN_PREPARACION: 'En preparación',
   LISTO: 'Listo',
+}
+
+const ORDER_STATUS_CONFIG: Record<
+  KitchenTicket['orderStatus'],
+  { label: string; badge: string; accent: string; icon: ComponentType<{ size?: number }> }
+> = {
+  CONFIRMADO: { label: 'Confirmado', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
+  EN_PREPARACION: { label: 'En preparación', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
+}
+
+// Umbrales de urgencia por tiempo — configurables acá, sin necesidad de una
+// tabla en base de datos para esto. El indicador queda contenido a su
+// propio badge (no tiñe la tarjeta completa) para no competir visualmente
+// con el color de estado o de prioridad.
+const TIME_WARN_MIN = 10
+const TIME_LATE_MIN = 20
+
+function timeTier(minutesAgo: number): 'normal' | 'atencion' | 'retrasado' {
+  if (minutesAgo >= TIME_LATE_MIN) return 'retrasado'
+  if (minutesAgo >= TIME_WARN_MIN) return 'atencion'
+  return 'normal'
+}
+
+const TIME_TIER_STYLE: Record<ReturnType<typeof timeTier>, string> = {
+  normal: 'text-neutral-500',
+  atencion: 'text-amber-400',
+  retrasado: 'text-red-400',
 }
 
 function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: () => void }) {
@@ -60,8 +94,8 @@ function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: ()
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[item.kitchenStatus]}`}>
-            {STATUS_LABEL[item.kitchenStatus]}
+          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ITEM_STATUS_BADGE[item.kitchenStatus]}`}>
+            {ITEM_STATUS_LABEL[item.kitchenStatus]}
           </span>
           {item.kitchenStatus !== 'LISTO' && (
             <button
@@ -91,8 +125,10 @@ function TicketCard({
   onAcknowledge: () => void
 }) {
   const minutesAgo = Math.max(0, Math.round((now - new Date(ticket.createdAt).getTime()) / 60000))
-  const urgent = minutesAgo >= 15
+  const tier = timeTier(minutesAgo)
   const prioritized = ticket.priority > 0
+  const statusConfig = ORDER_STATUS_CONFIG[ticket.orderStatus]
+  const StatusIcon = statusConfig.icon
   const pendingCount = ticket.items.filter((item) => item.kitchenStatus === 'PENDIENTE').length
   const notReadyCount = ticket.items.filter((item) => item.kitchenStatus !== 'LISTO').length
 
@@ -130,8 +166,8 @@ function TicketCard({
 
   return (
     <div
-      className={`${cardClass} ${urgent ? 'border-red-900/60' : ''} ${prioritized ? 'border-amber-600/70' : ''} ${
-        isNew ? 'border-brasa-500 shadow-[0_0_0_1px_var(--color-brasa-500),0_0_20px_-4px_var(--color-brasa-500)]' : ''
+      className={`${cardClass} border-l-4 ${prioritized ? 'border-l-violet-500' : statusConfig.accent} ${
+        isNew ? 'shadow-[0_0_0_1px_var(--color-brasa-500),0_0_20px_-4px_var(--color-brasa-500)]' : ''
       }`}
     >
       <div className="mb-2 flex items-start justify-between">
@@ -139,7 +175,7 @@ function TicketCard({
           <div className="flex items-center gap-2">
             <p className="font-medium text-neutral-100">{ticket.customerName}</p>
             {prioritized && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-400">
                 <Flag size={10} /> Prioritario
               </span>
             )}
@@ -149,10 +185,13 @@ function TicketCard({
               </span>
             )}
           </div>
-          <p className={`inline-flex items-center gap-1 text-xs ${urgent ? 'text-red-400' : 'text-neutral-500'}`}>
-            <Clock size={11} />
-            #{ticket.orderNumber} · hace {minutesAgo} min
-          </p>
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-neutral-500">
+            <span>#{ticket.orderNumber}</span>
+            <span className={`inline-flex items-center gap-1 ${TIME_TIER_STYLE[tier]}`}>
+              {tier === 'retrasado' ? <AlertTriangle size={11} /> : <Clock size={11} />}
+              hace {minutesAgo} min{tier === 'atencion' ? ' · atención' : tier === 'retrasado' ? ' · retrasado' : ''}
+            </span>
+          </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {isNew && (
@@ -164,12 +203,8 @@ function TicketCard({
               <Check size={11} /> Visto
             </button>
           )}
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              ticket.orderStatus === 'EN_PREPARACION' ? 'bg-brasa-500/20 text-brasa-400' : 'bg-neutral-700 text-neutral-200'
-            }`}
-          >
-            {ticket.orderStatus === 'EN_PREPARACION' ? 'En preparación' : 'Confirmado'}
+          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.badge}`}>
+            <StatusIcon size={11} /> {statusConfig.label}
           </span>
         </div>
       </div>
@@ -188,7 +223,7 @@ function TicketCard({
           onClick={handleTogglePriority}
           disabled={setPriority.isPending}
           title={prioritized ? 'Quitar prioridad' : 'Marcar como prioritario'}
-          className={`${secondaryButtonClass} !px-3.5 !py-3 ${prioritized ? '!border-amber-600/70 !text-amber-400' : ''}`}
+          className={`${secondaryButtonClass} !px-3.5 !py-3 ${prioritized ? '!border-violet-600/70 !text-violet-400' : ''}`}
         >
           <Flag size={13} /> {prioritized ? 'Quitar prioridad' : 'Prioritario'}
         </button>
