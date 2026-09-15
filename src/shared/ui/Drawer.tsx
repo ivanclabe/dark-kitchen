@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
-import { useEffect, type ReactNode } from 'react'
+import { useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useDialogA11y } from '../hooks/useDialogA11y'
 
 export function Drawer({
   open,
@@ -15,28 +16,28 @@ export function Drawer({
   subtitle?: ReactNode
   children: ReactNode
 }) {
-  useEffect(() => {
-    if (!open) return
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = ''
-    }
-  }, [open, onClose])
+  const panelRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+  useDialogA11y(panelRef, open, onClose)
 
   if (!open) return null
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="shadow-float animate-drawer-in relative flex h-full w-full max-w-2xl flex-col border-l border-neutral-800 bg-neutral-900">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="shadow-float animate-drawer-in relative flex h-full w-full max-w-2xl flex-col border-l border-neutral-800 bg-neutral-900 outline-none"
+      >
         <div className="flex items-start justify-between border-b border-neutral-800 px-6 py-4">
           <div className="min-w-0">
-            <h2 className="text-lg font-medium text-neutral-100">{title}</h2>
+            <h2 id={titleId} className="text-lg font-medium text-neutral-100">
+              {title}
+            </h2>
             {subtitle && <div className="mt-0.5 text-sm text-neutral-400">{subtitle}</div>}
           </div>
           <button

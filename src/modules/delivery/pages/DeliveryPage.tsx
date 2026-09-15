@@ -126,13 +126,15 @@ function RidersManager() {
         {riders?.map((r) => (
           <li
             key={r.id}
-            className={`rounded px-2 py-1 text-xs ${r.active ? 'bg-neutral-800 text-neutral-200' : 'bg-neutral-900 text-neutral-500'}`}
+            className={`flex items-center gap-2 rounded-full py-1 pr-1 pl-3 text-xs ${r.active ? 'bg-neutral-800 text-neutral-200' : 'bg-neutral-900 text-neutral-500'}`}
           >
-            {r.fullName}
-            {r.phone ? ` · ${r.phone}` : ''}
+            <span>
+              {r.fullName}
+              {r.phone ? ` · ${r.phone}` : ''}
+            </span>
             <button
               onClick={() => setActive.mutate({ id: r.id, active: !r.active })}
-              className="ml-2 text-neutral-400 hover:underline"
+              className="rounded-full px-2.5 py-2 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100"
             >
               {r.active ? 'Desactivar' : 'Activar'}
             </button>

@@ -66,7 +66,7 @@ function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: ()
             <button
               onClick={handleAdvance}
               disabled={advance.isPending}
-              className={`${secondaryButtonClass} !px-3 !py-1.5`}
+              className={`${secondaryButtonClass} !px-3.5 !py-3`}
             >
               <PlayCircle size={13} />
               {item.kitchenStatus === 'PENDIENTE' ? 'Iniciar' : 'Marcar listo'}
@@ -179,7 +179,7 @@ function TicketCard({
           onClick={handleTogglePriority}
           disabled={setPriority.isPending}
           title={prioritized ? 'Quitar prioridad' : 'Marcar como prioritario'}
-          className={`${secondaryButtonClass} !px-3 !py-1.5 ${prioritized ? '!border-amber-600/70 !text-amber-400' : ''}`}
+          className={`${secondaryButtonClass} !px-3.5 !py-3 ${prioritized ? '!border-amber-600/70 !text-amber-400' : ''}`}
         >
           <Flag size={13} /> {prioritized ? 'Quitar prioridad' : 'Prioritario'}
         </button>
@@ -187,7 +187,7 @@ function TicketCard({
           <button
             onClick={handleMarkAllReady}
             disabled={advanceAll.isPending}
-            className={`${secondaryButtonClass} !px-3 !py-1.5`}
+            className={`${secondaryButtonClass} !px-3.5 !py-3`}
           >
             <CheckCheck size={13} /> Marcar todo listo
           </button>
