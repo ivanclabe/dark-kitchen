@@ -1,7 +1,9 @@
 import { useProducts } from '@/modules/products/hooks/useProducts'
+import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
 import { Combobox } from '@/shared/ui/Combobox'
 import { ConfirmDialog } from '@/shared/ui/Modal'
+import { NumberStepper } from '@/shared/ui/NumberStepper'
 import {
   cardClass,
   dangerButtonClass,
@@ -14,7 +16,7 @@ import {
 } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { AlertTriangle, CheckCircle2, Plus, Trash2, XCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, History, Plus, Trash2, XCircle } from 'lucide-react'
 import { useMemo, useState, type FormEvent } from 'react'
 import {
   useAddOrderItem,
@@ -63,7 +65,7 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
   const cancelOrder = useCancelOrder(orderId)
 
   const [productId, setProductId] = useState('')
-  const [quantity, setQuantity] = useState('1')
+  const [quantity, setQuantity] = useState(1)
   const [unitPrice, setUnitPrice] = useState('')
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -93,12 +95,12 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
     try {
       await addItem.mutateAsync({
         productId,
-        quantity: Number(quantity),
+        quantity,
         unitPrice: Number(unitPrice),
         observation: observation || undefined,
       })
       setProductId('')
-      setQuantity('1')
+      setQuantity(1)
       setUnitPrice('')
       setObservation('')
     } catch (err) {
@@ -162,7 +164,7 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
           </div>
           <div>
             <label className={labelClass}>Cantidad</label>
-            <input type="number" min="1" step="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} className={inputClass} required />
+            <NumberStepper value={quantity} onChange={setQuantity} min={1} step={1} required />
           </div>
           <div>
             <label className={labelClass}>Precio unitario</label>
@@ -267,8 +269,7 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
       </div>
 
       {history && history.length > 0 && (
-        <div className={cardClass}>
-          <h2 className="mb-3 font-medium text-neutral-100">Historial de estados</h2>
+        <Card title="Historial de estados" icon={History}>
           <ul className="space-y-1 text-sm text-neutral-400">
             {history.map((h) => (
               <li key={h.id}>
@@ -278,7 +279,7 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
               </li>
             ))}
           </ul>
-        </div>
+        </Card>
       )}
 
       <ConfirmDialog

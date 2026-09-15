@@ -2,8 +2,10 @@ import { CreateIngredientModal } from '@/modules/inventory/components/CreateIngr
 import { useIngredients } from '@/modules/inventory/hooks/useIngredients'
 import type { Ingredient } from '@/modules/inventory/types'
 import { useUnits } from '@/shared/hooks/useUnits'
+import { Card } from '@/shared/ui/Card'
 import { Combobox } from '@/shared/ui/Combobox'
 import { ConfirmDialog } from '@/shared/ui/Modal'
+import { NumberStepper } from '@/shared/ui/NumberStepper'
 import {
   cardClass,
   inputClass,
@@ -48,7 +50,7 @@ export function PurchaseDetailPage() {
   const attachmentUrl = useAttachmentUrl()
 
   const [ingredientId, setIngredientId] = useState('')
-  const [quantity, setQuantity] = useState('')
+  const [quantity, setQuantity] = useState(0)
   const [purchaseUnitId, setPurchaseUnitId] = useState('')
   const [unitCost, setUnitCost] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -83,12 +85,12 @@ export function PurchaseDetailPage() {
     try {
       await addItem.mutateAsync({
         ingredientId,
-        quantity: Number(quantity),
+        quantity,
         purchaseUnitId,
         unitCost: Number(unitCost),
       })
       setIngredientId('')
-      setQuantity('')
+      setQuantity(0)
       setPurchaseUnitId('')
       setUnitCost('')
     } catch (err) {
@@ -180,7 +182,7 @@ export function PurchaseDetailPage() {
           </div>
           <div>
             <label className={labelClass}>Cantidad</label>
-            <input type="number" step="any" min="0" value={quantity} onChange={(e) => setQuantity(e.target.value)} className={inputClass} required />
+            <NumberStepper value={quantity} onChange={setQuantity} min={0} step={1} required />
           </div>
           <div>
             <label className={labelClass}>Unidad de compra</label>
@@ -248,10 +250,7 @@ export function PurchaseDetailPage() {
         </table>
       </div>
 
-      <div className={`${cardClass} space-y-3`}>
-        <h2 className="flex items-center gap-1.5 font-medium text-neutral-100">
-          <Paperclip size={15} /> Adjuntos (factura escaneada, fotos)
-        </h2>
+      <Card title="Adjuntos (factura escaneada, fotos)" icon={Paperclip} className="space-y-3">
         <input ref={fileInputRef} type="file" onChange={handleFileChange} className="text-sm text-neutral-300" />
         <ul className="space-y-1">
           {attachments?.map((a) => (
@@ -262,7 +261,7 @@ export function PurchaseDetailPage() {
             </li>
           ))}
         </ul>
-      </div>
+      </Card>
 
       {isDraft && (
         <div className="flex justify-end">
