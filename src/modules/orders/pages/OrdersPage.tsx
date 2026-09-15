@@ -1,17 +1,12 @@
+import { CreateCustomerModal } from '@/modules/customers/components/CreateCustomerModal'
 import { useCustomers } from '@/modules/customers/hooks/useCustomers'
+import type { Customer } from '@/modules/customers/types'
 import { Chip } from '@/shared/ui/Chip'
-import {
-  cardClass,
-  inputClass,
-  labelClass,
-  primaryButtonClass,
-  tableWrapperClass,
-  tdClass,
-  thClass,
-} from '@/shared/ui/formClasses'
+import { Combobox } from '@/shared/ui/Combobox'
+import { cardClass, labelClass, primaryButtonClass, tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { AlertTriangle, ArrowRight, Plus } from 'lucide-react'
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreateOrder, useOrders } from '../hooks/useOrders'
 import type { OrderStatus } from '../types'
@@ -56,6 +51,7 @@ export function OrdersPage() {
   const [customerId, setCustomerId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<OrderStatus | 'TODOS'>('TODOS')
+  const [createCustomerQuery, setCreateCustomerQuery] = useState<string | null>(null)
 
   const counts = useMemo(() => {
     const map = new Map<OrderStatus | 'TODOS', number>()
@@ -66,40 +62,61 @@ export function OrdersPage() {
 
   const filteredOrders = orders?.filter((o) => filter === 'TODOS' || o.status === filter)
 
-  async function handleCreate(e: FormEvent) {
-    e.preventDefault()
+  const customerOptions = useMemo(
+    () => customers?.map((c) => ({ value: c.id, label: c.fullName, sublabel: c.phone ?? undefined })) ?? [],
+    [customers],
+  )
+
+  async function startOrder(forCustomerId: string) {
     setError(null)
     try {
-      const order = await createOrder.mutateAsync({ customerId })
+      const order = await createOrder.mutateAsync({ customerId: forCustomerId })
       navigate(`/orders/${order.id}`)
     } catch (err) {
       setError(getErrorMessage(err, 'Error al crear el pedido'))
     }
   }
 
+  function handleCustomerCreated(customer: Customer) {
+    setCreateCustomerQuery(null)
+    setCustomerId(customer.id)
+    void startOrder(customer.id)
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-neutral-50">Pedidos</h1>
 
-      <form onSubmit={handleCreate} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-3`}>
+      <div className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-3`}>
         <div className="sm:col-span-2">
           <label className={labelClass}>Cliente *</label>
-          <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className={inputClass} required>
-            <option value="">Selecciona…</option>
-            {customers?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.fullName} {c.phone ? `— ${c.phone}` : ''}
-              </option>
-            ))}
-          </select>
+          <Combobox
+            value={customerId}
+            onChange={setCustomerId}
+            options={customerOptions}
+            placeholder="Nombre o teléfono…"
+            emptyMessage="Sin clientes con ese nombre o teléfono"
+            onCreateNew={(query) => setCreateCustomerQuery(query)}
+          />
         </div>
         <div className="flex items-end">
-          <button type="submit" disabled={createOrder.isPending} className={primaryButtonClass}>
+          <button
+            onClick={() => customerId && startOrder(customerId)}
+            disabled={createOrder.isPending || !customerId}
+            className={primaryButtonClass}
+          >
             <Plus size={15} /> Nuevo pedido
           </button>
         </div>
         {error && <p className="text-sm text-red-400 sm:col-span-3">{error}</p>}
-      </form>
+      </div>
+
+      <CreateCustomerModal
+        open={createCustomerQuery !== null}
+        onClose={() => setCreateCustomerQuery(null)}
+        initialQuery={createCustomerQuery ?? ''}
+        onCreated={handleCustomerCreated}
+      />
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (

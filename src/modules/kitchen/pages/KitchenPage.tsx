@@ -2,8 +2,9 @@ import { useNow } from '@/shared/hooks/useNow'
 import { cardClass, secondaryButtonClass } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { ChefHat, Clock, MessageSquareText, PlayCircle } from 'lucide-react'
+import { Bell, ChefHat, Check, Clock, MessageSquareText, PlayCircle, Volume2, VolumeX } from 'lucide-react'
 import { useAdvanceKitchenItem, useKitchenQueue } from '../hooks/useKitchen'
+import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import type { KitchenItemStatus, KitchenTicket, KitchenTicketItem } from '../types'
 
 const STATUS_BADGE: Record<KitchenItemStatus, string> = {
@@ -18,11 +19,12 @@ const STATUS_LABEL: Record<KitchenItemStatus, string> = {
   LISTO: 'Listo',
 }
 
-function ItemRow({ item }: { item: KitchenTicketItem }) {
+function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: () => void }) {
   const advance = useAdvanceKitchenItem()
   const { show } = useToast()
 
   async function handleAdvance() {
+    onInteract()
     try {
       await advance.mutateAsync(item.id)
       show(item.kitchenStatus === 'PENDIENTE' ? `${item.productName} en preparación.` : `${item.productName} listo.`)
@@ -64,27 +66,59 @@ function ItemRow({ item }: { item: KitchenTicketItem }) {
   )
 }
 
-function TicketCard({ ticket, now }: { ticket: KitchenTicket; now: number }) {
+function TicketCard({
+  ticket,
+  now,
+  isNew,
+  onAcknowledge,
+}: {
+  ticket: KitchenTicket
+  now: number
+  isNew: boolean
+  onAcknowledge: () => void
+}) {
   const minutesAgo = Math.max(0, Math.round((now - new Date(ticket.createdAt).getTime()) / 60000))
   const urgent = minutesAgo >= 15
 
   return (
-    <div className={`${cardClass} ${urgent ? 'border-red-900/60' : ''}`}>
+    <div
+      className={`${cardClass} ${urgent ? 'border-red-900/60' : ''} ${
+        isNew ? 'border-brasa-500 shadow-[0_0_0_1px_var(--color-brasa-500),0_0_20px_-4px_var(--color-brasa-500)]' : ''
+      }`}
+    >
       <div className="mb-2 flex items-start justify-between">
         <div>
-          <p className="font-medium text-neutral-100">{ticket.customerName}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-neutral-100">{ticket.customerName}</p>
+            {isNew && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-brasa-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brasa-400">
+                Nuevo
+              </span>
+            )}
+          </div>
           <p className={`inline-flex items-center gap-1 text-xs ${urgent ? 'text-red-400' : 'text-neutral-500'}`}>
             <Clock size={11} />
             #{ticket.orderId.slice(0, 8)} · hace {minutesAgo} min
           </p>
         </div>
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-            ticket.orderStatus === 'EN_PREPARACION' ? 'bg-brasa-500/20 text-brasa-400' : 'bg-neutral-700 text-neutral-200'
-          }`}
-        >
-          {ticket.orderStatus === 'EN_PREPARACION' ? 'En preparación' : 'Confirmado'}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {isNew && (
+            <button
+              onClick={onAcknowledge}
+              title="Marcar como visto"
+              className="inline-flex items-center gap-1 rounded-full border border-neutral-700 px-2 py-0.5 text-[11px] text-neutral-300 hover:bg-neutral-800"
+            >
+              <Check size={11} /> Visto
+            </button>
+          )}
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+              ticket.orderStatus === 'EN_PREPARACION' ? 'bg-brasa-500/20 text-brasa-400' : 'bg-neutral-700 text-neutral-200'
+            }`}
+          >
+            {ticket.orderStatus === 'EN_PREPARACION' ? 'En preparación' : 'Confirmado'}
+          </span>
+        </div>
       </div>
       {ticket.notes && (
         <p className="mb-2 inline-flex items-center gap-1 text-xs text-neutral-500">
@@ -93,7 +127,7 @@ function TicketCard({ ticket, now }: { ticket: KitchenTicket; now: number }) {
       )}
       <div>
         {ticket.items.map((item) => (
-          <ItemRow key={item.id} item={item} />
+          <ItemRow key={item.id} item={item} onInteract={onAcknowledge} />
         ))}
       </div>
     </div>
@@ -103,15 +137,32 @@ function TicketCard({ ticket, now }: { ticket: KitchenTicket; now: number }) {
 export function KitchenPage() {
   const { data: tickets, isLoading } = useKitchenQueue()
   const now = useNow()
+  const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(tickets)
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <ChefHat size={22} className="text-brasa-500" />
-        <div>
-          <h1 className="text-2xl font-semibold text-neutral-50">Cocina</h1>
-          <p className="text-sm text-neutral-400">Pedidos confirmados en cola. Se actualiza automáticamente.</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <ChefHat size={22} className="text-brasa-500" />
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold text-neutral-50">Cocina</h1>
+              {newIds.size > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brasa-600 px-2 py-0.5 text-xs font-semibold text-white">
+                  <Bell size={12} /> {newIds.size} {newIds.size === 1 ? 'nuevo' : 'nuevos'}
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-neutral-400">Pedidos confirmados en cola. Se actualiza automáticamente.</p>
+          </div>
         </div>
+        <button
+          onClick={toggleSound}
+          title={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
+          className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+        >
+          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+        </button>
       </div>
 
       {isLoading && <p className="text-neutral-400">Cargando…</p>}
@@ -121,7 +172,13 @@ export function KitchenPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {tickets?.map((ticket) => (
-          <TicketCard key={ticket.orderId} ticket={ticket} now={now} />
+          <TicketCard
+            key={ticket.orderId}
+            ticket={ticket}
+            now={now}
+            isNew={newIds.has(ticket.orderId)}
+            onAcknowledge={() => acknowledge(ticket.orderId)}
+          />
         ))}
       </div>
     </div>
