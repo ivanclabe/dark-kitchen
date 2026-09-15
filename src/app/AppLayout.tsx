@@ -1,5 +1,6 @@
 import { useAuth } from '@/shared/hooks/useAuth'
 import { canAccessModule, type ModuleKey } from '@/shared/rbac/roles'
+import { Tooltip } from '@/shared/ui/Tooltip'
 import {
   BarChart3,
   Bike,
@@ -11,7 +12,6 @@ import {
   Flame,
   LayoutDashboard,
   LogOut,
-  Menu as MenuIcon,
   ShoppingCart,
   Truck,
   UserCog,
@@ -19,7 +19,6 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from 'lucide-react'
-import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 const NAV_ITEMS: Array<{ to: string; label: string; module: ModuleKey; icon: LucideIcon }> = [
@@ -44,99 +43,65 @@ function initials(name: string | undefined) {
   return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase()
 }
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2 px-4 py-5">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brasa-400 to-brasa-600 shadow-sm">
-        <Flame size={18} className="text-white" strokeWidth={2.5} />
-      </div>
-      <div className="leading-tight">
-        <p className="text-sm font-extrabold tracking-wide text-neutral-50">DARK KITCHEN</p>
-        <p className="text-[10px] uppercase tracking-widest text-neutral-500">Operación</p>
-      </div>
-    </div>
-  )
-}
+const navIconClass =
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500'
 
 export function AppLayout() {
   const { profile, signOut } = useAuth()
   const role = profile?.role ?? null
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen bg-neutral-950 text-neutral-100">
-      {sidebarOpen && (
-        <button
-          aria-label="Cerrar menú"
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-black/60 sm:hidden"
-        />
-      )}
+      <aside className="flex w-16 shrink-0 flex-col items-center border-r border-neutral-800 bg-neutral-900 py-4">
+        <Tooltip label="Dark Kitchen">
+          <div className="mb-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brasa-400 to-brasa-600 shadow-sm">
+            <Flame size={18} className="text-white" strokeWidth={2.5} />
+          </div>
+        </Tooltip>
 
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 flex-col border-r border-neutral-800 bg-neutral-900 transition-transform sm:static sm:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <Logo />
-        <nav className="flex-1 space-y-0.5 overflow-y-auto px-2">
+        <nav className="flex flex-1 flex-col items-center gap-1 overflow-y-auto">
           {NAV_ITEMS.filter((item) => canAccessModule(role, item.module)).map((item) => {
             const Icon = item.icon
             return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                onClick={() => setSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-gradient-to-r from-brasa-600 to-brasa-600/80 text-white shadow-sm'
-                      : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
-                  }`
-                }
-              >
-                <Icon size={17} strokeWidth={2} className="shrink-0 opacity-90" />
-                {item.label}
-              </NavLink>
+              <Tooltip key={item.to} label={item.label}>
+                <NavLink
+                  to={item.to}
+                  end={item.to === '/'}
+                  aria-label={item.label}
+                  className={({ isActive }) =>
+                    `${navIconClass} ${
+                      isActive
+                        ? 'bg-gradient-to-br from-brasa-500 to-brasa-600 text-white shadow-sm'
+                        : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
+                    }`
+                  }
+                >
+                  <Icon size={20} strokeWidth={2} />
+                </NavLink>
+              </Tooltip>
             )
           })}
         </nav>
-        <div className="border-t border-neutral-800 p-3">
-          <div className="flex items-center gap-2.5 rounded-lg px-1 py-1.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-xs font-semibold text-neutral-200">
+
+        <div className="mt-2 flex flex-col items-center gap-2 border-t border-neutral-800 pt-3">
+          <Tooltip label={`${profile?.fullName ?? '—'} · ${profile?.role ?? ''}`}>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-xs font-semibold text-neutral-200">
               {initials(profile?.fullName)}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-neutral-200">{profile?.fullName}</p>
-              <p className="text-[11px] text-neutral-500">{profile?.role}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => void signOut()}
-            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-md border border-neutral-700 px-2 py-1.5 text-xs text-neutral-300 transition-colors hover:border-neutral-600 hover:bg-neutral-800"
-          >
-            <LogOut size={13} />
-            Cerrar sesión
-          </button>
+          </Tooltip>
+          <Tooltip label="Cerrar sesión">
+            <button
+              onClick={() => void signOut()}
+              aria-label="Cerrar sesión"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-neutral-700 text-neutral-300 transition-colors hover:border-neutral-600 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+            >
+              <LogOut size={15} />
+            </button>
+          </Tooltip>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-neutral-800 bg-neutral-900 px-4 py-3 sm:hidden">
-          <button
-            aria-label="Abrir menú"
-            onClick={() => setSidebarOpen(true)}
-            className="rounded-md border border-neutral-700 p-1.5 text-neutral-300"
-          >
-            <MenuIcon size={18} />
-          </button>
-          <div className="flex items-center gap-1.5">
-            <Flame size={16} className="text-brasa-500" />
-            <p className="text-sm font-semibold tracking-wide text-neutral-50">DARK KITCHEN</p>
-          </div>
-        </header>
-
         <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
           <Outlet />
         </main>
