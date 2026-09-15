@@ -1717,6 +1717,452 @@ export type Database = {
         }
         Relationships: []
       }
+      in_agent_executions: {
+        Row: {
+          company_id: string | null
+          completed_at: string | null
+          conversation_id: string | null
+          data_import_ids: Json
+          duration_ms: number | null
+          error_messages: Json
+          estimated_cost_usd: number | null
+          id: string
+          mode: string
+          model: string | null
+          report_id: string | null
+          report_version_id: string | null
+          request_params: Json
+          started_at: string
+          status: string
+          system_version: string | null
+          triggered_by: string | null
+          usage_metadata: Json
+        }
+        Insert: {
+          company_id?: string | null
+          completed_at?: string | null
+          conversation_id?: string | null
+          data_import_ids?: Json
+          duration_ms?: number | null
+          error_messages?: Json
+          estimated_cost_usd?: number | null
+          id: string
+          mode: string
+          model?: string | null
+          report_id?: string | null
+          report_version_id?: string | null
+          request_params?: Json
+          started_at?: string
+          status: string
+          system_version?: string | null
+          triggered_by?: string | null
+          usage_metadata?: Json
+        }
+        Update: {
+          company_id?: string | null
+          completed_at?: string | null
+          conversation_id?: string | null
+          data_import_ids?: Json
+          duration_ms?: number | null
+          error_messages?: Json
+          estimated_cost_usd?: number | null
+          id?: string
+          mode?: string
+          model?: string | null
+          report_id?: string | null
+          report_version_id?: string | null
+          request_params?: Json
+          started_at?: string
+          status?: string
+          system_version?: string | null
+          triggered_by?: string | null
+          usage_metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_agent_executions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "in_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_agent_executions_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "in_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_agent_executions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "in_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_agent_executions_report_version_id_fkey"
+            columns: ["report_version_id"]
+            isOneToOne: false
+            referencedRelation: "in_report_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_agent_executions_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "in_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_companies: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          name: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id: string
+          industry?: string | null
+          name: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      in_conversations: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_pinned: boolean
+          title: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id: string
+          is_pinned?: boolean
+          title?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_pinned?: boolean
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_conversations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "in_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_conversations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "in_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_data_imports: {
+        Row: {
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          data_source_id: string
+          file_hash: string | null
+          id: string
+          imported_by: string | null
+          row_count: number | null
+          source_file_ref: string | null
+          started_at: string | null
+          status: string
+          warning_count: number | null
+          warnings: Json
+        }
+        Insert: {
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          data_source_id: string
+          file_hash?: string | null
+          id: string
+          imported_by?: string | null
+          row_count?: number | null
+          source_file_ref?: string | null
+          started_at?: string | null
+          status: string
+          warning_count?: number | null
+          warnings?: Json
+        }
+        Update: {
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          data_source_id?: string
+          file_hash?: string | null
+          id?: string
+          imported_by?: string | null
+          row_count?: number | null
+          source_file_ref?: string | null
+          started_at?: string | null
+          status?: string
+          warning_count?: number | null
+          warnings?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_data_imports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "in_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_data_imports_data_source_id_fkey"
+            columns: ["data_source_id"]
+            isOneToOne: false
+            referencedRelation: "in_data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_data_imports_imported_by_fkey"
+            columns: ["imported_by"]
+            isOneToOne: false
+            referencedRelation: "in_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_data_sources: {
+        Row: {
+          company_id: string
+          config: Json
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          source_type: string
+        }
+        Insert: {
+          company_id: string
+          config?: Json
+          created_at?: string
+          id: string
+          is_active?: boolean
+          name: string
+          source_type: string
+        }
+        Update: {
+          company_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_data_sources_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "in_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "in_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_report_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          key: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          is_active?: boolean
+          key: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      in_report_versions: {
+        Row: {
+          change_summary: string | null
+          created_at: string
+          file_path: string
+          format: string
+          id: string
+          report_id: string
+          specification_json: Json
+          template_id: string | null
+          version: number
+        }
+        Insert: {
+          change_summary?: string | null
+          created_at?: string
+          file_path: string
+          format?: string
+          id: string
+          report_id: string
+          specification_json: Json
+          template_id?: string | null
+          version: number
+        }
+        Update: {
+          change_summary?: string | null
+          created_at?: string
+          file_path?: string
+          format?: string
+          id?: string
+          report_id?: string
+          specification_json?: Json
+          template_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_report_versions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "in_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_report_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "in_report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_reports: {
+        Row: {
+          company: string | null
+          company_id: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          company?: string | null
+          company_id?: string | null
+          conversation_id: string
+          created_at?: string
+          id: string
+        }
+        Update: {
+          company?: string | null
+          company_id?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_reports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "in_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_reports_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "in_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      in_users: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          role?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string
+          username?: string
+        }
+        Relationships: []
+      }
       incidencias: {
         Row: {
           activo: boolean
@@ -4267,6 +4713,10 @@ export type Database = {
           ingredient_name: string
           quantity: number
         }[]
+      }
+      dk_set_ticket_priority: {
+        Args: { p_order_id: string; p_priority: number }
+        Returns: undefined
       }
     }
     Enums: {

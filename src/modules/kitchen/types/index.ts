@@ -14,5 +14,6 @@ export interface KitchenTicket {
   orderStatus: 'CONFIRMADO' | 'EN_PREPARACION'
   createdAt: string
   notes: string | null
+  priority: number
   items: KitchenTicketItem[]
 }

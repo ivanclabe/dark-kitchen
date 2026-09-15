@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { advanceKitchenItem, listKitchenQueue } from '../api/kitchen'
+import { advanceKitchenItem, listKitchenQueue, setTicketPriority } from '../api/kitchen'
 
 const KITCHEN_KEY = ['kitchen-queue'] as const
 
@@ -17,5 +17,13 @@ export function useAdvanceKitchenItem() {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
     },
+  })
+}
+
+export function useSetTicketPriority() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ orderId, priority }: { orderId: string; priority: number }) => setTicketPriority(orderId, priority),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: KITCHEN_KEY }),
   })
 }

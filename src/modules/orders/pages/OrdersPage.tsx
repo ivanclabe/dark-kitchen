@@ -3,11 +3,13 @@ import { useCustomers } from '@/modules/customers/hooks/useCustomers'
 import type { Customer } from '@/modules/customers/types'
 import { Chip } from '@/shared/ui/Chip'
 import { Combobox } from '@/shared/ui/Combobox'
+import { Drawer } from '@/shared/ui/Drawer'
 import { cardClass, labelClass, primaryButtonClass, tableWrapperClass, tdClass, thClass } from '@/shared/ui/formClasses'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { AlertTriangle, ArrowRight, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { OrderBuilder } from '../components/OrderBuilder'
 import { useCreateOrder, useOrders } from '../hooks/useOrders'
 import type { OrderStatus } from '../types'
 
@@ -52,6 +54,7 @@ export function OrdersPage() {
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<OrderStatus | 'TODOS'>('TODOS')
   const [createCustomerQuery, setCreateCustomerQuery] = useState<string | null>(null)
+  const [drawerOrder, setDrawerOrder] = useState<{ id: string; customerName: string } | null>(null)
 
   const counts = useMemo(() => {
     const map = new Map<OrderStatus | 'TODOS', number>()
@@ -71,7 +74,8 @@ export function OrdersPage() {
     setError(null)
     try {
       const order = await createOrder.mutateAsync({ customerId: forCustomerId })
-      navigate(`/orders/${order.id}`)
+      setCustomerId('')
+      setDrawerOrder({ id: order.id, customerName: order.customerName })
     } catch (err) {
       setError(getErrorMessage(err, 'Error al crear el pedido'))
     }
@@ -117,6 +121,27 @@ export function OrdersPage() {
         initialQuery={createCustomerQuery ?? ''}
         onCreated={handleCustomerCreated}
       />
+
+      {drawerOrder && (
+        <Drawer
+          open
+          onClose={() => setDrawerOrder(null)}
+          title="Nuevo pedido"
+          subtitle={
+            <div className="flex items-center gap-2">
+              <span>Cliente: {drawerOrder.customerName}</span>
+              <button
+                onClick={() => navigate(`/orders/${drawerOrder.id}`)}
+                className="text-brasa-500 hover:underline"
+              >
+                Ver pedido completo
+              </button>
+            </div>
+          }
+        >
+          <OrderBuilder orderId={drawerOrder.id} />
+        </Drawer>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (

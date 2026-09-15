@@ -2,8 +2,20 @@ import { useNow } from '@/shared/hooks/useNow'
 import { cardClass, secondaryButtonClass } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { Bell, ChefHat, Check, Clock, MessageSquareText, PlayCircle, Volume2, VolumeX } from 'lucide-react'
-import { useAdvanceKitchenItem, useKitchenQueue } from '../hooks/useKitchen'
+import {
+  Bell,
+  ChefHat,
+  Check,
+  CheckCheck,
+  Clock,
+  Flag,
+  MessageSquareText,
+  PlayCircle,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
+import { useMemo } from 'react'
+import { useAdvanceKitchenItem, useKitchenQueue, useSetTicketPriority } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import type { KitchenItemStatus, KitchenTicket, KitchenTicketItem } from '../types'
 
@@ -79,10 +91,37 @@ function TicketCard({
 }) {
   const minutesAgo = Math.max(0, Math.round((now - new Date(ticket.createdAt).getTime()) / 60000))
   const urgent = minutesAgo >= 15
+  const prioritized = ticket.priority > 0
+  const pendingItems = ticket.items.filter((item) => item.kitchenStatus !== 'LISTO')
+
+  const advanceAll = useAdvanceKitchenItem()
+  const setPriority = useSetTicketPriority()
+  const { show } = useToast()
+
+  async function handleMarkAllReady() {
+    onAcknowledge()
+    try {
+      for (const item of pendingItems) {
+        if (item.kitchenStatus === 'PENDIENTE') await advanceAll.mutateAsync(item.id)
+        await advanceAll.mutateAsync(item.id)
+      }
+      show('Todos los platos del ticket quedaron listos.')
+    } catch (err) {
+      show(getErrorMessage(err, 'Error al marcar el ticket como listo'), 'error')
+    }
+  }
+
+  async function handleTogglePriority() {
+    try {
+      await setPriority.mutateAsync({ orderId: ticket.orderId, priority: prioritized ? 0 : 1 })
+    } catch (err) {
+      show(getErrorMessage(err, 'Error al actualizar la prioridad'), 'error')
+    }
+  }
 
   return (
     <div
-      className={`${cardClass} ${urgent ? 'border-red-900/60' : ''} ${
+      className={`${cardClass} ${urgent ? 'border-red-900/60' : ''} ${prioritized ? 'border-amber-600/70' : ''} ${
         isNew ? 'border-brasa-500 shadow-[0_0_0_1px_var(--color-brasa-500),0_0_20px_-4px_var(--color-brasa-500)]' : ''
       }`}
     >
@@ -90,6 +129,11 @@ function TicketCard({
         <div>
           <div className="flex items-center gap-2">
             <p className="font-medium text-neutral-100">{ticket.customerName}</p>
+            {prioritized && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
+                <Flag size={10} /> Prioritario
+              </span>
+            )}
             {isNew && (
               <span className="inline-flex items-center gap-1 rounded-full bg-brasa-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brasa-400">
                 Nuevo
@@ -130,6 +174,25 @@ function TicketCard({
           <ItemRow key={item.id} item={item} onInteract={onAcknowledge} />
         ))}
       </div>
+      <div className="mt-3 flex items-center gap-2 border-t border-neutral-800 pt-3">
+        <button
+          onClick={handleTogglePriority}
+          disabled={setPriority.isPending}
+          title={prioritized ? 'Quitar prioridad' : 'Marcar como prioritario'}
+          className={`${secondaryButtonClass} !px-3 !py-1.5 ${prioritized ? '!border-amber-600/70 !text-amber-400' : ''}`}
+        >
+          <Flag size={13} /> {prioritized ? 'Quitar prioridad' : 'Prioritario'}
+        </button>
+        {pendingItems.length > 0 && (
+          <button
+            onClick={handleMarkAllReady}
+            disabled={advanceAll.isPending}
+            className={`${secondaryButtonClass} !px-3 !py-1.5`}
+          >
+            <CheckCheck size={13} /> Marcar todo listo
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -138,6 +201,17 @@ export function KitchenPage() {
   const { data: tickets, isLoading } = useKitchenQueue()
   const now = useNow()
   const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(tickets)
+
+  const sortedTickets = useMemo(
+    () =>
+      tickets
+        ? [...tickets].sort((a, b) => {
+            if (a.priority !== b.priority) return b.priority - a.priority
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          })
+        : undefined,
+    [tickets],
+  )
 
   return (
     <div className="space-y-6">
@@ -166,12 +240,12 @@ export function KitchenPage() {
       </div>
 
       {isLoading && <p className="text-neutral-400">Cargando…</p>}
-      {!isLoading && tickets?.length === 0 && (
+      {!isLoading && sortedTickets?.length === 0 && (
         <p className={`${cardClass} text-neutral-400`}>No hay pedidos pendientes en cocina.</p>
       )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {tickets?.map((ticket) => (
+        {sortedTickets?.map((ticket) => (
           <TicketCard
             key={ticket.orderId}
             ticket={ticket}
