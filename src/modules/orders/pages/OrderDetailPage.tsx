@@ -15,7 +15,7 @@ export function OrderDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-neutral-50">Pedido — {order.customerName}</h1>
+          <h1 className="text-2xl font-semibold text-neutral-50">Pedido #{order.orderNumber} — {order.customerName}</h1>
           <p className="mt-1 text-sm text-neutral-400">{new Date(order.createdAt).toLocaleString()}</p>
         </div>
         <Link to="/orders" className="inline-flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-200">

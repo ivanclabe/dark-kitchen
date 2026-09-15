@@ -10,6 +10,7 @@ export interface KitchenTicketItem {
 
 export interface KitchenTicket {
   orderId: string
+  orderNumber: number
   customerName: string
   orderStatus: 'CONFIRMADO' | 'EN_PREPARACION'
   createdAt: string

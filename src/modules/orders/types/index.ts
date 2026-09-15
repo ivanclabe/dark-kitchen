@@ -9,6 +9,7 @@ export type OrderStatus =
 
 export interface Order {
   id: string
+  orderNumber: number
   customerId: string
   customerName: string
   status: OrderStatus

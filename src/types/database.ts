@@ -1002,6 +1002,7 @@ export type Database = {
           external_reference: string | null
           id: string
           notes: string | null
+          order_number: number
           payment_method: string | null
           requires_review: boolean
           status: Database["public"]["Enums"]["dk_order_status"]
@@ -1019,6 +1020,7 @@ export type Database = {
           external_reference?: string | null
           id?: string
           notes?: string | null
+          order_number?: number
           payment_method?: string | null
           requires_review?: boolean
           status?: Database["public"]["Enums"]["dk_order_status"]
@@ -1036,6 +1038,7 @@ export type Database = {
           external_reference?: string | null
           id?: string
           notes?: string | null
+          order_number?: number
           payment_method?: string | null
           requires_review?: boolean
           status?: Database["public"]["Enums"]["dk_order_status"]

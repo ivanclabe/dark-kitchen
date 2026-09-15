@@ -15,9 +15,10 @@ import {
   VolumeX,
 } from 'lucide-react'
 import { useMemo } from 'react'
-import { useAdvanceKitchenItem, useKitchenQueue, useSetTicketPriority } from '../hooks/useKitchen'
+import { useAdvanceKitchenItem, useAdvanceTicketItems, useKitchenQueue, useSetTicketPriority } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import type { KitchenItemStatus, KitchenTicket, KitchenTicketItem } from '../types'
+import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 
 const STATUS_BADGE: Record<KitchenItemStatus, string> = {
   PENDIENTE: 'bg-neutral-700 text-neutral-200',
@@ -92,19 +93,27 @@ function TicketCard({
   const minutesAgo = Math.max(0, Math.round((now - new Date(ticket.createdAt).getTime()) / 60000))
   const urgent = minutesAgo >= 15
   const prioritized = ticket.priority > 0
-  const pendingItems = ticket.items.filter((item) => item.kitchenStatus !== 'LISTO')
+  const pendingCount = ticket.items.filter((item) => item.kitchenStatus === 'PENDIENTE').length
+  const notReadyCount = ticket.items.filter((item) => item.kitchenStatus !== 'LISTO').length
 
-  const advanceAll = useAdvanceKitchenItem()
+  const { advanceTicketItems, isPending: advancingAll } = useAdvanceTicketItems()
   const setPriority = useSetTicketPriority()
   const { show } = useToast()
+
+  async function handleStartAll() {
+    onAcknowledge()
+    try {
+      await advanceTicketItems(ticket.items, 'EN_PREPARACION')
+      show('Todos los platos pendientes iniciaron preparación.')
+    } catch (err) {
+      show(getErrorMessage(err, 'Error al iniciar el ticket'), 'error')
+    }
+  }
 
   async function handleMarkAllReady() {
     onAcknowledge()
     try {
-      for (const item of pendingItems) {
-        if (item.kitchenStatus === 'PENDIENTE') await advanceAll.mutateAsync(item.id)
-        await advanceAll.mutateAsync(item.id)
-      }
+      await advanceTicketItems(ticket.items, 'LISTO')
       show('Todos los platos del ticket quedaron listos.')
     } catch (err) {
       show(getErrorMessage(err, 'Error al marcar el ticket como listo'), 'error')
@@ -142,7 +151,7 @@ function TicketCard({
           </div>
           <p className={`inline-flex items-center gap-1 text-xs ${urgent ? 'text-red-400' : 'text-neutral-500'}`}>
             <Clock size={11} />
-            #{ticket.orderId.slice(0, 8)} · hace {minutesAgo} min
+            #{ticket.orderNumber} · hace {minutesAgo} min
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -183,10 +192,19 @@ function TicketCard({
         >
           <Flag size={13} /> {prioritized ? 'Quitar prioridad' : 'Prioritario'}
         </button>
-        {pendingItems.length > 0 && (
+        {pendingCount > 0 && (
+          <button
+            onClick={handleStartAll}
+            disabled={advancingAll}
+            className={`${secondaryButtonClass} !px-3.5 !py-3`}
+          >
+            <PlayCircle size={13} /> Iniciar todo
+          </button>
+        )}
+        {notReadyCount > 0 && (
           <button
             onClick={handleMarkAllReady}
-            disabled={advanceAll.isPending}
+            disabled={advancingAll}
             className={`${secondaryButtonClass} !px-3.5 !py-3`}
           >
             <CheckCheck size={13} /> Marcar todo listo
@@ -230,13 +248,16 @@ export function KitchenPage() {
             <p className="text-sm text-neutral-400">Pedidos confirmados en cola. Se actualiza automáticamente.</p>
           </div>
         </div>
-        <button
-          onClick={toggleSound}
-          title={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
-          className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-        >
-          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleSound}
+            title={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
+            className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+          >
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          </button>
+          <VoiceCommandBar tickets={sortedTickets} />
+        </div>
       </div>
 
       {isLoading && <p className="text-neutral-400">Cargando…</p>}

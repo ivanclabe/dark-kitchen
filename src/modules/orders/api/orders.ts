@@ -3,6 +3,7 @@ import type { Order, OrderInput, OrderStatusHistoryEntry } from '../types'
 
 interface OrderRow {
   id: string
+  order_number: number
   customer_id: string
   status: Order['status']
   subtotal: number
@@ -17,13 +18,14 @@ interface OrderRow {
 }
 
 const SELECT = `
-  id, customer_id, status, subtotal, discount, delivery_fee, total, payment_method, notes, requires_review, created_at,
+  id, order_number, customer_id, status, subtotal, discount, delivery_fee, total, payment_method, notes, requires_review, created_at,
   dk_customers ( full_name )
 `
 
 function mapRow(row: OrderRow): Order {
   return {
     id: row.id,
+    orderNumber: row.order_number,
     customerId: row.customer_id,
     customerName: row.dk_customers?.full_name ?? '—',
     status: row.status,

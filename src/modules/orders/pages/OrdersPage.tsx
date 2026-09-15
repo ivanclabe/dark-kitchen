@@ -54,7 +54,7 @@ export function OrdersPage() {
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<OrderStatus | 'TODOS'>('TODOS')
   const [createCustomerQuery, setCreateCustomerQuery] = useState<string | null>(null)
-  const [drawerOrder, setDrawerOrder] = useState<{ id: string; customerName: string } | null>(null)
+  const [drawerOrder, setDrawerOrder] = useState<{ id: string; orderNumber: number; customerName: string } | null>(null)
 
   const counts = useMemo(() => {
     const map = new Map<OrderStatus | 'TODOS', number>()
@@ -75,7 +75,7 @@ export function OrdersPage() {
     try {
       const order = await createOrder.mutateAsync({ customerId: forCustomerId })
       setCustomerId('')
-      setDrawerOrder({ id: order.id, customerName: order.customerName })
+      setDrawerOrder({ id: order.id, orderNumber: order.orderNumber, customerName: order.customerName })
     } catch (err) {
       setError(getErrorMessage(err, 'Error al crear el pedido'))
     }
@@ -126,7 +126,7 @@ export function OrdersPage() {
         <Drawer
           open
           onClose={() => setDrawerOrder(null)}
-          title="Nuevo pedido"
+          title={`Nuevo pedido #${drawerOrder.orderNumber}`}
           subtitle={
             <div className="flex items-center gap-2">
               <span>Cliente: {drawerOrder.customerName}</span>
@@ -153,6 +153,7 @@ export function OrdersPage() {
         <table className="min-w-full divide-y divide-neutral-800">
           <thead className="bg-neutral-900">
             <tr>
+              <th className={thClass}>#</th>
               <th className={thClass}>Cliente</th>
               <th className={thClass}>Fecha</th>
               <th className={thClass}>Total</th>
@@ -163,14 +164,14 @@ export function OrdersPage() {
           <tbody className="divide-y divide-neutral-800 bg-neutral-950">
             {isLoading && (
               <tr>
-                <td className={tdClass} colSpan={5}>
+                <td className={tdClass} colSpan={6}>
                   Cargando…
                 </td>
               </tr>
             )}
             {!isLoading && filteredOrders?.length === 0 && (
               <tr>
-                <td className={tdClass} colSpan={5}>
+                <td className={tdClass} colSpan={6}>
                   No hay pedidos en este estado.
                 </td>
               </tr>
@@ -181,6 +182,7 @@ export function OrdersPage() {
                 onClick={() => navigate(`/orders/${order.id}`)}
                 className="cursor-pointer transition-colors hover:bg-neutral-900"
               >
+                <td className={`${tdClass} font-medium text-neutral-400`}>#{order.orderNumber}</td>
                 <td className={tdClass}>{order.customerName}</td>
                 <td className={tdClass}>{new Date(order.createdAt).toLocaleString()}</td>
                 <td className={tdClass}>${order.total.toFixed(2)}</td>

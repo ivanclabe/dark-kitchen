@@ -3,6 +3,7 @@ import type { KitchenTicket } from '../types'
 
 interface OrderRow {
   id: string
+  order_number: number
   status: 'CONFIRMADO' | 'EN_PREPARACION'
   notes: string | null
   created_at: string
@@ -26,7 +27,7 @@ export async function listKitchenQueue(): Promise<KitchenTicket[]> {
   const { data, error } = await supabase
     .from('dk_orders')
     .select(
-      `id, status, notes, created_at,
+      `id, order_number, status, notes, created_at,
        dk_customers ( full_name ),
        dk_kitchen_tickets ( priority ),
        dk_order_items ( id, quantity, observation, kitchen_status, dk_products ( name ) )`,
@@ -38,6 +39,7 @@ export async function listKitchenQueue(): Promise<KitchenTicket[]> {
 
   return (data as unknown as OrderRow[]).map((row) => ({
     orderId: row.id,
+    orderNumber: row.order_number,
     customerName: row.dk_customers?.full_name ?? '—',
     orderStatus: row.status,
     createdAt: row.created_at,
