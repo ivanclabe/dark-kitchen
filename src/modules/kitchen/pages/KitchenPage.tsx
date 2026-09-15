@@ -4,10 +4,10 @@ import { Bell, ChefHat, Gauge, Kanban, LayoutGrid, List, Volume2, VolumeX } from
 import { useMemo, useState } from 'react'
 import { useKitchenQueue } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
-import { ComingSoonView } from '../views/ComingSoonView'
 import { GridView } from '../views/GridView'
 import { KanbanView } from '../views/KanbanView'
 import { ListView } from '../views/ListView'
+import { SlaView } from '../views/SlaView'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 
 type KitchenView = 'grid' | 'kanban' | 'list' | 'sla'
@@ -97,7 +97,7 @@ export function KitchenPage() {
       {view === 'list' && (
         <ListView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
       )}
-      {view === 'sla' && <ComingSoonView icon={Gauge} label="SLA" />}
+      {view === 'sla' && <SlaView tickets={sortedTickets} now={now} />}
     </div>
   )
 }
