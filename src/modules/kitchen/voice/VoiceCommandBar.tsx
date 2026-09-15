@@ -44,7 +44,13 @@ export function VoiceCommandBar({ tickets }: { tickets: KitchenTicket[] | undefi
         </button>
       </div>
 
-      {(engine.lastTranscript || engine.lastMessage) && (
+      {engine.phase === 'listening' && (
+        <p className="max-w-xs text-right text-xs text-neutral-400">
+          {engine.liveTranscript ? `🎤 "${engine.liveTranscript}"` : 'Escuchando…'}
+        </p>
+      )}
+
+      {engine.phase !== 'listening' && (engine.lastTranscript || engine.lastMessage) && (
         <div className="max-w-xs text-right text-xs">
           {engine.lastTranscript && <p className="text-neutral-500">🎤 "{engine.lastTranscript}"</p>}
           {engine.lastMessage && (

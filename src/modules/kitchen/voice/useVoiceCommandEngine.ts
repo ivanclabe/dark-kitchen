@@ -12,6 +12,15 @@ export type VoicePhase = 'idle' | 'listening' | 'processing' | 'success' | 'erro
 const TTS_PREF_KEY = 'dk-kitchen-voice-tts'
 const RESULT_DISPLAY_MS = 4000
 
+/**
+ * Ventana de silencio antes de procesar un comando de voz. Mientras el
+ * transcript siga cambiando ("Pedido..." → "Pedido 2040..." → "Pedido 2040
+ * en preparación") no se ejecuta nada — solo cuando pasan
+ * VOICE_COMMAND_DELAY_MS sin cambios se toma el transcript acumulado como
+ * la intención completa del usuario y se procesa.
+ */
+export const VOICE_COMMAND_DELAY_MS = 1800
+
 const ACTION_FEEDBACK: Record<VoiceAction, string> = {
   CONFIRM: 'confirmado',
   START_PREPARATION: 'en preparación',
@@ -29,11 +38,12 @@ function readTtsPref(): boolean {
 }
 
 /**
- * Orquesta: transcript de voz → parseVoiceCommand (puro) → busca el ticket
- * por orderNumber en la cola ya cargada → valida contra su estado actual →
- * ejecuta las MISMAS mutaciones que usan los botones (useAdvanceTicketItems,
- * useSetTicketPriority) → feedback visual (toast) + auditivo opcional (TTS).
- * No llama Supabase directamente en ningún punto.
+ * Orquesta: transcript acumulado de voz (buffer + debounce) →
+ * parseVoiceCommand (puro) → busca el ticket por orderNumber en la cola ya
+ * cargada → valida contra su estado actual → ejecuta las MISMAS mutaciones
+ * que usan los botones (useAdvanceTicketItems, useSetTicketPriority) →
+ * feedback visual (toast) + auditivo opcional (TTS). No llama Supabase
+ * directamente en ningún punto.
  */
 export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   const ticketsRef = useRef(tickets)
@@ -46,10 +56,18 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   const { show } = useToast()
 
   const [phase, setPhase] = useState<VoicePhase>('idle')
+  const [liveTranscript, setLiveTranscript] = useState('')
   const [lastTranscript, setLastTranscript] = useState('')
   const [lastMessage, setLastMessage] = useState('')
   const [ttsEnabled, setTtsEnabled] = useState(readTtsPref)
+
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Se pone en true apenas el debounce dispara (antes incluso de validar) y
+  // se usa para: (a) ignorar cualquier transcript tardío que el navegador
+  // siga entregando mientras recognition.stop() termina de aplicarse, (b)
+  // evitar que el mismo comando se procese dos veces.
+  const isProcessingRef = useRef(false)
 
   function scheduleReset() {
     if (resetTimer.current) clearTimeout(resetTimer.current)
@@ -64,19 +82,24 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     scheduleReset()
   }
 
-  async function handleTranscript(transcript: string) {
-    setLastTranscript(transcript)
+  async function processTranscript(transcript: string) {
+    isProcessingRef.current = true
+    speech.stop()
     setPhase('processing')
+    setLastTranscript(transcript)
+
     const parsed = parseVoiceCommand(transcript)
 
     if (parsed.confidence !== 'high' || !parsed.orderCode || !parsed.action) {
       announce('error', 'No entendí el comando.')
+      isProcessingRef.current = false
       return
     }
 
     const ticket = ticketsRef.current?.find((t) => t.orderNumber === Number(parsed.orderCode))
     if (!ticket) {
       announce('error', `El pedido ${parsed.orderCode} no existe.`)
+      isProcessingRef.current = false
       return
     }
 
@@ -106,11 +129,29 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
       announce('success', `Pedido ${parsed.orderCode} ${ACTION_FEEDBACK[parsed.action]}.`)
     } catch (err) {
       announce('error', getErrorMessage(err, `No se pudo actualizar el pedido ${parsed.orderCode}.`))
+    } finally {
+      isProcessingRef.current = false
     }
   }
 
+  function handleTranscriptChange(transcript: string) {
+    // El navegador puede seguir entregando un último resultado mientras
+    // stop() termina de aplicarse — se ignora, ya hay un comando en curso.
+    if (isProcessingRef.current) return
+
+    setLiveTranscript(transcript)
+    setPhase('listening')
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    if (transcript.length === 0) return
+
+    debounceTimer.current = setTimeout(() => {
+      void processTranscript(transcript)
+    }, VOICE_COMMAND_DELAY_MS)
+  }
+
   const speech = useSpeechRecognition({
-    onResult: handleTranscript,
+    onTranscriptChange: handleTranscriptChange,
     onError: (code) => announce('error', speechErrorMessage(code)),
     lang: 'es-CO',
   })
@@ -118,10 +159,13 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   useEffect(() => {
     return () => {
       if (resetTimer.current) clearTimeout(resetTimer.current)
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
     }
   }, [])
 
   function start() {
+    isProcessingRef.current = false
+    setLiveTranscript('')
     setPhase('listening')
     speech.start()
   }
@@ -141,14 +185,24 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   return {
     supported: speech.supported,
     phase,
+    liveTranscript,
     lastTranscript,
     lastMessage,
     ttsEnabled,
     toggleTts,
     start,
     stop: speech.stop,
-    /** Alimenta el pipeline con un transcript sin pasar por el micrófono real — usado por el input de "simular comando" para pruebas. */
-    simulateTranscript: handleTranscript,
+    /**
+     * Alimenta el pipeline con un transcript sin pasar por el micrófono
+     * real — usado por el input de "simular comando" para pruebas. Pasa
+     * por el MISMO buffer/debounce que la voz real (handleTranscriptChange),
+     * no directo a processTranscript: así el campo de texto también sirve
+     * para probar que enviar fragmentos crecientes ("Pedido" → "Pedido
+     * 2040" → "Pedido 2040 listo") en menos de VOICE_COMMAND_DELAY_MS entre
+     * sí NO ejecuta nada hasta el último, en vez de solo probar el comando
+     * final de forma aislada.
+     */
+    simulateTranscript: handleTranscriptChange,
   }
 }
 
