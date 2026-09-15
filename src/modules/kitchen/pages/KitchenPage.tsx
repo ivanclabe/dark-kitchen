@@ -84,24 +84,24 @@ function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: ()
     <div className="border-b border-neutral-800 py-2 last:border-0">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-medium text-neutral-100">
+          <p className="text-sm font-medium text-neutral-100 2xl:text-base">
             {item.quantity}× {item.productName}
           </p>
           {item.observation && (
-            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-neutral-500">
+            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-neutral-500 2xl:text-sm">
               <MessageSquareText size={11} /> {item.observation}
             </p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ITEM_STATUS_BADGE[item.kitchenStatus]}`}>
+          <span className={`rounded-full px-2 py-0.5 text-xs font-medium 2xl:text-sm ${ITEM_STATUS_BADGE[item.kitchenStatus]}`}>
             {ITEM_STATUS_LABEL[item.kitchenStatus]}
           </span>
           {item.kitchenStatus !== 'LISTO' && (
             <button
               onClick={handleAdvance}
               disabled={advance.isPending}
-              className={`${secondaryButtonClass} !px-3.5 !py-3`}
+              className={`${secondaryButtonClass} !px-3.5 !py-3 2xl:!text-base`}
             >
               <PlayCircle size={13} />
               {item.kitchenStatus === 'PENDIENTE' ? 'Iniciar' : 'Marcar listo'}
@@ -173,19 +173,19 @@ function TicketCard({
       <div className="mb-2 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-medium text-neutral-100">{ticket.customerName}</p>
+            <p className="font-medium text-neutral-100 2xl:text-lg">{ticket.customerName}</p>
             {prioritized && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-400 2xl:text-xs">
                 <Flag size={10} /> Prioritario
               </span>
             )}
             {isNew && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-brasa-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brasa-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-brasa-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brasa-400 2xl:text-xs">
                 Nuevo
               </span>
             )}
           </div>
-          <div className="mt-0.5 flex items-center gap-2 text-xs text-neutral-500">
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-neutral-500 2xl:text-sm">
             <span>#{ticket.orderNumber}</span>
             <span className={`inline-flex items-center gap-1 ${TIME_TIER_STYLE[tier]}`}>
               {tier === 'retrasado' ? <AlertTriangle size={11} /> : <Clock size={11} />}
@@ -198,12 +198,12 @@ function TicketCard({
             <button
               onClick={onAcknowledge}
               title="Marcar como visto"
-              className="inline-flex items-center gap-1 rounded-full border border-neutral-700 px-2 py-0.5 text-[11px] text-neutral-300 hover:bg-neutral-800"
+              className="inline-flex items-center gap-1 rounded-full border border-neutral-700 px-2 py-0.5 text-[11px] text-neutral-300 hover:bg-neutral-800 2xl:text-xs"
             >
               <Check size={11} /> Visto
             </button>
           )}
-          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.badge}`}>
+          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium 2xl:text-sm ${statusConfig.badge}`}>
             <StatusIcon size={11} /> {statusConfig.label}
           </span>
         </div>
@@ -223,7 +223,7 @@ function TicketCard({
           onClick={handleTogglePriority}
           disabled={setPriority.isPending}
           title={prioritized ? 'Quitar prioridad' : 'Marcar como prioritario'}
-          className={`${secondaryButtonClass} !px-3.5 !py-3 ${prioritized ? '!border-violet-600/70 !text-violet-400' : ''}`}
+          className={`${secondaryButtonClass} !px-3.5 !py-3 2xl:!text-base ${prioritized ? '!border-violet-600/70 !text-violet-400' : ''}`}
         >
           <Flag size={13} /> {prioritized ? 'Quitar prioridad' : 'Prioritario'}
         </button>
@@ -231,7 +231,7 @@ function TicketCard({
           <button
             onClick={handleStartAll}
             disabled={advancingAll}
-            className={`${secondaryButtonClass} !px-3.5 !py-3`}
+            className={`${secondaryButtonClass} !px-3.5 !py-3 2xl:!text-base`}
           >
             <PlayCircle size={13} /> Iniciar todo
           </button>
@@ -240,7 +240,7 @@ function TicketCard({
           <button
             onClick={handleMarkAllReady}
             disabled={advancingAll}
-            className={`${secondaryButtonClass} !px-3.5 !py-3`}
+            className={`${secondaryButtonClass} !px-3.5 !py-3 2xl:!text-base`}
           >
             <CheckCheck size={13} /> Marcar todo listo
           </button>
@@ -273,7 +273,7 @@ export function KitchenPage() {
           <ChefHat size={22} className="text-brasa-500" />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold text-neutral-50">Cocina</h1>
+              <h1 className="text-2xl font-semibold text-neutral-50 2xl:text-3xl">Cocina</h1>
               {newIds.size > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-brasa-600 px-2 py-0.5 text-xs font-semibold text-white">
                   <Bell size={12} /> {newIds.size} {newIds.size === 1 ? 'nuevo' : 'nuevos'}
