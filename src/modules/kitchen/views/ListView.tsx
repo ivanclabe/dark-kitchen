@@ -5,7 +5,16 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { AlertTriangle, Clock, Flag, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useAdvanceTicketItems } from '../hooks/useKitchen'
-import { minutesAgoSince, ORDER_STATUS_CONFIG, TIME_TIER_STYLE, timeTier } from '../lib/ticketVisuals'
+import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
+import {
+  alertMinutesFor,
+  DEFAULT_SLA_THRESHOLDS,
+  formatElapsed,
+  minutesAgoSince,
+  ORDER_STATUS_CONFIG,
+  TIME_TIER_STYLE,
+  timeTier,
+} from '../lib/ticketVisuals'
 import type { KitchenOrderStatus, KitchenTicket } from '../types'
 
 const STATUS_FILTERS: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
@@ -21,8 +30,9 @@ function ListRow({
   isNew: boolean
   onAcknowledge: () => void
 }) {
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
   const minutesAgo = minutesAgoSince(ticket.createdAt, now)
-  const tier = timeTier(minutesAgo)
+  const tier = timeTier(minutesAgo, alertMinutesFor(ticket.orderStatus, thresholds), thresholds.nearThresholdPct)
   const prioritized = ticket.priority > 0
   const statusConfig = ORDER_STATUS_CONFIG[ticket.orderStatus]
   const StatusIcon = statusConfig.icon
@@ -67,7 +77,7 @@ function ListRow({
       <td className={tdClass}>
         <span className={`inline-flex items-center gap-1 ${TIME_TIER_STYLE[tier]}`}>
           {tier === 'retrasado' ? <AlertTriangle size={12} /> : <Clock size={12} />}
-          {minutesAgo} min
+          {formatElapsed(minutesAgo)}
         </span>
       </td>
       <td className={`${tdClass} text-right`}>

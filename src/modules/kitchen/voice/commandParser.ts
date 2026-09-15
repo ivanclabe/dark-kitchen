@@ -11,7 +11,7 @@
  * useVoiceCommandEngine, no aquí.
  */
 
-export type VoiceAction = 'CONFIRM' | 'START_PREPARATION' | 'MARK_READY' | 'SET_PRIORITY' | 'UNSET_PRIORITY'
+export type VoiceAction = 'CONFIRM' | 'START_PREPARATION' | 'MARK_READY' | 'CANCEL' | 'SET_PRIORITY' | 'UNSET_PRIORITY'
 
 export interface ParsedVoiceCommand {
   /** Código de 4 dígitos del pedido, o null si no se encontró exactamente uno. */
@@ -33,6 +33,7 @@ export interface ParsedVoiceCommand {
 const ACTION_PATTERNS: { action: VoiceAction; patterns: RegExp[] }[] = [
   { action: 'UNSET_PRIORITY', patterns: [/quitar\s+prioridad/i, /no\s+prioritari[oa]/i, /sin\s+prioridad/i] },
   { action: 'SET_PRIORITY', patterns: [/prioritari[oa]/i, /\bprioridad\b/i, /\burgente\b/i] },
+  { action: 'CANCEL', patterns: [/cancelad[oa]/i, /\bcancelar\b/i] },
   { action: 'MARK_READY', patterns: [/\blist[oa]\b/i, /terminad[oa]/i] },
   {
     action: 'START_PREPARATION',

@@ -1,13 +1,15 @@
-import { CheckCircle2, Clock, Flame } from 'lucide-react'
+import { CheckCircle2, Clock, Flame, XCircle } from 'lucide-react'
 import type { ComponentType } from 'react'
-import type { KitchenItemStatus, KitchenTicket } from '../types'
+import type { KitchenItemStatus, KitchenOrderStatus } from '../types'
 
 /**
  * Paleta semántica compartida por las 4 vistas de Cocina (Kanban, Lista,
  * Grid, SLA) — un solo lugar para no reinventar los colores/umbrales en
- * cada vista. CONFIRMADO (azul, "esperando") y EN_PREPARACION (ámbar, "en
- * marcha") a nivel de pedido y de plato; PRIORITARIO usa violeta (ver
- * TicketCard) para no colisionar con ningún estado.
+ * cada vista. CONFIRMADO (azul, "esperando"), EN_PREPARACION (ámbar, "en
+ * marcha"), LISTO (verde) y CANCELADO (rojo, mismo tono que ya usa el
+ * módulo Pedidos para este estado) a nivel de pedido y de plato;
+ * PRIORITARIO usa violeta (ver TicketCard) para no colisionar con ningún
+ * estado.
  */
 export const ITEM_STATUS_BADGE: Record<KitchenItemStatus, string> = {
   PENDIENTE: 'bg-neutral-700 text-neutral-200',
@@ -22,28 +24,60 @@ export const ITEM_STATUS_LABEL: Record<KitchenItemStatus, string> = {
 }
 
 export const ORDER_STATUS_CONFIG: Record<
-  KitchenTicket['orderStatus'],
+  KitchenOrderStatus,
   { label: string; badge: string; accent: string; icon: ComponentType<{ size?: number; className?: string }> }
 > = {
   CONFIRMADO: { label: 'Confirmado', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
   EN_PREPARACION: { label: 'En preparación', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
   LISTO: { label: 'Listo', badge: 'bg-emerald-500/20 text-emerald-400', accent: 'border-l-emerald-500', icon: CheckCircle2 },
+  CANCELADO: { label: 'Cancelado', badge: 'bg-red-500/20 text-red-400', accent: 'border-l-red-500', icon: XCircle },
 }
 
-// Umbrales de urgencia por tiempo — configurables acá, sin necesidad de una
-// tabla en base de datos para esto. El indicador queda contenido a su
-// propio badge (no tiñe la tarjeta completa) para no competir visualmente
-// con el color de estado o de prioridad. La vista SLA reutiliza estos
-// mismos umbrales (en particular TIME_LATE_MIN) para "pedidos atrasados" —
-// no inventa un número nuevo.
-export const TIME_WARN_MIN = 10
-export const TIME_LATE_MIN = 20
+/**
+ * Umbrales de alerta por estado — antes fijos (TIME_WARN_MIN/TIME_LATE_MIN
+ * globales), ahora configurables desde dk_kitchen_sla_settings (ver
+ * useKitchenSettings). Estos valores son solo el fallback mientras carga la
+ * configuración real o si nunca se guardó una fila (no debería pasar, la
+ * migración siembra una por defecto).
+ */
+export interface SlaThresholds {
+  confirmadoAlertMin: number
+  enPreparacionAlertMin: number
+  listoAlertMin: number
+  nearThresholdPct: number
+}
+
+export const DEFAULT_SLA_THRESHOLDS: SlaThresholds = {
+  confirmadoAlertMin: 10,
+  enPreparacionAlertMin: 20,
+  listoAlertMin: 15,
+  nearThresholdPct: 80,
+}
+
+/** CANCELADO no tiene umbral: un pedido cancelado no debe seguir generando alertas operativas. */
+export function alertMinutesFor(status: KitchenOrderStatus, thresholds: SlaThresholds): number | null {
+  switch (status) {
+    case 'CONFIRMADO':
+      return thresholds.confirmadoAlertMin
+    case 'EN_PREPARACION':
+      return thresholds.enPreparacionAlertMin
+    case 'LISTO':
+      return thresholds.listoAlertMin
+    case 'CANCELADO':
+      return null
+  }
+}
 
 export type TimeTier = 'normal' | 'atencion' | 'retrasado'
 
-export function timeTier(minutesAgo: number): TimeTier {
-  if (minutesAgo >= TIME_LATE_MIN) return 'retrasado'
-  if (minutesAgo >= TIME_WARN_MIN) return 'atencion'
+/**
+ * `alertMin: null` (pedido CANCELADO) siempre da 'normal' — sin esa señal
+ * no hay "tiempo transcurrido" operativo que alertar.
+ */
+export function timeTier(minutesAgo: number, alertMin: number | null, nearThresholdPct: number): TimeTier {
+  if (alertMin === null) return 'normal'
+  if (minutesAgo >= alertMin) return 'retrasado'
+  if (minutesAgo >= alertMin * (nearThresholdPct / 100)) return 'atencion'
   return 'normal'
 }
 
@@ -55,4 +89,14 @@ export const TIME_TIER_STYLE: Record<TimeTier, string> = {
 
 export function minutesAgoSince(iso: string, now: number): number {
   return Math.max(0, Math.round((now - new Date(iso).getTime()) / 60000))
+}
+
+/**
+ * < 1h: "08 min" / "37 min". >= 1h: "1h 04m" / "2h 10m" — nunca "125 min".
+ */
+export function formatElapsed(minutesAgo: number): string {
+  if (minutesAgo < 60) return `${String(minutesAgo).padStart(2, '0')} min`
+  const hours = Math.floor(minutesAgo / 60)
+  const mins = minutesAgo % 60
+  return `${hours}h ${String(mins).padStart(2, '0')}m`
 }

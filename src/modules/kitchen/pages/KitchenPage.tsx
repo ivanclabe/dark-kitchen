@@ -1,7 +1,9 @@
+import { useAuth } from '@/shared/hooks/useAuth'
 import { useNow } from '@/shared/hooks/useNow'
 import { Tabs, type TabItem } from '@/shared/ui/Tabs'
-import { Bell, ChefHat, Gauge, Kanban, LayoutGrid, List, Volume2, VolumeX } from 'lucide-react'
+import { Bell, ChefHat, Gauge, Kanban, LayoutGrid, List, Settings, Volume2, VolumeX } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { KitchenSettingsModal } from '../components/KitchenSettingsModal'
 import { useKitchenQueue } from '../hooks/useKitchen'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import { GridView } from '../views/GridView'
@@ -32,6 +34,10 @@ function readViewPref(): KitchenView {
 }
 
 export function KitchenPage() {
+  const { profile } = useAuth()
+  const canConfigureSla = profile?.role === 'ADMIN' || profile?.role === 'MANAGER'
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
   const { data: tickets, isLoading } = useKitchenQueue()
   const now = useNow()
   const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(tickets)
@@ -75,6 +81,15 @@ export function KitchenPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {canConfigureSla && (
+            <button
+              onClick={() => setSettingsOpen(true)}
+              title="Configurar umbrales de alerta (SLA)"
+              className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+            >
+              <Settings size={16} />
+            </button>
+          )}
           <button
             onClick={toggleSound}
             title={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
@@ -87,6 +102,8 @@ export function KitchenPage() {
       </div>
 
       <Tabs value={view} onChange={handleViewChange} items={VIEW_ITEMS} />
+
+      {canConfigureSla && <KitchenSettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />}
 
       {view === 'grid' && (
         <GridView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />

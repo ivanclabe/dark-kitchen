@@ -1,5 +1,4 @@
 import { supabase } from '@/shared/lib/supabase'
-import { TIME_LATE_MIN } from '../lib/ticketVisuals'
 
 export interface SlaSummary {
   totalCompleted: number
@@ -27,7 +26,14 @@ const EMPTY_SUMMARY: SlaSummary = {
  * que llegaron a LISTO dentro del rango, después el momento en que esos
  * mismos pedidos fueron CONFIRMADO, y se cruzan en JS.
  */
-export async function getSlaSummary(rangeStart: Date): Promise<SlaSummary> {
+/**
+ * lateThresholdMin: umbral de tiempo total de preparación (CONFIRMADO →
+ * LISTO) considerado "dentro de SLA". Antes era el TIME_LATE_MIN global
+ * fijo; ahora lo calcula el caller (useSlaSummary) a partir de los
+ * umbrales configurables por estado — confirmadoAlertMin +
+ * enPreparacionAlertMin, la suma de ambas etapas que cubre este tramo.
+ */
+export async function getSlaSummary(rangeStart: Date, lateThresholdMin: number): Promise<SlaSummary> {
   const { data: listoRows, error: listoError } = await supabase
     .from('dk_order_status_history')
     .select('order_id, changed_at')
@@ -59,7 +65,7 @@ export async function getSlaSummary(rangeStart: Date): Promise<SlaSummary> {
   const totalCompleted = prepMinutes.length
   if (totalCompleted === 0) return EMPTY_SUMMARY
 
-  const withinSla = prepMinutes.filter((minutes) => minutes <= TIME_LATE_MIN).length
+  const withinSla = prepMinutes.filter((minutes) => minutes <= lateThresholdMin).length
   const overSla = totalCompleted - withinSla
 
   return {

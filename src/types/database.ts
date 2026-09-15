@@ -778,6 +778,44 @@ export type Database = {
           },
         ]
       }
+      dk_kitchen_sla_settings: {
+        Row: {
+          confirmado_alert_min: number
+          en_preparacion_alert_min: number
+          id: number
+          listo_alert_min: number
+          near_threshold_pct: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          confirmado_alert_min?: number
+          en_preparacion_alert_min?: number
+          id?: number
+          listo_alert_min?: number
+          near_threshold_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          confirmado_alert_min?: number
+          en_preparacion_alert_min?: number
+          id?: number
+          listo_alert_min?: number
+          near_threshold_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_sla_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_kitchen_tickets: {
         Row: {
           created_at: string
@@ -4716,6 +4754,10 @@ export type Database = {
           ingredient_name: string
           quantity: number
         }[]
+      }
+      dk_revert_kitchen_item: {
+        Args: { p_order_item_id: string }
+        Returns: undefined
       }
       dk_set_ticket_priority: {
         Args: { p_order_id: string; p_priority: number }

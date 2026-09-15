@@ -3,7 +3,16 @@ import { Chip } from '@/shared/ui/Chip'
 import { AlertTriangle, CheckCircle2, Clock, Flag } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSlaSummary } from '../hooks/useSla'
-import { minutesAgoSince, TIME_TIER_STYLE, timeTier, type TimeTier } from '../lib/ticketVisuals'
+import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
+import {
+  alertMinutesFor,
+  DEFAULT_SLA_THRESHOLDS,
+  formatElapsed,
+  minutesAgoSince,
+  TIME_TIER_STYLE,
+  timeTier,
+  type TimeTier,
+} from '../lib/ticketVisuals'
 import type { KitchenTicket } from '../types'
 
 type SlaRange = 'hoy' | 'ultima_hora' | '4h'
@@ -62,8 +71,8 @@ function MetricCard({
  * Vista operacional, no un dashboard administrativo: responde "¿cómo
  * vamos con los tiempos?" y "¿qué pedidos están causando el problema
  * ahora?" en un vistazo. Los pedidos activos reutilizan exactamente el
- * mismo timeTier ya usado en Grid/Kanban/Lista (normal/atención/retrasado
- * → Dentro SLA/Cerca del límite/Fuera SLA) — ningún umbral nuevo.
+ * mismo timeTier ya usado en Grid/Kanban/Lista, parametrizado con los
+ * umbrales configurables (useKitchenSlaSettings) — ningún umbral nuevo.
  */
 export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined; now: number }) {
   const [range, setRange] = useState<SlaRange>('hoy')
@@ -71,7 +80,11 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
   // que su ISO string (parte de la queryKey) no cambie en cada render y la
   // consulta no se reinicie infinitamente.
   const start = useMemo(() => rangeStart(range), [range])
-  const { data: summary, isLoading } = useSlaSummary(start)
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
+  // Tiempo total de preparación (CONFIRMADO -> LISTO) dentro de SLA = suma
+  // de los umbrales de las dos etapas que ese tramo cubre.
+  const lateThresholdMin = thresholds.confirmadoAlertMin + thresholds.enPreparacionAlertMin
+  const { data: summary, isLoading } = useSlaSummary(start, lateThresholdMin)
 
   const activeWithTime = useMemo(
     () =>
@@ -81,8 +94,12 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
     [tickets, now],
   )
 
-  const lateNowCount = activeWithTime.filter(({ minutesAgo }) => timeTier(minutesAgo) === 'retrasado').length
-  const nearLimitCount = activeWithTime.filter(({ minutesAgo }) => timeTier(minutesAgo) === 'atencion').length
+  function tierFor(ticket: KitchenTicket, minutesAgo: number): TimeTier {
+    return timeTier(minutesAgo, alertMinutesFor(ticket.orderStatus, thresholds), thresholds.nearThresholdPct)
+  }
+
+  const lateNowCount = activeWithTime.filter(({ ticket, minutesAgo }) => tierFor(ticket, minutesAgo) === 'retrasado').length
+  const nearLimitCount = activeWithTime.filter(({ ticket, minutesAgo }) => tierFor(ticket, minutesAgo) === 'atencion').length
 
   return (
     <div className="space-y-6">
@@ -108,8 +125,8 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
             hint={nearLimitCount > 0 ? `${nearLimitCount} cerca del límite` : undefined}
             tone={lateNowCount > 0 ? 'warn' : 'good'}
           />
-          <MetricCard label="Tiempo promedio" value={`${summary.avgPrepMinutes} min`} />
-          <MetricCard label="Mayor tiempo" value={`${summary.maxPrepMinutes} min`} />
+          <MetricCard label="Tiempo promedio" value={formatElapsed(Math.round(summary.avgPrepMinutes))} />
+          <MetricCard label="Mayor tiempo" value={formatElapsed(Math.round(summary.maxPrepMinutes))} />
         </div>
       )}
 
@@ -117,7 +134,7 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
         {activeWithTime.length === 0 && <p className="text-sm text-neutral-500">No hay pedidos activos en cocina.</p>}
         <ul className="divide-y divide-neutral-800">
           {activeWithTime.map(({ ticket, minutesAgo }) => {
-            const tier = timeTier(minutesAgo)
+            const tier = tierFor(ticket, minutesAgo)
             const TierIcon = TIER_ICON[tier]
             return (
               <li key={ticket.orderId} className="flex items-center justify-between gap-3 py-2.5">
@@ -126,7 +143,7 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
                   #{ticket.orderNumber} · {ticket.customerName}
                 </span>
                 <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${TIME_TIER_STYLE[tier]}`}>
-                  {minutesAgo} min <TierIcon size={13} /> {TIER_LABEL[tier]}
+                  {formatElapsed(minutesAgo)} <TierIcon size={13} /> {TIER_LABEL[tier]}
                 </span>
               </li>
             )

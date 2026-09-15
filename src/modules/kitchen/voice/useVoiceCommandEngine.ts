@@ -1,7 +1,7 @@
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useEffect, useRef, useState } from 'react'
-import { useAdvanceTicketItems, useSetTicketPriority } from '../hooks/useKitchen'
+import { useAdvanceTicketItems, useCancelKitchenOrder, useSetTicketPriority } from '../hooks/useKitchen'
 import type { KitchenTicket } from '../types'
 import { parseVoiceCommand, type VoiceAction } from './commandParser'
 import { speak } from './speak'
@@ -25,6 +25,7 @@ const ACTION_FEEDBACK: Record<VoiceAction, string> = {
   CONFIRM: 'confirmado',
   START_PREPARATION: 'en preparación',
   MARK_READY: 'listo',
+  CANCEL: 'cancelado',
   SET_PRIORITY: 'marcado como prioritario',
   UNSET_PRIORITY: 'ya no es prioritario',
 }
@@ -53,6 +54,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
 
   const { advanceTicketItems } = useAdvanceTicketItems()
   const setPriority = useSetTicketPriority()
+  const cancelOrder = useCancelKitchenOrder()
   const { show } = useToast()
 
   const [phase, setPhase] = useState<VoicePhase>('idle')
@@ -119,6 +121,9 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
           await advanceTicketItems(ticket.items, 'LISTO')
           break
         }
+        case 'CANCEL':
+          await cancelOrder.mutateAsync({ orderId: ticket.orderId })
+          break
         case 'SET_PRIORITY':
           await setPriority.mutateAsync({ orderId: ticket.orderId, priority: 1 })
           break

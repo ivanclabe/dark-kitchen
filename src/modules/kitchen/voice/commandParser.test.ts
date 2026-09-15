@@ -19,6 +19,20 @@ describe('parseVoiceCommand', () => {
     expect(result.confidence).toBe('high')
   })
 
+  it('formato corto "1004 listo" — el contexto de Kanban no requiere decir "pedido"', () => {
+    const result = parseVoiceCommand('1004 listo')
+    expect(result.orderCode).toBe('1004')
+    expect(result.action).toBe('MARK_READY')
+    expect(result.confidence).toBe('high')
+  })
+
+  it('formato corto "1004 confirmado"', () => {
+    const result = parseVoiceCommand('1004 confirmado')
+    expect(result.orderCode).toBe('1004')
+    expect(result.action).toBe('CONFIRM')
+    expect(result.confidence).toBe('high')
+  })
+
   it('reconoce la variante con coma', () => {
     const result = parseVoiceCommand('Pedido 2040, listo')
     expect(result.orderCode).toBe('2040')
@@ -53,6 +67,25 @@ describe('parseVoiceCommand', () => {
     const result = parseVoiceCommand('Pedido 2040 confirmado')
     expect(result.action).toBe('CONFIRM')
     expect(result.confidence).toBe('high')
+  })
+
+  it('reconoce "cancelado" como CANCEL, formato corto sin "pedido"', () => {
+    const result = parseVoiceCommand('1004 cancelado')
+    expect(result.orderCode).toBe('1004')
+    expect(result.action).toBe('CANCEL')
+    expect(result.confidence).toBe('high')
+  })
+
+  it('reconoce "cancelado" también con la palabra "pedido" (compatibilidad)', () => {
+    const result = parseVoiceCommand('Pedido 1004 cancelado')
+    expect(result.orderCode).toBe('1004')
+    expect(result.action).toBe('CANCEL')
+    expect(result.confidence).toBe('high')
+  })
+
+  it('reconoce "cancelar" como CANCEL', () => {
+    const result = parseVoiceCommand('1004 cancelar')
+    expect(result.action).toBe('CANCEL')
   })
 
   it('confidence baja cuando falta la acción (comando incompleto)', () => {

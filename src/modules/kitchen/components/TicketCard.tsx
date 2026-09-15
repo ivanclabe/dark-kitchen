@@ -3,7 +3,18 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { AlertTriangle, Check, CheckCheck, Clock, Flag, MessageSquareText, PlayCircle } from 'lucide-react'
 import { useAdvanceKitchenItem, useAdvanceTicketItems, useSetTicketPriority } from '../hooks/useKitchen'
-import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL, minutesAgoSince, ORDER_STATUS_CONFIG, TIME_TIER_STYLE, timeTier } from '../lib/ticketVisuals'
+import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
+import {
+  alertMinutesFor,
+  DEFAULT_SLA_THRESHOLDS,
+  formatElapsed,
+  ITEM_STATUS_BADGE,
+  ITEM_STATUS_LABEL,
+  minutesAgoSince,
+  ORDER_STATUS_CONFIG,
+  TIME_TIER_STYLE,
+  timeTier,
+} from '../lib/ticketVisuals'
 import type { KitchenTicket, KitchenTicketItem } from '../types'
 
 function ItemRow({ item, onInteract }: { item: KitchenTicketItem; onInteract: () => void }) {
@@ -64,8 +75,9 @@ export function TicketCard({
   isNew: boolean
   onAcknowledge: () => void
 }) {
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
   const minutesAgo = minutesAgoSince(ticket.createdAt, now)
-  const tier = timeTier(minutesAgo)
+  const tier = timeTier(minutesAgo, alertMinutesFor(ticket.orderStatus, thresholds), thresholds.nearThresholdPct)
   const prioritized = ticket.priority > 0
   const statusConfig = ORDER_STATUS_CONFIG[ticket.orderStatus]
   const StatusIcon = statusConfig.icon
@@ -129,7 +141,7 @@ export function TicketCard({
             <span>#{ticket.orderNumber}</span>
             <span className={`inline-flex items-center gap-1 ${TIME_TIER_STYLE[tier]}`}>
               {tier === 'retrasado' ? <AlertTriangle size={11} /> : <Clock size={11} />}
-              hace {minutesAgo} min{tier === 'atencion' ? ' · atención' : tier === 'retrasado' ? ' · retrasado' : ''}
+              hace {formatElapsed(minutesAgo)}{tier === 'atencion' ? ' · atención' : tier === 'retrasado' ? ' · retrasado' : ''}
             </span>
           </div>
         </div>

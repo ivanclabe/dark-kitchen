@@ -1,6 +1,6 @@
 export type KitchenItemStatus = 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO'
 
-export type KitchenOrderStatus = 'CONFIRMADO' | 'EN_PREPARACION' | 'LISTO'
+export type KitchenOrderStatus = 'CONFIRMADO' | 'EN_PREPARACION' | 'LISTO' | 'CANCELADO'
 
 export interface KitchenTicketItem {
   id: string
@@ -19,4 +19,7 @@ export interface KitchenTicket {
   notes: string | null
   priority: number
   items: KitchenTicketItem[]
+  /** Solo presente en tickets CANCELADO — cuándo y por qué, para la columna Cancelado del Kanban. */
+  cancelledAt?: string
+  cancelReason?: string | null
 }
