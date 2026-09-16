@@ -11,6 +11,7 @@ import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { MenusPage } from '@/modules/menus/pages/MenusPage'
 import { MenuDetailPage } from '@/modules/menus/pages/MenuDetailPage'
 import { TodayMenuPage } from '@/modules/menus/pages/TodayMenuPage'
+import { WeeklyMenuPage } from '@/modules/menus/pages/WeeklyMenuPage'
 import { SuppliersPage } from '@/modules/suppliers/pages/SuppliersPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
       { path: 'products', element: <ProductsPage /> },
       { path: 'menus', element: <MenusPage /> },
       { path: 'menus/dia', element: <TodayMenuPage /> },
+      { path: 'menus/semanal', element: <WeeklyMenuPage /> },
       { path: 'menus/:id', element: <MenuDetailPage /> },
       { path: 'customers', element: <CustomersPage /> },
       {

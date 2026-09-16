@@ -894,6 +894,13 @@ export type Database = {
             referencedRelation: "dk_products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_menu_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
         ]
       }
       dk_menus: {
@@ -974,6 +981,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_products"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "dk_order_items_recipe_id_fkey"
@@ -1373,6 +1387,13 @@ export type Database = {
             referencedRelation: "dk_products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_recipes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
         ]
       }
       dk_supplier_ingredients: {
@@ -1509,6 +1530,51 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      dk_weekly_menu_items: {
+        Row: {
+          created_at: string
+          day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
+          display_order: number
+          id: string
+          is_active: boolean
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: Database["public"]["Enums"]["dk_day_of_week"]
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_weekly_menu_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_weekly_menu_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       documentos_soporte: {
         Row: {
@@ -4424,6 +4490,18 @@ export type Database = {
       }
     }
     Views: {
+      dk_today_menu: {
+        Row: {
+          available: boolean | null
+          category: string | null
+          description: string | null
+          display_order: number | null
+          price: number | null
+          product: string | null
+          product_id: string | null
+        }
+        Relationships: []
+      }
       v_cartera: {
         Row: {
           cliente_id: string | null
@@ -4669,6 +4747,24 @@ export type Database = {
         Args: { p_purchase_id: string }
         Returns: undefined
       }
+      dk_copy_weekly_menu_day: {
+        Args: {
+          p_from_day: Database["public"]["Enums"]["dk_day_of_week"]
+          p_to_day: Database["public"]["Enums"]["dk_day_of_week"]
+        }
+        Returns: undefined
+      }
+      dk_create_conversational_order: {
+        Args: {
+          p_channel?: Database["public"]["Enums"]["dk_order_channel"]
+          p_customer_name?: string
+          p_external_reference?: string
+          p_items?: Json
+          p_notes?: string
+          p_phone: string
+        }
+        Returns: string
+      }
       dk_create_recipe_version: {
         Args: { p_items: Json; p_product_id: string }
         Returns: string
@@ -4682,6 +4778,10 @@ export type Database = {
       dk_dispatch_order: {
         Args: { p_notes?: string; p_order_id: string; p_rider_id: string }
         Returns: undefined
+      }
+      dk_find_or_create_customer_by_phone: {
+        Args: { p_full_name?: string; p_phone: string }
+        Returns: string
       }
       dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
       dk_register_adjustment: {
@@ -4763,6 +4863,10 @@ export type Database = {
         Args: { p_order_id: string; p_priority: number }
         Returns: undefined
       }
+      dk_today_day_of_week: {
+        Args: never
+        Returns: Database["public"]["Enums"]["dk_day_of_week"]
+      }
     }
     Enums: {
       destinatario_anticipo:
@@ -4770,6 +4874,14 @@ export type Database = {
         | "Conductor"
         | "Propietario"
         | "Administrador(a)"
+      dk_day_of_week:
+        | "LUNES"
+        | "MARTES"
+        | "MIERCOLES"
+        | "JUEVES"
+        | "VIERNES"
+        | "SABADO"
+        | "DOMINGO"
       dk_delivery_status: "EN_RUTA" | "ENTREGADO" | "FALLIDO"
       dk_kitchen_item_status: "PENDIENTE" | "EN_PREPARACION" | "LISTO"
       dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
@@ -4945,6 +5057,15 @@ export const Constants = {
         "Conductor",
         "Propietario",
         "Administrador(a)",
+      ],
+      dk_day_of_week: [
+        "LUNES",
+        "MARTES",
+        "MIERCOLES",
+        "JUEVES",
+        "VIERNES",
+        "SABADO",
+        "DOMINGO",
       ],
       dk_delivery_status: ["EN_RUTA", "ENTREGADO", "FALLIDO"],
       dk_kitchen_item_status: ["PENDIENTE", "EN_PREPARACION", "LISTO"],

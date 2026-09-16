@@ -8,7 +8,7 @@ import {
   tdClass,
   thClass,
 } from '@/shared/ui/formClasses'
-import { CalendarDays, Power, Soup, UtensilsCrossed } from 'lucide-react'
+import { CalendarDays, CalendarRange, Power, Soup, UtensilsCrossed } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useCreateMenu, useMenus, useSetMenuActive } from '../hooks/useMenus'
@@ -35,9 +35,14 @@ export function MenusPage() {
           <Soup size={22} className="text-brasa-500" />
           <h1 className="text-2xl font-semibold text-neutral-50">Menús</h1>
         </div>
-        <Link to="/menus/dia" className={secondaryButtonClass}>
-          <CalendarDays size={15} /> Menú del día
-        </Link>
+        <div className="flex gap-2">
+          <Link to="/menus/semanal" className={secondaryButtonClass}>
+            <CalendarRange size={15} /> Menú semanal
+          </Link>
+          <Link to="/menus/dia" className={secondaryButtonClass}>
+            <CalendarDays size={15} /> Menú del día
+          </Link>
+        </div>
       </div>
 
       <form onSubmit={handleCreate} className={`${cardClass} grid grid-cols-1 gap-4 sm:grid-cols-3`}>
