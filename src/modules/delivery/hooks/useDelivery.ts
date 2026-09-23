@@ -23,12 +23,12 @@ export function useSetRiderActive() {
   })
 }
 
-export function useReadyOrders() {
-  return useQuery({ queryKey: ['ready-orders'], queryFn: listReadyOrders, refetchInterval: 15_000 })
+export function useReadyOrders(enabled = true) {
+  return useQuery({ queryKey: ['ready-orders'], queryFn: listReadyOrders, refetchInterval: 15_000, enabled })
 }
 
-export function useDispatchedOrders() {
-  return useQuery({ queryKey: ['dispatched-orders'], queryFn: listDispatchedOrders, refetchInterval: 15_000 })
+export function useDispatchedOrders(enabled = true) {
+  return useQuery({ queryKey: ['dispatched-orders'], queryFn: listDispatchedOrders, refetchInterval: 15_000, enabled })
 }
 
 function useInvalidateDeliveries() {
@@ -37,6 +37,8 @@ function useInvalidateDeliveries() {
     queryClient.invalidateQueries({ queryKey: ['ready-orders'] })
     queryClient.invalidateQueries({ queryKey: ['dispatched-orders'] })
     queryClient.invalidateQueries({ queryKey: ['orders'] })
+    // Despachar/entregar mueve la tarjeta del tablero de Cocina (Listo → En ruta → fuera).
+    queryClient.invalidateQueries({ queryKey: ['kitchen-queue'] })
   }
 }
 

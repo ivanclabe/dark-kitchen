@@ -1,11 +1,13 @@
 import { AccountDisabledPage } from '@/modules/auth/pages/AccountDisabledPage'
 import { NoProfilePage } from '@/modules/auth/pages/NoProfilePage'
+import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { useAuth } from '@/shared/hooks/useAuth'
 import type { ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, profile, loading, profileLoading } = useAuth()
+  const { pathname } = useLocation()
 
   // Solo bloquea toda la pantalla en la carga inicial. Supabase dispara
   // onAuthStateChange (p.ej. TOKEN_REFRESHED) periódicamente en segundo
@@ -20,7 +22,13 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     )
   }
 
-  if (!session) return <Navigate to="/login" replace />
+  if (!session) {
+    // Sin sesión, la página de inicio es la landing (en la misma URL "/", sin
+    // redirigir). Cualquier otra ruta protegida sigue llevando al login:
+    // quien entra por un enlace directo viene a usar la app, no a conocerla.
+    if (pathname === '/') return <LandingPage />
+    return <Navigate to="/login" replace />
+  }
 
   if (!profile) return <NoProfilePage />
 

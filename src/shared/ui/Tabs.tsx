@@ -44,7 +44,7 @@ export function Tabs<T extends string>({
     <div
       role="tablist"
       onKeyDown={handleKeyDown}
-      className="inline-flex items-center gap-1 rounded-lg border border-neutral-800 bg-neutral-900 p-1"
+      className="inline-flex items-center gap-1 rounded-full border border-neutral-800/60 bg-neutral-900/60 p-1"
     >
       {items.map((item) => {
         const Icon = item.icon
@@ -60,8 +60,8 @@ export function Tabs<T extends string>({
             aria-selected={active}
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(item.value)}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
-              active ? 'bg-neutral-800 text-neutral-50 shadow-sm' : 'text-neutral-400 hover:text-neutral-200'
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
+              active ? 'bg-brasa-500 text-white' : 'text-neutral-400 hover:text-neutral-200'
             }`}
           >
             {Icon && <Icon size={15} />}

@@ -46,6 +46,12 @@ export async function listOrders(): Promise<Order[]> {
   return (data as unknown as OrderRow[]).map(mapRow)
 }
 
+export async function listOrdersByCustomer(customerId: string): Promise<Order[]> {
+  const { data, error } = await supabase.from('dk_orders').select(SELECT).eq('customer_id', customerId).order('created_at', { ascending: false })
+  if (error) throw error
+  return (data as unknown as OrderRow[]).map(mapRow)
+}
+
 export async function getOrder(id: string): Promise<Order> {
   const { data, error } = await supabase.from('dk_orders').select(SELECT).eq('id', id).single()
   if (error) throw error

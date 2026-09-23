@@ -1,51 +1,76 @@
-import type { KitchenOrderStatus } from '../types'
+import type { Role } from '@/shared/rbac/roles'
+import { canPerform, type FlowAction } from '../lib/permissions'
+import type { KitchenOrderStatus, KitchenPrepStatus } from '../types'
 
-// Columnas visibles en el Kanban. CANCELADO se muestra aparte — es terminal,
-// no participa de la secuencia activa de preparación.
-export const KANBAN_COLUMNS: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'CANCELADO']
+/**
+ * Columnas del tablero, en orden: el flujo completo del pedido. CANCELADO va
+ * aparte al final (terminal). ENTREGADO no es columna: sale del tablero.
+ */
+export const KANBAN_COLUMNS: KitchenOrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO', 'CANCELADO']
 
-// Secuencia lineal de estados activos. Drag & drop y voz pueden moverse
-// libremente hacia adelante o hacia atrás dentro de ella (corregir errores
-// operativos sin un flujo especial de "deshacer").
-const SEQUENCE: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
+/** Tramo de cocina: dentro de él se avanza y retrocede libremente (corregir errores sin un "deshacer" especial). */
+const KITCHEN_SEQUENCE: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
 
-const NEXT_STATUS: Partial<Record<KitchenOrderStatus, Extract<KitchenOrderStatus, 'EN_PREPARACION' | 'LISTO'>>> = {
+/** Orden lineal del flujo completo, para saber qué es "hacia adelante". */
+const FLOW_SEQUENCE: KitchenOrderStatus[] = ['NUEVO', ...KITCHEN_SEQUENCE, 'DESPACHADO']
+
+const NEXT_STATUS: Partial<Record<KitchenOrderStatus, KitchenOrderStatus>> = {
+  NUEVO: 'CONFIRMADO',
   CONFIRMADO: 'EN_PREPARACION',
   EN_PREPARACION: 'LISTO',
+  LISTO: 'DESPACHADO',
 }
 
-const PREV_STATUS: Partial<Record<KitchenOrderStatus, Extract<KitchenOrderStatus, 'CONFIRMADO' | 'EN_PREPARACION'>>> = {
+const PREV_STATUS: Partial<Record<KitchenOrderStatus, KitchenPrepStatus>> = {
   EN_PREPARACION: 'CONFIRMADO',
   LISTO: 'EN_PREPARACION',
 }
 
-/** Siguiente estado, o null si no hay paso siguiente (LISTO, CANCELADO). */
+/** Siguiente columna, o null si no hay (DESPACHADO sale del tablero con "Entregar"; CANCELADO es terminal). */
 export function nextStatus(current: KitchenOrderStatus) {
   return NEXT_STATUS[current] ?? null
 }
 
-/** Paso anterior, o null si ya está al principio (CONFIRMADO) o es terminal (CANCELADO). */
+/**
+ * Columna anterior, o null. Solo existe dentro del tramo de cocina: no hay
+ * RPC para "desconfirmar" un pedido ni para "desdespacharlo".
+ */
 export function prevStatus(current: KitchenOrderStatus) {
   return PREV_STATUS[current] ?? null
 }
 
-/**
- * Única fuente de verdad de qué transiciones son válidas — la usan drag &
- * drop, voz y los botones manuales del card. CANCELADO es terminal: no se
- * puede salir de él (no existe "descancelar", igual que dk_cancel_order ya
- * rechaza cancelar dos veces), pero se puede cancelar cualquier pedido
- * activo. Entre los 3 estados activos se permite avanzar y retroceder
- * libremente, incluyendo saltos de más de un paso (p. ej. LISTO ->
- * CONFIRMADO directo).
- */
-export function canTransition(from: KitchenOrderStatus, to: KitchenOrderStatus): boolean {
-  if (from === to) return false
-  if (from === 'CANCELADO') return false
-  if (to === 'CANCELADO') return true
-  return SEQUENCE.includes(from) && SEQUENCE.includes(to)
+/** true si `to` está más adelante que `from` en el flujo (false si alguno es CANCELADO). */
+export function isForward(from: KitchenOrderStatus, to: KitchenOrderStatus): boolean {
+  const a = FLOW_SEQUENCE.indexOf(from)
+  const b = FLOW_SEQUENCE.indexOf(to)
+  return a !== -1 && b !== -1 && b > a
 }
 
-/** true si `to` está más adelante que `from` en la secuencia activa (false para CANCELADO en cualquiera de los dos lados). */
-export function isForward(from: KitchenOrderStatus, to: KitchenOrderStatus): boolean {
-  return SEQUENCE.indexOf(to) > SEQUENCE.indexOf(from)
+/**
+ * Qué acción real (qué RPC) implica mover un pedido de `from` a `to`, o null
+ * si no existe forma de hacerlo. Única fuente de verdad para drag & drop,
+ * botones del card y voz:
+ *   - cualquier estado activo → CANCELADO: cancelar
+ *   - NUEVO → CONFIRMADO: confirmar (no se salta: confirmar reserva inventario)
+ *   - LISTO → DESPACHADO: despachar (pide domiciliario)
+ *   - dentro de Confirmado/Preparación/Listo: avanzar o retroceder, con saltos
+ *   - nada sale de CANCELADO ni de DESPACHADO, y nada vuelve a NUEVO
+ */
+export function transitionAction(from: KitchenOrderStatus, to: KitchenOrderStatus): FlowAction | null {
+  if (from === to || from === 'CANCELADO') return null
+  if (to === 'CANCELADO') return 'cancel'
+  if (from === 'NUEVO') return to === 'CONFIRMADO' ? 'confirm' : null
+  if (to === 'DESPACHADO') return from === 'LISTO' ? 'dispatch' : null
+  if (KITCHEN_SEQUENCE.includes(from) && KITCHEN_SEQUENCE.includes(to)) return isForward(from, to) ? 'advance' : 'revert'
+  return null
+}
+
+/**
+ * ¿Se puede mover? Sin `role` responde solo si la transición existe; con
+ * `role` además exige que ese rol pueda ejecutar la acción (ver permissions.ts).
+ */
+export function canTransition(from: KitchenOrderStatus, to: KitchenOrderStatus, role?: Role | null): boolean {
+  const action = transitionAction(from, to)
+  if (!action) return false
+  return role === undefined ? true : canPerform(role, action)
 }

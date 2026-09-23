@@ -1,24 +1,25 @@
 import { useAuth } from '@/shared/hooks/useAuth'
-import { ShieldOff } from 'lucide-react'
+import { Button } from '@/shared/ui/Button'
+import { typography } from '@/shared/ui/typography'
+import { LogOut, ShieldOff } from 'lucide-react'
 
 export function AccountDisabledPage() {
   const { profile, signOut } = useAuth()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-center">
-      <div className="max-w-sm">
-        <ShieldOff size={28} className="mx-auto mb-3 text-red-400" />
-        <h1 className="text-lg font-semibold text-neutral-50">Cuenta desactivada</h1>
-        <p className="mt-2 text-sm text-neutral-400">
-          {profile?.fullName}, tu cuenta fue desactivada por un administrador. Contacta a tu administrador si crees
-          que esto es un error.
+    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
+      <div className="w-full max-w-sm rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
+        <span className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
+          <ShieldOff size={22} aria-hidden />
+        </span>
+        <h1 className={typography.h2}>Cuenta desactivada</h1>
+        <p className={`mt-2 ${typography.small}`}>
+          <span className="text-neutral-200">{profile?.fullName}</span>, tu cuenta fue desactivada por un administrador. Contacta a tu administrador si
+          crees que esto es un error.
         </p>
-        <button
-          onClick={() => void signOut()}
-          className="mt-4 rounded-md border border-neutral-700 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800"
-        >
+        <Button variant="secondary" icon={LogOut} onClick={() => void signOut()} className="mt-6 w-full">
           Cerrar sesión
-        </button>
+        </Button>
       </div>
     </div>
   )

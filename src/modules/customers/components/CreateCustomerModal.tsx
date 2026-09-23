@@ -1,9 +1,10 @@
+import { Button } from '@/shared/ui/Button'
+import { FormField, Input, Textarea } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
-import { inputClass, labelClass, primaryButtonClass, secondaryButtonClass } from '@/shared/ui/formClasses'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useState, type FormEvent } from 'react'
-import { useCreateCustomer } from '../hooks/useCustomers'
+import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
 import type { Customer } from '../types'
 
 /** Detecta si el texto escrito parece un teléfono (mayoría dígitos) en vez de un nombre. */
@@ -12,72 +13,90 @@ function looksLikePhone(text: string) {
   return digits.length >= 6 && digits.length / text.length > 0.6
 }
 
-interface Props {
-  open: boolean
+interface FormProps {
+  /** Cliente a editar; si no viene, el formulario crea uno nuevo. */
+  customer?: Customer
+  initialQuery?: string
   onClose: () => void
-  initialQuery: string
-  onCreated: (customer: Customer) => void
+  onSaved?: (customer: Customer) => void
 }
 
-// Componente hijo separado (en vez de estado local en CreateCustomerModal):
-// solo se instancia mientras open=true, así cada apertura es un montaje
-// nuevo y los campos parten limpios de initialQuery sin necesitar un efecto
-// para resetearlos.
-function CreateCustomerForm({ initialQuery, onClose, onCreated }: Omit<Props, 'open'>) {
+// Componente hijo separado (en vez de estado local en el modal): solo se
+// instancia mientras open=true, así cada apertura es un montaje nuevo y los
+// campos parten limpios sin necesitar un efecto para resetearlos.
+function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormProps) {
   const createCustomer = useCreateCustomer()
+  const updateCustomer = useUpdateCustomer()
   const { show } = useToast()
-  const [fullName, setFullName] = useState(() => (looksLikePhone(initialQuery) ? '' : initialQuery))
-  const [phone, setPhone] = useState(() => (looksLikePhone(initialQuery) ? initialQuery : ''))
-  const [address, setAddress] = useState('')
+  const [fullName, setFullName] = useState(() => customer?.fullName ?? (looksLikePhone(initialQuery) ? '' : initialQuery))
+  const [phone, setPhone] = useState(() => customer?.phone ?? (looksLikePhone(initialQuery) ? initialQuery : ''))
+  const [address, setAddress] = useState(customer?.address ?? '')
+  const [notes, setNotes] = useState(customer?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
+  const pending = createCustomer.isPending || updateCustomer.isPending
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    const input = { fullName: fullName.trim(), phone: phone.trim() || null, address: address.trim() || null, notes: notes.trim() || null }
     try {
-      const customer = await createCustomer.mutateAsync({
-        fullName,
-        phone: phone || null,
-        address: address || null,
-      })
-      show(`Cliente "${customer.fullName}" creado.`)
-      onCreated(customer)
+      if (customer) {
+        await updateCustomer.mutateAsync({ id: customer.id, input })
+        show(`Cliente "${input.fullName}" actualizado.`)
+        onSaved?.({ ...customer, ...input })
+      } else {
+        const created = await createCustomer.mutateAsync(input)
+        show(`Cliente "${created.fullName}" creado.`)
+        onSaved?.(created)
+      }
+      onClose()
     } catch (err) {
-      setError(getErrorMessage(err, 'Error al crear el cliente'))
+      setError(getErrorMessage(err, customer ? 'Error al actualizar el cliente' : 'Error al crear el cliente'))
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className={labelClass}>Nombre *</label>
-        <input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} required autoFocus />
-      </div>
-      <div>
-        <label className={labelClass}>Teléfono</label>
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
-      </div>
-      <div>
-        <label className={labelClass}>Dirección</label>
-        <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
-      </div>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+    <form id="customer-form" onSubmit={handleSubmit} className="space-y-4">
+      <FormField label="Nombre" required error={error}>
+        {(a11y) => <Input {...a11y} value={fullName} onChange={(e) => setFullName(e.target.value)} required autoFocus autoComplete="name" />}
+      </FormField>
+      <FormField label="Teléfono" hint="Se usa para reconocer al cliente en pedidos por WhatsApp.">
+        {(a11y) => <Input {...a11y} type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />}
+      </FormField>
+      <FormField label="Dirección">{(a11y) => <Input {...a11y} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />}</FormField>
+      <FormField label="Notas">{(a11y) => <Textarea {...a11y} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />}</FormField>
       <div className="flex justify-end gap-2 pt-2">
-        <button type="button" onClick={onClose} className={secondaryButtonClass}>
+        <Button variant="ghost" onClick={onClose} disabled={pending}>
           Cancelar
-        </button>
-        <button type="submit" disabled={createCustomer.isPending} className={primaryButtonClass}>
-          {createCustomer.isPending ? 'Creando…' : 'Crear cliente'}
-        </button>
+        </Button>
+        <Button type="submit" variant="primary" loading={pending}>
+          {customer ? 'Guardar cambios' : 'Crear cliente'}
+        </Button>
       </div>
     </form>
   )
 }
 
-export function CreateCustomerModal({ open, onClose, initialQuery, onCreated }: Props) {
+/** Alta y edición de clientes en un mismo modal. */
+export function CustomerFormModal({ open, customer, initialQuery, onClose, onSaved }: FormProps & { open: boolean }) {
   return (
-    <Modal open={open} onClose={onClose} title="Crear cliente">
-      {open && <CreateCustomerForm initialQuery={initialQuery} onClose={onClose} onCreated={onCreated} />}
+    <Modal open={open} onClose={onClose} title={customer ? 'Editar cliente' : 'Nuevo cliente'} description={customer ? customer.fullName : undefined}>
+      {open && <CustomerForm customer={customer} initialQuery={initialQuery} onClose={onClose} onSaved={onSaved} />}
     </Modal>
   )
+}
+
+/** Compatibilidad: el picker de Pedidos sigue usando esta firma (crear desde texto buscado). */
+export function CreateCustomerModal({
+  open,
+  onClose,
+  initialQuery,
+  onCreated,
+}: {
+  open: boolean
+  onClose: () => void
+  initialQuery: string
+  onCreated: (customer: Customer) => void
+}) {
+  return <CustomerFormModal open={open} initialQuery={initialQuery} onClose={onClose} onSaved={onCreated} />
 }

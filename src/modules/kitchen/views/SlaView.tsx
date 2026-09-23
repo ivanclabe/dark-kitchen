@@ -1,6 +1,10 @@
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
-import { AlertTriangle, CheckCircle2, Clock, Flag } from 'lucide-react'
+import { EmptyState } from '@/shared/ui/EmptyState'
+import { ErrorState } from '@/shared/ui/ErrorState'
+import { LoadingState } from '@/shared/ui/LoadingState'
+import { StatCard } from '@/shared/ui/StatCard'
+import { AlertTriangle, CheckCircle2, ChefHat, Clock, Flag, Gauge, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSlaSummary } from '../hooks/useSla'
 import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
@@ -46,27 +50,6 @@ const TIER_ICON: Record<TimeTier, typeof Clock> = {
   retrasado: AlertTriangle,
 }
 
-function MetricCard({
-  label,
-  value,
-  hint,
-  tone = 'neutral',
-}: {
-  label: string
-  value: string
-  hint?: string
-  tone?: 'good' | 'warn' | 'neutral'
-}) {
-  const toneClass = tone === 'good' ? 'text-emerald-400' : tone === 'warn' ? 'text-red-400' : 'text-neutral-50'
-  return (
-    <Card>
-      <p className="text-xs uppercase tracking-wide text-neutral-500">{label}</p>
-      <p className={`mt-1 text-4xl font-bold 2xl:text-5xl ${toneClass}`}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-neutral-500">{hint}</p>}
-    </Card>
-  )
-}
-
 /**
  * Vista operacional, no un dashboard administrativo: responde "¿cómo
  * vamos con los tiempos?" y "¿qué pedidos están causando el problema
@@ -84,7 +67,7 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
   // Tiempo total de preparación (CONFIRMADO -> LISTO) dentro de SLA = suma
   // de los umbrales de las dos etapas que ese tramo cubre.
   const lateThresholdMin = thresholds.confirmadoAlertMin + thresholds.enPreparacionAlertMin
-  const { data: summary, isLoading } = useSlaSummary(start, lateThresholdMin)
+  const { data: summary, isLoading, isError, error, refetch } = useSlaSummary(start, lateThresholdMin)
 
   const activeWithTime = useMemo(
     () =>
@@ -100,55 +83,63 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
 
   const lateNowCount = activeWithTime.filter(({ ticket, minutesAgo }) => tierFor(ticket, minutesAgo) === 'retrasado').length
   const nearLimitCount = activeWithTime.filter(({ ticket, minutesAgo }) => tierFor(ticket, minutesAgo) === 'atencion').length
+  const complianceTone = summary ? (summary.complianceRate >= 90 ? 'good' : summary.complianceRate >= 75 ? 'neutral' : 'warn') : 'neutral'
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Rango de tiempo">
         {RANGE_ORDER.map((r) => (
           <Chip key={r} label={RANGE_LABEL[r]} active={range === r} onClick={() => setRange(r)} />
         ))}
       </div>
 
-      {isLoading && <p className="text-neutral-400">Cargando…</p>}
+      {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
+      {isLoading && <LoadingState variant="cards" rows={4} cols={4} />}
 
       {summary && (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <MetricCard
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <StatCard
             label="Cumplimiento"
             value={`${summary.complianceRate}%`}
             hint={`${summary.totalCompleted} pedidos completados`}
-            tone={summary.complianceRate >= 90 ? 'good' : summary.complianceRate >= 75 ? 'neutral' : 'warn'}
+            icon={complianceTone === 'warn' ? AlertTriangle : Gauge}
+            tone={complianceTone}
+            emphasis
           />
-          <MetricCard
+          <StatCard
             label="Atrasados ahora"
-            value={String(lateNowCount)}
-            hint={nearLimitCount > 0 ? `${nearLimitCount} cerca del límite` : undefined}
+            value={lateNowCount}
+            hint={nearLimitCount > 0 ? `${nearLimitCount} cerca del límite` : 'Ninguno cerca del límite'}
+            icon={lateNowCount > 0 ? AlertTriangle : CheckCircle2}
             tone={lateNowCount > 0 ? 'warn' : 'good'}
           />
-          <MetricCard label="Tiempo promedio" value={formatElapsed(Math.round(summary.avgPrepMinutes))} />
-          <MetricCard label="Mayor tiempo" value={formatElapsed(Math.round(summary.maxPrepMinutes))} />
+          <StatCard label="Tiempo promedio" value={formatElapsed(Math.round(summary.avgPrepMinutes))} hint="Confirmado → listo" icon={Timer} />
+          <StatCard label="Mayor tiempo" value={formatElapsed(Math.round(summary.maxPrepMinutes))} hint="Confirmado → listo" icon={Clock} />
         </div>
       )}
 
-      <Card title="Pedidos activos por tiempo transcurrido" icon={Clock}>
-        {activeWithTime.length === 0 && <p className="text-sm text-neutral-500">No hay pedidos activos en cocina.</p>}
-        <ul className="divide-y divide-neutral-800">
-          {activeWithTime.map(({ ticket, minutesAgo }) => {
-            const tier = tierFor(ticket, minutesAgo)
-            const TierIcon = TIER_ICON[tier]
-            return (
-              <li key={ticket.orderId} className="flex items-center justify-between gap-3 py-2.5">
-                <span className="inline-flex items-center gap-2 text-sm text-neutral-200">
-                  {ticket.priority > 0 && <Flag size={12} className="shrink-0 text-violet-400" />}
-                  #{ticket.orderNumber} · {ticket.customerName}
-                </span>
-                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${TIME_TIER_STYLE[tier]}`}>
-                  {formatElapsed(minutesAgo)} <TierIcon size={13} /> {TIER_LABEL[tier]}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+      <Card title="Pedidos activos por tiempo transcurrido" icon={Clock} description="Del más antiguo al más reciente">
+        {activeWithTime.length === 0 ? (
+          <EmptyState icon={ChefHat} title="No hay pedidos activos en cocina" compact />
+        ) : (
+          <ul className="divide-y divide-neutral-800/60">
+            {activeWithTime.map(({ ticket, minutesAgo }) => {
+              const tier = tierFor(ticket, minutesAgo)
+              const TierIcon = TIER_ICON[tier]
+              return (
+                <li key={ticket.orderId} className="flex items-center justify-between gap-3 py-2.5">
+                  <span className="inline-flex items-center gap-2 text-sm text-neutral-200">
+                    {ticket.priority > 0 && <Flag size={12} className="shrink-0 text-violet-400" aria-label="Prioritario" />}
+                    <span className="tabular-nums">#{ticket.orderNumber}</span> · {ticket.customerName}
+                  </span>
+                  <span className={`inline-flex items-center gap-1.5 text-sm font-medium tabular-nums ${TIME_TIER_STYLE[tier]}`}>
+                    {formatElapsed(minutesAgo)} <TierIcon size={13} aria-hidden /> {TIER_LABEL[tier]}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        )}
       </Card>
     </div>
   )

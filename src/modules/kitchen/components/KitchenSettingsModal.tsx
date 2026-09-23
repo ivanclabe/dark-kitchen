@@ -1,6 +1,8 @@
+import { Button } from '@/shared/ui/Button'
+import { FormActions, FormField, Input } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
-import { inputClass, labelClass, primaryButtonClass, secondaryButtonClass } from '@/shared/ui/formClasses'
+import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useState, type FormEvent } from 'react'
 import { useKitchenSlaSettings, useUpdateKitchenSlaSettings } from '../hooks/useKitchenSettings'
@@ -47,66 +49,39 @@ export function KitchenSettingsModal({ open, onClose }: { open: boolean; onClose
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Umbrales de alerta (SLA)">
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Umbrales de alerta (SLA)"
+      description="Minutos de espera antes de que un pedido se marque como fuera de SLA en cada estado."
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-xs text-neutral-500">
-          Minutos de espera antes de que un pedido se marque como "fuera de SLA" en cada estado. "Cerca del límite" se
-          calcula como un porcentaje de ese umbral.
-        </p>
+        <p className={typography.overline}>Minutos por estado</p>
+        <FormField label="Confirmado" required>
+          {(a11y) => <Input {...a11y} type="number" min={1} inputMode="numeric" required value={form.confirmadoAlertMin} onChange={(e) => setField('confirmadoAlertMin', e.target.value)} />}
+        </FormField>
+        <FormField label="En preparación" required>
+          {(a11y) => (
+            <Input {...a11y} type="number" min={1} inputMode="numeric" required value={form.enPreparacionAlertMin} onChange={(e) => setField('enPreparacionAlertMin', e.target.value)} />
+          )}
+        </FormField>
+        <FormField label="Listo (esperando despacho)" required>
+          {(a11y) => <Input {...a11y} type="number" min={1} inputMode="numeric" required value={form.listoAlertMin} onChange={(e) => setField('listoAlertMin', e.target.value)} />}
+        </FormField>
+        <FormField label='Umbral de "cerca del límite" (%)' required hint="Porcentaje del umbral a partir del cual el pedido se marca como cerca del límite.">
+          {(a11y) => (
+            <Input {...a11y} type="number" min={1} max={100} inputMode="numeric" required value={form.nearThresholdPct} onChange={(e) => setField('nearThresholdPct', e.target.value)} />
+          )}
+        </FormField>
 
-        <div>
-          <label className={labelClass}>Confirmado</label>
-          <input
-            type="number"
-            min={1}
-            value={form.confirmadoAlertMin}
-            onChange={(e) => setField('confirmadoAlertMin', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label className={labelClass}>En preparación</label>
-          <input
-            type="number"
-            min={1}
-            value={form.enPreparacionAlertMin}
-            onChange={(e) => setField('enPreparacionAlertMin', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label className={labelClass}>Listo (esperando despacho)</label>
-          <input
-            type="number"
-            min={1}
-            value={form.listoAlertMin}
-            onChange={(e) => setField('listoAlertMin', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label className={labelClass}>Umbral de "cerca del límite" (%)</label>
-          <input
-            type="number"
-            min={1}
-            max={100}
-            value={form.nearThresholdPct}
-            onChange={(e) => setField('nearThresholdPct', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-
-        <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={handleClose} className={secondaryButtonClass}>
+        <FormActions>
+          <Button variant="ghost" onClick={handleClose} disabled={update.isPending}>
             Cancelar
-          </button>
-          <button type="submit" disabled={update.isPending} className={primaryButtonClass}>
-            {update.isPending ? 'Guardando…' : 'Guardar configuración'}
-          </button>
-        </div>
+          </Button>
+          <Button type="submit" variant="primary" loading={update.isPending}>
+            Guardar configuración
+          </Button>
+        </FormActions>
       </form>
     </Modal>
   )

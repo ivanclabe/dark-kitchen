@@ -462,6 +462,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
+          {
             foreignKeyName: "dk_deliveries_rider_id_fkey"
             columns: ["rider_id"]
             isOneToOne: false
@@ -560,6 +567,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_ingredient_purchase_units_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
+          },
+          {
             foreignKeyName: "dk_ingredient_purchase_units_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
@@ -597,6 +611,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "dk_ingredients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_stock_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: true
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
           },
         ]
       }
@@ -731,6 +752,13 @@ export type Database = {
             referencedRelation: "dk_ingredients"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_inventory_movements_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
+          },
         ]
       }
       dk_inventory_reservations: {
@@ -768,6 +796,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_ingredients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_inventory_reservations_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
           },
           {
             foreignKeyName: "dk_inventory_reservations_order_item_id_fkey"
@@ -843,6 +878,13 @@ export type Database = {
             referencedRelation: "dk_orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_kitchen_tickets_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
         ]
       }
       dk_menu_items: {
@@ -896,6 +938,76 @@ export type Database = {
           },
           {
             foreignKeyName: "dk_menu_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      dk_menu_plan_items: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_order: number
+          end_time: string | null
+          id: string
+          is_active: boolean
+          plan_date: string
+          product_id: string
+          special_price: number | null
+          start_time: string | null
+          unit_limit: number | null
+          updated_at: string
+          while_supplies_last: boolean
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          plan_date: string
+          product_id: string
+          special_price?: number | null
+          start_time?: string | null
+          unit_limit?: number | null
+          updated_at?: string
+          while_supplies_last?: boolean
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          plan_date?: string
+          product_id?: string
+          special_price?: number | null
+          start_time?: string | null
+          unit_limit?: number | null
+          updated_at?: string
+          while_supplies_last?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_menu_plan_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_plan_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_plan_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "dk_today_menu"
@@ -976,6 +1088,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
+          {
             foreignKeyName: "dk_order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -995,6 +1114,58 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_recipes"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_order_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          method: string | null
+          note: string | null
+          order_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string | null
+          note?: string | null
+          order_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string | null
+          note?: string | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_order_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
           },
         ]
       }
@@ -1041,6 +1212,13 @@ export type Database = {
             referencedRelation: "dk_orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
         ]
       }
       dk_orders: {
@@ -1051,6 +1229,7 @@ export type Database = {
           customer_id: string
           delivery_fee: number
           discount: number
+          due_date: string | null
           external_reference: string | null
           id: string
           notes: string | null
@@ -1069,6 +1248,7 @@ export type Database = {
           customer_id: string
           delivery_fee?: number
           discount?: number
+          due_date?: string | null
           external_reference?: string | null
           id?: string
           notes?: string | null
@@ -1087,6 +1267,7 @@ export type Database = {
           customer_id?: string
           delivery_fee?: number
           discount?: number
+          due_date?: string | null
           external_reference?: string | null
           id?: string
           notes?: string | null
@@ -1233,6 +1414,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_purchase_items_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
+          },
+          {
             foreignKeyName: "dk_purchase_items_purchase_id_fkey"
             columns: ["purchase_id"]
             isOneToOne: false
@@ -1339,6 +1527,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_recipe_items_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
+          },
+          {
             foreignKeyName: "dk_recipe_items_recipe_id_fkey"
             columns: ["recipe_id"]
             isOneToOne: false
@@ -1425,6 +1620,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_ingredients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_supplier_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
           },
           {
             foreignKeyName: "dk_supplier_ingredients_supplier_id_fkey"
@@ -2347,6 +2549,36 @@ export type Database = {
           },
         ]
       }
+      ipler_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_username: string
+          created_at: string
+          details: Json
+          id: number
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_username: string
+          created_at?: string
+          details?: Json
+          id?: never
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_username?: string
+          created_at?: string
+          details?: Json
+          id?: never
+          target?: string | null
+        }
+        Relationships: []
+      }
       ipler_execution_log: {
         Row: {
           candidatos_omitidos: number
@@ -2383,6 +2615,33 @@ export type Database = {
           status?: string
           timestamp_fin?: string | null
           timestamp_inicio?: string | null
+        }
+        Relationships: []
+      }
+      ipler_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          must_change_password: boolean
+          role: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id: string
+          must_change_password?: boolean
+          role: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          must_change_password?: boolean
+          role?: string
+          username?: string
         }
         Relationships: []
       }
@@ -2899,7 +3158,7 @@ export type Database = {
           detalle: Json | null
           entidad: string
           entidad_id: string | null
-          estacion_id: string | null
+          estacion_id: string
           id: string
           nivel: string
         }
@@ -2911,7 +3170,7 @@ export type Database = {
           detalle?: Json | null
           entidad: string
           entidad_id?: string | null
-          estacion_id?: string | null
+          estacion_id: string
           id?: string
           nivel?: string
         }
@@ -2923,7 +3182,7 @@ export type Database = {
           detalle?: Json | null
           entidad?: string
           entidad_id?: string | null
-          estacion_id?: string | null
+          estacion_id?: string
           id?: string
           nivel?: string
         }
@@ -3276,36 +3535,89 @@ export type Database = {
           },
         ]
       }
+      sjap_estacion_config: {
+        Row: {
+          clave: string
+          created_at: string
+          descripcion: string | null
+          estacion_id: string
+          id: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          clave: string
+          created_at?: string
+          descripcion?: string | null
+          estacion_id: string
+          id?: string
+          updated_at?: string
+          valor: string
+        }
+        Update: {
+          clave?: string
+          created_at?: string
+          descripcion?: string | null
+          estacion_id?: string
+          id?: string
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sjap_estacion_config_estacion_id_fkey"
+            columns: ["estacion_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sjap_estaciones: {
         Row: {
           activa: boolean
           bandera: string | null
           ciudad: string | null
           created_at: string
+          direccion: string | null
+          email: string | null
           id: string
+          moneda: string
           nit: string | null
           nombre: string
           razon_social: string | null
+          telefono: string | null
+          zona_horaria: string
         }
         Insert: {
           activa?: boolean
           bandera?: string | null
           ciudad?: string | null
           created_at?: string
+          direccion?: string | null
+          email?: string | null
           id?: string
+          moneda?: string
           nit?: string | null
           nombre: string
           razon_social?: string | null
+          telefono?: string | null
+          zona_horaria?: string
         }
         Update: {
           activa?: boolean
           bandera?: string | null
           ciudad?: string | null
           created_at?: string
+          direccion?: string | null
+          email?: string | null
           id?: string
+          moneda?: string
           nit?: string | null
           nombre?: string
           razon_social?: string | null
+          telefono?: string | null
+          zona_horaria?: string
         }
         Relationships: []
       }
@@ -3442,6 +3754,41 @@ export type Database = {
             columns: ["producto_id"]
             isOneToOne: false
             referencedRelation: "sjap_productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sjap_medios_pago: {
+        Row: {
+          activo: boolean
+          created_at: string
+          estacion_id: string
+          id: string
+          nombre: string
+          orden: number
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          estacion_id: string
+          id?: string
+          nombre: string
+          orden?: number
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          estacion_id?: string
+          id?: string
+          nombre?: string
+          orden?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sjap_medios_pago_estacion_id_fkey"
+            columns: ["estacion_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_estaciones"
             referencedColumns: ["id"]
           },
         ]
@@ -3596,6 +3943,51 @@ export type Database = {
             columns: ["estacion_id"]
             isOneToOne: false
             referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sjap_presupuesto_producto_mensual: {
+        Row: {
+          anio: number
+          created_at: string
+          estacion_id: string
+          id: string
+          mes: number
+          presupuesto: number
+          producto_id: string
+        }
+        Insert: {
+          anio: number
+          created_at?: string
+          estacion_id: string
+          id?: string
+          mes: number
+          presupuesto?: number
+          producto_id: string
+        }
+        Update: {
+          anio?: number
+          created_at?: string
+          estacion_id?: string
+          id?: string
+          mes?: number
+          presupuesto?: number
+          producto_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sjap_presupuesto_producto_mensual_estacion_id_fkey"
+            columns: ["estacion_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sjap_presupuesto_producto_mensual_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_productos"
             referencedColumns: ["id"]
           },
         ]
@@ -4135,8 +4527,10 @@ export type Database = {
           isla: string | null
           numero_clientes: number | null
           origen: string
+          promotor_id: string | null
           promotor_nombre: string
           turno: string | null
+          turno_tipo_id: string | null
         }
         Insert: {
           created_at?: string
@@ -4147,8 +4541,10 @@ export type Database = {
           isla?: string | null
           numero_clientes?: number | null
           origen?: string
+          promotor_id?: string | null
           promotor_nombre: string
           turno?: string | null
+          turno_tipo_id?: string | null
         }
         Update: {
           created_at?: string
@@ -4159,8 +4555,10 @@ export type Database = {
           isla?: string | null
           numero_clientes?: number | null
           origen?: string
+          promotor_id?: string | null
           promotor_nombre?: string
           turno?: string | null
+          turno_tipo_id?: string | null
         }
         Relationships: [
           {
@@ -4168,6 +4566,20 @@ export type Database = {
             columns: ["estacion_id"]
             isOneToOne: false
             referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sjap_ventas_promotor_turno_promotor_id_fkey"
+            columns: ["promotor_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_promotores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sjap_ventas_promotor_turno_turno_tipo_id_fkey"
+            columns: ["turno_tipo_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_turno_tipos"
             referencedColumns: ["id"]
           },
         ]
@@ -4490,6 +4902,59 @@ export type Database = {
       }
     }
     Views: {
+      dk_receivables: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          customer_id: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          due_date: string | null
+          order_id: string | null
+          order_number: number | null
+          paid_amount: number | null
+          status: Database["public"]["Enums"]["dk_order_status"] | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_supply_suggestions: {
+        Row: {
+          avg_cost: number | null
+          base_unit_code: string | null
+          below_min: boolean | null
+          code: string | null
+          consumed_30d: number | null
+          coverage_days: number | null
+          daily_burn: number | null
+          ingredient_id: string | null
+          max_stock: number | null
+          min_stock: number | null
+          name: string | null
+          primary_supplier_id: string | null
+          stock_available: number | null
+          suggested_quantity: number | null
+          supplier_name: string | null
+          wasted_30d: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredients_primary_supplier_id_fkey"
+            columns: ["primary_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_today_menu: {
         Row: {
           available: boolean | null
@@ -4747,6 +5212,10 @@ export type Database = {
         Args: { p_purchase_id: string }
         Returns: undefined
       }
+      dk_copy_menu_plan_range: {
+        Args: { p_days?: number; p_from_date: string; p_to_date: string }
+        Returns: undefined
+      }
       dk_copy_weekly_menu_day: {
         Args: {
           p_from_day: Database["public"]["Enums"]["dk_day_of_week"]
@@ -4789,6 +5258,15 @@ export type Database = {
           p_ingredient_id: string
           p_observation?: string
           p_quantity: number
+        }
+        Returns: string
+      }
+      dk_register_payment: {
+        Args: {
+          p_amount: number
+          p_method?: string
+          p_note?: string
+          p_order_id: string
         }
         Returns: string
       }
@@ -4867,6 +5345,27 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["dk_day_of_week"]
       }
+      ipler_dashboard_stats: {
+        Args: { p_tz?: string }
+        Returns: {
+          fallos_recientes: number
+          leads_hoy: number
+          leads_semana: number
+          runs_hoy: number
+          runs_recientes: number
+          tasa_exito_recientes: number
+          total_runs: number
+          ultima_corrida_at: string
+          ultima_corrida_status: string
+        }[]
+      }
+      ipler_is_master: { Args: never; Returns: boolean }
+      ipler_log_action: {
+        Args: { p_action: string; p_details?: Json }
+        Returns: undefined
+      }
+      sjap_estacion_de_usuario: { Args: never; Returns: string }
+      sjap_rol_de_usuario: { Args: never; Returns: string }
     }
     Enums: {
       destinatario_anticipo:

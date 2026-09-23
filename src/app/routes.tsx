@@ -1,28 +1,30 @@
+import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
 import { SignUpStaffPage } from '@/modules/auth/pages/SignUpStaffPage'
-import { InventoryPage } from '@/modules/inventory/pages/InventoryPage'
-import { MovementsPage } from '@/modules/inventory/pages/MovementsPage'
-import { PurchasesPage } from '@/modules/purchases/pages/PurchasesPage'
-import { PurchaseDetailPage } from '@/modules/purchases/pages/PurchaseDetailPage'
-import { ProductsPage } from '@/modules/products/pages/ProductsPage'
-import { RecipesPage } from '@/modules/recipes/pages/RecipesPage'
+import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
+import { MenuPlannerPage } from '@/modules/menuPlanner/pages/MenuPlannerPage'
 import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
-import { MenusPage } from '@/modules/menus/pages/MenusPage'
-import { MenuDetailPage } from '@/modules/menus/pages/MenuDetailPage'
-import { TodayMenuPage } from '@/modules/menus/pages/TodayMenuPage'
-import { WeeklyMenuPage } from '@/modules/menus/pages/WeeklyMenuPage'
-import { SuppliersPage } from '@/modules/suppliers/pages/SuppliersPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
-import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
-import { OrderDetailPage } from '@/modules/orders/pages/OrderDetailPage'
+import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
-import { DeliveryPage } from '@/modules/delivery/pages/DeliveryPage'
 import { UsersPage } from '@/modules/users/pages/UsersPage'
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { ProtectedRoute } from './ProtectedRoute'
+
+/** /orders/:id (ruta vieja) → el tablero de Cocina con ese pedido abierto en el detalle. */
+function LegacyOrderRedirect() {
+  const { id } = useParams<{ id: string }>()
+  return <Navigate to={id ? `/kitchen?pedido=${id}` : '/kitchen'} replace />
+}
+
+/** /purchases/:id (ruta vieja) → el detalle de esa misma compra dentro de Abastecimiento. */
+function LegacyPurchaseRedirect() {
+  const { id } = useParams<{ id: string }>()
+  return <Navigate to={id ? `/supply/compras/${id}` : '/supply/compras'} replace />
+}
 
 // recharts (usado solo por Dashboard y Reportes) pesa bastante — se separa en
 // su propio chunk para que el resto de la app (cocina, pedidos, etc.) no
@@ -33,6 +35,8 @@ const DashboardPage = lazy(() =>
 const ReportsPage = lazy(() => import('@/modules/reports/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })))
 
 export const router = createBrowserRouter([
+  // Pública: presentación del producto, antes de iniciar sesión.
+  { path: '/landing', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup-admin', element: <SignUpAdminPage /> },
   { path: '/signup-staff', element: <SignUpStaffPage /> },
@@ -52,23 +56,38 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      { path: 'orders', element: <OrdersPage /> },
-      { path: 'orders/:id', element: <OrderDetailPage /> },
+      // Cocina — el centro operativo: un solo tablero con el flujo completo
+      // del pedido (por confirmar → en cola → preparando → listo → en ruta),
+      // que reemplaza las pantallas separadas de Pedidos, Cola y Despacho.
+      // Las rutas viejas redirigen para no romper enlaces (Dashboard, Clientes).
       { path: 'kitchen', element: <KitchenPage /> },
-      { path: 'delivery', element: <DeliveryPage /> },
-      { path: 'inventory', element: <InventoryPage /> },
-      { path: 'inventory/movimientos', element: <MovementsPage /> },
-      { path: 'purchases', element: <PurchasesPage /> },
-      { path: 'purchases/:id', element: <PurchaseDetailPage /> },
-      { path: 'suppliers', element: <SuppliersPage /> },
-      { path: 'recipes', element: <RecipesPage /> },
+      { path: 'orders', element: <Navigate to="/kitchen" replace /> },
+      { path: 'orders/:id', element: <LegacyOrderRedirect /> },
+      { path: 'delivery', element: <Navigate to="/kitchen" replace /> },
+      // Catálogo — Planificador de Menús: platos, calendario de disponibilidad
+      // y recetas en una sola experiencia (reemplaza Platos/Menús/Menú del
+      // día/Menú semanal/Recetas). La receta de un plato sigue siendo una
+      // ruta propia (drill-in desde el catálogo lateral), sin cambios.
+      { path: 'menu-planner', element: <MenuPlannerPage /> },
       { path: 'recipes/:productId', element: <RecipeEditorPage /> },
-      { path: 'products', element: <ProductsPage /> },
-      { path: 'menus', element: <MenusPage /> },
-      { path: 'menus/dia', element: <TodayMenuPage /> },
-      { path: 'menus/semanal', element: <WeeklyMenuPage /> },
-      { path: 'menus/:id', element: <MenuDetailPage /> },
+      // Abastecimiento — Stock, Compras y Proveedores en una sola experiencia
+      // (reemplaza Inventario/Movimientos/Compras/Proveedores por separado).
+      // La vista y el elemento seleccionado viven en la URL.
+      { path: 'supply', element: <SupplyPage /> },
+      { path: 'supply/:view', element: <SupplyPage /> },
+      { path: 'supply/:view/:id', element: <SupplyPage /> },
+      // Rutas viejas: se conservan como redirecciones para no romper enlaces
+      // guardados ni la memoria muscular del equipo.
+      { path: 'inventory', element: <Navigate to="/supply/stock" replace /> },
+      { path: 'inventory/movimientos', element: <Navigate to="/supply/stock" replace /> },
+      { path: 'purchases', element: <Navigate to="/supply/compras" replace /> },
+      { path: 'purchases/:id', element: <LegacyPurchaseRedirect /> },
+      { path: 'suppliers', element: <Navigate to="/supply/proveedores" replace /> },
+      // Clientes — dashboard (antes "Cartera"/"Clientes" separados) + ficha
+      // individual con saldo, pedidos y pagos. Reutiliza dk_receivables y
+      // dk_register_payment sin cambios, solo la presentación.
       { path: 'customers', element: <CustomersPage /> },
+      { path: 'customers/:id', element: <CustomerDetailPage /> },
       {
         path: 'reports',
         element: (

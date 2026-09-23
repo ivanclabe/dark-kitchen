@@ -1,5 +1,7 @@
-import { inputClass, secondaryButtonClass } from '@/shared/ui/formClasses'
-import { Volume2, VolumeX } from 'lucide-react'
+import { Tooltip } from '@/shared/ui/Tooltip'
+import { Button, IconButton } from '@/shared/ui/Button'
+import { Input } from '@/shared/ui/FormField'
+import { MicOff, Volume2, VolumeX } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import type { KitchenTicket } from '../types'
 import { useVoiceCommandEngine } from './useVoiceCommandEngine'
@@ -11,17 +13,32 @@ import { VoiceMicButton } from './VoiceMicButton'
  * reconocimiento de voz (Firefox, la mayoría de Smart TV) — el resto del
  * KDS (botones táctiles) sigue funcionando exactamente igual sin esto.
  *
+ * `enabled=false` (modo histórico, día distinto de hoy) apaga el motor de
+ * voz por completo — ni siquiera se le pasan los tickets — y el botón queda
+ * visiblemente inactivo en vez de desaparecer, para que quede claro que la
+ * función existe pero no aplica a un día pasado.
+ *
  * Incluye un campo opcional "probar comando de texto" que alimenta el mismo
  * pipeline (parseVoiceCommand → validación → mutación) sin pasar por el
  * micrófono — útil para probar sin hablar y como registro de qué comandos
  * se probaron.
  */
-export function VoiceCommandBar({ tickets }: { tickets: KitchenTicket[] | undefined }) {
-  const engine = useVoiceCommandEngine(tickets)
+export function VoiceCommandBar({ tickets, enabled = true }: { tickets: KitchenTicket[] | undefined; enabled?: boolean }) {
+  const engine = useVoiceCommandEngine(enabled ? tickets : undefined)
   const [simulateOpen, setSimulateOpen] = useState(false)
   const [simulateValue, setSimulateValue] = useState('')
 
   if (!engine.supported) return null
+
+  if (!enabled) {
+    return (
+      <Tooltip label="Disponible solo para pedidos de hoy" side="top">
+        <Button variant="secondary" icon={MicOff} disabled aria-label="Control por voz no disponible en días anteriores">
+          Voz no disponible
+        </Button>
+      </Tooltip>
+    )
+  }
 
   function handleSimulateSubmit(e: FormEvent) {
     e.preventDefault()
@@ -35,23 +52,23 @@ export function VoiceCommandBar({ tickets }: { tickets: KitchenTicket[] | undefi
     <div className="flex flex-col items-end gap-1.5">
       <div className="flex items-center gap-2">
         <VoiceMicButton phase={engine.phase} onStart={engine.start} />
-        <button
+        <IconButton
+          icon={engine.ttsEnabled ? Volume2 : VolumeX}
+          aria-label={engine.ttsEnabled ? 'Silenciar respuestas por voz' : 'Activar respuestas por voz'}
+          aria-pressed={engine.ttsEnabled}
+          active={engine.ttsEnabled}
           onClick={engine.toggleTts}
-          title={engine.ttsEnabled ? 'Silenciar respuestas por voz' : 'Activar respuestas por voz'}
-          className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-        >
-          {engine.ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-        </button>
+        />
       </div>
 
       {engine.phase === 'listening' && (
-        <p className="max-w-xs text-right text-xs text-neutral-400">
+        <p role="status" className="max-w-xs text-right text-xs text-neutral-400">
           {engine.liveTranscript ? `🎤 "${engine.liveTranscript}"` : 'Escuchando…'}
         </p>
       )}
 
       {engine.phase !== 'listening' && (engine.lastTranscript || engine.lastMessage) && (
-        <div className="max-w-xs text-right text-xs">
+        <div role="status" className="max-w-xs text-right text-xs">
           {engine.lastTranscript && <p className="text-neutral-500">🎤 "{engine.lastTranscript}"</p>}
           {engine.lastMessage && (
             <p className={engine.phase === 'error' ? 'text-red-400' : 'text-emerald-400'}>{engine.lastMessage}</p>
@@ -62,21 +79,23 @@ export function VoiceCommandBar({ tickets }: { tickets: KitchenTicket[] | undefi
       <button
         type="button"
         onClick={() => setSimulateOpen((open) => !open)}
+        aria-expanded={simulateOpen}
         className="text-[11px] text-neutral-600 hover:text-neutral-400 hover:underline"
       >
         {simulateOpen ? 'Ocultar prueba de texto' : 'Probar comando de texto'}
       </button>
       {simulateOpen && (
-        <form onSubmit={handleSimulateSubmit} className="flex gap-1.5">
-          <input
+        <form onSubmit={handleSimulateSubmit} className="flex items-center gap-1.5">
+          <Input
             value={simulateValue}
             onChange={(e) => setSimulateValue(e.target.value)}
             placeholder='"pedido 2040 listo"'
-            className={`${inputClass} !mt-0 w-48 !py-1.5 text-xs`}
+            aria-label="Comando de texto"
+            className="!mt-0 h-8 w-48 !py-1 text-xs"
           />
-          <button type="submit" className={`${secondaryButtonClass} !px-2.5 !py-1.5 text-xs`}>
+          <Button type="submit" size="sm" variant="secondary">
             Enviar
-          </button>
+          </Button>
         </form>
       )}
     </div>

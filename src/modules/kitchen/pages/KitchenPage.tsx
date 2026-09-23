@@ -1,120 +1,302 @@
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useNow } from '@/shared/hooks/useNow'
+import { Badge } from '@/shared/ui/Badge'
+import { Button, IconButton } from '@/shared/ui/Button'
+import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tabs, type TabItem } from '@/shared/ui/Tabs'
-import { Bell, ChefHat, Gauge, Kanban, LayoutGrid, List, Settings, Volume2, VolumeX } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Tooltip } from '@/shared/ui/Tooltip'
+import { formatDateLong } from '@/shared/utils/format'
+import clsx from 'clsx'
+import { Bell, BellOff, Bike, ChefHat, Gauge, History, Kanban, ListOrdered, Plus, Settings, ZoomIn, ZoomOut, type LucideIcon } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { HistoryDrawer } from '../components/HistoryDrawer'
+import { KitchenDateNav, todayStr } from '../components/KitchenDateNav'
 import { KitchenSettingsModal } from '../components/KitchenSettingsModal'
-import { useKitchenQueue } from '../hooks/useKitchen'
+import { NewOrderDrawer } from '../components/NewOrderDrawer'
+import { OrderDetailDrawer } from '../components/OrderDetailDrawer'
+import { RidersDrawer } from '../components/RidersDrawer'
+import { useDeliveredTodayCount, useKitchenFlow } from '../hooks/useKitchen'
+import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
-import { GridView } from '../views/GridView'
+import { BoardActionsContext, type BoardActions } from '../kanban/boardActions'
+import { CancelOrderDialog, ConfirmOrderDialog, DispatchDialog } from '../kanban/BoardDialogs'
+import { ACTION_DENIED_REASON, canPerform } from '../lib/permissions'
+import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '../lib/ticketVisuals'
+import type { KitchenOrderStatus, KitchenTicket } from '../types'
 import { KanbanView } from '../views/KanbanView'
-import { ListView } from '../views/ListView'
 import { SlaView } from '../views/SlaView'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 
-type KitchenView = 'grid' | 'kanban' | 'list' | 'sla'
+type KitchenView = 'tablero' | 'sla'
+type Density = 'normal' | 'grande'
 
 const VIEW_PREF_KEY = 'dk-kitchen-view'
+const DENSITY_PREF_KEY = 'dk-kitchen-density'
 
-const VIEW_ITEMS: TabItem<KitchenView>[] = [
-  { value: 'kanban', label: 'Kanban', icon: Kanban },
-  { value: 'list', label: 'Lista', icon: List },
-  { value: 'grid', label: 'Grid', icon: LayoutGrid },
+const VIEWS: TabItem<KitchenView>[] = [
+  { value: 'tablero', label: 'Tablero', icon: Kanban },
   { value: 'sla', label: 'SLA', icon: Gauge },
 ]
 
-function readViewPref(): KitchenView {
+/** Estados de la cocina propiamente dicha: lo único que ven la voz, la alerta de "pedido nuevo" y la vista SLA. */
+const KITCHEN_STATUSES = new Set<KitchenOrderStatus>(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
+
+function readPref<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
   try {
-    const stored = localStorage.getItem(VIEW_PREF_KEY)
-    if (stored === 'grid' || stored === 'kanban' || stored === 'list' || stored === 'sla') return stored
+    const stored = localStorage.getItem(key)
+    if (stored && (allowed as readonly string[]).includes(stored)) return stored as T
   } catch {
     // localStorage puede no estar disponible (modo privado) — se usa el default.
   }
-  return 'grid'
+  return fallback
 }
 
+function writePref(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // No crítico.
+  }
+}
+
+/** Tira de indicadores del flujo: una cifra por etapa, legible de un vistazo. */
+function FlowKpi({ label, value, icon: Icon, tone = 'neutral' }: { label: string; value: number; icon?: LucideIcon; tone?: 'neutral' | 'warn' | 'good' }) {
+  return (
+    <div
+      className={clsx(
+        'flex min-w-0 items-center gap-2.5 rounded-xl border px-3 py-2',
+        tone === 'warn' && value > 0 ? 'border-red-500/30 bg-red-500/5' : 'border-neutral-800/60 bg-neutral-900/60',
+      )}
+    >
+      {Icon && <Icon size={14} className={tone === 'warn' && value > 0 ? 'text-red-400' : tone === 'good' ? 'text-emerald-400' : 'text-neutral-500'} aria-hidden />}
+      <div className="min-w-0">
+        <p className={clsx('text-lg leading-none font-semibold tabular-nums', tone === 'warn' && value > 0 ? 'text-red-400' : 'text-neutral-50')}>{value}</p>
+        <p className="mt-1 truncate text-[11px] text-neutral-500">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Cocina: el centro operativo. Un solo tablero con el flujo completo del
+ * pedido — por confirmar, en cola, preparando, listo, en ruta — que reemplaza
+ * las pantallas separadas de Pedidos, Cola y Despacho; un switch a la vista
+ * SLA; y en paneles laterales lo que no es flujo activo (nuevo pedido,
+ * historial, domiciliarios). La voz, las alertas y la navegación por fecha
+ * siguen exactamente como estaban.
+ */
 export function KitchenPage() {
   const { profile } = useAuth()
-  const canConfigureSla = profile?.role === 'ADMIN' || profile?.role === 'MANAGER'
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const role = profile?.role ?? null
+  const canConfigureSla = role === 'ADMIN' || role === 'MANAGER'
+  const canCreate = canPerform(role, 'create')
 
-  const { data: tickets, isLoading } = useKitchenQueue()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const detailOrderId = searchParams.get('pedido')
+
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const isToday = selectedDate >= todayStr()
+
+  const { data: flowTickets, isLoading } = useKitchenFlow(isToday ? null : selectedDate)
+  const { data: deliveredToday } = useDeliveredTodayCount(isToday)
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
   const now = useNow()
-  const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(tickets)
-  const [view, setView] = useState<KitchenView>(readViewPref)
+
+  const [view, setView] = useState<KitchenView>(() => readPref(VIEW_PREF_KEY, ['tablero', 'sla'] as const, 'tablero'))
+  const [density, setDensity] = useState<Density>(() => readPref(DENSITY_PREF_KEY, ['normal', 'grande'] as const, 'normal'))
+
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [newOrderOpen, setNewOrderOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [ridersOpen, setRidersOpen] = useState(false)
+  const [confirmTicket, setConfirmTicket] = useState<KitchenTicket | null>(null)
+  const [dispatchTicket, setDispatchTicket] = useState<KitchenTicket | null>(null)
+  const [cancelTicket, setCancelTicket] = useState<KitchenTicket | null>(null)
 
   const sortedTickets = useMemo(
     () =>
-      tickets
-        ? [...tickets].sort((a, b) => {
+      flowTickets
+        ? [...flowTickets].sort((a, b) => {
             if (a.priority !== b.priority) return b.priority - a.priority
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           })
         : undefined,
-    [tickets],
+    [flowTickets],
   )
 
-  function handleViewChange(next: KitchenView) {
-    setView(next)
-    try {
-      localStorage.setItem(VIEW_PREF_KEY, next)
-    } catch {
-      // localStorage puede no estar disponible (modo privado) — no crítico.
+  // La voz, la alerta de "pedido nuevo" y la vista SLA siguen viendo SOLO la
+  // cocina (Confirmado → Listo), sin filtros de búsqueda — exactamente lo
+  // mismo que recibían antes. Si recibieran el flujo completo, un borrador de
+  // caja sonaría en cocina y, al confirmarse, ya no sonaría (mismo id).
+  const kitchenTickets = useMemo(() => sortedTickets?.filter((t) => KITCHEN_STATUSES.has(t.orderStatus)), [sortedTickets])
+  const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(isToday ? kitchenTickets : undefined)
+
+  const kpis = useMemo(() => {
+    const count = (status: KitchenOrderStatus) => (flowTickets ?? []).filter((t) => t.orderStatus === status).length
+    const late = (kitchenTickets ?? []).filter(
+      (t) => timeTier(minutesAgoSince(t.createdAt, now), alertMinutesFor(t.orderStatus, thresholds), thresholds.nearThresholdPct) === 'retrasado',
+    ).length
+    return {
+      nuevo: count('NUEVO'),
+      cola: count('CONFIRMADO'),
+      preparando: count('EN_PREPARACION'),
+      listo: count('LISTO'),
+      enRuta: count('DESPACHADO'),
+      late,
     }
+  }, [flowTickets, kitchenTickets, now, thresholds])
+
+  // El pedido abierto vive en la URL (?pedido=id): el detalle se puede
+  // compartir, sobrevive a un refresh, y los enlaces viejos /orders/:id
+  // (Dashboard, ficha de Cliente) redirigen acá con el drawer ya abierto.
+  const setDetailOrder = useCallback(
+    (orderId: string | null) =>
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev)
+        if (orderId) next.set('pedido', orderId)
+        else next.delete('pedido')
+        return next
+      }),
+    [setSearchParams],
+  )
+
+  const boardActions = useMemo<BoardActions>(
+    () => ({
+      role,
+      density,
+      openDetail: (ticket) => setDetailOrder(ticket.orderId),
+      requestConfirm: setConfirmTicket,
+      requestDispatch: setDispatchTicket,
+      requestCancel: setCancelTicket,
+    }),
+    [role, density, setDetailOrder],
+  )
+
+  function changeView(next: KitchenView) {
+    setView(next)
+    writePref(VIEW_PREF_KEY, next)
   }
 
+  function toggleDensity() {
+    const next: Density = density === 'normal' ? 'grande' : 'normal'
+    setDensity(next)
+    writePref(DENSITY_PREF_KEY, next)
+  }
+
+  const liveDetailTicket = detailOrderId ? flowTickets?.find((t) => t.orderId === detailOrderId) : undefined
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <ChefHat size={22} className="text-brasa-500" />
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold text-neutral-50 2xl:text-3xl">Cocina</h1>
-              {newIds.size > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-brasa-600 px-2 py-0.5 text-xs font-semibold text-white">
-                  <Bell size={12} /> {newIds.size} {newIds.size === 1 ? 'nuevo' : 'nuevos'}
-                </span>
-              )}
+    <BoardActionsContext.Provider value={boardActions}>
+      <div className="flex h-full min-h-0 flex-col gap-4">
+        <div className="shrink-0 space-y-4">
+          <PageHeader
+            title="Cocina"
+            icon={ChefHat}
+            description={isToday ? 'Del pedido a la entrega, en un solo tablero. Se actualiza solo.' : formatDateLong(selectedDate)}
+            meta={
+              isToday &&
+              newIds.size > 0 && (
+                <Badge tone="brand" icon={Bell}>
+                  {newIds.size} {newIds.size === 1 ? 'nuevo' : 'nuevos'}
+                </Badge>
+              )
+            }
+            actions={
+              // items-start: VoiceCommandBar apila texto debajo del botón y su
+              // caja es más alta; así las tres pastillas arrancan alineadas.
+              <div className="flex flex-wrap items-start gap-2.5">
+                <KitchenDateNav date={selectedDate} onChange={setSelectedDate} />
+                <div className="inline-flex h-10 items-center gap-0.5 rounded-full border border-neutral-800/60 bg-neutral-900/60 p-1">
+                  {canConfigureSla && (
+                    <IconButton variant="ghost" size="sm" icon={Settings} aria-label="Configurar umbrales de alerta (SLA)" onClick={() => setSettingsOpen(true)} />
+                  )}
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={soundEnabled ? Bell : BellOff}
+                    aria-label={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
+                    aria-pressed={soundEnabled}
+                    active={soundEnabled}
+                    onClick={toggleSound}
+                  />
+                </div>
+                <VoiceCommandBar tickets={kitchenTickets} enabled={isToday} />
+              </div>
+            }
+          />
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs value={view} onChange={changeView} items={VIEWS} />
+            <Tooltip label={density === 'grande' ? 'Tamaño normal' : 'Tamaño grande (pantalla de cocina)'} side="top">
+              <IconButton
+                variant="secondary"
+                icon={density === 'grande' ? ZoomOut : ZoomIn}
+                aria-label={density === 'grande' ? 'Usar tamaño normal' : 'Usar tamaño grande'}
+                aria-pressed={density === 'grande'}
+                active={density === 'grande'}
+                onClick={toggleDensity}
+              />
+            </Tooltip>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Button variant="ghost" icon={History} onClick={() => setHistoryOpen(true)}>
+                Historial
+              </Button>
+              <Button variant="ghost" icon={Bike} onClick={() => setRidersOpen(true)}>
+                Domiciliarios
+              </Button>
+              <Tooltip label={canCreate ? 'Crear un pedido nuevo' : ACTION_DENIED_REASON.create} side="top">
+                <Button variant="primary" icon={Plus} onClick={() => setNewOrderOpen(true)} disabled={!canCreate}>
+                  Nuevo pedido
+                </Button>
+              </Tooltip>
             </div>
-            <p className="text-sm text-neutral-400">Pedidos confirmados en cola. Se actualiza automáticamente.</p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {canConfigureSla && (
-            <button
-              onClick={() => setSettingsOpen(true)}
-              title="Configurar umbrales de alerta (SLA)"
-              className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-            >
-              <Settings size={16} />
-            </button>
+
+          {isToday && (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+              <FlowKpi label="Por confirmar" value={kpis.nuevo} icon={ListOrdered} />
+              <FlowKpi label="En cola" value={kpis.cola} />
+              <FlowKpi label="Preparando" value={kpis.preparando} />
+              <FlowKpi label="Listos" value={kpis.listo} />
+              <FlowKpi label="En ruta" value={kpis.enRuta} icon={Bike} />
+              <FlowKpi label="Entregados hoy" value={deliveredToday ?? 0} tone="good" />
+              <FlowKpi label="Atrasados" value={kpis.late} tone="warn" />
+            </div>
           )}
-          <button
-            onClick={toggleSound}
-            title={soundEnabled ? 'Silenciar alerta de pedidos nuevos' : 'Activar alerta de pedidos nuevos'}
-            className="rounded-md border border-neutral-700 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-          >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          </button>
-          <VoiceCommandBar tickets={sortedTickets} />
+
+          {!isToday && (
+            <div role="status" className="flex items-center gap-2 rounded-xl border border-amber-800/40 bg-amber-500/5 px-4 py-2.5 text-sm text-amber-300">
+              <History size={15} className="shrink-0" aria-hidden />
+              Estás consultando un día anterior. El control por voz está disponible únicamente para los pedidos de hoy.
+            </div>
+          )}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {view === 'tablero' ? (
+            <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} isToday={isToday} />
+          ) : (
+            <SlaView tickets={kitchenTickets} now={now} />
+          )}
         </div>
       </div>
 
-      <Tabs value={view} onChange={handleViewChange} items={VIEW_ITEMS} />
-
       {canConfigureSla && <KitchenSettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />}
-
-      {view === 'grid' && (
-        <GridView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
-      )}
-      {view === 'kanban' && (
-        <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
-      )}
-      {view === 'list' && (
-        <ListView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} />
-      )}
-      {view === 'sla' && <SlaView tickets={sortedTickets} now={now} />}
-    </div>
+      {newOrderOpen && <NewOrderDrawer open onClose={() => setNewOrderOpen(false)} />}
+      <HistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onOpenOrder={(orderId) => {
+          setHistoryOpen(false)
+          setDetailOrder(orderId)
+        }}
+      />
+      <RidersDrawer open={ridersOpen} onClose={() => setRidersOpen(false)} role={role} />
+      <OrderDetailDrawer orderId={detailOrderId} ticket={liveDetailTicket} role={role} onClose={() => setDetailOrder(null)} />
+      {confirmTicket && <ConfirmOrderDialog ticket={confirmTicket} onClose={() => setConfirmTicket(null)} />}
+      {dispatchTicket && <DispatchDialog ticket={dispatchTicket} onClose={() => setDispatchTicket(null)} />}
+      {cancelTicket && <CancelOrderDialog ticket={cancelTicket} onClose={() => setCancelTicket(null)} />}
+    </BoardActionsContext.Provider>
   )
 }

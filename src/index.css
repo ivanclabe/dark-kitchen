@@ -19,12 +19,46 @@
   --color-brasa-800: #9a3412;
   --color-brasa-900: #7c2d12;
 
+  /* Tokens semánticos del Design System. Mapean a la escala neutral que ya
+     usa toda la app (no cambian el look actual) pero dan un nombre estable
+     para componentes nuevos: bg-surface, border-line, text-muted, etc. */
+  --color-canvas: #0a0a0a; /* neutral-950 — fondo de la app */
+  --color-surface: #171717; /* neutral-900 — cards, sidebar, inputs */
+  --color-surface-raised: #1f1f1f; /* hover de filas, chips inactivos */
+  --color-line: #262626; /* neutral-800 — bordes hairline */
+  --color-line-strong: #404040; /* neutral-700 — bordes con foco/hover */
+  --color-text: #fafafa; /* neutral-50 */
+  --color-text-secondary: #a3a3a3; /* neutral-400 */
+  --color-text-muted: #737373; /* neutral-500 */
+  --color-success: #34d399; /* emerald-400 */
+  --color-warning: #fbbf24; /* amber-400 */
+  --color-danger: #f87171; /* red-400 */
+  --color-info: #38bdf8; /* sky-400 */
+
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
   --shadow-float: 0 12px 40px -8px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 body {
   font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco por teclado consistente en toda la app (links, filas clickeables,
+   botones sin clase de foco propia). Los inputs ya traen su propio ring. */
+:where(a, button, [role='button'], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brasa-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -54,4 +88,68 @@ body {
 
 .animate-drawer-in {
   animation: drawer-in 0.2s ease-out;
+}
+
+@keyframes drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-drawer-in-left {
+  animation: drawer-in-left 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+/* Landing: brasas que suben y titilan. La opacidad máxima de cada una viene
+   en --ember-opacity para que no todas brillen igual. */
+@keyframes ember-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20%,
+  75% {
+    opacity: var(--ember-opacity, 0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+}
+
+.animate-ember {
+  animation: ember-rise var(--ember-duration, 6s) ease-in-out var(--ember-delay, 0s) infinite;
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-landing-rise {
+  animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

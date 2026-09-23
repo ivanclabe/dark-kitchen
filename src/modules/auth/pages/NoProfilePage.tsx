@@ -1,22 +1,25 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { Button } from '@/shared/ui/Button'
+import { typography } from '@/shared/ui/typography'
+import { LogOut, UserX } from 'lucide-react'
 
 export function NoProfilePage() {
   const { user, signOut } = useAuth()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-center">
-      <div className="max-w-sm">
-        <h1 className="text-lg font-semibold text-neutral-50">Cuenta sin perfil asignado</h1>
-        <p className="mt-2 text-sm text-neutral-400">
-          {user?.email} inició sesión correctamente, pero no tiene un perfil en Dark Kitchen. Pide a un
+    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
+      <div className="w-full max-w-sm rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
+        <span className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl border border-neutral-800 bg-neutral-900 text-neutral-400">
+          <UserX size={22} aria-hidden />
+        </span>
+        <h1 className={typography.h2}>Cuenta sin perfil asignado</h1>
+        <p className={`mt-2 ${typography.small}`}>
+          <span className="text-neutral-200">{user?.email}</span> inició sesión correctamente, pero no tiene un perfil en Dark Kitchen. Pide a un
           administrador que te cree una cuenta desde el módulo de Usuarios.
         </p>
-        <button
-          onClick={() => void signOut()}
-          className="mt-4 rounded-md border border-neutral-700 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800"
-        >
+        <Button variant="secondary" icon={LogOut} onClick={() => void signOut()} className="mt-6 w-full">
           Cerrar sesión
-        </button>
+        </Button>
       </div>
     </div>
   )

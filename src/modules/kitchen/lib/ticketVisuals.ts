@@ -1,6 +1,6 @@
-import { CheckCircle2, Clock, Flame, XCircle } from 'lucide-react'
+import { Bike, CheckCircle2, Clock, FilePen, Flame, MessageCircle, Phone, Store, XCircle } from 'lucide-react'
 import type { ComponentType } from 'react'
-import type { KitchenItemStatus, KitchenOrderStatus } from '../types'
+import type { KitchenItemStatus, KitchenOrderStatus, OrderChannel } from '../types'
 
 /**
  * Paleta semántica compartida por las 4 vistas de Cocina (Kanban, Lista,
@@ -27,11 +27,47 @@ export const ORDER_STATUS_CONFIG: Record<
   KitchenOrderStatus,
   { label: string; badge: string; accent: string; icon: ComponentType<{ size?: number; className?: string }> }
 > = {
-  CONFIRMADO: { label: 'Confirmado', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
-  EN_PREPARACION: { label: 'En preparación', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
+  NUEVO: { label: 'Por confirmar', badge: 'bg-neutral-700/60 text-neutral-300', accent: 'border-l-neutral-500', icon: FilePen },
+  CONFIRMADO: { label: 'En cola', badge: 'bg-blue-500/20 text-blue-400', accent: 'border-l-blue-500', icon: Clock },
+  EN_PREPARACION: { label: 'Preparando', badge: 'bg-amber-500/20 text-amber-400', accent: 'border-l-amber-500', icon: Flame },
   LISTO: { label: 'Listo', badge: 'bg-emerald-500/20 text-emerald-400', accent: 'border-l-emerald-500', icon: CheckCircle2 },
+  DESPACHADO: { label: 'En ruta', badge: 'bg-violet-500/20 text-violet-400', accent: 'border-l-violet-500', icon: Bike },
   CANCELADO: { label: 'Cancelado', badge: 'bg-red-500/20 text-red-400', accent: 'border-l-red-500', icon: XCircle },
 }
+
+/**
+ * Etiqueta de canal del pedido (pill pequeño en el card del Kanban,
+ * inspirado en las etiquetas de Epic de Jira) — da contexto inmediato de
+ * dónde vino el pedido sin ocupar una columna propia.
+ */
+export const CHANNEL_CONFIG: Record<
+  OrderChannel,
+  { label: string; badge: string; icon: ComponentType<{ size?: number; className?: string }> }
+> = {
+  MANUAL: { label: 'Mostrador', badge: 'bg-neutral-700/60 text-neutral-300', icon: Store },
+  WHATSAPP: { label: 'WhatsApp', badge: 'bg-emerald-500/20 text-emerald-400', icon: MessageCircle },
+  PHONE: { label: 'Teléfono', badge: 'bg-sky-500/20 text-sky-400', icon: Phone },
+}
+
+/** Paleta rotativa para el avatar de iniciales del cliente — mismo color siempre para el mismo nombre. */
+const AVATAR_PALETTE = [
+  'bg-rose-500/25 text-rose-300',
+  'bg-amber-500/25 text-amber-300',
+  'bg-emerald-500/25 text-emerald-300',
+  'bg-sky-500/25 text-sky-300',
+  'bg-violet-500/25 text-violet-300',
+  'bg-pink-500/25 text-pink-300',
+  'bg-teal-500/25 text-teal-300',
+  'bg-indigo-500/25 text-indigo-300',
+]
+
+export function avatarColorFor(name: string): string {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length]
+}
+
+export { initials as initialsFor } from '@/shared/utils/format'
 
 /**
  * Umbrales de alerta por estado — antes fijos (TIME_WARN_MIN/TIME_LATE_MIN
@@ -54,7 +90,12 @@ export const DEFAULT_SLA_THRESHOLDS: SlaThresholds = {
   nearThresholdPct: 80,
 }
 
-/** CANCELADO no tiene umbral: un pedido cancelado no debe seguir generando alertas operativas. */
+/**
+ * Solo los estados de cocina tienen umbral configurado en
+ * dk_kitchen_sla_settings. NUEVO (borrador de caja), DESPACHADO (en manos
+ * del domiciliario) y CANCELADO no generan alerta de SLA: no hay un umbral
+ * acordado para ellos y no se inventa uno.
+ */
 export function alertMinutesFor(status: KitchenOrderStatus, thresholds: SlaThresholds): number | null {
   switch (status) {
     case 'CONFIRMADO':
@@ -63,6 +104,8 @@ export function alertMinutesFor(status: KitchenOrderStatus, thresholds: SlaThres
       return thresholds.enPreparacionAlertMin
     case 'LISTO':
       return thresholds.listoAlertMin
+    case 'NUEVO':
+    case 'DESPACHADO':
     case 'CANCELADO':
       return null
   }

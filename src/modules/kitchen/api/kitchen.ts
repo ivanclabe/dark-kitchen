@@ -1,14 +1,18 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { KitchenTicket } from '../types'
+import type { KitchenOrderStatus, KitchenTicket, OrderChannel } from '../types'
 
 interface OrderRow {
   id: string
   order_number: number
-  status: 'CONFIRMADO' | 'EN_PREPARACION' | 'LISTO'
+  status: KitchenOrderStatus
+  channel: OrderChannel
   notes: string | null
   created_at: string
-  dk_customers: { full_name: string } | null
+  total: number
+  requires_review: boolean
+  dk_customers: { full_name: string; address: string | null } | null
   dk_kitchen_tickets: { priority: number } | { priority: number }[] | null
+  dk_deliveries: DeliveryEmbed | DeliveryEmbed[] | null
   dk_order_items: {
     id: string
     quantity: number
@@ -18,37 +22,31 @@ interface OrderRow {
   }[]
 }
 
-function ticketPriority(row: OrderRow): number {
-  const ticket = Array.isArray(row.dk_kitchen_tickets) ? row.dk_kitchen_tickets[0] : row.dk_kitchen_tickets
-  return ticket?.priority ?? 0
+interface DeliveryEmbed {
+  dispatched_at: string | null
+  dk_delivery_riders: { full_name: string } | null
 }
 
-export async function listKitchenQueue(): Promise<KitchenTicket[]> {
-  const { data, error } = await supabase
-    .from('dk_orders')
-    .select(
-      `id, order_number, status, notes, created_at,
-       dk_customers ( full_name ),
-       dk_kitchen_tickets ( priority ),
-       dk_order_items ( id, quantity, observation, kitchen_status, dk_products ( name ) )`,
-    )
-    // LISTO se incluye a propósito: Cocina necesita ver qué pedidos ya están
-    // listos y esperando que Despachos los recoja (columna "Listo" del
-    // Kanban) — es una ampliación de lectura, no toca ningún RPC ni regla
-    // de negocio existente.
-    .in('status', ['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
-    .order('created_at')
+function firstOf<T>(value: T | T[] | null): T | null {
+  return Array.isArray(value) ? (value[0] ?? null) : value
+}
 
-  if (error) throw error
-
-  return (data as unknown as OrderRow[]).map((row) => ({
+function mapOrderRow(row: OrderRow): KitchenTicket {
+  const delivery = firstOf(row.dk_deliveries)
+  return {
     orderId: row.id,
     orderNumber: row.order_number,
     customerName: row.dk_customers?.full_name ?? '—',
+    address: row.dk_customers?.address ?? null,
     orderStatus: row.status,
+    channel: row.channel,
     createdAt: row.created_at,
     notes: row.notes,
-    priority: ticketPriority(row),
+    priority: firstOf(row.dk_kitchen_tickets)?.priority ?? 0,
+    total: Number(row.total),
+    requiresReview: row.requires_review,
+    riderName: delivery?.dk_delivery_riders?.full_name ?? null,
+    dispatchedAt: delivery?.dispatched_at ?? null,
     items: row.dk_order_items.map((item) => ({
       id: item.id,
       productName: item.dk_products?.name ?? '—',
@@ -56,7 +54,70 @@ export async function listKitchenQueue(): Promise<KitchenTicket[]> {
       observation: item.observation,
       kitchenStatus: item.kitchen_status,
     })),
-  }))
+  }
+}
+
+const ORDER_ROW_SELECT = `id, order_number, status, channel, notes, created_at, total, requires_review,
+       dk_customers ( full_name, address ),
+       dk_kitchen_tickets ( priority ),
+       dk_deliveries ( dispatched_at, dk_delivery_riders ( full_name ) ),
+       dk_order_items ( id, quantity, observation, kitchen_status, dk_products ( name ) )`
+
+/** Estados de la cocina propiamente dicha — lo que ve el Dashboard y lo que controla la voz. */
+const KITCHEN_STATUSES: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
+
+/** El flujo completo del tablero: de NUEVO (por confirmar) a DESPACHADO (en ruta). */
+const FLOW_STATUSES: KitchenOrderStatus[] = ['NUEVO', ...KITCHEN_STATUSES, 'DESPACHADO']
+
+async function fetchTickets(statuses: KitchenOrderStatus[], range?: { start: string; end: string }): Promise<KitchenTicket[]> {
+  let query = supabase.from('dk_orders').select(ORDER_ROW_SELECT).in('status', statuses)
+  if (range) query = query.gte('created_at', range.start).lt('created_at', range.end)
+  const { data, error } = await query.order('created_at')
+  if (error) throw error
+  return (data as unknown as OrderRow[]).map(mapOrderRow)
+}
+
+/** Cola de cocina en vivo (Confirmado → Listo). La sigue usando el Dashboard. */
+export function listKitchenQueue(): Promise<KitchenTicket[]> {
+  return fetchTickets(KITCHEN_STATUSES)
+}
+
+/**
+ * Tablero de Cocina en vivo: todo lo que sigue abierto, sin importar cuándo
+ * se creó — un borrador de hace días o un pedido listo que nadie despachó es
+ * trabajo pendiente real y debe verse.
+ */
+export function listKitchenFlow(): Promise<KitchenTicket[]> {
+  return fetchTickets(FLOW_STATUSES)
+}
+
+/** Límites [00:00, 24:00) locales del día `date` (formato "YYYY-MM-DD", el de un <input type="date">). */
+function dayRange(date: string) {
+  const start = new Date(`${date}T00:00:00`)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 1)
+  return { start: start.toISOString(), end: end.toISOString() }
+}
+
+/**
+ * Modo histórico: foto de los pedidos CREADOS en `date`, incluyendo los
+ * cancelados — para revisar o corregir un día anterior.
+ */
+export function listKitchenFlowByDate(date: string): Promise<KitchenTicket[]> {
+  return fetchTickets([...FLOW_STATUSES, 'CANCELADO'], dayRange(date))
+}
+
+/** Cuántos pedidos se entregaron hoy — ENTREGADO sale del tablero, así que solo se cuenta. */
+export async function countDeliveredToday(): Promise<number> {
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+  const { count, error } = await supabase
+    .from('dk_orders')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'ENTREGADO')
+    .gte('updated_at', startOfToday.toISOString())
+  if (error) throw error
+  return count ?? 0
 }
 
 export async function advanceKitchenItem(orderItemId: string): Promise<void> {
@@ -84,27 +145,14 @@ export async function cancelKitchenOrder(orderId: string, reason?: string): Prom
   if (error) throw error
 }
 
-interface CancelledOrderRow {
-  id: string
-  order_number: number
-  notes: string | null
-  created_at: string
-  dk_customers: { full_name: string } | null
-  dk_order_items: {
-    id: string
-    quantity: number
-    observation: string | null
-    kitchen_status: KitchenTicket['items'][number]['kitchenStatus']
-    dk_products: { name: string } | null
-  }[]
+interface CancelledOrderRow extends Omit<OrderRow, 'status' | 'dk_kitchen_tickets' | 'dk_deliveries'> {
   dk_order_status_history: { changed_at: string; note: string | null; to_status: string }[]
 }
 
 /**
- * Query separada de listKitchenQueue: solo alimenta la columna CANCELADO
- * del Kanban (Grid/Lista/SLA siguen usando exclusivamente
- * useKitchenQueue). Acotada a "cancelados hoy" para no acumular todo el
- * historial — eso ya vive en el módulo Pedidos, pestaña Cancelado.
+ * Solo alimenta la columna Cancelado del tablero en modo "hoy en vivo".
+ * Acotada a "cancelados hoy" para no acumular todo el historial — eso vive
+ * en el panel Historial.
  */
 export async function listCancelledKitchenQueue(): Promise<KitchenTicket[]> {
   const startOfToday = new Date()
@@ -113,8 +161,8 @@ export async function listCancelledKitchenQueue(): Promise<KitchenTicket[]> {
   const { data, error } = await supabase
     .from('dk_orders')
     .select(
-      `id, order_number, notes, created_at,
-       dk_customers ( full_name ),
+      `id, order_number, channel, notes, created_at, total, requires_review,
+       dk_customers ( full_name, address ),
        dk_order_items ( id, quantity, observation, kitchen_status, dk_products ( name ) ),
        dk_order_status_history ( changed_at, note, to_status )`,
     )
@@ -130,10 +178,14 @@ export async function listCancelledKitchenQueue(): Promise<KitchenTicket[]> {
       orderId: row.id,
       orderNumber: row.order_number,
       customerName: row.dk_customers?.full_name ?? '—',
+      address: row.dk_customers?.address ?? null,
       orderStatus: 'CANCELADO' as const,
+      channel: row.channel,
       createdAt: row.created_at,
       notes: row.notes,
       priority: 0,
+      total: Number(row.total),
+      requiresReview: row.requires_review,
       items: row.dk_order_items.map((item) => ({
         id: item.id,
         productName: item.dk_products?.name ?? '—',

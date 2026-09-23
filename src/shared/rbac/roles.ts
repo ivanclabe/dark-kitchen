@@ -15,15 +15,9 @@ export type Role = (typeof ROLES)[number]
 export type ModuleKey =
   | 'dashboard'
   | 'users'
-  | 'inventory'
-  | 'suppliers'
-  | 'purchases'
-  | 'recipes'
-  | 'products'
-  | 'menus'
-  | 'orders'
+  | 'supply'
+  | 'menuPlanner'
   | 'kitchen'
-  | 'delivery'
   | 'customers'
   | 'reports'
 
@@ -32,17 +26,26 @@ export type ModuleKey =
 const MODULE_ACCESS: Record<ModuleKey, readonly Role[]> = {
   dashboard: ['ADMIN', 'MANAGER', 'INVENTORY', 'CASHIER'],
   users: ['ADMIN'],
-  inventory: ['ADMIN', 'MANAGER', 'INVENTORY'],
-  suppliers: ['ADMIN', 'MANAGER', 'INVENTORY'],
-  purchases: ['ADMIN', 'MANAGER', 'INVENTORY'],
-  recipes: ['ADMIN', 'MANAGER', 'INVENTORY', 'KITCHEN'],
-  products: ['ADMIN', 'MANAGER', 'INVENTORY', 'KITCHEN', 'CASHIER'],
-  menus: ['ADMIN', 'MANAGER', 'KITCHEN', 'CASHIER'],
-  orders: ['ADMIN', 'MANAGER', 'CASHIER', 'KITCHEN', 'DELIVERY'],
-  kitchen: ['ADMIN', 'MANAGER', 'KITCHEN'],
-  delivery: ['ADMIN', 'MANAGER', 'CASHIER', 'DELIVERY'],
+  // Stock (insumos + movimientos), compras y proveedores fusionados — mismos
+  // roles que tenían los tres ModuleKey separados que reemplaza.
+  supply: ['ADMIN', 'MANAGER', 'INVENTORY'],
+  // Platos, calendario de disponibilidad y recetas — reemplaza los antiguos
+  // módulos separados 'products'/'menus'/'recipes' (unión de sus roles).
+  menuPlanner: ['ADMIN', 'MANAGER', 'INVENTORY', 'KITCHEN', 'CASHIER'],
+  // Cocina = Pedidos + Cola + Despacho fusionados: la unión de los tres
+  // ModuleKey anteriores. Cada acción del tablero se sigue limitando por rol
+  // (ver kitchen/lib/permissions.ts, espejo de los chequeos de cada RPC).
+  kitchen: ['ADMIN', 'MANAGER', 'CASHIER', 'KITCHEN', 'DELIVERY'],
+  // Clientes + cuentas por cobrar fusionadas — dk_register_payment y la vista
+  // dk_receivables ya aplican este mismo filtro de rol del lado de Postgres
+  // (ver migración dk_cartera_schema).
   customers: ['ADMIN', 'MANAGER', 'CASHIER'],
   reports: ['ADMIN', 'MANAGER', 'INVENTORY', 'CASHIER'],
+}
+
+/** true si el rol puede acceder a al menos uno de los módulos dados — usado para los ítems de sidebar que agrupan varias rutas. */
+export function canAccessAnyModule(role: Role | null, modules: readonly ModuleKey[]): boolean {
+  return modules.some((m) => canAccessModule(role, m))
 }
 
 export function canAccessModule(role: Role | null, module: ModuleKey): boolean {

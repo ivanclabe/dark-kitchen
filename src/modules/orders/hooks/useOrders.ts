@@ -6,10 +6,18 @@ import {
   createOrder,
   getOrder,
   listOrders,
+  listOrdersByCustomer,
   listOrderStatusHistory,
   updateOrder,
 } from '../api/orders'
 import type { OrderInput, OrderItemInput } from '../types'
+
+/**
+ * Prefijo de las queries del tablero de Cocina (ver kitchen/hooks/useKitchen.ts).
+ * Crear, editar, confirmar o cancelar un pedido cambia lo que muestra el
+ * tablero; sin esto la tarjeta tardaba hasta 15 s (el próximo polling) en moverse.
+ */
+const KITCHEN_FLOW_PREFIX = ['kitchen-queue'] as const
 
 export function useOrders() {
   return useQuery({ queryKey: ['orders'], queryFn: listOrders })
@@ -17,6 +25,10 @@ export function useOrders() {
 
 export function useOrder(id: string) {
   return useQuery({ queryKey: ['orders', id], queryFn: () => getOrder(id), enabled: !!id })
+}
+
+export function useOrdersByCustomer(customerId: string) {
+  return useQuery({ queryKey: ['orders', 'by-customer', customerId], queryFn: () => listOrdersByCustomer(customerId), enabled: !!customerId })
 }
 
 export function useOrderStatusHistory(orderId: string) {
@@ -35,7 +47,10 @@ export function useCreateOrder() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: OrderInput) => createOrder(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: KITCHEN_FLOW_PREFIX })
+    },
   })
 }
 
@@ -57,6 +72,7 @@ export function useAddOrderItem(orderId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-items', orderId] })
       queryClient.invalidateQueries({ queryKey: ['orders', orderId] })
+      queryClient.invalidateQueries({ queryKey: KITCHEN_FLOW_PREFIX })
     },
   })
 }
@@ -68,6 +84,7 @@ export function useRemoveOrderItem(orderId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-items', orderId] })
       queryClient.invalidateQueries({ queryKey: ['orders', orderId] })
+      queryClient.invalidateQueries({ queryKey: KITCHEN_FLOW_PREFIX })
     },
   })
 }
@@ -83,6 +100,7 @@ export function useConfirmOrder(orderId: string) {
       queryClient.invalidateQueries({ queryKey: ['order-status-history', orderId] })
       queryClient.invalidateQueries({ queryKey: ['ingredients'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
+      queryClient.invalidateQueries({ queryKey: KITCHEN_FLOW_PREFIX })
     },
   })
 }
@@ -96,6 +114,7 @@ export function useCancelOrder(orderId: string) {
       queryClient.invalidateQueries({ queryKey: ['orders', orderId] })
       queryClient.invalidateQueries({ queryKey: ['order-status-history', orderId] })
       queryClient.invalidateQueries({ queryKey: ['ingredients'] })
+      queryClient.invalidateQueries({ queryKey: KITCHEN_FLOW_PREFIX })
     },
   })
 }
