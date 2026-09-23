@@ -813,6 +813,82 @@ export type Database = {
           },
         ]
       }
+      dk_kitchen_hour_exceptions: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          created_by: string | null
+          exception_date: string
+          is_open: boolean
+          note: string | null
+          opens_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          exception_date: string
+          is_open: boolean
+          note?: string | null
+          opens_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          exception_date?: string
+          is_open?: boolean
+          note?: string | null
+          opens_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_hour_exceptions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_kitchen_hours: {
+        Row: {
+          closes_at: string | null
+          day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
+          is_open: boolean
+          opens_at: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          closes_at?: string | null
+          day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
+          is_open?: boolean
+          opens_at?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          closes_at?: string | null
+          day_of_week?: Database["public"]["Enums"]["dk_day_of_week"]
+          is_open?: boolean
+          opens_at?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_hours_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_kitchen_sla_settings: {
         Row: {
           confirmado_alert_min: number
@@ -3054,6 +3130,389 @@ export type Database = {
           solicitante_nombre?: string | null
         }
         Relationships: []
+      }
+      sc_auditoria: {
+        Row: {
+          accion: string
+          created_at: string
+          detalle: Json | null
+          id: string
+          informe_id: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          accion: string
+          created_at?: string
+          detalle?: Json | null
+          id?: string
+          informe_id?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          accion?: string
+          created_at?: string
+          detalle?: Json | null
+          id?: string
+          informe_id?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_auditoria_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sc_clasificaciones: {
+        Row: {
+          confianza: number | null
+          cuenta_id: string
+          estado: string
+          id: string
+          informe_id: string
+          origen: string
+          razon: string | null
+          rubro_codigo: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          confianza?: number | null
+          cuenta_id: string
+          estado?: string
+          id?: string
+          informe_id: string
+          origen: string
+          razon?: string | null
+          rubro_codigo?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          confianza?: number | null
+          cuenta_id?: string
+          estado?: string
+          id?: string
+          informe_id?: string
+          origen?: string
+          razon?: string | null
+          rubro_codigo?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_clasificaciones_cuenta_id_fkey"
+            columns: ["cuenta_id"]
+            isOneToOne: true
+            referencedRelation: "sc_cuentas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sc_clasificaciones_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sc_clasificaciones_rubro_codigo_fkey"
+            columns: ["rubro_codigo"]
+            isOneToOne: false
+            referencedRelation: "sc_rubros"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
+      sc_cuentas: {
+        Row: {
+          codigo: string
+          created_at: string
+          es_hoja: boolean
+          fila_origen: number | null
+          id: string
+          informe_id: string
+          nivel: string
+          nombre: string
+          saldo_actual: number
+          saldo_anterior: number | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string
+          es_hoja?: boolean
+          fila_origen?: number | null
+          id?: string
+          informe_id: string
+          nivel: string
+          nombre: string
+          saldo_actual?: number
+          saldo_anterior?: number | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          es_hoja?: boolean
+          fila_origen?: number | null
+          id?: string
+          informe_id?: string
+          nivel?: string
+          nombre?: string
+          saldo_actual?: number
+          saldo_anterior?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_cuentas_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sc_empresas: {
+        Row: {
+          created_at: string
+          id: string
+          nit: string | null
+          nombre: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nit?: string | null
+          nombre: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nit?: string | null
+          nombre?: string
+        }
+        Relationships: []
+      }
+      sc_informes: {
+        Row: {
+          aprobado_at: string | null
+          aprobado_por: string | null
+          creado_por: string | null
+          created_at: string
+          empresa_id: string | null
+          estado: string
+          hoja_origen: string | null
+          id: string
+          mapeo_columnas: Json | null
+          nombre_archivo: string
+          periodo_actual: number
+          periodo_anterior: number | null
+        }
+        Insert: {
+          aprobado_at?: string | null
+          aprobado_por?: string | null
+          creado_por?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          estado?: string
+          hoja_origen?: string | null
+          id?: string
+          mapeo_columnas?: Json | null
+          nombre_archivo: string
+          periodo_actual: number
+          periodo_anterior?: number | null
+        }
+        Update: {
+          aprobado_at?: string | null
+          aprobado_por?: string | null
+          creado_por?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          estado?: string
+          hoja_origen?: string | null
+          id?: string
+          mapeo_columnas?: Json | null
+          nombre_archivo?: string
+          periodo_actual?: number
+          periodo_anterior?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_informes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "sc_empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sc_mapeos_confirmados: {
+        Row: {
+          codigo: string
+          confirmado_por: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          nombre_norm: string
+          rubro_codigo: string
+        }
+        Insert: {
+          codigo: string
+          confirmado_por?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          nombre_norm: string
+          rubro_codigo: string
+        }
+        Update: {
+          codigo?: string
+          confirmado_por?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          nombre_norm?: string
+          rubro_codigo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_mapeos_confirmados_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "sc_empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sc_mapeos_confirmados_rubro_codigo_fkey"
+            columns: ["rubro_codigo"]
+            isOneToOne: false
+            referencedRelation: "sc_rubros"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
+      sc_reglas_mapeo: {
+        Row: {
+          activo: boolean
+          created_at: string
+          id: string
+          origen: string
+          prefijo: string
+          prioridad: number
+          rubro_codigo: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          origen?: string
+          prefijo: string
+          prioridad?: number
+          rubro_codigo: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          origen?: string
+          prefijo?: string
+          prioridad?: number
+          rubro_codigo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_reglas_mapeo_rubro_codigo_fkey"
+            columns: ["rubro_codigo"]
+            isOneToOne: false
+            referencedRelation: "sc_rubros"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
+      sc_rubros: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          estado: string
+          id: string
+          naturaleza: string
+          nombre: string
+          nota_numero: number | null
+          orden: number
+          origen: string
+          seccion: string
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          estado: string
+          id?: string
+          naturaleza?: string
+          nombre: string
+          nota_numero?: number | null
+          orden?: number
+          origen?: string
+          seccion: string
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          estado?: string
+          id?: string
+          naturaleza?: string
+          nombre?: string
+          nota_numero?: number | null
+          orden?: number
+          origen?: string
+          seccion?: string
+        }
+        Relationships: []
+      }
+      sc_validaciones: {
+        Row: {
+          bloqueante: boolean
+          codigo: string
+          created_at: string
+          detalle: Json | null
+          id: string
+          informe_id: string
+          ok: boolean
+          titulo: string
+        }
+        Insert: {
+          bloqueante?: boolean
+          codigo: string
+          created_at?: string
+          detalle?: Json | null
+          id?: string
+          informe_id: string
+          ok: boolean
+          titulo: string
+        }
+        Update: {
+          bloqueante?: boolean
+          codigo?: string
+          created_at?: string
+          detalle?: Json | null
+          id?: string
+          informe_id?: string
+          ok?: boolean
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_validaciones_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sjap_archivos_cierre: {
         Row: {

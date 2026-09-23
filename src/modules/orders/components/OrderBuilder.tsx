@@ -43,7 +43,7 @@ function TotalRow({ label, value, trailingCols, emphasis = false }: { label: str
   )
 }
 
-export function OrderBuilder({ orderId }: { orderId: string }) {
+export function OrderBuilder({ orderId, statusActions = true }: { orderId: string; /** false cuando quien lo aloja ya ofrece confirmar/cancelar (tablero de Cocina). */ statusActions?: boolean }) {
   const { show } = useToast()
 
   const { data: order, isLoading } = useOrder(orderId)
@@ -232,7 +232,7 @@ export function OrderBuilder({ orderId }: { orderId: string }) {
         }
       />
 
-      {(isNuevo || canCancel) && (
+      {statusActions && (isNuevo || canCancel) && (
         <div className="flex flex-wrap justify-end gap-2">
           {canCancel && (
             <Button variant="danger" icon={XCircle} onClick={() => setCancelOpen(true)}>

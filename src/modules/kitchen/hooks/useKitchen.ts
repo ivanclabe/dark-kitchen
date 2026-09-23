@@ -3,7 +3,6 @@ import {
   advanceKitchenItem,
   cancelKitchenOrder,
   countDeliveredToday,
-  listCancelledKitchenQueue,
   listKitchenFlow,
   listKitchenFlowByDate,
   listKitchenQueue,
@@ -14,14 +13,13 @@ import type { KitchenItemStatus, KitchenTicketItem } from '../types'
 
 /**
  * Prefijo común de TODAS las queries del flujo de Cocina (cola del
- * Dashboard, tablero, cancelados, entregados hoy). Cualquier mutación que
+ * Dashboard, tablero, entregados hoy). Cualquier mutación que
  * mueva un pedido — acá, en Pedidos o en Despacho — invalida este prefijo y
  * refresca todo junto. Antes cada pantalla tenía su propia clave y el
  * tablero tardaba hasta 15 s en reflejar una confirmación o un despacho.
  */
 export const KITCHEN_KEY = ['kitchen-queue'] as const
 const FLOW_KEY = [...KITCHEN_KEY, 'flow'] as const
-const CANCELLED_KEY = [...KITCHEN_KEY, 'cancelled'] as const
 const DELIVERED_TODAY_KEY = [...KITCHEN_KEY, 'delivered-today'] as const
 
 // Compartida por todas las mutaciones que tocan inventario o el estado del
@@ -61,11 +59,6 @@ export function useKitchenFlow(date: string | null = null) {
     queryFn: () => (date ? listKitchenFlowByDate(date) : listKitchenFlow()),
     refetchInterval: date ? false : 15_000,
   })
-}
-
-/** Columna Cancelado en vivo — en modo histórico los cancelados ya vienen dentro del flujo. */
-export function useCancelledKitchenQueue(enabled = true) {
-  return useQuery({ queryKey: CANCELLED_KEY, queryFn: listCancelledKitchenQueue, refetchInterval: enabled ? 15_000 : false, enabled })
 }
 
 export function useDeliveredTodayCount(enabled = true) {

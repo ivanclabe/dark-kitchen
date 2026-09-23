@@ -3,10 +3,11 @@ import { canPerform, type FlowAction } from '../lib/permissions'
 import type { KitchenOrderStatus, KitchenPrepStatus } from '../types'
 
 /**
- * Columnas del tablero, en orden: el flujo completo del pedido. CANCELADO va
- * aparte al final (terminal). ENTREGADO no es columna: sale del tablero.
+ * Columnas del tablero, en orden: el flujo activo del pedido. ENTREGADO y
+ * CANCELADO no son columna: salen del tablero y se consultan en Historial.
+ * Cancelar sigue siendo una transición válida (desde el detalle del pedido).
  */
-export const KANBAN_COLUMNS: KitchenOrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO', 'CANCELADO']
+export const KANBAN_COLUMNS: KitchenOrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO']
 
 /** Tramo de cocina: dentro de él se avanza y retrocede libremente (corregir errores sin un "deshacer" especial). */
 const KITCHEN_SEQUENCE: KitchenOrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']

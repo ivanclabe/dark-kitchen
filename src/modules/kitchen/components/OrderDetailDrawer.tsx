@@ -7,14 +7,68 @@ import { Tooltip } from '@/shared/ui/Tooltip'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import clsx from 'clsx'
-import { AlertTriangle, ChefHat, ChevronLeft, ChevronRight, Play } from 'lucide-react'
+import { AlertTriangle, ChefHat, ChevronLeft, ChevronRight, Flag, Play, XCircle } from 'lucide-react'
+import { Button, type ButtonProps } from '@/shared/ui/Button'
 import { useAdvanceKitchenItem, useRevertKitchenItem } from '../hooks/useKitchen'
-import { ACTION_DENIED_REASON, canPerform } from '../lib/permissions'
+import { useTicketActions } from '../kanban/useTicketActions'
+import { ACTION_DENIED_REASON, canPerform, type FlowAction } from '../lib/permissions'
 import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL, ORDER_STATUS_CONFIG } from '../lib/ticketVisuals'
 import type { KitchenTicket, KitchenTicketItem } from '../types'
 import type { Role } from '@/shared/rbac/roles'
 
 const KITCHEN_STAGES = new Set(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
+
+/** Botón gateado por rol: deshabilitado con el motivo en el tooltip si tu rol no puede. */
+function GatedButton({ action, userRole, label, ...props }: { action: FlowAction; userRole: Role | null; label: string } & Omit<ButtonProps, 'children' | 'role'>) {
+  const allowed = canPerform(userRole, action)
+  return (
+    <Tooltip label={allowed ? label : ACTION_DENIED_REASON[action]} side="top">
+      <Button {...props} disabled={props.disabled || !allowed}>
+        {label}
+      </Button>
+    </Tooltip>
+  )
+}
+
+/**
+ * Todas las acciones del pedido en el tablero — las que antes llenaban el pie
+ * de cada tarjeta (prioridad, retroceder, cancelar) más el siguiente paso.
+ */
+function TicketActionBar({ ticket, role }: { ticket: KitchenTicket; role: Role | null }) {
+  const actions = useTicketActions(ticket)
+  const primary = actions.primaryAction
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {primary && (
+        <GatedButton
+          action={primary.action}
+          userRole={role}
+          label={primary.label}
+          variant="primary"
+          icon={primary.icon}
+          onClick={actions.primary}
+          loading={actions.busy}
+          disabled={actions.primaryDisabled}
+        />
+      )}
+      {actions.revertLabel && <GatedButton action="revert" userRole={role} label={actions.revertLabel} variant="secondary" icon={ChevronLeft} onClick={actions.revert} disabled={actions.busy} />}
+      {actions.canPrioritize && (
+        <GatedButton
+          action="priority"
+          userRole={role}
+          label={actions.prioritized ? 'Quitar prioridad' : 'Prioritario'}
+          variant="secondary"
+          icon={Flag}
+          onClick={actions.togglePriority}
+          loading={actions.priorityPending}
+        />
+      )}
+      <div className="ml-auto">
+        <GatedButton action="cancel" userRole={role} label="Cancelar pedido" variant="danger" icon={XCircle} onClick={actions.cancel} />
+      </div>
+    </div>
+  )
+}
 
 function ItemRow({ item, orderNumber, role }: { item: KitchenTicketItem; orderNumber: number; role: Role | null }) {
   const advance = useAdvanceKitchenItem()
@@ -111,6 +165,7 @@ export function OrderDetailDrawer({
   return (
     <Drawer open onClose={onClose} title={title} subtitle={subtitle}>
       <div className="space-y-5">
+        {ticket && <TicketActionBar ticket={ticket} role={role} />}
         {ticket && inKitchen && ticket.items.length > 0 && (
           <Card title="Cocina" description="Avanza o corrige plato por plato" icon={ChefHat}>
             <ul className="divide-y divide-neutral-800/60">
@@ -120,7 +175,7 @@ export function OrderDetailDrawer({
             </ul>
           </Card>
         )}
-        <OrderBuilder orderId={orderId} />
+        <OrderBuilder orderId={orderId} statusActions={!ticket} />
       </div>
     </Drawer>
   )
