@@ -1,0 +1,13 @@
+# node_modules del host trae binarios nativos de macOS (rolldown, lightningcss)
+# que romperían el build en Alpine: `npm ci` instala los de Linux dentro de la imagen.
+node_modules
+dist
+.git
+.claude
+*.log
+.DS_Store
+
+# .env.local NO se excluye a propósito: Vite necesita VITE_SUPABASE_URL y
+# VITE_SUPABASE_PUBLISHABLE_KEY en tiempo de build (quedan en el bundle
+# público de todas formas). Solo pasa por la etapa de build; la imagen final
+# contiene únicamente dist/.
