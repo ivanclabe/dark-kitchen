@@ -1,0 +1,12 @@
+name: dark-kitchen
+
+services:
+  dark-kitchen:
+    build: .
+    restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
