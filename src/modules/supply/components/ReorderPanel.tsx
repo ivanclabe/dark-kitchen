@@ -10,6 +10,10 @@ import { typography } from '@/shared/ui/typography'
 import { formatMoney } from '@/shared/utils/format'
 import { AlertTriangle, ArrowRight, CheckCircle2, Clock, History, PackagePlus, Settings2, Trash2, Wallet } from 'lucide-react'
 import { useMemo } from 'react'
+import { InsightExplanation, InsightSummary } from '@/modules/ai/components/InsightParts'
+import { insightItemsByRef } from '@/modules/ai/lib/insightItems'
+import { useAiFeature, useAiInsight } from '@/modules/ai/hooks/useAi'
+import { numberSetting, PRIORITY_ORDER } from '@/modules/ai/lib/catalog'
 import { useIngredients } from '../hooks/useIngredients'
 import { useSupplySuggestions } from '../hooks/useSuggestions'
 import { formatCoverage, needsAttention, orderQuantity, SHORT_COVERAGE_DAYS, urgencyOf } from '../lib/coverage'
@@ -17,9 +21,10 @@ import { inventoryValue } from '../lib/stock'
 import type { SupplySuggestion } from '../types'
 import type { PresetLine } from './NewPurchaseDialog'
 import { MovementTimeline } from './MovementTimeline'
+import { SupplyAiCards } from './SupplyAiCards'
 
-function UrgencyBadge({ suggestion }: { suggestion: SupplySuggestion }) {
-  const urgency = urgencyOf(suggestion)
+function UrgencyBadge({ suggestion, coverageDays }: { suggestion: SupplySuggestion; coverageDays: number }) {
+  const urgency = urgencyOf(suggestion, coverageDays)
   if (urgency === 'bajo_minimo')
     return (
       <Badge tone="danger" icon={AlertTriangle} size="sm">
@@ -57,9 +62,14 @@ export function ReorderPanel({
 }) {
   const { data: suggestions, isLoading, isError, error, refetch } = useSupplySuggestions()
   const { data: ingredients } = useIngredients()
+  // El umbral de cobertura corta es configurable (Configuración → IA → Sugerencias de compra).
+  const reorderAi = useAiFeature('supply_reorder')
+  const coverageDays = numberSetting(reorderAi.settings, 'coverage_days', SHORT_COVERAGE_DAYS)
+  const { data: aiResult, isLoading: aiLoading } = useAiInsight('supply_reorder', reorderAi.enabled)
+  const aiByRef = useMemo(() => insightItemsByRef(aiResult), [aiResult])
 
   const active = useMemo(() => (ingredients ?? []).filter((i) => i.active), [ingredients])
-  const attention = useMemo(() => (suggestions ?? []).filter(needsAttention), [suggestions])
+  const attention = useMemo(() => (suggestions ?? []).filter((s) => needsAttention(s, coverageDays)), [suggestions, coverageDays])
   const wasted30d = useMemo(() => (suggestions ?? []).reduce((sum, s) => sum + s.wasted30d * s.avgCost, 0), [suggestions])
 
   const bySupplier = useMemo(() => {
@@ -70,8 +80,14 @@ export function ReorderPanel({
       if (entry) entry.items.push(s)
       else map.set(key, { supplierId: s.primarySupplierId, supplierName: s.supplierName ?? 'Sin proveedor asignado', items: [s] })
     }
-    return [...map.values()].sort((a, b) => b.items.length - a.items.length)
-  }, [attention])
+    // Con análisis de IA, lo que la IA marca como más urgente va primero dentro de cada proveedor.
+    const rank = (s: SupplySuggestion) => {
+      const item = aiByRef.get(s.ingredientId)
+      return item ? PRIORITY_ORDER[item.priority] : 3
+    }
+    const groups = [...map.values()].map((g) => ({ ...g, items: [...g.items].sort((a, b) => rank(a) - rank(b)) }))
+    return groups.sort((a, b) => Math.min(...a.items.map(rank)) - Math.min(...b.items.map(rank)) || b.items.length - a.items.length)
+  }, [attention, aiByRef])
 
   /** El diálogo necesita el Ingredient completo (baseUnitId, avgCost); la cantidad la decide orderQuantity. */
   function toLines(items: SupplySuggestion[]): PresetLine[] {
@@ -90,14 +106,14 @@ export function ReorderPanel({
         <StatCard
           label="Piden atención"
           value={attention.length}
-          hint={attention.length > 0 ? `Bajo mínimo o < ${SHORT_COVERAGE_DAYS} días` : 'Todo con cobertura suficiente'}
+          hint={attention.length > 0 ? `Bajo mínimo o < ${coverageDays} días` : 'Todo con cobertura suficiente'}
           icon={attention.length > 0 ? AlertTriangle : CheckCircle2}
           tone={attention.length > 0 ? 'warn' : 'good'}
         />
         <StatCard label="Merma (30 días)" value={formatMoney(wasted30d)} hint="Valorizada al costo promedio" icon={Trash2} tone={wasted30d > 0 ? 'warn' : 'neutral'} />
       </div>
 
-      <Card title="Reponer" description={`Bajo mínimo o con menos de ${SHORT_COVERAGE_DAYS} días de cobertura, agrupado por proveedor`} icon={PackagePlus}>
+      <Card title="Reponer" description={`Bajo mínimo o con menos de ${coverageDays} días de cobertura, agrupado por proveedor`} icon={PackagePlus}>
         {isError ? (
           <ErrorState error={error} onRetry={() => void refetch()} compact />
         ) : isLoading ? (
@@ -106,6 +122,7 @@ export function ReorderPanel({
           <EmptyState icon={CheckCircle2} title="Nada por reponer" description="Ningún insumo activo está bajo mínimo ni se queda corto esta semana." compact />
         ) : (
           <div className="space-y-5">
+            {reorderAi.enabled && <InsightSummary feature="supply_reorder" result={aiResult} isLoading={aiLoading} />}
             {bySupplier.map((group) => {
               const orderable = group.items.filter((s) => orderQuantity(s) > 0)
               return (
@@ -129,6 +146,7 @@ export function ReorderPanel({
                   <ul className="divide-y divide-neutral-800/60">
                     {group.items.map((s) => {
                       const qty = orderQuantity(s)
+                      const ai = aiByRef.get(s.ingredientId)
                       return (
                         <li key={s.ingredientId}>
                           <button
@@ -138,12 +156,13 @@ export function ReorderPanel({
                           >
                             <div className="min-w-0">
                               <p className="flex items-center gap-2 truncate text-sm font-medium text-neutral-100">
-                                {s.name} <UrgencyBadge suggestion={s} />
+                                {s.name} <UrgencyBadge suggestion={s} coverageDays={coverageDays} />
                               </p>
                               <p className="text-xs text-neutral-500 tabular-nums">
                                 {s.stockAvailable} {s.baseUnitCode}
                                 {s.dailyBurn > 0 ? ` · gasta ${Math.round(s.dailyBurn * 100) / 100}/día · dura ${formatCoverage(s)}` : ' · sin consumo en 30 días'}
                               </p>
+                              {ai && <InsightExplanation item={ai} />}
                             </div>
                             <span className="inline-flex shrink-0 items-center gap-2">
                               {qty > 0 ? (
@@ -166,6 +185,8 @@ export function ReorderPanel({
           </div>
         )}
       </Card>
+
+      <SupplyAiCards onSelectIngredient={onSelectIngredient} />
 
       <Card title="Movimientos recientes" description="Todo el inventario" icon={History}>
         <MovementTimeline showIngredientName />

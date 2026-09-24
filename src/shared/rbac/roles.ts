@@ -20,6 +20,7 @@ export type ModuleKey =
   | 'kitchen'
   | 'customers'
   | 'reports'
+  | 'settings'
 
 // Which roles can even see/enter a module. Fine-grained read/write is
 // enforced per-action closer to each service call, not just per module.
@@ -41,6 +42,9 @@ const MODULE_ACCESS: Record<ModuleKey, readonly Role[]> = {
   // (ver migración dk_cartera_schema).
   customers: ['ADMIN', 'MANAGER', 'CASHIER'],
   reports: ['ADMIN', 'MANAGER', 'INVENTORY', 'CASHIER'],
+  // Configuración del sistema (hoy: funciones de IA). Escribir dk_ai_features
+  // solo lo permite la RLS a ADMIN/MANAGER.
+  settings: ['ADMIN', 'MANAGER'],
 }
 
 /** true si el rol puede acceder a al menos uno de los módulos dados — usado para los ítems de sidebar que agrupan varias rutas. */

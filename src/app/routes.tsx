@@ -9,6 +9,7 @@ import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { UsersPage } from '@/modules/users/pages/UsersPage'
+import { AiSettingsPage } from '@/modules/ai/pages/AiSettingsPage'
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
@@ -97,6 +98,8 @@ export const router = createBrowserRouter([
         ),
       },
       { path: 'users', element: <UsersPage /> },
+      { path: 'settings', element: <Navigate to="/settings/ai" replace /> },
+      { path: 'settings/ai', element: <AiSettingsPage /> },
     ],
   },
 ])

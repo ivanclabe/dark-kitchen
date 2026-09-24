@@ -28,12 +28,14 @@ function KanbanColumn({
   newIds,
   onAcknowledge,
   dropState,
+  stalledByOrder,
 }: {
   status: KitchenOrderStatus
   tickets: KitchenTicket[]
   now: number
   newIds: Set<string>
   onAcknowledge: (orderId: string) => void
+  stalledByOrder?: Map<string, string[]>
   /** Durante un arrastre: si esta columna acepta la tarjeta (flujo + rol). null = no hay arrastre. */
   dropState: 'valid' | 'invalid' | null
 }) {
@@ -55,7 +57,14 @@ function KanbanColumn({
         )}
       >
         {tickets.map((ticket) => (
-          <KanbanTicketCard key={ticket.orderId} ticket={ticket} now={now} isNew={newIds.has(ticket.orderId)} onAcknowledge={() => onAcknowledge(ticket.orderId)} />
+          <KanbanTicketCard
+            key={ticket.orderId}
+            ticket={ticket}
+            now={now}
+            isNew={newIds.has(ticket.orderId)}
+            onAcknowledge={() => onAcknowledge(ticket.orderId)}
+            stalledNotes={stalledByOrder?.get(ticket.orderId)}
+          />
         ))}
       </div>
     </div>
@@ -74,6 +83,7 @@ export function KanbanView({
   newIds,
   onAcknowledge,
   search = '',
+  stalledByOrder,
 }: {
   tickets: KitchenTicket[] | undefined
   isLoading: boolean
@@ -82,6 +92,8 @@ export function KanbanView({
   onAcknowledge: (orderId: string) => void
   /** Filtra por # de pedido o cliente (la búsqueda vive en el header de la página). */
   search?: string
+  /** Pedidos/platos detenidos, para marcar su tarjeta. */
+  stalledByOrder?: Map<string, string[]>
 }) {
   const board = useBoardActions()
   const { sensors, activeTicket, handleDragStart, handleDragEnd } = useKanbanDragDrop(tickets, board)
@@ -116,6 +128,7 @@ export function KanbanView({
               now={now}
               newIds={newIds}
               onAcknowledge={onAcknowledge}
+              stalledByOrder={stalledByOrder}
               dropState={!activeTicket || status === activeTicket.orderStatus ? null : canTransition(activeTicket.orderStatus, status, board.role) ? 'valid' : 'invalid'}
             />
           ))}

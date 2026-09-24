@@ -15,6 +15,7 @@ import { useSearchParams } from 'react-router-dom'
 import { HistoryDrawer } from '../components/HistoryDrawer'
 import { KitchenConfigDrawer, type KitchenConfigTab } from '../components/KitchenConfigDrawer'
 import { KitchenDateNav, todayStr } from '../components/KitchenDateNav'
+import { KitchenInsightLine } from '../components/KitchenInsightLine'
 import { KitchenStatusLine } from '../components/KitchenStatusLine'
 import { NewOrderDrawer } from '../components/NewOrderDrawer'
 import { OrderDetailDrawer } from '../components/OrderDetailDrawer'
@@ -22,6 +23,7 @@ import { RidersDrawer } from '../components/RidersDrawer'
 import { useDeliveredTodayCount, useKitchenFlow } from '../hooks/useKitchen'
 import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
 import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
+import { useStallAlerts } from '../hooks/useStallAlerts'
 import { BoardActionsContext, type BoardActions } from '../kanban/boardActions'
 import { CancelOrderDialog, ConfirmOrderDialog, DispatchDialog } from '../kanban/BoardDialogs'
 import { ACTION_DENIED_REASON, canPerform } from '../lib/permissions'
@@ -132,6 +134,9 @@ export function KitchenPage() {
   const kitchenTickets = useMemo(() => sortedTickets?.filter((t) => KITCHEN_STATUSES.has(t.orderStatus)), [sortedTickets])
   const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(isToday ? kitchenTickets : undefined)
   const voice = useVoiceCommandEngine(isToday ? kitchenTickets : undefined)
+  // Mientras el micrófono escucha, los avisos hablados esperan (si no, se transcribirían).
+  const voiceBusy = voice.phase === 'listening' || voice.phase === 'processing'
+  const { stalledByOrder } = useStallAlerts({ active: isToday, paused: voiceBusy, muted: !soundEnabled })
 
   const kpis = useMemo(() => {
     const count = (status: KitchenOrderStatus) => (flowTickets ?? []).filter((t) => t.orderStatus === status).length
@@ -189,7 +194,7 @@ export function KitchenPage() {
       ? { label: 'Ver tiempos (SLA)', icon: Gauge, onSelect: () => changeView('sla') }
       : { label: 'Ver tablero', icon: Kanban, onSelect: () => changeView('tablero') },
     { label: 'Tamaño grande', icon: ZoomIn, checked: density === 'grande', onSelect: toggleDensity },
-    { label: 'Sonido de pedidos nuevos', icon: Bell, checked: soundEnabled, onSelect: toggleSound },
+    { label: 'Sonidos y avisos de voz', icon: Bell, checked: soundEnabled, onSelect: toggleSound },
     ...(voiceAvailable
       ? [
           { label: 'Respuesta hablada', icon: Volume2, checked: voice.ttsEnabled, onSelect: voice.toggleTts },
@@ -287,6 +292,16 @@ export function KitchenPage() {
             </div>
           )}
 
+          {isToday && (
+            <KitchenInsightLine
+              active={isToday}
+              paused={voiceBusy}
+              muted={!soundEnabled}
+              orderNumberOf={(orderId) => flowTickets?.find((t) => t.orderId === orderId)?.orderNumber}
+              onOpenOrder={setDetailOrder}
+            />
+          )}
+
           {view === 'sla' && (
             <p className={clsx('flex items-center gap-2', typography.small)}>
               <Gauge size={14} className="text-brasa-400" aria-hidden /> Tiempos por pedido (SLA)
@@ -299,7 +314,7 @@ export function KitchenPage() {
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {view === 'tablero' ? (
-            <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} search={search} />
+            <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} search={search} stalledByOrder={stalledByOrder} />
           ) : (
             <SlaView tickets={kitchenTickets} now={now} />
           )}

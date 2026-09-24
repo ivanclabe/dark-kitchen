@@ -20,11 +20,13 @@ export const KanbanTicketCard = memo(function KanbanTicketCard({
   now,
   isNew,
   onAcknowledge,
+  stalledNotes,
 }: {
   ticket: KitchenTicket
   now: number
   isNew: boolean
   onAcknowledge: () => void
+  stalledNotes?: string[]
 }) {
   const board = useBoardActions()
   const actions = useTicketActions(ticket)
@@ -70,6 +72,7 @@ export const KanbanTicketCard = memo(function KanbanTicketCard({
         ticket={ticket}
         now={now}
         density={board.density}
+        stalledNotes={stalledNotes}
         trailing={
           primary && (
             <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top">

@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Settings,
   Soup,
   UserCog,
   Users,
@@ -75,6 +76,14 @@ const NAV_ITEMS: NavItem[] = [
   },
   { to: '/reports', label: 'Reportes', description: 'Ventas, compras y rentabilidad', modules: ['reports'], icon: BarChart3 },
   { to: '/users', label: 'Usuarios', description: 'Equipo y roles', modules: ['users'], icon: UserCog },
+  {
+    to: '/settings/ai',
+    label: 'Configuración',
+    description: 'Funciones de IA y umbrales',
+    modules: ['settings'],
+    icon: Settings,
+    matchPrefixes: ['/settings'],
+  },
 ]
 
 function isNavItemActive(pathname: string, item: NavItem): boolean {

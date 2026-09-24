@@ -39,7 +39,11 @@ export function useUpdateIngredient() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: IngredientInput }) => updateIngredient(id, input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY }),
+    // Mín./máx., proveedor y vida útil alimentan las sugerencias y señales de inventario.
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY })
+      void queryClient.invalidateQueries({ queryKey: ['supply-suggestions'] })
+    },
   })
 }
 
@@ -47,6 +51,9 @@ export function useSetIngredientActive() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, active }: { id: string; active: boolean }) => setIngredientActive(id, active),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY })
+      void queryClient.invalidateQueries({ queryKey: ['supply-suggestions'] })
+    },
   })
 }

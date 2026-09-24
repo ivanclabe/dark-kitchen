@@ -256,6 +256,89 @@ export type Database = {
           },
         ]
       }
+      dk_ai_features: {
+        Row: {
+          enabled: boolean
+          feature_key: string
+          settings: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          feature_key: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          feature_key?: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ai_features_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_ai_insights: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          error: string | null
+          feature_key: string
+          id: string
+          input: Json
+          model: string | null
+          output: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          feature_key: string
+          id?: string
+          input: Json
+          model?: string | null
+          output?: Json | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          feature_key?: string
+          id?: string
+          input?: Json
+          model?: string | null
+          output?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ai_insights_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ai_insights_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "dk_ai_features"
+            referencedColumns: ["feature_key"]
+          },
+        ]
+      }
       dk_attachments: {
         Row: {
           created_at: string
@@ -305,7 +388,8 @@ export type Database = {
           id: string
           new_data: Json | null
           old_data: Json | null
-          record_id: string
+          record_id: string | null
+          record_key: string | null
           table_name: string
         }
         Insert: {
@@ -315,7 +399,8 @@ export type Database = {
           id?: string
           new_data?: Json | null
           old_data?: Json | null
-          record_id: string
+          record_id?: string | null
+          record_key?: string | null
           table_name: string
         }
         Update: {
@@ -325,7 +410,8 @@ export type Database = {
           id?: string
           new_data?: Json | null
           old_data?: Json | null
-          record_id?: string
+          record_id?: string | null
+          record_key?: string | null
           table_name?: string
         }
         Relationships: [
@@ -1123,6 +1209,7 @@ export type Database = {
           created_at: string
           id: string
           kitchen_status: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          kitchen_status_changed_at: string
           line_total: number | null
           observation: string | null
           order_id: string
@@ -1135,6 +1222,7 @@ export type Database = {
           created_at?: string
           id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          kitchen_status_changed_at?: string
           line_total?: number | null
           observation?: string | null
           order_id: string
@@ -1147,6 +1235,7 @@ export type Database = {
           created_at?: string
           id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
+          kitchen_status_changed_at?: string
           line_total?: number | null
           observation?: string | null
           order_id?: string
@@ -3229,40 +3318,61 @@ export type Database = {
       }
       sc_cuentas: {
         Row: {
+          celda_actual: string | null
+          celda_anterior: string | null
+          clave: string | null
           codigo: string
+          codigo_padre: string | null
           created_at: string
           es_hoja: boolean
+          fila_anterior: number | null
           fila_origen: number | null
           id: string
           informe_id: string
+          nit: string | null
           nivel: string
           nombre: string
-          saldo_actual: number
+          saldo_actual: number | null
           saldo_anterior: number | null
+          saldo_inicial: number | null
         }
         Insert: {
+          celda_actual?: string | null
+          celda_anterior?: string | null
+          clave?: string | null
           codigo: string
+          codigo_padre?: string | null
           created_at?: string
           es_hoja?: boolean
+          fila_anterior?: number | null
           fila_origen?: number | null
           id?: string
           informe_id: string
+          nit?: string | null
           nivel: string
           nombre: string
-          saldo_actual?: number
+          saldo_actual?: number | null
           saldo_anterior?: number | null
+          saldo_inicial?: number | null
         }
         Update: {
+          celda_actual?: string | null
+          celda_anterior?: string | null
+          clave?: string | null
           codigo?: string
+          codigo_padre?: string | null
           created_at?: string
           es_hoja?: boolean
+          fila_anterior?: number | null
           fila_origen?: number | null
           id?: string
           informe_id?: string
+          nit?: string | null
           nivel?: string
           nombre?: string
-          saldo_actual?: number
+          saldo_actual?: number | null
           saldo_anterior?: number | null
+          saldo_inicial?: number | null
         }
         Relationships: [
           {
@@ -3303,12 +3413,16 @@ export type Database = {
           created_at: string
           empresa_id: string | null
           estado: string
+          hoja_anterior: string | null
+          hoja_notas: string | null
           hoja_origen: string | null
           id: string
+          identificacion: Json | null
           mapeo_columnas: Json | null
           nombre_archivo: string
           periodo_actual: number
           periodo_anterior: number | null
+          reporte_extraccion: Json | null
         }
         Insert: {
           aprobado_at?: string | null
@@ -3317,12 +3431,16 @@ export type Database = {
           created_at?: string
           empresa_id?: string | null
           estado?: string
+          hoja_anterior?: string | null
+          hoja_notas?: string | null
           hoja_origen?: string | null
           id?: string
+          identificacion?: Json | null
           mapeo_columnas?: Json | null
           nombre_archivo: string
           periodo_actual: number
           periodo_anterior?: number | null
+          reporte_extraccion?: Json | null
         }
         Update: {
           aprobado_at?: string | null
@@ -3331,12 +3449,16 @@ export type Database = {
           created_at?: string
           empresa_id?: string | null
           estado?: string
+          hoja_anterior?: string | null
+          hoja_notas?: string | null
           hoja_origen?: string | null
           id?: string
+          identificacion?: Json | null
           mapeo_columnas?: Json | null
           nombre_archivo?: string
           periodo_actual?: number
           periodo_anterior?: number | null
+          reporte_extraccion?: Json | null
         }
         Relationships: [
           {
@@ -3390,6 +3512,110 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sc_rubros"
             referencedColumns: ["codigo"]
+          },
+        ]
+      }
+      sc_notas_archivo: {
+        Row: {
+          created_at: string
+          fila_fin: number | null
+          fila_inicio: number | null
+          id: string
+          informe_id: string
+          numero: string | null
+          orden: number
+          seccion: string | null
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          fila_fin?: number | null
+          fila_inicio?: number | null
+          id?: string
+          informe_id: string
+          numero?: string | null
+          orden: number
+          seccion?: string | null
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          fila_fin?: number | null
+          fila_inicio?: number | null
+          id?: string
+          informe_id?: string
+          numero?: string | null
+          orden?: number
+          seccion?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_notas_archivo_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sc_notas_archivo_lineas: {
+        Row: {
+          celda_actual: string | null
+          celda_anterior: string | null
+          etiqueta: string | null
+          fila_origen: number | null
+          id: string
+          informe_id: string
+          nota_id: string
+          orden: number
+          sangria: number
+          tipo: string
+          valor_actual: number | null
+          valor_anterior: number | null
+        }
+        Insert: {
+          celda_actual?: string | null
+          celda_anterior?: string | null
+          etiqueta?: string | null
+          fila_origen?: number | null
+          id?: string
+          informe_id: string
+          nota_id: string
+          orden: number
+          sangria?: number
+          tipo: string
+          valor_actual?: number | null
+          valor_anterior?: number | null
+        }
+        Update: {
+          celda_actual?: string | null
+          celda_anterior?: string | null
+          etiqueta?: string | null
+          fila_origen?: number | null
+          id?: string
+          informe_id?: string
+          nota_id?: string
+          orden?: number
+          sangria?: number
+          tipo?: string
+          valor_actual?: number | null
+          valor_anterior?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sc_notas_archivo_lineas_informe_id_fkey"
+            columns: ["informe_id"]
+            isOneToOne: false
+            referencedRelation: "sc_informes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sc_notas_archivo_lineas_nota_id_fkey"
+            columns: ["nota_id"]
+            isOneToOne: false
+            referencedRelation: "sc_notas_archivo"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3987,6 +4213,90 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "sjap_efectivo_diario_estacion_id_fkey"
+            columns: ["estacion_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sjap_esquema_reglas: {
+        Row: {
+          created_at: string
+          dia_semana: number | null
+          esquema_id: string
+          estacion_id: string
+          fecha: string | null
+          id: string
+          isla_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dia_semana?: number | null
+          esquema_id: string
+          estacion_id: string
+          fecha?: string | null
+          id?: string
+          isla_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dia_semana?: number | null
+          esquema_id?: string
+          estacion_id?: string
+          fecha?: string | null
+          id?: string
+          isla_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sjap_esquema_reglas_esquema_id_fkey"
+            columns: ["esquema_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_esquemas_turno"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sjap_esquema_reglas_estacion_id_fkey"
+            columns: ["estacion_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_estaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sjap_esquema_reglas_isla_id_fkey"
+            columns: ["isla_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_islas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sjap_esquemas_turno: {
+        Row: {
+          created_at: string
+          es_predeterminado: boolean
+          estacion_id: string
+          id: string
+          nombre: string
+        }
+        Insert: {
+          created_at?: string
+          es_predeterminado?: boolean
+          estacion_id: string
+          id?: string
+          nombre: string
+        }
+        Update: {
+          created_at?: string
+          es_predeterminado?: boolean
+          estacion_id?: string
+          id?: string
+          nombre?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sjap_esquemas_turno_estacion_id_fkey"
             columns: ["estacion_id"]
             isOneToOne: false
             referencedRelation: "sjap_estaciones"
@@ -4678,6 +4988,7 @@ export type Database = {
         Row: {
           activo: boolean
           created_at: string
+          esquema_id: string
           estacion_id: string
           hora_fin: string
           hora_inicio: string
@@ -4688,6 +4999,7 @@ export type Database = {
         Insert: {
           activo?: boolean
           created_at?: string
+          esquema_id: string
           estacion_id: string
           hora_fin: string
           hora_inicio: string
@@ -4698,6 +5010,7 @@ export type Database = {
         Update: {
           activo?: boolean
           created_at?: string
+          esquema_id?: string
           estacion_id?: string
           hora_fin?: string
           hora_inicio?: string
@@ -4706,6 +5019,13 @@ export type Database = {
           orden?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "sjap_turno_tipos_esquema_id_fkey"
+            columns: ["esquema_id"]
+            isOneToOne: false
+            referencedRelation: "sjap_esquemas_turno"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sjap_turno_tipos_estacion_id_fkey"
             columns: ["estacion_id"]
@@ -5658,6 +5978,10 @@ export type Database = {
         Args: { p_order_item_id: string }
         Returns: undefined
       }
+      dk_ai_feature_allowed: {
+        Args: { p_feature_key: string }
+        Returns: boolean
+      }
       dk_calculate_recipe_cost: {
         Args: { p_recipe_id: string }
         Returns: number
@@ -5711,6 +6035,49 @@ export type Database = {
         Args: { p_full_name?: string; p_phone: string }
         Returns: string
       }
+      dk_inventory_signals: {
+        Args: {
+          p_coverage_days?: number
+          p_overstock_days?: number
+          p_slow_days?: number
+          p_warning_days?: number
+        }
+        Returns: {
+          avg_cost: number
+          base_unit_code: string
+          below_min: boolean
+          code: string
+          consumed_30d: number
+          consumed_7d: number
+          coverage_days: number
+          daily_burn: number
+          daily_burn_7d: number
+          days_since_consumption: number
+          est_days_to_expiry: number
+          ingredient_id: string
+          last_consumed_at: string
+          max_stock: number
+          min_stock: number
+          name: string
+          needs_reorder: boolean
+          oldest_stock_at: string
+          oldest_stock_qty: number
+          overstock: boolean
+          perishable: boolean
+          perishable_risk: boolean
+          primary_supplier_id: string
+          projected_waste_qty: number
+          shelf_life_days: number
+          slow_mover: boolean
+          stock_available: number
+          stock_on_hand: number
+          stock_value: number
+          suggested_quantity: number
+          supplier_name: string
+          wasted_30d: number
+        }[]
+      }
+      dk_kitchen_signals: { Args: { p_dish_stall_min?: number }; Returns: Json }
       dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
       dk_register_adjustment: {
         Args: {
@@ -5824,6 +6191,10 @@ export type Database = {
         Returns: undefined
       }
       sjap_estacion_de_usuario: { Args: never; Returns: string }
+      sjap_guardar_esquema_turnos: {
+        Args: { p_esquema_id: string; p_turnos: Json }
+        Returns: undefined
+      }
       sjap_rol_de_usuario: { Args: never; Returns: string }
     }
     Enums: {

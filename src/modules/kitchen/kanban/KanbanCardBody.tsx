@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Bike, Flag, MapPin } from 'lucide-react'
+import { Bike, Flag, MapPin, Pause } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, formatElapsed, minutesAgoSince, TIME_TIER_STYLE, timeTier } from '../lib/ticketVisuals'
@@ -44,11 +44,14 @@ export function KanbanCardBody({
   now,
   density = 'normal',
   trailing,
+  stalledNotes,
 }: {
   ticket: KitchenTicket
   now: number
   density?: 'normal' | 'grande'
   trailing?: ReactNode
+  /** Platos o pedido detenidos (alertas de Configuración → IA). */
+  stalledNotes?: string[]
 }) {
   const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
   const big = density === 'grande'
@@ -71,6 +74,13 @@ export function KanbanCardBody({
 
       {notes.length > 0 && (
         <p className={clsx('mt-1 text-amber-300', big ? 'text-sm' : 'text-xs', big ? 'line-clamp-3' : 'line-clamp-2')}>⚠ {notes.join(' · ')}</p>
+      )}
+
+      {stalledNotes && stalledNotes.length > 0 && (
+        <p className={clsx('mt-1 flex items-start gap-1 font-medium text-red-400', big ? 'text-sm' : 'text-xs')}>
+          <Pause size={11} className="mt-0.5 shrink-0" aria-label="Detenido" />
+          <span className="line-clamp-2">{stalledNotes.join(' · ')}</span>
+        </p>
       )}
 
       {ticket.orderStatus === 'LISTO' && (
