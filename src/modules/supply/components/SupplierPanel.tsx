@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -10,6 +11,7 @@ import { useSuppliers } from '../hooks/useSuppliers'
 import type { Supplier } from '../types'
 
 export function SupplierPanel({ selectedId, onSelect, onCreate }: { selectedId: string | null; onSelect: (supplier: Supplier) => void; onCreate: () => void }) {
+  const { can } = useActiveKitchen()
   const { data: suppliers, isLoading, isError, error, refetch } = useSuppliers()
   const [query, setQuery] = useState('')
   const [showInactive, setShowInactive] = useState(false)
@@ -29,9 +31,11 @@ export function SupplierPanel({ selectedId, onSelect, onCreate }: { selectedId: 
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-neutral-100">Proveedores</h2>
-        <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
-          Nuevo
-        </Button>
+        {can('suppliers.edit') && (
+          <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
+            Nuevo
+          </Button>
+        )}
       </div>
 
       <div className="relative">

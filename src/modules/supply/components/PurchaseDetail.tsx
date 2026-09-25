@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useUnits } from '@/shared/hooks/useUnits'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -38,6 +39,7 @@ import type { Ingredient } from '../types'
  * visual: vive dentro del shell de Abastecimiento en vez de una página aparte.
  */
 export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
+  const { can } = useActiveKitchen()
   const { show } = useToast()
   const { data: purchase, isLoading, isError, error: purchaseError, refetch } = usePurchase(purchaseId)
   const { data: items, isLoading: itemsLoading, isError: itemsError, error: itemsErr, refetch: refetchItems } = usePurchaseItems(purchaseId)
@@ -63,6 +65,9 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const { data: lastPrice } = useLastIngredientPrice(ingredientId)
 
   const isDraft = purchase?.status === 'BORRADOR'
+  // Borradores: los edita quien crea compras; confirmar (entra al inventario) es un permiso aparte.
+  const canEditDraft = isDraft && can('purchasing.create')
+  const canConfirm = isDraft && can('purchasing.confirm')
   const total = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
 
   const ingredientOptions = useMemo(() => ingredients?.map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [], [ingredients])
@@ -145,7 +150,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
               </p>
             </div>
           </div>
-          {isDraft && (
+          {canConfirm && (
             <Button variant="primary" icon={CheckCircle2} onClick={() => setConfirmOpen(true)} disabled={!items?.length}>
               Confirmar compra
             </Button>
@@ -170,7 +175,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         </p>
       )}
 
-      {isDraft && (
+      {canEditDraft && (
         <Card title="Agregar línea" icon={Plus}>
           <form onSubmit={handleAddItem} className="space-y-3">
             <FormField
@@ -249,7 +254,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <span className="text-sm font-semibold tabular-nums text-neutral-100">{formatMoney(item.lineTotal)}</span>
-                  {isDraft && (
+                  {canEditDraft && (
                     <Button
                       variant="link"
                       size="sm"
@@ -268,37 +273,41 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         )}
       </Card>
 
-      <Card title="Adjuntos" description="Factura escaneada, fotos u otros comprobantes." icon={Paperclip}>
-        <div className="space-y-3">
-          <div>
-            <label htmlFor="purchase-attachment" className="sr-only">
-              Subir adjunto
-            </label>
-            <input
-              id="purchase-attachment"
-              ref={fileInputRef}
-              type="file"
-              onChange={handleFileChange}
-              disabled={uploadAttachment.isPending}
-              className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-full file:border file:border-neutral-800 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-neutral-200 hover:file:bg-neutral-800 disabled:opacity-50"
-            />
-            {uploadAttachment.isPending && <LoadingState variant="inline" label="Subiendo…" className="mt-2" />}
+      {can('invoices.view') && (
+        <Card title="Adjuntos" description="Factura escaneada, fotos u otros comprobantes." icon={Paperclip}>
+          <div className="space-y-3">
+            {can('invoices.upload') && (
+              <div>
+                <label htmlFor="purchase-attachment" className="sr-only">
+                  Subir adjunto
+                </label>
+                <input
+                  id="purchase-attachment"
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileChange}
+                  disabled={uploadAttachment.isPending}
+                  className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-full file:border file:border-neutral-800 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-neutral-200 hover:file:bg-neutral-800 disabled:opacity-50"
+                />
+                {uploadAttachment.isPending && <LoadingState variant="inline" label="Subiendo…" className="mt-2" />}
+              </div>
+            )}
+            {attachments && attachments.length > 0 ? (
+              <ul className="space-y-1">
+                {attachments.map((a) => (
+                  <li key={a.id}>
+                    <Button variant="link" size="sm" icon={Paperclip} onClick={() => void handleOpenAttachment(a.filePath)}>
+                      {a.fileName}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={typography.caption}>Todavía no hay adjuntos.</p>
+            )}
           </div>
-          {attachments && attachments.length > 0 ? (
-            <ul className="space-y-1">
-              {attachments.map((a) => (
-                <li key={a.id}>
-                  <Button variant="link" size="sm" icon={Paperclip} onClick={() => void handleOpenAttachment(a.filePath)}>
-                    {a.fileName}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={typography.caption}>Todavía no hay adjuntos.</p>
-          )}
-        </div>
-      </Card>
+        </Card>
+      )}
 
       <ConfirmDialog
         open={confirmOpen}

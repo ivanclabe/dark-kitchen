@@ -12,10 +12,10 @@ export function AccountDisabledPage() {
         <span className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
           <ShieldOff size={22} aria-hidden />
         </span>
-        <h1 className={typography.h2}>Cuenta desactivada</h1>
+        <h1 className={typography.h2}>Usuario desactivado</h1>
         <p className={`mt-2 ${typography.small}`}>
-          <span className="text-neutral-200">{profile?.fullName}</span>, tu cuenta fue desactivada por un administrador. Contacta a tu administrador si
-          crees que esto es un error.
+          <span className="text-neutral-200">{profile?.fullName}</span>, tu usuario está desactivado en Dark Kitchen. Si crees que es un error,
+          contacta al administrador de tu negocio.
         </p>
         <Button variant="secondary" icon={LogOut} onClick={() => void signOut()} className="mt-6 w-full">
           Cerrar sesión

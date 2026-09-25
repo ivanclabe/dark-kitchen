@@ -191,14 +191,14 @@
     Dark Kitchen
   </div>
   <h1>Manual de<br/><span>usuario</span></h1>
-  <p class="sub">Guía práctica para operar la plataforma: pedidos, cocina, despacho, menús, abastecimiento, clientes, reportes y equipo.</p>
+  <p class="sub">Guía práctica para operar la plataforma: tu negocio y sus cuentas, pedidos, cocina, despacho, menús, abastecimiento, clientes, reportes, usuarios y permisos.</p>
   <div class="flow">
     <span>Por confirmar</span><span>En cola</span><span class="on">Preparando</span><span>Listo</span><span>En ruta</span><span>Entregado</span>
   </div>
   <div class="meta">
-    <div><b>Versión</b>1.0</div>
+    <div><b>Versión</b>3.1 · Funciones, iconos y avatares</div>
     <div><b>Fecha</b>Septiembre de 2026</div>
-    <div><b>Dirigido a</b>Administración, caja, cocina, inventario y domiciliarios</div>
+    <div><b>Dirigido a</b>SUPER_ADMIN (creador del negocio), ADMIN y todo el equipo: caja, cocina, inventario y domiciliarios</div>
   </div>
   <span class="ember" style="width:6px;height:6px;right:38mm;bottom:70mm"></span>
   <span class="ember" style="width:4px;height:4px;right:62mm;bottom:48mm;opacity:.5"></span>
@@ -214,8 +214,10 @@
     <li><a href="#c2"><span class="num">2</span>Primeros pasos<span class="fill"></span><span class="pg" data-for="c2"></span></a>
       <ol>
         <li><a href="#c2-1">Entrar a la aplicación<span class="fill"></span><span class="pg" data-for="c2-1"></span></a></li>
-        <li><a href="#c2-2">Moverse por la aplicación<span class="fill"></span><span class="pg" data-for="c2-2"></span></a></li>
-        <li><a href="#c2-3">Roles y permisos<span class="fill"></span><span class="pg" data-for="c2-3"></span></a></li>
+        <li><a href="#c2-2">Tus cuentas y cambiar de cuenta<span class="fill"></span><span class="pg" data-for="c2-2"></span></a></li>
+        <li><a href="#c2-3">Moverse por la aplicación<span class="fill"></span><span class="pg" data-for="c2-3"></span></a></li>
+        <li><a href="#c2-4">Roles, rol activo y permisos<span class="fill"></span><span class="pg" data-for="c2-4"></span></a></li>
+        <li><a href="#c2-5">Mi perfil y tu avatar<span class="fill"></span><span class="pg" data-for="c2-5"></span></a></li>
       </ol>
     </li>
     <li><a href="#c3"><span class="num">3</span>Dashboard<span class="fill"></span><span class="pg" data-for="c3"></span></a></li>
@@ -235,16 +237,31 @@
     <li><a href="#c6"><span class="num">6</span>Abastecimiento<span class="fill"></span><span class="pg" data-for="c6"></span></a></li>
     <li><a href="#c7"><span class="num">7</span>Clientes<span class="fill"></span><span class="pg" data-for="c7"></span></a></li>
     <li><a href="#c8"><span class="num">8</span>Reportes<span class="fill"></span><span class="pg" data-for="c8"></span></a></li>
-    <li><a href="#c9"><span class="num">9</span>Usuarios<span class="fill"></span><span class="pg" data-for="c9"></span></a></li>
-    <li><a href="#c10"><span class="num">10</span>Preguntas frecuentes<span class="fill"></span><span class="pg" data-for="c10"></span></a></li>
-    <li><a href="#c11"><span class="num">11</span>Glosario<span class="fill"></span><span class="pg" data-for="c11"></span></a></li>
+    <li><a href="#c9"><span class="num">9</span>Usuarios y permisos<span class="fill"></span><span class="pg" data-for="c9"></span></a>
+      <ol>
+        <li><a href="#c9-1">Crear un usuario<span class="fill"></span><span class="pg" data-for="c9-1"></span></a></li>
+        <li><a href="#c9-2">Cuentas, roles y estado de un usuario<span class="fill"></span><span class="pg" data-for="c9-2"></span></a></li>
+        <li><a href="#c9-3">Roles<span class="fill"></span><span class="pg" data-for="c9-3"></span></a></li>
+      </ol>
+    </li>
+    <li><a href="#c10"><span class="num">10</span>Configuración de la cuenta<span class="fill"></span><span class="pg" data-for="c10"></span></a></li>
+    <li><a href="#c11"><span class="num">11</span>Configuración de la organización<span class="fill"></span><span class="pg" data-for="c11"></span></a>
+      <ol>
+        <li><a href="#c11-1">Datos y cuentas<span class="fill"></span><span class="pg" data-for="c11-1"></span></a></li>
+        <li><a href="#c11-2">Funciones de la organización<span class="fill"></span><span class="pg" data-for="c11-2"></span></a></li>
+        <li><a href="#c11-3">Menús maestros<span class="fill"></span><span class="pg" data-for="c11-3"></span></a></li>
+        <li><a href="#c11-4">SUPER_ADMIN<span class="fill"></span><span class="pg" data-for="c11-4"></span></a></li>
+      </ol>
+    </li>
+    <li><a href="#c12"><span class="num">12</span>Preguntas frecuentes<span class="fill"></span><span class="pg" data-for="c12"></span></a></li>
+    <li><a href="#c13"><span class="num">13</span>Glosario<span class="fill"></span><span class="pg" data-for="c13"></span></a></li>
   </ol>
 </nav>
 
 <!-- =================================================== 1 INTRODUCCIÓN -->
 <p class="chapter-kicker">Capítulo 1</p>
 <h2 class="chapter" id="c1" data-toc="c1">Introducción</h2>
-<p class="lead">Dark Kitchen reúne en una sola plataforma todo lo que pasa en una cocina de domicilios: el pedido, su preparación, el despacho, el menú, el inventario y los cobros.</p>
+<p class="lead">Dark Kitchen reúne en una sola plataforma todo lo que pasa en una cocina de domicilios: el pedido, su preparación, el despacho, el menú, el inventario y los cobros. Tu <strong>organización</strong> (tu negocio) puede tener <strong>varias cuentas</strong>: cada cuenta es un establecimiento completo, con sus propios datos.</p>
 
 <h3>Qué puedes hacer con Dark Kitchen</h3>
 <div class="grid2">
@@ -253,6 +270,12 @@
   <div class="box"><h4>Abastecimiento</h4><p>Stock, compras y proveedores, con sugerencias de reposición basadas en el consumo real de cada insumo.</p></div>
   <div class="box"><h4>Clientes y cobros</h4><p>Saldos, pagos e historial de cada cliente, con alertas de cartera vencida.</p></div>
 </div>
+<h3>Organización y cuentas</h3>
+<div class="grid2">
+  <div class="box"><h4>Organización</h4><p>Tu negocio o grupo (por ejemplo, “Grupo XYZ”). Agrupa tus cuentas, tus usuarios y los roles que creas. Quien la crea es su <strong>SUPER_ADMIN</strong>.</p></div>
+  <div class="box"><h4>Cuenta</h4><p>Un establecimiento completo (por ejemplo, “Hamburguesería Centro”): su cocina, pedidos, clientes, menú, inventario, compras, reportes y configuración. Cada cuenta tiene su <strong>icono</strong> (una hamburguesa, una pizza, un taco…) para reconocerla de un vistazo.</p></div>
+</div>
+<div class="callout info"><b class="t">Cada cuenta es independiente</b>Los pedidos, clientes, menú, inventario, compras y reportes de una cuenta nunca se mezclan con los de otra. Una persona puede trabajar en varias cuentas, con roles distintos en cada una. Ojo: la <strong>cuenta</strong> es el establecimiento completo; <strong>Cocina</strong> es uno de sus módulos (el tablero).</div>
 
 <h3>El recorrido de un pedido</h3>
 <p>Todo en la aplicación gira alrededor de este recorrido. Cada etapa es una columna del tablero de Cocina:</p>
@@ -277,88 +300,139 @@
 <!-- =================================================== 2 PRIMEROS PASOS -->
 <p class="chapter-kicker">Capítulo 2</p>
 <h2 class="chapter" id="c2" data-toc="c2">Primeros pasos</h2>
-<p class="lead">Cómo entrar, cómo está organizada la aplicación y qué puede hacer cada rol.</p>
+<p class="lead">Cómo entrar, cómo elegir la cuenta, cómo está organizada la aplicación, qué puede hacer cada rol y cómo personalizar tu perfil.</p>
 
 <h3 id="c2-1" data-toc="c2-1">2.1 Entrar a la aplicación</h3>
-<p>Al abrir la dirección de la aplicación sin haber iniciado sesión verás la página de presentación de Dark Kitchen. Pulsa <span class="ui">Iniciar sesión</span> o <span class="ui">Entrar a mi cocina</span>.</p>
+<p>Al abrir la dirección de la aplicación sin haber iniciado sesión verás la página de presentación de Dark Kitchen.</p>
 
 <h4>Iniciar sesión</h4>
 <ol class="steps">
-  <li>Escribe tu <span class="ui">Correo</span> y tu <span class="ui">Contraseña</span>.</li>
-  <li>Pulsa <span class="ui">Ingresar</span>.</li>
+  <li>Pulsa <span class="ui">Iniciar sesión</span>.</li>
+  <li>Escribe tu <span class="ui">Correo</span> y tu <span class="ui">Contraseña</span> y pulsa <span class="ui">Ingresar</span>.</li>
+  <li>Entras directo a la última cuenta que usaste (también si entras desde otro equipo).</li>
 </ol>
 
-<h4>Crear tu cuenta (personal nuevo)</h4>
+<h4>Registrar tu negocio (dueños)</h4>
+<p>Si todavía no usas Dark Kitchen, pulsa <span class="ui">Crear mi negocio</span> en la página de presentación.</p>
 <ol class="steps">
-  <li>En la pantalla de inicio de sesión pulsa <span class="ui">¿Eres nuevo en el equipo? Crear cuenta</span>, o abre el enlace de registro que te compartió el administrador.</li>
-  <li>Completa <span class="ui">Nombre completo</span>, <span class="ui">Correo</span> y <span class="ui">Contraseña</span> (mínimo 6 caracteres) y pulsa <span class="ui">Crear cuenta</span>.</li>
-  <li>Si te lo pide, confirma la cuenta desde el correo que te llega y vuelve a iniciar sesión.</li>
-  <li>Tu cuenta nace con el rol <strong>Caja</strong>. Pide al administrador que te asigne el rol correcto desde <span class="ui">Usuarios</span>.</li>
+  <li><strong>Tu usuario:</strong> <span class="ui">Tu nombre</span>, <span class="ui">Correo</span> y <span class="ui">Contraseña</span> (mínimo 8 caracteres).</li>
+  <li><strong>Tu negocio:</strong> <span class="ui">Nombre del negocio</span>, <span class="ui">Sector</span>, <span class="ui">Categoría</span>, dirección, ciudad y país. Teléfono, NIT y razón social son opcionales.</li>
+  <li>Pulsa <span class="ui">Crear mi negocio</span> y revisa tu correo.</li>
+  <li>Abre el enlace del correo: se crean tu organización y tu primera cuenta, y entras directo a ella como <strong>SUPER_ADMIN</strong>. Verás una bienvenida con atajos para empezar.</li>
 </ol>
+<div class="callout info"><b class="t">¿No llega el correo?</b>Revisa la carpeta de spam. En la pantalla “Revisa tu correo” puedes reenviarlo o corregir la dirección.</div>
 
-<h4>Mensajes de cuenta</h4>
+<h4>Activar tu usuario (personal nuevo)</h4>
+<p>Si trabajas en un negocio que ya usa Dark Kitchen, su administrador crea tu usuario y te envía un <strong>enlace de activación</strong> (por WhatsApp, correo…). El enlace es personal, solo funciona con tu correo y vence en 7 días. El administrador nunca ve ni define tu contraseña.</p>
+<ol class="steps">
+  <li>Abre el enlace. Verás el nombre del negocio y tu nombre.</li>
+  <li><span class="ui">Crea tu contraseña</span> (mínimo 8 caracteres) y pulsa <span class="ui">Activar mi usuario</span>.</li>
+  <li>Si ya tienes usuario en Dark Kitchen (por ejemplo, trabajas en otro negocio), pulsa <span class="ui">Iniciar sesión</span> y luego <span class="ui">Activar y entrar</span>.</li>
+  <li>Entras directo a tu cuenta, con los roles que te asignaron.</li>
+</ol>
+<div class="callout warn"><b class="t">El enlace no funciona</b>Si dice que venció, que se usó o que fue reemplazado, pide al administrador un enlace nuevo (el anterior deja de valer). Si entraste con otro correo, cierra sesión y entra con el correo correcto.</div>
+
+<h4>Mensajes de acceso</h4>
 <table>
   <thead><tr><th>Mensaje</th><th>Qué significa</th><th>Qué hacer</th></tr></thead>
   <tbody>
-    <tr><td><span class="ui">Cuenta sin perfil asignado</span></td><td>Iniciaste sesión pero aún no tienes un perfil en Dark Kitchen.</td><td>Pide a un administrador que lo cree.</td></tr>
-    <tr><td><span class="ui">Cuenta desactivada</span></td><td>Un administrador desactivó tu acceso.</td><td>Habla con el administrador.</td></tr>
+    <tr><td><span class="ui">Tu usuario aún no tiene acceso</span></td><td>Iniciaste sesión, pero no perteneces a ningún negocio todavía.</td><td>Pide al administrador que te cree el usuario, o abre tu enlace de activación.</td></tr>
+    <tr><td><span class="ui">Usuario desactivado</span></td><td>Tu usuario fue desactivado en Dark Kitchen.</td><td>Habla con el administrador de tu negocio.</td></tr>
+    <tr><td><span class="ui">Aún no tienes acceso a ninguna cuenta</span></td><td>Perteneces al negocio, pero no tienes ninguna cuenta asignada (o te quitaron).</td><td>Pide al administrador que te asigne una cuenta.</td></tr>
+    <tr><td><span class="ui">Cuenta desactivada</span></td><td>El SUPER_ADMIN pausó esa cuenta. Sus datos se conservan.</td><td>Pulsa <span class="ui">Ver mis cuentas</span> para ir a otra.</td></tr>
   </tbody>
 </table>
 
-<h3 id="c2-2" data-toc="c2-2">2.2 Moverse por la aplicación</h3>
-<p>A la izquierda está la barra lateral con los módulos. Solo ves los módulos que tu rol puede usar.</p>
+<h3 id="c2-2" data-toc="c2-2">2.2 Tus cuentas y cambiar de cuenta</h3>
+<p>Arriba del contenido siempre ves <strong>dónde estás</strong>: la organización (si tienes más de una cuenta), la cuenta y tu rol. Por ejemplo: <span class="say">Grupo XYZ › Hamburguesería Centro · Cocina</span>.</p>
+<ul>
+  <li><strong>Para cambiar de cuenta</strong>, pulsa ese indicador (o tu avatar → <span class="ui">Cambiar de cuenta</span>) y elige otra. Llegas a la misma sección en la otra cuenta (si estabas en Abastecimiento, sigues en Abastecimiento), sin cerrar sesión.</li>
+  <li><span class="ui">Todas mis cuentas</span> abre la pantalla <span class="ui">Tus cuentas</span>: una tarjeta por cuenta, con su icono, agrupadas por organización si tienes varias.</li>
+  <li><strong>Al cambiar de cuenta cambian tus permisos:</strong> la aplicación usa los roles que tienes en <em>esa</em> cuenta. Ser ADMIN en una no te hace ADMIN en otra.</li>
+  <li>Cada cuenta tiene su propia dirección (<code>/k/nombre-de-la-cuenta</code>): puedes guardarla en favoritos o abrir dos cuentas en pestañas distintas.</li>
+  <li>Si solo tienes una cuenta, la aplicación no te muestra nada de organizaciones: entras y trabajas.</li>
+</ul>
+
+<h3 id="c2-3" data-toc="c2-3">2.3 Moverse por la aplicación</h3>
+<p>A la izquierda está la barra lateral con los módulos de la operación, solo con su ícono (pasa el cursor para ver el nombre). Solo ves los módulos que tu rol activo puede usar en esta cuenta.</p>
 <table>
   <thead><tr><th>Módulo</th><th>Para qué sirve</th></tr></thead>
   <tbody>
     <tr><td><strong>Dashboard</strong></td><td>Resumen del negocio: ventas, pedidos y alertas del día.</td></tr>
     <tr><td><strong>Cocina</strong></td><td>El centro operativo: del pedido a la entrega, en un tablero.</td></tr>
     <tr><td><strong>Catálogo</strong></td><td>Planificador de menús, platos y recetas.</td></tr>
-    <tr><td><strong>Abastecimiento</strong></td><td>Stock, compras y proveedores.</td></tr>
+    <tr><td><strong>Abastecimiento</strong></td><td>Stock, compras, proveedores y facturas.</td></tr>
     <tr><td><strong>Clientes</strong></td><td>Saldos, pagos e historial de cada cliente.</td></tr>
     <tr><td><strong>Reportes</strong></td><td>Ventas, compras, mermas y rentabilidad.</td></tr>
-    <tr><td><strong>Usuarios</strong></td><td>Equipo y roles.</td></tr>
   </tbody>
 </table>
+<h4>El menú de usuario</h4>
+<p>Abajo en la barra lateral (arriba a la derecha en el celular) está <strong>tu avatar</strong>. Al pulsarlo se abre tu menú:</p>
 <ul>
-  <li>Abajo en la barra lateral están tus iniciales y el botón <span class="ui">Salir</span> para cerrar sesión.</li>
-  <li>En el celular, abre el menú con el botón de la barra superior. Al final del menú está <span class="ui">Cerrar sesión</span>.</li>
-  <li>Los paneles laterales y ventanas se cierran con la <strong>X</strong> o con la tecla <span class="kbd">Esc</span>.</li>
+  <li>Tu nombre, tu correo y dónde estás: <span class="ui">Organización</span>, <span class="ui">Cuenta</span> y <span class="ui">Rol activo</span>.</li>
+  <li><span class="ui">Cambiar de rol</span> (si tienes varios en esta cuenta) y <span class="ui">Cambiar de cuenta</span> (si tienes varias).</li>
+  <li><span class="ui">Mi perfil</span> y <span class="ui">Configuración</span> de la cuenta.</li>
+  <li><span class="ui">Usuarios y permisos</span> y <span class="ui">Configuración de la organización</span>, si tu rol lo permite.</li>
+  <li><span class="ui">Cerrar sesión</span>, siempre al final.</li>
 </ul>
+<p>Las opciones que tu rol no permite no aparecen. Los paneles laterales y ventanas se cierran con la <strong>X</strong> o con la tecla <span class="kbd">Esc</span>.</p>
 
-<h3 id="c2-3" data-toc="c2-3">2.3 Roles y permisos</h3>
-<p>Cada persona tiene un rol. El rol decide qué módulos aparecen y qué acciones puede hacer. Los roles Cocina y Domiciliario trabajan desde el módulo <strong>Cocina</strong>.</p>
+<h3 id="c2-4" data-toc="c2-4">2.4 Roles, rol activo y permisos</h3>
+<p>En cada cuenta tienes <strong>uno o varios roles</strong>. Cada rol es un conjunto de permisos (ver pedidos, confirmar pedidos, registrar mermas, ver rentabilidad…). Tu rol puede ser distinto en cada cuenta.</p>
+<h4>Rol activo</h4>
+<p>Si tienes varios roles en una cuenta, trabajas con <strong>uno a la vez</strong>: el <strong>rol activo</strong>. Por ejemplo, si eres ADMIN y COCINA, puedes cambiar a COCINA y la aplicación se comporta exactamente como para ese rol: solo ves sus módulos y sus botones.</p>
+<ol class="steps">
+  <li>Pulsa tu avatar → <span class="ui">Cambiar de rol</span>, o pulsa el indicador de arriba.</li>
+  <li>Elige el rol. La aplicación se adapta de inmediato; si la pantalla en la que estabas no es de ese rol, te lleva a su inicio.</li>
+</ol>
+<p>Cambiar el rol activo no cambia tus asignaciones: solo eliges con cuál trabajas. Solo puedes elegir entre los roles que te asignaron. La próxima vez que entres a esa cuenta, vuelves con el último rol que usaste.</p>
+
+<h4>Plantillas de roles</h4>
+<p>Dark Kitchen trae estas plantillas. Cada negocio puede crear además sus propios roles (ver <a href="#c9-3">9.3</a>).</p>
 <table>
-  <thead><tr><th>Módulo</th><th class="c">Administrador</th><th class="c">Gerente</th><th class="c">Caja</th><th class="c">Cocina</th><th class="c">Inventario</th><th class="c">Domiciliario</th></tr></thead>
+  <thead><tr><th>Módulo</th><th class="c">ADMIN</th><th class="c">GERENTE</th><th class="c">CAJA</th><th class="c">COCINA</th><th class="c">INVENTARIO</th><th class="c">DOMICILIARIO</th></tr></thead>
   <tbody>
     <tr><td>Dashboard</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
     <tr><td>Cocina</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c yes">✓</td></tr>
     <tr><td>Catálogo</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td></tr>
     <tr><td>Abastecimiento</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
     <tr><td>Clientes</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
-    <tr><td>Reportes</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
-    <tr><td>Usuarios</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
+    <tr><td>Reportes</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓ <small>sin rentabilidad</small></td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
+    <tr><td>Usuarios y permisos</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
+    <tr><td>Configuración</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
   </tbody>
 </table>
+<p>Quien no tiene el Dashboard (por ejemplo, COCINA) entra directo a su primer módulo: el tablero de Cocina.</p>
 
-<h4>Qué puede hacer cada rol con un pedido</h4>
+<h4>Qué puede hacer cada plantilla con un pedido</h4>
 <table>
   <thead><tr><th>Acción</th><th>Quién puede</th></tr></thead>
   <tbody>
-    <tr><td>Crear y confirmar pedidos</td><td>Administrador, Gerente, Caja</td></tr>
-    <tr><td>Iniciar, marcar listo y retroceder la preparación</td><td>Administrador, Gerente, Cocina</td></tr>
-    <tr><td>Marcar o quitar prioridad</td><td>Administrador, Gerente, Cocina</td></tr>
-    <tr><td>Cancelar pedidos</td><td>Administrador, Gerente, Caja, Cocina</td></tr>
-    <tr><td>Despachar (asignar domiciliario)</td><td>Administrador, Gerente, Caja</td></tr>
-    <tr><td>Marcar como entregado</td><td>Administrador, Gerente, Caja y Domiciliario (este último, solo sus propios pedidos)</td></tr>
-    <tr><td>Cambiar horario y alertas de Cocina</td><td>Administrador, Gerente</td></tr>
+    <tr><td>Crear y confirmar pedidos</td><td>ADMIN, GERENTE, CAJA</td></tr>
+    <tr><td>Iniciar, marcar listo y retroceder la preparación</td><td>ADMIN, GERENTE, COCINA</td></tr>
+    <tr><td>Marcar o quitar prioridad</td><td>ADMIN, GERENTE, COCINA</td></tr>
+    <tr><td>Cancelar pedidos</td><td>ADMIN, GERENTE, CAJA, COCINA</td></tr>
+    <tr><td>Despachar (asignar domiciliario)</td><td>ADMIN, GERENTE, CAJA</td></tr>
+    <tr><td>Marcar como entregado</td><td>ADMIN, GERENTE, CAJA y DOMICILIARIO (este último, solo sus propios pedidos)</td></tr>
+    <tr><td>Cambiar horario y alertas de Cocina</td><td>ADMIN, GERENTE</td></tr>
   </tbody>
 </table>
-<p>Si tu rol no puede hacer algo, el botón aparece deshabilitado y al pasar el cursor encima verás el motivo, por ejemplo <span class="say">“Solo caja o administración despacha pedidos”</span>.</p>
+<div class="callout info"><b class="t">SUPER_ADMIN y ADMIN</b><strong>SUPER_ADMIN</strong> es el creador del negocio: acceso global a todas las cuentas de la organización, incluidas las que se creen después, y administra usuarios, roles, cuentas y la organización. Es <strong>único e intransferible</strong> y no se asigna a otras personas. <strong>ADMIN</strong> es un rol de cuenta: todas las opciones y configuraciones de esa cuenta, y se asigna a quien la administre.</div>
+<p>Si tu rol no puede hacer algo, el botón no aparece, o aparece deshabilitado con el motivo al pasar el cursor, por ejemplo <span class="say">“Solo caja o administración despacha pedidos”</span>.</p>
+
+<h3 id="c2-5" data-toc="c2-5">2.5 Mi perfil y tu avatar</h3>
+<p>Pulsa tu avatar → <span class="ui">Mi perfil</span>.</p>
+<ul>
+  <li><strong>Nombre:</strong> cómo te ven los demás en todas tus cuentas.</li>
+  <li><strong>Avatar:</strong> elige uno de los 20 avatares de personas (chef, panadera, domiciliario, barista, robot chef…). Por ahora no se pueden subir fotos. Si no eliges uno, tienes uno asignado automáticamente. Los iconos de comida (hamburguesa, pizza…) son de las cuentas, no de las personas.</li>
+  <li><strong>Contraseña:</strong> para cambiarla, confirma la actual y escribe la nueva dos veces (mínimo 8 caracteres).</li>
+  <li><strong>Dónde tengo acceso:</strong> tus cuentas y tu rol en cada una.</li>
+</ul>
 
 <!-- =================================================== 3 DASHBOARD -->
 <p class="chapter-kicker">Capítulo 3</p>
 <h2 class="chapter" id="c3" data-toc="c3">Dashboard</h2>
-<p class="lead">El resumen del negocio de un vistazo. Disponible para Administrador, Gerente, Caja e Inventario.</p>
+<p class="lead">El resumen del negocio de un vistazo. Disponible para ADMIN, GERENTE, CAJA e INVENTARIO.</p>
 
 <h3>Barra superior</h3>
 <ul>
@@ -375,7 +449,7 @@
 <table>
   <thead><tr><th>Tarjeta</th><th>Qué muestra</th></tr></thead>
   <tbody>
-    <tr><td><strong>Pedidos recientes</strong></td><td>Los últimos 4 pedidos. Tocar uno lo abre en Cocina. (Administrador, Gerente y Caja.)</td></tr>
+    <tr><td><strong>Pedidos recientes</strong></td><td>Los últimos 4 pedidos. Tocar uno lo abre en Cocina. (ADMIN, GERENTE y CAJA.)</td></tr>
     <tr><td><strong>Cocina ahora</strong></td><td>Pedidos nuevos, confirmados y en preparación. Administración y caja ven además atrasados, listos para despachar y en ruta.</td></tr>
     <tr><td><strong>Cartera y compras</strong></td><td>Compras y mermas del mes. Administración y caja ven además lo que está por cobrar y lo vencido.</td></tr>
   </tbody>
@@ -474,7 +548,7 @@
 <p>Pulsa la lupa y escribe el número del pedido o el nombre del cliente. El tablero se filtra al instante. <span class="kbd">Esc</span> cierra la búsqueda.</p>
 
 <h3 id="c4-2" data-toc="c4-2">4.2 Crear un pedido</h3>
-<p>Disponible para Administrador, Gerente y Caja.</p>
+<p>Disponible para ADMIN, GERENTE y CAJA.</p>
 <ol class="steps">
   <li>Pulsa <span class="ui">+ Nuevo pedido</span>.</li>
   <li>En <span class="ui">Cliente</span>, busca por nombre o teléfono. Si no existe, elige <span class="ui">Crear “…”</span> y completa sus datos (si escribiste un teléfono, se llena solo).</li>
@@ -491,11 +565,11 @@
 <table>
   <thead><tr><th>Columna</th><th>Botón de la tarjeta</th><th>Qué pasa</th><th>Quién</th></tr></thead>
   <tbody>
-    <tr><td>Por confirmar</td><td><span class="ui">Confirmar</span></td><td>Abre la confirmación; reserva inventario.</td><td>Admin., Gerente, Caja</td></tr>
-    <tr><td>En cola</td><td><span class="ui">Iniciar</span></td><td>Pasa a Preparando.</td><td>Admin., Gerente, Cocina</td></tr>
-    <tr><td>Preparando</td><td><span class="ui">Marcar listo</span></td><td>Pasa a Listo; descuenta insumos.</td><td>Admin., Gerente, Cocina</td></tr>
-    <tr><td>Listo</td><td><span class="ui">Despachar</span></td><td>Pide el domiciliario y lo pasa a En ruta.</td><td>Admin., Gerente, Caja</td></tr>
-    <tr><td>En ruta</td><td><span class="ui">Entregar</span></td><td>Lo marca entregado; sale del tablero.</td><td>Admin., Gerente, Caja, Domiciliario</td></tr>
+    <tr><td>Por confirmar</td><td><span class="ui">Confirmar</span></td><td>Abre la confirmación; reserva inventario.</td><td>ADMIN, GERENTE, CAJA</td></tr>
+    <tr><td>En cola</td><td><span class="ui">Iniciar</span></td><td>Pasa a Preparando.</td><td>ADMIN, GERENTE, COCINA</td></tr>
+    <tr><td>Preparando</td><td><span class="ui">Marcar listo</span></td><td>Pasa a Listo; descuenta insumos.</td><td>ADMIN, GERENTE, COCINA</td></tr>
+    <tr><td>Listo</td><td><span class="ui">Despachar</span></td><td>Pide el domiciliario y lo pasa a En ruta.</td><td>ADMIN, GERENTE, CAJA</td></tr>
+    <tr><td>En ruta</td><td><span class="ui">Entregar</span></td><td>Lo marca entregado; sale del tablero.</td><td>ADMIN, GERENTE, CAJA, DOMICILIARIO</td></tr>
   </tbody>
 </table>
 
@@ -545,7 +619,7 @@
     <tr><td><span class="ui">Ver tiempos (SLA)</span> / <span class="ui">Ver tablero</span></td><td>Cambia entre el tablero y la vista de tiempos (ver abajo).</td></tr>
     <tr><td><span class="ui">Tamaño grande</span></td><td>Tarjetas más grandes, ideal para una pantalla de cocina lejana.</td></tr>
     <tr><td><span class="ui">Sonido de pedidos nuevos</span></td><td>Suena un aviso cuando entra un pedido a cocina.</td></tr>
-    <tr><td><span class="ui">Respuesta hablada</span></td><td>La aplicación lee en voz alta el resultado de cada comando de voz.</td></tr>
+    <tr><td><span class="ui">Respuesta hablada</span></td><td>La aplicación lee en voz alta el resultado de cada comando de voz. Aparece si la cuenta tiene activada la <span class="ui">Voz de la aplicación</span> (ver capítulo 10).</td></tr>
     <tr><td><span class="ui">Probar comando de texto</span></td><td>Escribe un comando en vez de decirlo (útil para practicar).</td></tr>
     <tr><td><span class="ui">Ver un día anterior</span> / <span class="ui">Volver a hoy</span></td><td>Consulta los pedidos creados otro día que siguen abiertos.</td></tr>
     <tr><td><span class="ui">Historial de pedidos</span></td><td>Todos los pedidos, incluidos entregados y cancelados.</td></tr>
@@ -562,13 +636,13 @@
 <p>Busca por número o cliente y filtra por estado (<span class="ui">Nuevo</span>, <span class="ui">Confirmado</span>, <span class="ui">En preparación</span>, <span class="ui">Listo</span>, <span class="ui">Despachado</span>, <span class="ui">Entregado</span>, <span class="ui">Cancelado</span>). Toca un pedido para abrir su detalle.</p>
 
 <h4>Domiciliarios</h4>
-<p>Administrador y Gerente agregan domiciliarios con <span class="ui">Nombre</span>, <span class="ui">Teléfono</span> y <span class="ui">Vehículo</span>, y los activan o desactivan. Solo los activos aparecen al despachar.</p>
+<p>ADMIN y GERENTE agregan domiciliarios con <span class="ui">Nombre</span>, <span class="ui">Teléfono</span> y <span class="ui">Vehículo</span>, y los activan o desactivan. Solo los activos aparecen al despachar.</p>
 
 <h4>Consultar un día anterior</h4>
 <p>Aparece un selector de fecha bajo el título, con flechas para el día anterior y el siguiente, y <span class="ui">Hoy</span> para volver. En este modo no hay cifras, ni voz, ni sonido de pedidos nuevos.</p>
 
 <h3 id="c4-7" data-toc="c4-7">4.7 Control por voz</h3>
-<p>Permite actualizar pedidos de cocina sin tocar la pantalla, por ejemplo con las manos ocupadas. Funciona en navegadores con reconocimiento de voz (como Chrome). Si tu navegador no lo tiene, el micrófono no aparece y todo lo demás funciona igual.</p>
+<p>Permite actualizar pedidos de cocina sin tocar la pantalla, por ejemplo con las manos ocupadas. Funciona en navegadores con reconocimiento de voz (como Chrome) y en las cuentas que tienen activados los <span class="ui">Comandos de voz</span> (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>). Si falta alguna de las dos cosas, el micrófono no aparece y todo lo demás funciona igual.</p>
 <ol class="steps">
   <li>Pulsa el <strong>micrófono</strong>. Se pone naranja: <span class="say">Escuchando…</span></li>
   <li>Di el <strong>número del pedido</strong> (4 dígitos) y la <strong>acción</strong>. Por ejemplo: <span class="say">“Pedido 2040 listo”</span>.</li>
@@ -603,7 +677,7 @@
 </table>
 
 <h3 id="c4-8" data-toc="c4-8">4.8 Configuración: horario y alertas</h3>
-<p>Ábrela desde <span class="ui">⋯</span> → <span class="ui">Configuración</span>, o tocando el estado bajo el título. Todo el equipo de cocina puede consultarla; solo <strong>Administrador</strong> y <strong>Gerente</strong> pueden cambiarla.</p>
+<p>Ábrela desde <span class="ui">⋯</span> → <span class="ui">Configuración</span>, o tocando el estado bajo el título. Todo el equipo de cocina puede consultarla; solo <strong>ADMIN</strong> y <strong>GERENTE</strong> pueden cambiarla.</p>
 
 <h4>Pestaña Horario (semanal)</h4>
 <p>El horario que se repite todas las semanas.</p>
@@ -638,7 +712,7 @@
 <!-- =================================================== 5 CATÁLOGO -->
 <p class="chapter-kicker">Capítulo 5</p>
 <h2 class="chapter" id="c5" data-toc="c5">Catálogo: Planificador de Menús</h2>
-<p class="lead">Platos, recetas y el calendario del menú en un solo lugar. Disponible para Administrador, Gerente, Caja, Cocina e Inventario.</p>
+<p class="lead">Platos, recetas y el calendario del menú en un solo lugar. Disponible para ADMIN, GERENTE, CAJA, COCINA e INVENTARIO.</p>
 
 <h3>La pantalla</h3>
 <p>A la izquierda, el <strong>Catálogo de platos</strong>, con búsqueda por nombre o código y filtros por categoría. A la derecha, el <strong>calendario</strong> en vista <span class="ui">Semana</span> o <span class="ui">Mes</span>.</p>
@@ -676,6 +750,15 @@
   <li>Al editar puedes subir una <span class="ui">Imagen</span>, <span class="ui">Desactivar</span> el plato, o abrir su receta.</li>
 </ol>
 
+<h4>Platos de un menú maestro</h4>
+<p>Algunos platos llegan desde un <strong>menú maestro</strong> que el SUPER_ADMIN comparte con varias cuentas de la organización (ver <a href="#c11-3">11.3</a>). Se reconocen por la etiqueta <span class="ui">Maestro</span>.</p>
+<ul>
+  <li>Nombre, código, categoría, descripción y receta los define el menú maestro: en la cuenta no se editan, y la receta se puede ver pero no cambiar.</li>
+  <li>Sí puedes fijar un <span class="ui">Precio de venta</span> propio para tu cuenta. Con <span class="ui">Usar el precio del menú maestro</span> vuelves al precio que define el maestro.</li>
+  <li>Se programan en el calendario igual que cualquier otro plato, con sus reglas por día.</li>
+  <li>Cuando el SUPER_ADMIN cambia el plato o su receta, el cambio llega solo a tu cuenta. Si ya fijaste un precio propio, se respeta.</li>
+</ul>
+
 <h3>Recetas</h3>
 <p>La receta define qué insumos consume cada plato. Sin receta activa, un plato no se puede confirmar en pedidos.</p>
 <ol class="steps">
@@ -688,7 +771,7 @@
 <!-- =================================================== 6 ABASTECIMIENTO -->
 <p class="chapter-kicker">Capítulo 6</p>
 <h2 class="chapter" id="c6" data-toc="c6">Abastecimiento</h2>
-<p class="lead">Stock, compras y proveedores en un solo lugar. Disponible para Administrador, Gerente e Inventario.</p>
+<p class="lead">Stock, compras y proveedores en un solo lugar. Disponible para ADMIN, GERENTE e INVENTARIO.</p>
 <p>El módulo tiene tres pestañas: <span class="ui">Stock</span>, <span class="ui">Compras</span> y <span class="ui">Proveedores</span>. En cada una, la lista va a la izquierda y el detalle a la derecha.</p>
 
 <h3>Stock</h3>
@@ -731,7 +814,7 @@
 <!-- =================================================== 7 CLIENTES -->
 <p class="chapter-kicker">Capítulo 7</p>
 <h2 class="chapter" id="c7" data-toc="c7">Clientes</h2>
-<p class="lead">Datos, saldos, pagos e historial de cada cliente. Disponible para Administrador, Gerente y Caja.</p>
+<p class="lead">Datos, saldos, pagos e historial de cada cliente. Disponible para ADMIN, GERENTE y CAJA.</p>
 
 <h3>La lista de clientes</h3>
 <p>Arriba, las cifras de cartera: <span class="ui">Total pendiente</span>, <span class="ui">Vencido</span>, <span class="ui">Clientes con saldo</span> y <span class="ui">Pagos recientes</span>. Busca por nombre o teléfono y filtra por <span class="ui">Todos</span>, <span class="ui">Con saldo</span> o <span class="ui">Vencidos</span>.</p>
@@ -755,7 +838,7 @@
 <!-- =================================================== 8 REPORTES -->
 <p class="chapter-kicker">Capítulo 8</p>
 <h2 class="chapter" id="c8" data-toc="c8">Reportes</h2>
-<p class="lead">Ventas, compras, mermas y rentabilidad por rango de fechas. Disponible para Administrador, Gerente, Caja e Inventario.</p>
+<p class="lead">Ventas, compras, mermas y rentabilidad por rango de fechas. Disponible para ADMIN, GERENTE, CAJA e INVENTARIO.</p>
 <p>Elige el rango con <span class="ui">Desde</span> y <span class="ui">Hasta</span>, o con los atajos <span class="ui">Hoy</span>, <span class="ui">7 días</span> y <span class="ui">30 días</span>. Luego cambia de pestaña:</p>
 <table>
   <thead><tr><th>Pestaña</th><th>Qué muestra</th></tr></thead>
@@ -770,47 +853,162 @@
 </table>
 <p>La rentabilidad se calcula con las ventas no canceladas menos el costo real de los insumos consumidos, al costo promedio del momento en que se consumieron.</p>
 
-<!-- =================================================== 9 USUARIOS -->
+<!-- =================================================== 9 USUARIOS Y PERMISOS -->
 <p class="chapter-kicker">Capítulo 9</p>
-<h2 class="chapter" id="c9" data-toc="c9">Usuarios</h2>
-<p class="lead">El equipo y sus roles. Solo para Administrador.</p>
+<h2 class="chapter" id="c9" data-toc="c9">Usuarios y permisos</h2>
+<p class="lead">Quién trabaja en tu negocio, en qué cuentas y con qué roles. Ábrelo desde tu avatar → <span class="ui">Usuarios y permisos</span>.</p>
+<p>El <strong>SUPER_ADMIN</strong> ve y administra a todos los usuarios de la organización. Quien tiene el rol <strong>ADMIN</strong> en una cuenta ve y administra solo a la gente de esa cuenta. Tiene dos pestañas: <span class="ui">Usuarios</span> y <span class="ui">Roles</span>.</p>
 
-<h3>Agregar a alguien al equipo</h3>
+<h3 id="c9-1" data-toc="c9-1">9.1 Crear un usuario</h3>
 <ol class="steps">
-  <li>Pulsa <span class="ui">Copiar enlace de registro</span> y envíalo a la persona.</li>
-  <li>La persona crea su cuenta con ese enlace. Nace con el rol <strong>Caja</strong>.</li>
-  <li>Cuando aparezca en la lista, cámbiale el <span class="ui">Rol</span> al que corresponda. El cambio aplica de inmediato.</li>
+  <li>Pulsa <span class="ui">Crear usuario</span>.</li>
+  <li>Escribe su <span class="ui">Nombre</span> y su <span class="ui">Correo</span>.</li>
+  <li>En <strong>Cuentas y roles</strong>, marca las cuentas donde trabaja y, en cada una, sus roles. Puede tener varios; si tiene más de uno, elige en <span class="ui">Entra como</span> su rol predeterminado. <span class="ui">Aplicar a todas las cuentas</span> copia la misma asignación a todas.</li>
+  <li>Pulsa <span class="ui">Crear usuario</span>. Aparece el <strong>enlace de activación</strong>: pulsa <span class="ui">Copiar</span> y envíaselo por WhatsApp o correo.</li>
 </ol>
+<div class="callout warn"><b class="t">El enlace se muestra una sola vez</b>Por seguridad no se vuelve a mostrar. Si se pierde, abre el usuario y pulsa <span class="ui">Generar enlace nuevo</span> (el anterior deja de valer). Vence en 7 días.</div>
+<p>Hasta que la persona active su usuario aparece como <strong>Pendiente</strong>. Mientras tanto puedes corregir su nombre, correo, cuentas y roles. Tú nunca ves ni defines su contraseña: la crea ella al activar.</p>
+<p>Si la persona ya trabaja en otro negocio que usa Dark Kitchen, usa el mismo usuario: solo abre el enlace, inicia sesión y acepta.</p>
+<p>El ADMIN de una cuenta solo puede dar roles con permisos que él mismo tiene; los demás aparecen deshabilitados.</p>
 
-<h3>Roles disponibles</h3>
+<h3 id="c9-2" data-toc="c9-2">9.2 Cuentas, roles y estado de un usuario</h3>
+<p>La lista muestra a cada persona con su avatar, correo, <strong>Acceso</strong> (“SUPER_ADMIN · creador · acceso global”, o sus roles en cada cuenta) y <strong>Estado</strong> (Activo, Pendiente o Desactivado). Puedes buscar por nombre o correo y filtrar por cuenta. Pulsa una fila para abrir el usuario.</p>
+<ul>
+  <li><strong>Cambiar cuentas y roles:</strong> marca o desmarca cuentas y roles, y pulsa <span class="ui">Guardar cambios</span>. Aplica de inmediato.</li>
+  <li><strong>Permisos efectivos:</strong> en cada cuenta, <span class="ui">Permisos efectivos</span> muestra todo lo que la persona puede llegar a hacer con sus roles, módulo por módulo. Si tiene varios roles, rige el que tenga activo; la lista es el máximo posible.</li>
+  <li><span class="ui">Desactivar</span> (SUPER_ADMIN): pierde el acceso a todas las cuentas de la organización de inmediato. Con <span class="ui">Activar</span> lo recupera con sus roles.</li>
+  <li><span class="ui">Quitar de la organización</span>: sale de las cuentas; su historial (pedidos, movimientos) se conserva. El ADMIN de una cuenta ve <span class="ui">Quitar de mis cuentas</span>.</li>
+</ul>
+<p>Nadie puede cambiar su propio acceso (roles, cuentas, estado): lo hace otro administrador. El SUPER_ADMIN (creador de la organización) no se puede desactivar ni quitar, y ese rol no se asigna a nadie más.</p>
+
+<h3 id="c9-3" data-toc="c9-3">9.3 Roles</h3>
+<p>En la pestaña <span class="ui">Roles</span> ves las <strong>plantillas</strong> (iguales en toda la plataforma) y los <strong>roles propios</strong> de tu organización, con cuántos permisos tienen y cuántas personas los usan.</p>
 <table>
-  <thead><tr><th>Rol</th><th>Pensado para</th></tr></thead>
+  <thead><tr><th>Plantilla</th><th>Pensada para</th></tr></thead>
   <tbody>
-    <tr><td><strong>Administrador</strong></td><td>Dueños y administración general. Acceso total, incluido Usuarios.</td></tr>
-    <tr><td><strong>Gerente</strong></td><td>Jefe de operación: todo excepto gestionar usuarios.</td></tr>
-    <tr><td><strong>Caja</strong></td><td>Crear, confirmar y despachar pedidos; cobros a clientes.</td></tr>
-    <tr><td><strong>Cocina</strong></td><td>Preparar pedidos, prioridades y el catálogo de platos.</td></tr>
-    <tr><td><strong>Inventario</strong></td><td>Stock, compras, proveedores, recetas y reportes.</td></tr>
-    <tr><td><strong>Domiciliario</strong></td><td>Ver el tablero y marcar entregados sus pedidos.</td></tr>
+    <tr><td><strong>ADMIN</strong></td><td>Administración de la cuenta: todas sus opciones y configuraciones. Se asigna a usuarios.</td></tr>
+    <tr><td><strong>GERENTE</strong></td><td>Jefe de operación: todo excepto usuarios y auditoría.</td></tr>
+    <tr><td><strong>CAJA</strong></td><td>Crear, confirmar y despachar pedidos; clientes y cobros; reportes sin rentabilidad.</td></tr>
+    <tr><td><strong>COCINA</strong></td><td>Preparar y priorizar pedidos; menú del día; ver platos y recetas.</td></tr>
+    <tr><td><strong>INVENTARIO</strong></td><td>Stock, compras, proveedores, facturas, recetas y reportes.</td></tr>
+    <tr><td><strong>DOMICILIARIO</strong></td><td>Ver el tablero y marcar entregados sus pedidos.</td></tr>
   </tbody>
 </table>
+<h4>Crear, duplicar o editar un rol propio (SUPER_ADMIN)</h4>
+<ol class="steps">
+  <li>Pulsa <span class="ui">Nuevo rol</span>, o <span class="ui">Duplicar</span> sobre una plantilla para partir de ella.</li>
+  <li>Escribe el <span class="ui">Nombre</span> y una descripción. El nombre queda en MAYÚSCULAS y con “_” en lugar de espacios (por ejemplo, “Encargado de turno” → ENCARGADO_DE_TURNO). SUPER_ADMIN y ADMIN están reservados.</li>
+  <li>Marca sus permisos, módulo por módulo: Ver, Crear, Editar, Confirmar, Cancelar, Despachar, Rentabilidad… <span class="ui">Todo</span> marca un módulo completo. Pasa el cursor sobre cada permiso para ver exactamente qué permite.</li>
+  <li>Pulsa <span class="ui">Crear rol</span>. Sirve en todas las cuentas de la organización.</li>
+</ol>
+<p>Al abrir un rol ves también <strong>Usuarios con este rol</strong> y en qué cuentas. Para eliminar un rol propio, primero quítaselo a quien lo tenga.</p>
+<div class="callout info"><b class="t">Soporte de la plataforma</b>El equipo de soporte de Dark Kitchen puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.</div>
 
-<h3>Desactivar o activar</h3>
-<p>Pulsa <span class="ui">Desactivar</span> en la fila de la persona y confirma. Pierde el acceso a toda la aplicación de inmediato, aunque tenga la sesión abierta. Con <span class="ui">Activar</span> recupera el acceso con su rol actual. No puedes cambiar tu propio rol ni desactivar tu propia cuenta.</p>
-
-<!-- =================================================== 10 FAQ -->
+<!-- =================================================== 10 CONFIGURACIÓN DE LA CUENTA -->
 <p class="chapter-kicker">Capítulo 10</p>
-<h2 class="chapter" id="c10" data-toc="c10">Preguntas frecuentes</h2>
+<h2 class="chapter" id="c10" data-toc="c10">Configuración de la cuenta</h2>
+<p class="lead">Datos e icono de la cuenta, integraciones y funciones (voz e inteligencia artificial). Ábrela desde tu avatar → <span class="ui">Configuración</span>. Para ADMIN y GERENTE.</p>
+<p>Tiene dos secciones: <span class="ui">General</span> y <span class="ui">Funciones</span>. El horario de atención y las alertas de tiempo del tablero siguen en el módulo Cocina (ver <a href="#c4-8">4.8</a>).</p>
+
+<h3>General</h3>
+<table>
+  <thead><tr><th>Campo</th><th>Para qué sirve</th></tr></thead>
+  <tbody>
+    <tr><td><span class="ui">Nombre</span></td><td>Cómo se ve la cuenta en la app.</td></tr>
+    <tr><td><span class="ui">Icono de la cuenta</span></td><td>Elige uno de los 20 iconos de establecimiento. Se ve en el selector de cuentas, en <span class="ui">Tus cuentas</span> y en la organización. No se suben imágenes.</td></tr>
+    <tr><td><span class="ui">Identificador (URL)</span></td><td>La parte de la dirección <code>/k/…</code>. Solo minúsculas, números y guiones. Cambiarlo cambia los enlaces guardados de esta cuenta.</td></tr>
+    <tr><td><span class="ui">Razón social</span>, <span class="ui">NIT</span>, <span class="ui">Teléfono</span>, <span class="ui">Dirección</span></td><td>Datos del establecimiento, opcionales.</td></tr>
+    <tr><td><span class="ui">Zona horaria</span></td><td>Define el “hoy” de la cuenta: menú del día, ventas de hoy y horario de atención.</td></tr>
+  </tbody>
+</table>
+<h4>Integraciones</h4>
+<p>Muestra el <span class="ui">ID de la cuenta</span>, con un botón para copiarlo. Lo necesita quien conecte un sistema externo a esta cuenta, por ejemplo los pedidos por WhatsApp.</p>
+
+<h3>Funciones</h3>
+<p>Activa las funciones que tu organización ofrece a esta cuenta:</p>
+<ul>
+  <li><strong>Voz:</strong> <span class="ui">Comandos de voz</span> (el micrófono de Cocina) y <span class="ui">Voz de la aplicación</span> (respuestas habladas y avisos por voz). Las activa quien tiene el permiso de configuración (ADMIN, GERENTE).</li>
+  <li><strong>Inteligencia artificial:</strong> cada función de <strong>Abastecimiento e inventario</strong> y de <strong>Cocina</strong> por separado, con sus umbrales. Arriba se indica si la IA está conectada. Las activa quien tiene el permiso de IA.</li>
+</ul>
+<p>Si una función dice <span class="say">Tu organización no tiene disponible esta función</span>, no se puede activar aquí: lo decide el SUPER_ADMIN (ver <a href="#c11-2">11.2</a>). Lo que la cuenta tenía configurado se conserva y vuelve cuando la organización la ofrezca de nuevo.</p>
+<div class="callout info"><b class="t">La IA recomienda, tú decides</b>La IA explica y sugiere; nunca compra, confirma ni cambia nada por su cuenta.</div>
+
+<!-- =================================================== 11 CONFIGURACIÓN DE LA ORGANIZACIÓN -->
+<p class="chapter-kicker">Capítulo 11</p>
+<h2 class="chapter" id="c11" data-toc="c11">Configuración de la organización</h2>
+<p class="lead">Tu negocio, sus cuentas, las funciones que ofrece y sus menús maestros. Solo para el SUPER_ADMIN: tu avatar → <span class="ui">Configuración de la organización</span>.</p>
+
+<h3 id="c11-1" data-toc="c11-1">11.1 Datos y cuentas</h3>
+<p><strong>General:</strong> nombre del negocio, sector, categoría, país, ciudad y dirección; datos legales y de contacto; moneda para las cuentas nuevas. Pulsa <span class="ui">Guardar cambios</span>.</p>
+<p><strong>Cuentas:</strong> todas las cuentas de la organización, con su icono y su estado.</p>
+<ul>
+  <li><span class="ui">Nueva cuenta</span>: escribe el nombre (el identificador y un icono se proponen solos; con <span class="ui">Cambiar icono</span> eliges otro) y pulsa <span class="ui">Crear cuenta</span>. Nace con su configuración por defecto y entras directo a ella.</li>
+  <li><strong>Al crearla quedas como SUPER_ADMIN + ADMIN</strong> de esa cuenta: SUPER_ADMIN por ser el creador de la organización, y ADMIN como rol de la cuenta (lo ves en <span class="ui">Usuarios y permisos</span> y puedes cambiarlo). Esto pasa solo cuando la crea el SUPER_ADMIN.</li>
+  <li><span class="ui">Editar</span> cambia el nombre y el icono de la cuenta. El resto de sus datos se edita dentro de la cuenta (<span class="ui">Configuración</span> → <span class="ui">General</span>).</li>
+  <li><span class="ui">Entrar</span> abre la cuenta; <span class="ui">Desactivar</span> la pausa (nadie puede operarla, sus datos se conservan) y <span class="ui">Activar</span> la reanuda.</li>
+</ul>
+
+<h3 id="c11-2" data-toc="c11-2">11.2 Funciones de la organización</h3>
+<p>En la pestaña <span class="ui">Funciones</span> decides qué funciones opcionales ofrece tu negocio (voz e inteligencia artificial) y en qué cuentas están activadas. Cada función muestra:</p>
+<ul>
+  <li><strong>Disponible / No disponible</strong> (arriba a la derecha): si la organización la ofrece.</li>
+  <li><strong>Una fila por cuenta</strong> con su interruptor: si está activada en esa cuenta.</li>
+</ul>
+<table>
+  <thead><tr><th>Organización</th><th>Cuenta</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td>Disponible</td><td>Activada</td><td>La usan quienes tengan el permiso (por ejemplo, las sugerencias de compra, quien ve el inventario).</td></tr>
+    <tr><td>Disponible</td><td>Apagada</td><td>No se usa en esa cuenta.</td></tr>
+    <tr><td>No disponible</td><td>Cualquiera</td><td>Apagada en todas las cuentas. Ninguna cuenta puede activarla.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><b class="t">Lo de cada cuenta se conserva</b>Si dejas de ofrecer una función y luego la vuelves a ofrecer, cada cuenta vuelve a como la tenía. Los umbrales de la IA se ajustan dentro de cada cuenta (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>).</div>
+
+<h3 id="c11-3" data-toc="c11-3">11.3 Menús maestros</h3>
+<p>Un menú maestro es un conjunto de platos, con su receta, que mantienes en un solo lugar y compartes con las cuentas que elijas.</p>
+<ol class="steps">
+  <li>Pulsa <span class="ui">Nuevo menú</span>, escribe el nombre y pulsa <span class="ui">Crear menú</span>.</li>
+  <li>Con <span class="ui">Agregar plato</span> define nombre, código, categoría, <span class="ui">Precio de venta</span> y la <span class="ui">Receta</span>: por cada insumo, su código, nombre, cantidad y unidad.</li>
+  <li>En <span class="ui">Cuentas que lo usan</span>, marca las cuentas y pulsa <span class="ui">Compartir</span>.</li>
+</ol>
+<ul>
+  <li><strong>Al compartir</strong>, cada cuenta recibe su propia copia de los platos y su receta. Los insumos se relacionan por código: si la cuenta ya tiene ese insumo, se usa el suyo; si no, se crea.</li>
+  <li><strong>Los cambios se aplican solos</strong> en todas las cuentas que usan el menú. Las cuentas que fijaron un precio propio lo conservan.</li>
+  <li><strong>Lo que decide cada cuenta:</strong> el precio y en qué días lo ofrece.</li>
+  <li><span class="ui">Dejar de compartir</span>, <span class="ui">Quitar</span> un plato o <span class="ui">Eliminar menú</span>: en las cuentas afectadas los platos quedan como propios, desactivados; su historial se conserva.</li>
+</ul>
+
+<h3 id="c11-4" data-toc="c11-4">11.4 SUPER_ADMIN</h3>
+<p>Muestra quién es el <strong>SUPER_ADMIN</strong>: el creador de la organización. Es <strong>único e intransferible</strong> y no se asigna a otras personas, porque tiene acceso global. Para que alguien administre una cuenta, dale el rol <strong>ADMIN</strong> en esa cuenta.</p>
+
+<!-- =================================================== 12 FAQ -->
+<p class="chapter-kicker">Capítulo 12</p>
+<h2 class="chapter" id="c12" data-toc="c12">Preguntas frecuentes</h2>
 <p class="lead">Situaciones habituales y cómo resolverlas.</p>
 <div class="faq">
   <h4>No puedo confirmar un pedido.</h4>
-  <p>Revisa que tenga al menos un plato, que todos sus platos tengan receta activa y que haya stock suficiente de los insumos. El mensaje de error indica el motivo. Recuerda que confirmar es para Administrador, Gerente y Caja.</p>
+  <p>Revisa que tenga al menos un plato, que todos sus platos tengan receta activa y que haya stock suficiente de los insumos. El mensaje de error indica el motivo. Confirmar requiere el permiso de confirmar pedidos (en las plantillas: ADMIN, GERENTE y CAJA).</p>
 
-  <h4>Un botón aparece gris.</h4>
-  <p>Tu rol no puede hacer esa acción, o falta un dato. Pasa el cursor sobre el botón: el mensaje explica por qué.</p>
+  <h4>No veo un botón que otros sí ven, o aparece gris.</h4>
+  <p>Tu rol activo no puede hacer esa acción, o falta un dato. Si tienes varios roles, revisa con cuál estás trabajando (tu avatar → <span class="ui">Cambiar de rol</span>). Si el botón está gris, pasa el cursor: el mensaje explica por qué.</p>
 
   <h4>No veo un módulo en la barra lateral.</h4>
-  <p>Tu rol no tiene acceso a ese módulo (ver <a href="#c2-3">2.3</a>). Si lo necesitas, pide a un administrador que revise tu rol.</p>
+  <p>Tu rol activo en <strong>esta cuenta</strong> no tiene acceso a ese módulo (ver <a href="#c2-4">2.4</a>). Revisa que estés en la cuenta y el rol correctos (el indicador de arriba lo muestra); si lo necesitas, pide al administrador que revise tus roles.</p>
+
+  <h4>No veo los pedidos (o el menú) que esperaba.</h4>
+  <p>Seguramente estás en otra cuenta. Mira el indicador de arriba y cambia de cuenta (ver <a href="#c2-2">2.2</a>).</p>
+
+  <h4>No aparece una cuenta en mi lista.</h4>
+  <p>No tienes acceso a ella, o te desactivaron o quitaron. Pide al administrador que te la asigne.</p>
+
+  <h4>Un compañero nuevo no puede entrar.</h4>
+  <p>Abre su usuario en <span class="ui">Usuarios y permisos</span>: si está <strong>Pendiente</strong>, revisa que el correo sea el correcto y pulsa <span class="ui">Generar enlace nuevo</span> si venció o se perdió.</p>
+
+  <h4>No puedo cambiar el nombre o la receta de un plato.</h4>
+  <p>Es un plato de un menú maestro: solo el SUPER_ADMIN lo cambia, en la configuración de la organización. En tu cuenta puedes ajustar su precio y sus días en el calendario. Si no es de un menú maestro, tu rol quizá no tiene el permiso de editar platos o recetas.</p>
+
+  <h4>No veo la pestaña Rentabilidad en Reportes.</h4>
+  <p>La rentabilidad muestra costos y tiene su propio permiso. En las plantillas lo tienen ADMIN, GERENTE e INVENTARIO.</p>
 
   <h4>¿Dónde están los pedidos entregados o cancelados?</h4>
   <p>Salen del tablero. Consúltalos en Cocina → <span class="ui">⋯</span> → <span class="ui">Historial de pedidos</span>.</p>
@@ -819,13 +1017,16 @@
   <p>Arrástralo de vuelta a Preparando, o abre su detalle y pulsa <span class="ui">Retroceder a preparación</span>. También puedes retroceder un plato a la vez.</p>
 
   <h4>El indicador dice “En vivo” en vez de Abierta o Cerrada.</h4>
-  <p>Aún no hay horario configurado. Un administrador o gerente puede cargarlo en Configuración → Horario.</p>
+  <p>Aún no hay horario configurado. Un administrador o gerente puede cargarlo en Cocina → <span class="ui">⋯</span> → <span class="ui">Configuración</span>.</p>
 
   <h4>No suena el aviso de pedidos nuevos.</h4>
   <p>Verifica que <span class="ui">Sonido de pedidos nuevos</span> esté activo en el menú <span class="ui">⋯</span> y que el equipo no esté silenciado. Algunos navegadores solo permiten sonido después de que tocas la página una vez.</p>
 
   <h4>El micrófono no aparece o no me entiende.</h4>
-  <p>Usa un navegador con reconocimiento de voz (como Chrome), permite el micrófono y habla cerca, diciendo el número de 4 dígitos y la acción. Solo funciona con los pedidos de hoy.</p>
+  <p>Revisa que la cuenta tenga activados los <span class="ui">Comandos de voz</span> (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>) y que tu organización los ofrezca. Usa un navegador con reconocimiento de voz (como Chrome), permite el micrófono y habla cerca, diciendo el número de 4 dígitos y la acción. Solo funciona con los pedidos de hoy.</p>
+
+  <h4>No puedo activar una función: dice que mi organización no la tiene disponible.</h4>
+  <p>La organización decide qué funciones ofrece. Pídele al SUPER_ADMIN que la ofrezca en <span class="ui">Configuración de la organización</span> → <span class="ui">Funciones</span>.</p>
 
   <h4>La cantidad sugerida para reponer está vacía.</h4>
   <p>El insumo no tiene mínimo/máximo configurado ni consumo reciente. Configúralos en su ficha.</p>
@@ -837,29 +1038,44 @@
   <p>Por ahora los reportes se consultan en pantalla; no hay exportación a archivo.</p>
 
   <h4>Olvidé mi contraseña.</h4>
-  <p>Contacta al administrador de la plataforma.</p>
+  <p>Pide al administrador de tu negocio que te ayude. Si recuerdas la actual, puedes cambiarla en <span class="ui">Mi perfil</span>.</p>
 </div>
 
-<!-- =================================================== 11 GLOSARIO -->
-<p class="chapter-kicker">Capítulo 11</p>
-<h2 class="chapter" id="c11" data-toc="c11">Glosario</h2>
+<!-- =================================================== 13 GLOSARIO -->
+<p class="chapter-kicker">Capítulo 13</p>
+<h2 class="chapter" id="c13" data-toc="c13">Glosario</h2>
 <p class="lead">Términos que usa la aplicación.</p>
 <dl class="gloss two-col">
+  <div><dt>ADMIN</dt><dd>Rol de cuenta con todas sus opciones y configuraciones. Se asigna a quien administre esa cuenta.</dd></div>
+  <div><dt>Avatar</dt><dd>La ilustración de una persona que te identifica. Se elige entre 20 en Mi perfil.</dd></div>
   <div><dt>Borrador</dt><dd>Pedido o compra creado pero aún no confirmado. No afecta el inventario.</dd></div>
+  <div><dt>Cocina (módulo)</dt><dd>El tablero donde se preparan y despachan los pedidos de una cuenta.</dd></div>
   <div><dt>Comanda</dt><dd>La orden que llega a cocina cuando se confirma un pedido.</dd></div>
   <div><dt>Consumo</dt><dd>Salida de insumos cuando un plato se marca listo.</dd></div>
   <div><dt>Costo promedio</dt><dd>Costo unitario de un insumo, recalculado con cada compra confirmada.</dd></div>
+  <div><dt>Cuenta</dt><dd>Un establecimiento completo de tu negocio, con sus propios pedidos, clientes, menú, inventario y configuración.</dd></div>
   <div><dt>Devolución</dt><dd>Reingreso de insumos al cancelar un pedido que ya se había preparado. Marca el pedido para revisar.</dd></div>
+  <div><dt>Función</dt><dd>Capacidad opcional (voz, IA). La organización decide si la ofrece; cada cuenta, si la activa; y cada rol, si la puede usar.</dd></div>
   <div><dt>Excepción de horario</dt><dd>Fecha puntual con un horario distinto al semanal (festivo, cierre, evento).</dd></div>
+  <div><dt>Icono de la cuenta</dt><dd>La ilustración que representa a un establecimiento (hamburguesa, pizza, taco…). La elige el SUPER_ADMIN o el ADMIN de la cuenta.</dd></div>
   <div><dt>Insumo</dt><dd>Materia prima que se compra y se consume en las recetas.</dd></div>
+  <div><dt>Enlace de activación</dt><dd>Enlace personal con el que un usuario nuevo crea su contraseña y entra. Vale para su correo y vence en 7 días.</dd></div>
   <div><dt>Margen</dt><dd>Precio de venta menos el costo de los insumos.</dd></div>
+  <div><dt>Menú maestro</dt><dd>Platos con receta que el SUPER_ADMIN comparte con varias cuentas de la organización.</dd></div>
   <div><dt>Merma</dt><dd>Pérdida de insumos por vencimiento, daño o error.</dd></div>
+  <div><dt>Organización</dt><dd>Tu negocio o grupo: agrupa tus cuentas, tus usuarios y tus roles propios.</dd></div>
+  <div><dt>Permiso</dt><dd>Una acción concreta que un rol permite (ver pedidos, confirmar compras, ver rentabilidad…).</dd></div>
+  <div><dt>Plantilla</dt><dd>Rol listo para usar, igual en toda la plataforma (ADMIN, CAJA, COCINA…). Se puede duplicar.</dd></div>
   <div><dt>Prioritario</dt><dd>Pedido que pasa primero en su columna. Se ve con borde violeta.</dd></div>
   <div><dt>Receta</dt><dd>Lista de insumos y cantidades de un plato. Tiene versiones.</dd></div>
   <div><dt>Reserva</dt><dd>Insumos apartados al confirmar un pedido, para que no se usen en otro.</dd></div>
   <div><dt>Revisar</dt><dd>Marca de un pedido con devoluciones de inventario que conviene verificar.</dd></div>
+  <div><dt>Rol activo</dt><dd>El rol con el que trabajas en este momento, si tienes varios en la cuenta.</dd></div>
+  <div><dt>Rol propio</dt><dd>Rol creado por tu organización con los permisos que elija. Sirve en todas sus cuentas.</dd></div>
   <div><dt>SLA</dt><dd>Tiempo máximo esperado en cada etapa. Pasado ese tiempo, el pedido está atrasado.</dd></div>
   <div><dt>Stock disponible</dt><dd>Cantidad de un insumo que se puede usar (existencia menos reservas).</dd></div>
+  <div><dt>SUPER_ADMIN</dt><dd>El creador del negocio: acceso global a todas las cuentas de la organización. Único, intransferible y no se asigna a otros.</dd></div>
+  <div><dt>Usuario pendiente</dt><dd>Usuario creado por un administrador que aún no abre su enlace de activación.</dd></div>
   <div><dt>Unidad base</dt><dd>Unidad en que se mide un insumo en recetas e inventario (g, ml, und…).</dd></div>
 </dl>
 

@@ -129,7 +129,7 @@ export function KanbanView({
               newIds={newIds}
               onAcknowledge={onAcknowledge}
               stalledByOrder={stalledByOrder}
-              dropState={!activeTicket || status === activeTicket.orderStatus ? null : canTransition(activeTicket.orderStatus, status, board.role) ? 'valid' : 'invalid'}
+              dropState={!activeTicket || status === activeTicket.orderStatus ? null : canTransition(activeTicket.orderStatus, status, board.can) ? 'valid' : 'invalid'}
             />
           ))}
         </div>

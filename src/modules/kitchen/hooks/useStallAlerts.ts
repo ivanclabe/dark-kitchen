@@ -2,11 +2,11 @@ import { useAiFeature, useKitchenSignals } from '@/modules/ai/hooks/useAi'
 import { numberSetting } from '@/modules/ai/lib/catalog'
 import { currentStalls, dueStallAnnouncement, type StallAlert } from '@/modules/ai/lib/stallAlerts'
 import { useEffect, useMemo, useRef } from 'react'
-import { speak } from '../voice/speak'
+import { useSpeech } from '../voice/useSpeech'
 
 /**
- * Alertas de pedidos y platos detenidos (Configuración → IA → Alertas de
- * pedidos detenidos). Regla fija, sin modelo: lee dk_kitchen_signals cada
+ * Alertas de pedidos y platos detenidos (Configuración → Funciones → Alertas
+ * de pedidos detenidos). Regla fija, sin modelo: lee dk_kitchen_signals cada
  * 30 s y avisa por voz lo nuevo, repitiendo cada `repeat_min`.
  *
  * `paused` (el micrófono está escuchando) aplaza la voz: si hablara, el
@@ -18,7 +18,8 @@ export function useStallAlerts({ active, paused, muted }: { active: boolean; pau
   const enabled = active && feature.enabled
   const dishStallMin = numberSetting(feature.settings, 'dish_stall_min', 12)
   const repeatMin = numberSetting(feature.settings, 'repeat_min', 5)
-  const voice = feature.settings.voice === true
+  const { allowed: speechAllowed, say } = useSpeech()
+  const voice = feature.settings.voice === true && speechAllowed
 
   const { data: signals } = useKitchenSignals(enabled, dishStallMin)
   const stalls = useMemo(() => (enabled && signals ? currentStalls(signals) : []), [enabled, signals])
@@ -28,8 +29,8 @@ export function useStallAlerts({ active, paused, muted }: { active: boolean; pau
     if (!enabled || !voice || paused || muted) return
     const { text, next } = dueStallAnnouncement(stalls, lastAnnounced.current, Date.now(), repeatMin)
     lastAnnounced.current = next
-    if (text) speak(text)
-  }, [stalls, enabled, voice, paused, muted, repeatMin])
+    if (text) say(text)
+  }, [stalls, enabled, voice, paused, muted, repeatMin, say])
 
   /** Etiquetas cortas por pedido, para marcar la tarjeta en el tablero. */
   const stalledByOrder = useMemo(() => {

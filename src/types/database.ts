@@ -14,280 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      app_estado_workflow: {
-        Row: {
-          actualizado_en: string
-          clave: string
-          valor: string | null
-        }
-        Insert: {
-          actualizado_en?: string
-          clave: string
-          valor?: string | null
-        }
-        Update: {
-          actualizado_en?: string
-          clave?: string
-          valor?: string | null
-        }
-        Relationships: []
-      }
-      audit_log: {
-        Row: {
-          action: string
-          changed_at: string
-          changed_by: string | null
-          changed_by_email: string | null
-          id: string
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string | null
-          table_name: string
-        }
-        Insert: {
-          action: string
-          changed_at?: string
-          changed_by?: string | null
-          changed_by_email?: string | null
-          id?: string
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string | null
-          table_name: string
-        }
-        Update: {
-          action?: string
-          changed_at?: string
-          changed_by?: string | null
-          changed_by_email?: string | null
-          id?: string
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string | null
-          table_name?: string
-        }
-        Relationships: []
-      }
-      clientes: {
-        Row: {
-          activo: boolean
-          created_at: string
-          empresa_pagadora_id: string | null
-          id: string
-          nombre: string
-          updated_at: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          empresa_pagadora_id?: string | null
-          id?: string
-          nombre: string
-          updated_at?: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          empresa_pagadora_id?: string | null
-          id?: string
-          nombre?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "clientes_empresa_pagadora_id_fkey"
-            columns: ["empresa_pagadora_id"]
-            isOneToOne: false
-            referencedRelation: "empresas_pagadoras"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comprobantes_pago_conductor: {
-        Row: {
-          consecutivo: number
-          created_at: string
-          id: string
-          viaje_id: string
-        }
-        Insert: {
-          consecutivo?: number
-          created_at?: string
-          id?: string
-          viaje_id: string
-        }
-        Update: {
-          consecutivo?: number
-          created_at?: string
-          id?: string
-          viaje_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comprobantes_pago_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: true
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comprobantes_pago_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: true
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conceptos_obligacion: {
-        Row: {
-          created_at: string
-          id: string
-          nombre: string
-          vehiculo_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          nombre: string
-          vehiculo_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          nombre?: string
-          vehiculo_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conceptos_obligacion_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "conceptos_obligacion_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conductores: {
-        Row: {
-          activo: boolean
-          cedula: string | null
-          created_at: string
-          id: string
-          licencia_numero: string | null
-          licencia_vencimiento: string | null
-          nombre: string
-          telefono: string | null
-          updated_at: string
-        }
-        Insert: {
-          activo?: boolean
-          cedula?: string | null
-          created_at?: string
-          id?: string
-          licencia_numero?: string | null
-          licencia_vencimiento?: string | null
-          nombre: string
-          telefono?: string | null
-          updated_at?: string
-        }
-        Update: {
-          activo?: boolean
-          cedula?: string | null
-          created_at?: string
-          id?: string
-          licencia_numero?: string | null
-          licencia_vencimiento?: string | null
-          nombre?: string
-          telefono?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      descuentos_conductor: {
-        Row: {
-          comentarios: string | null
-          created_at: string
-          fecha_descuento: string
-          id: string
-          tipo_descuento: string
-          valor: number
-          viaje_id: string
-        }
-        Insert: {
-          comentarios?: string | null
-          created_at?: string
-          fecha_descuento?: string
-          id?: string
-          tipo_descuento: string
-          valor?: number
-          viaje_id: string
-        }
-        Update: {
-          comentarios?: string | null
-          created_at?: string
-          fecha_descuento?: string
-          id?: string
-          tipo_descuento?: string
-          valor?: number
-          viaje_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "descuentos_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "descuentos_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dk_ai_features: {
-        Row: {
-          enabled: boolean
-          feature_key: string
-          settings: Json
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          enabled?: boolean
-          feature_key: string
-          settings?: Json
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          enabled?: boolean
-          feature_key?: string
-          settings?: Json
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dk_ai_features_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "dk_users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dk_ai_insights: {
         Row: {
           created_at: string
@@ -296,6 +22,7 @@ export type Database = {
           feature_key: string
           id: string
           input: Json
+          kitchen_id: string
           model: string | null
           output: Json | null
           status: string
@@ -307,6 +34,7 @@ export type Database = {
           feature_key: string
           id?: string
           input: Json
+          kitchen_id?: string
           model?: string | null
           output?: Json | null
           status: string
@@ -318,6 +46,7 @@ export type Database = {
           feature_key?: string
           id?: string
           input?: Json
+          kitchen_id?: string
           model?: string | null
           output?: Json | null
           status?: string
@@ -334,8 +63,15 @@ export type Database = {
             foreignKeyName: "dk_ai_insights_feature_key_fkey"
             columns: ["feature_key"]
             isOneToOne: false
-            referencedRelation: "dk_ai_features"
-            referencedColumns: ["feature_key"]
+            referencedRelation: "dk_features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_ai_insights_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -347,6 +83,7 @@ export type Database = {
           file_name: string
           file_path: string
           id: string
+          kitchen_id: string
           mime_type: string | null
           uploaded_by: string | null
         }
@@ -357,6 +94,7 @@ export type Database = {
           file_name: string
           file_path: string
           id?: string
+          kitchen_id?: string
           mime_type?: string | null
           uploaded_by?: string | null
         }
@@ -367,10 +105,18 @@ export type Database = {
           file_name?: string
           file_path?: string
           id?: string
+          kitchen_id?: string
           mime_type?: string | null
           uploaded_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dk_attachments_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dk_attachments_uploaded_by_fkey"
             columns: ["uploaded_by"]
@@ -386,8 +132,10 @@ export type Database = {
           changed_by: string | null
           created_at: string
           id: string
+          kitchen_id: string | null
           new_data: Json | null
           old_data: Json | null
+          organization_id: string | null
           record_id: string | null
           record_key: string | null
           table_name: string
@@ -397,8 +145,10 @@ export type Database = {
           changed_by?: string | null
           created_at?: string
           id?: string
+          kitchen_id?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          organization_id?: string | null
           record_id?: string | null
           record_key?: string | null
           table_name: string
@@ -408,8 +158,10 @@ export type Database = {
           changed_by?: string | null
           created_at?: string
           id?: string
+          kitchen_id?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          organization_id?: string | null
           record_id?: string | null
           record_key?: string | null
           table_name?: string
@@ -422,6 +174,13 @@ export type Database = {
             referencedRelation: "dk_users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_audit_log_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
         ]
       }
       dk_customers: {
@@ -430,6 +189,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          kitchen_id: string
           notes: string | null
           phone: string | null
           updated_at: string
@@ -440,6 +200,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          kitchen_id?: string
           notes?: string | null
           phone?: string | null
           updated_at?: string
@@ -450,12 +211,21 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          kitchen_id?: string
           notes?: string | null
           phone?: string | null
           updated_at?: string
           whatsapp_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_customers_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_daily_availability: {
         Row: {
@@ -463,6 +233,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          kitchen_id: string
           menu_date: string
           menu_item_id: string
           special_price: number | null
@@ -473,6 +244,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kitchen_id?: string
           menu_date: string
           menu_item_id: string
           special_price?: number | null
@@ -483,6 +255,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kitchen_id?: string
           menu_date?: string
           menu_item_id?: string
           special_price?: number | null
@@ -497,11 +270,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_daily_availability_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_daily_availability_menu_item_id_fkey"
-            columns: ["menu_item_id"]
+            columns: ["kitchen_id", "menu_item_id"]
             isOneToOne: false
             referencedRelation: "dk_menu_items"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -511,6 +291,7 @@ export type Database = {
           delivered_at: string | null
           dispatched_at: string
           id: string
+          kitchen_id: string
           notes: string | null
           order_id: string
           rider_id: string | null
@@ -522,6 +303,7 @@ export type Database = {
           delivered_at?: string | null
           dispatched_at?: string
           id?: string
+          kitchen_id?: string
           notes?: string | null
           order_id: string
           rider_id?: string | null
@@ -533,6 +315,7 @@ export type Database = {
           delivered_at?: string | null
           dispatched_at?: string
           id?: string
+          kitchen_id?: string
           notes?: string | null
           order_id?: string
           rider_id?: string | null
@@ -541,25 +324,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "dk_deliveries_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "dk_orders"
+            foreignKeyName: "dk_deliveries_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_deliveries_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "dk_receivables"
-            referencedColumns: ["order_id"]
+            columns: ["kitchen_id", "order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_deliveries_rider_id_fkey"
-            columns: ["rider_id"]
+            columns: ["kitchen_id", "rider_id"]
             isOneToOne: false
             referencedRelation: "dk_delivery_riders"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -569,6 +352,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          kitchen_id: string
           phone: string | null
           updated_at: string
           user_id: string | null
@@ -579,6 +363,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          kitchen_id?: string
           phone?: string | null
           updated_at?: string
           user_id?: string | null
@@ -589,6 +374,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          kitchen_id?: string
           phone?: string | null
           updated_at?: string
           user_id?: string | null
@@ -596,11 +382,78 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "dk_delivery_riders_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_delivery_riders_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "dk_users"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_features: {
+        Row: {
+          active: boolean
+          category: string
+          default_available: boolean
+          default_enabled: boolean
+          default_settings: Json
+          description: string
+          key: string
+          label: string
+          manage_permission: string
+          sort_order: number
+          use_permission: string
+          uses_model: boolean
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          default_available?: boolean
+          default_enabled?: boolean
+          default_settings?: Json
+          description: string
+          key: string
+          label: string
+          manage_permission: string
+          sort_order: number
+          use_permission: string
+          uses_model?: boolean
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          default_available?: boolean
+          default_enabled?: boolean
+          default_settings?: Json
+          description?: string
+          key?: string
+          label?: string
+          manage_permission?: string
+          sort_order?: number
+          use_permission?: string
+          uses_model?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_features_manage_permission_fkey"
+            columns: ["manage_permission"]
+            isOneToOne: false
+            referencedRelation: "dk_permissions"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_features_use_permission_fkey"
+            columns: ["use_permission"]
+            isOneToOne: false
+            referencedRelation: "dk_permissions"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -608,19 +461,30 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          kitchen_id: string
           name: string
         }
         Insert: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           name: string
         }
         Update: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredient_categories_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_ingredient_purchase_units: {
         Row: {
@@ -628,6 +492,7 @@ export type Database = {
           factor_to_base: number
           id: string
           ingredient_id: string
+          kitchen_id: string
           unit_id: string
         }
         Insert: {
@@ -635,6 +500,7 @@ export type Database = {
           factor_to_base: number
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           unit_id: string
         }
         Update: {
@@ -642,22 +508,23 @@ export type Database = {
           factor_to_base?: number
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           unit_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "dk_ingredient_purchase_units_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_ingredient_purchase_units_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            foreignKeyName: "dk_ingredient_purchase_units_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_ingredient_purchase_units_unit_id_fkey"
@@ -671,6 +538,7 @@ export type Database = {
       dk_ingredient_stock: {
         Row: {
           ingredient_id: string
+          kitchen_id: string
           stock_available: number | null
           stock_on_hand: number
           stock_reserved: number
@@ -678,6 +546,7 @@ export type Database = {
         }
         Insert: {
           ingredient_id: string
+          kitchen_id?: string
           stock_available?: number | null
           stock_on_hand?: number
           stock_reserved?: number
@@ -685,6 +554,7 @@ export type Database = {
         }
         Update: {
           ingredient_id?: string
+          kitchen_id?: string
           stock_available?: number | null
           stock_on_hand?: number
           stock_reserved?: number
@@ -693,17 +563,17 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dk_ingredient_stock_ingredient_id_fkey"
-            columns: ["ingredient_id"]
-            isOneToOne: true
+            columns: ["kitchen_id", "ingredient_id"]
+            isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_ingredient_stock_ingredient_id_fkey"
-            columns: ["ingredient_id"]
-            isOneToOne: true
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            foreignKeyName: "dk_ingredient_stock_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -717,6 +587,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          kitchen_id: string
           max_stock: number | null
           min_stock: number
           name: string
@@ -734,6 +605,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          kitchen_id?: string
           max_stock?: number | null
           min_stock?: number
           name: string
@@ -751,6 +623,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          kitchen_id?: string
           max_stock?: number | null
           min_stock?: number
           name?: string
@@ -769,17 +642,24 @@ export type Database = {
           },
           {
             foreignKeyName: "dk_ingredients_category_id_fkey"
-            columns: ["category_id"]
+            columns: ["kitchen_id", "category_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredient_categories"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_ingredients_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_ingredients_primary_supplier_id_fkey"
-            columns: ["primary_supplier_id"]
+            columns: ["kitchen_id", "primary_supplier_id"]
             isOneToOne: false
             referencedRelation: "dk_suppliers"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -789,6 +669,7 @@ export type Database = {
           created_by: string | null
           id: string
           ingredient_id: string
+          kitchen_id: string
           movement_type: Database["public"]["Enums"]["dk_movement_type"]
           observation: string | null
           quantity_base_unit: number
@@ -802,6 +683,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           movement_type: Database["public"]["Enums"]["dk_movement_type"]
           observation?: string | null
           quantity_base_unit: number
@@ -815,6 +697,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           movement_type?: Database["public"]["Enums"]["dk_movement_type"]
           observation?: string | null
           quantity_base_unit?: number
@@ -833,17 +716,17 @@ export type Database = {
           },
           {
             foreignKeyName: "dk_inventory_movements_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_inventory_movements_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            foreignKeyName: "dk_inventory_movements_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -852,6 +735,7 @@ export type Database = {
           created_at: string
           id: string
           ingredient_id: string
+          kitchen_id: string
           order_item_id: string
           quantity_base_unit: number
           resolved_at: string | null
@@ -861,6 +745,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           order_item_id: string
           quantity_base_unit: number
           resolved_at?: string | null
@@ -870,6 +755,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           order_item_id?: string
           quantity_base_unit?: number
           resolved_at?: string | null
@@ -878,23 +764,98 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dk_inventory_reservations_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_inventory_reservations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dk_inventory_reservations_ingredient_id_fkey"
-            columns: ["ingredient_id"]
-            isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
-          },
-          {
             foreignKeyName: "dk_inventory_reservations_order_item_id_fkey"
-            columns: ["order_item_id"]
+            columns: ["kitchen_id", "order_item_id"]
             isOneToOne: false
             referencedRelation: "dk_order_items"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_kitchen_counters: {
+        Row: {
+          kitchen_id: string
+          last_value: number
+          name: string
+        }
+        Insert: {
+          kitchen_id: string
+          last_value: number
+          name: string
+        }
+        Update: {
+          kitchen_id?: string
+          last_value?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_counters_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_kitchen_features: {
+        Row: {
+          enabled: boolean
+          feature_key: string
+          kitchen_id: string
+          settings: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          feature_key: string
+          kitchen_id?: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          feature_key?: string
+          kitchen_id?: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_features_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "dk_features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_features_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_features_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
             referencedColumns: ["id"]
           },
         ]
@@ -906,6 +867,7 @@ export type Database = {
           created_by: string | null
           exception_date: string
           is_open: boolean
+          kitchen_id: string
           note: string | null
           opens_at: string | null
           updated_at: string
@@ -916,6 +878,7 @@ export type Database = {
           created_by?: string | null
           exception_date: string
           is_open: boolean
+          kitchen_id?: string
           note?: string | null
           opens_at?: string | null
           updated_at?: string
@@ -926,6 +889,7 @@ export type Database = {
           created_by?: string | null
           exception_date?: string
           is_open?: boolean
+          kitchen_id?: string
           note?: string | null
           opens_at?: string | null
           updated_at?: string
@@ -938,6 +902,13 @@ export type Database = {
             referencedRelation: "dk_users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dk_kitchen_hour_exceptions_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
         ]
       }
       dk_kitchen_hours: {
@@ -945,6 +916,7 @@ export type Database = {
           closes_at: string | null
           day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
           is_open: boolean
+          kitchen_id: string
           opens_at: string | null
           updated_at: string
           updated_by: string | null
@@ -953,6 +925,7 @@ export type Database = {
           closes_at?: string | null
           day_of_week: Database["public"]["Enums"]["dk_day_of_week"]
           is_open?: boolean
+          kitchen_id?: string
           opens_at?: string | null
           updated_at?: string
           updated_by?: string | null
@@ -961,14 +934,81 @@ export type Database = {
           closes_at?: string | null
           day_of_week?: Database["public"]["Enums"]["dk_day_of_week"]
           is_open?: boolean
+          kitchen_id?: string
           opens_at?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "dk_kitchen_hours_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_kitchen_hours_updated_by_fkey"
             columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_kitchen_members: {
+        Row: {
+          active: boolean
+          created_at: string
+          default_role_id: string
+          invited_by: string | null
+          kitchen_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          default_role_id: string
+          invited_by?: string | null
+          kitchen_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          default_role_id?: string
+          invited_by?: string | null
+          kitchen_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_members_default_role_id_fkey"
+            columns: ["default_role_id"]
+            isOneToOne: false
+            referencedRelation: "dk_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_members_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_members_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_members_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "dk_users"
             referencedColumns: ["id"]
@@ -979,7 +1019,8 @@ export type Database = {
         Row: {
           confirmado_alert_min: number
           en_preparacion_alert_min: number
-          id: number
+          id: number | null
+          kitchen_id: string
           listo_alert_min: number
           near_threshold_pct: number
           updated_at: string
@@ -988,7 +1029,8 @@ export type Database = {
         Insert: {
           confirmado_alert_min?: number
           en_preparacion_alert_min?: number
-          id?: number
+          id?: number | null
+          kitchen_id?: string
           listo_alert_min?: number
           near_threshold_pct?: number
           updated_at?: string
@@ -997,13 +1039,21 @@ export type Database = {
         Update: {
           confirmado_alert_min?: number
           en_preparacion_alert_min?: number
-          id?: number
+          id?: number | null
+          kitchen_id?: string
           listo_alert_min?: number
           near_threshold_pct?: number
           updated_at?: string
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_sla_settings_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: true
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dk_kitchen_sla_settings_updated_by_fkey"
             columns: ["updated_by"]
@@ -1017,35 +1067,346 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          kitchen_id: string
           order_id: string
           priority: number
         }
         Insert: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           order_id: string
           priority?: number
         }
         Update: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           order_id?: string
           priority?: number
         }
         Relationships: [
           {
-            foreignKeyName: "dk_kitchen_tickets_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "dk_orders"
+            foreignKeyName: "dk_kitchen_tickets_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_kitchen_tickets_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "dk_receivables"
-            referencedColumns: ["order_id"]
+            columns: ["kitchen_id", "order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_kitchens: {
+        Row: {
+          active: boolean
+          address: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          icon_key: string | null
+          id: string
+          legal_name: string | null
+          logo_path: string | null
+          name: string
+          organization_id: string
+          phone: string | null
+          slug: string
+          tax_id: string | null
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          icon_key?: string | null
+          id?: string
+          legal_name?: string | null
+          logo_path?: string | null
+          name: string
+          organization_id: string
+          phone?: string | null
+          slug: string
+          tax_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          icon_key?: string | null
+          id?: string
+          legal_name?: string | null
+          logo_path?: string | null
+          name?: string
+          organization_id?: string
+          phone?: string | null
+          slug?: string
+          tax_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchens_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchens_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_master_menu_kitchens: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          kitchen_id: string
+          master_menu_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          kitchen_id: string
+          master_menu_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          kitchen_id?: string
+          master_menu_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_master_menu_kitchens_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_master_menu_kitchens_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_master_menu_kitchens_master_menu_id_fkey"
+            columns: ["master_menu_id"]
+            isOneToOne: false
+            referencedRelation: "dk_master_menus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_master_menus: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_master_menus_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_master_menus_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_master_products: {
+        Row: {
+          active: boolean
+          category_name: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          master_menu_id: string
+          name: string
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category_name?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          master_menu_id: string
+          name: string
+          price: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category_name?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          master_menu_id?: string
+          name?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_master_products_master_menu_id_fkey"
+            columns: ["master_menu_id"]
+            isOneToOne: false
+            referencedRelation: "dk_master_menus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_master_recipe_items: {
+        Row: {
+          id: string
+          ingredient_code: string
+          ingredient_name: string
+          master_product_id: string
+          quantity: number
+          unit_code: string
+        }
+        Insert: {
+          id?: string
+          ingredient_code: string
+          ingredient_name: string
+          master_product_id: string
+          quantity: number
+          unit_code: string
+        }
+        Update: {
+          id?: string
+          ingredient_code?: string
+          ingredient_name?: string
+          master_product_id?: string
+          quantity?: number
+          unit_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_master_recipe_items_master_product_id_fkey"
+            columns: ["master_product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_master_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_master_recipe_items_unit_code_fkey"
+            columns: ["unit_code"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["base_unit_code"]
+          },
+          {
+            foreignKeyName: "dk_master_recipe_items_unit_code_fkey"
+            columns: ["unit_code"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      dk_member_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          kitchen_id: string
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          kitchen_id: string
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          kitchen_id?: string
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_member_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_member_roles_kitchen_id_user_id_fkey"
+            columns: ["kitchen_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchen_members"
+            referencedColumns: ["kitchen_id", "user_id"]
+          },
+          {
+            foreignKeyName: "dk_member_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "dk_roles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1055,6 +1416,7 @@ export type Database = {
           created_at: string
           end_time: string | null
           id: string
+          kitchen_id: string
           menu_id: string
           product_id: string
           special_price: number | null
@@ -1066,6 +1428,7 @@ export type Database = {
           created_at?: string
           end_time?: string | null
           id?: string
+          kitchen_id?: string
           menu_id: string
           product_id: string
           special_price?: number | null
@@ -1077,6 +1440,7 @@ export type Database = {
           created_at?: string
           end_time?: string | null
           id?: string
+          kitchen_id?: string
           menu_id?: string
           product_id?: string
           special_price?: number | null
@@ -1085,25 +1449,25 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "dk_menu_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_menu_items_menu_id_fkey"
-            columns: ["menu_id"]
+            columns: ["kitchen_id", "menu_id"]
             isOneToOne: false
             referencedRelation: "dk_menus"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_menu_items_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["kitchen_id", "product_id"]
             isOneToOne: false
             referencedRelation: "dk_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_menu_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "dk_today_menu"
-            referencedColumns: ["product_id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1115,6 +1479,7 @@ export type Database = {
           end_time: string | null
           id: string
           is_active: boolean
+          kitchen_id: string
           plan_date: string
           product_id: string
           special_price: number | null
@@ -1130,6 +1495,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           plan_date: string
           product_id: string
           special_price?: number | null
@@ -1145,6 +1511,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           plan_date?: string
           product_id?: string
           special_price?: number | null
@@ -1162,18 +1529,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dk_menu_plan_items_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "dk_menu_plan_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_products"
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_menu_plan_items_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["kitchen_id", "product_id"]
             isOneToOne: false
-            referencedRelation: "dk_today_menu"
-            referencedColumns: ["product_id"]
+            referencedRelation: "dk_products"
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1183,6 +1550,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          kitchen_id: string
           name: string
           updated_at: string
         }
@@ -1191,6 +1559,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          kitchen_id?: string
           name: string
           updated_at?: string
         }
@@ -1199,15 +1568,25 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          kitchen_id?: string
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_menus_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_order_items: {
         Row: {
           created_at: string
           id: string
+          kitchen_id: string
           kitchen_status: Database["public"]["Enums"]["dk_kitchen_item_status"]
           kitchen_status_changed_at: string
           line_total: number | null
@@ -1221,6 +1600,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
           kitchen_status_changed_at?: string
           line_total?: number | null
@@ -1234,6 +1614,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
           kitchen_status_changed_at?: string
           line_total?: number | null
@@ -1246,39 +1627,32 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "dk_order_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_order_items_order_id_fkey"
-            columns: ["order_id"]
+            columns: ["kitchen_id", "order_id"]
             isOneToOne: false
             referencedRelation: "dk_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "dk_receivables"
-            referencedColumns: ["order_id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_order_items_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["kitchen_id", "product_id"]
             isOneToOne: false
             referencedRelation: "dk_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_order_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "dk_today_menu"
-            referencedColumns: ["product_id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_order_items_recipe_id_fkey"
-            columns: ["recipe_id"]
+            columns: ["kitchen_id", "recipe_id"]
             isOneToOne: false
             referencedRelation: "dk_recipes"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1288,6 +1662,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          kitchen_id: string
           method: string | null
           note: string | null
           order_id: string
@@ -1297,6 +1672,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kitchen_id?: string
           method?: string | null
           note?: string | null
           order_id: string
@@ -1306,6 +1682,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kitchen_id?: string
           method?: string | null
           note?: string | null
           order_id?: string
@@ -1319,18 +1696,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dk_order_payments_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: "dk_order_payments_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_orders"
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_order_payments_order_id_fkey"
-            columns: ["order_id"]
+            columns: ["kitchen_id", "order_id"]
             isOneToOne: false
-            referencedRelation: "dk_receivables"
-            referencedColumns: ["order_id"]
+            referencedRelation: "dk_orders"
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1340,6 +1717,7 @@ export type Database = {
           changed_by: string | null
           from_status: Database["public"]["Enums"]["dk_order_status"] | null
           id: string
+          kitchen_id: string
           note: string | null
           order_id: string
           to_status: Database["public"]["Enums"]["dk_order_status"]
@@ -1349,6 +1727,7 @@ export type Database = {
           changed_by?: string | null
           from_status?: Database["public"]["Enums"]["dk_order_status"] | null
           id?: string
+          kitchen_id?: string
           note?: string | null
           order_id: string
           to_status: Database["public"]["Enums"]["dk_order_status"]
@@ -1358,6 +1737,7 @@ export type Database = {
           changed_by?: string | null
           from_status?: Database["public"]["Enums"]["dk_order_status"] | null
           id?: string
+          kitchen_id?: string
           note?: string | null
           order_id?: string
           to_status?: Database["public"]["Enums"]["dk_order_status"]
@@ -1371,18 +1751,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dk_order_status_history_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: "dk_order_status_history_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_orders"
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_order_status_history_order_id_fkey"
-            columns: ["order_id"]
+            columns: ["kitchen_id", "order_id"]
             isOneToOne: false
-            referencedRelation: "dk_receivables"
-            referencedColumns: ["order_id"]
+            referencedRelation: "dk_orders"
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1397,6 +1777,7 @@ export type Database = {
           due_date: string | null
           external_reference: string | null
           id: string
+          kitchen_id: string
           notes: string | null
           order_number: number
           payment_method: string | null
@@ -1416,6 +1797,7 @@ export type Database = {
           due_date?: string | null
           external_reference?: string | null
           id?: string
+          kitchen_id?: string
           notes?: string | null
           order_number?: number
           payment_method?: string | null
@@ -1435,6 +1817,7 @@ export type Database = {
           due_date?: string | null
           external_reference?: string | null
           id?: string
+          kitchen_id?: string
           notes?: string | null
           order_number?: number
           payment_method?: string | null
@@ -1454,30 +1837,257 @@ export type Database = {
           },
           {
             foreignKeyName: "dk_orders_customer_id_fkey"
-            columns: ["customer_id"]
+            columns: ["kitchen_id", "customer_id"]
             isOneToOne: false
             referencedRelation: "dk_customers"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_orders_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
         ]
+      }
+      dk_organization_features: {
+        Row: {
+          available: boolean
+          feature_key: string
+          organization_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          available: boolean
+          feature_key: string
+          organization_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          available?: boolean
+          feature_key?: string
+          organization_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_organization_features_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "dk_features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_organization_features_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_organization_features_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_organization_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          is_super_admin: boolean
+          organization_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          is_super_admin?: boolean
+          organization_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          is_super_admin?: boolean
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_organization_members_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_organizations: {
+        Row: {
+          active: boolean
+          address: string | null
+          category: string | null
+          city: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_timezone: string
+          id: string
+          legal_name: string | null
+          max_accounts: number | null
+          name: string
+          owner_user_id: string
+          phone: string | null
+          sector: string | null
+          slug: string
+          tax_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_timezone?: string
+          id?: string
+          legal_name?: string | null
+          max_accounts?: number | null
+          name: string
+          owner_user_id: string
+          phone?: string | null
+          sector?: string | null
+          slug: string
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_timezone?: string
+          id?: string
+          legal_name?: string | null
+          max_accounts?: number | null
+          name?: string
+          owner_user_id?: string
+          phone?: string | null
+          sector?: string | null
+          slug?: string
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_organizations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_organizations_owner_user_id_fkey"
+            columns: ["owner_user_id"]
+            isOneToOne: true
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_permissions: {
+        Row: {
+          action: string
+          description: string | null
+          key: string
+          label: string
+          module: string
+          scope: string
+          sort_order: number
+        }
+        Insert: {
+          action: string
+          description?: string | null
+          key: string
+          label: string
+          module: string
+          scope: string
+          sort_order: number
+        }
+        Update: {
+          action?: string
+          description?: string | null
+          key?: string
+          label?: string
+          module?: string
+          scope?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       dk_product_categories: {
         Row: {
           created_at: string
           id: string
+          kitchen_id: string
           name: string
         }
         Insert: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           name: string
         }
         Update: {
           created_at?: string
           id?: string
+          kitchen_id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_product_categories_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_products: {
         Row: {
@@ -1490,8 +2100,11 @@ export type Database = {
           estimated_cost: number
           id: string
           image_path: string | null
+          kitchen_id: string
+          master_product_id: string | null
           name: string
           price: number
+          price_is_local: boolean
           updated_at: string
         }
         Insert: {
@@ -1504,8 +2117,11 @@ export type Database = {
           estimated_cost?: number
           id?: string
           image_path?: string | null
+          kitchen_id?: string
+          master_product_id?: string | null
           name: string
           price?: number
+          price_is_local?: boolean
           updated_at?: string
         }
         Update: {
@@ -1518,23 +2134,40 @@ export type Database = {
           estimated_cost?: number
           id?: string
           image_path?: string | null
+          kitchen_id?: string
+          master_product_id?: string | null
           name?: string
           price?: number
+          price_is_local?: boolean
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "dk_products_active_recipe_fkey"
-            columns: ["active_recipe_id"]
+            columns: ["kitchen_id", "active_recipe_id"]
             isOneToOne: false
             referencedRelation: "dk_recipes"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_products_category_id_fkey"
-            columns: ["category_id"]
+            columns: ["kitchen_id", "category_id"]
             isOneToOne: false
             referencedRelation: "dk_product_categories"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_products_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_products_master_product_id_fkey"
+            columns: ["master_product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_master_products"
             referencedColumns: ["id"]
           },
         ]
@@ -1544,6 +2177,7 @@ export type Database = {
           created_at: string
           id: string
           ingredient_id: string
+          kitchen_id: string
           line_total: number | null
           purchase_id: string
           purchase_unit_id: string
@@ -1554,6 +2188,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           line_total?: number | null
           purchase_id: string
           purchase_unit_id: string
@@ -1564,6 +2199,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           line_total?: number | null
           purchase_id?: string
           purchase_unit_id?: string
@@ -1573,24 +2209,24 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dk_purchase_items_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_purchase_items_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            foreignKeyName: "dk_purchase_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_purchase_items_purchase_id_fkey"
-            columns: ["purchase_id"]
+            columns: ["kitchen_id", "purchase_id"]
             isOneToOne: false
             referencedRelation: "dk_purchases"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_purchase_items_purchase_unit_id_fkey"
@@ -1608,6 +2244,7 @@ export type Database = {
           id: string
           invoice_date: string
           invoice_number: string
+          kitchen_id: string
           notes: string | null
           status: Database["public"]["Enums"]["dk_purchase_status"]
           subtotal: number
@@ -1622,6 +2259,7 @@ export type Database = {
           id?: string
           invoice_date: string
           invoice_number: string
+          kitchen_id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["dk_purchase_status"]
           subtotal?: number
@@ -1636,6 +2274,7 @@ export type Database = {
           id?: string
           invoice_date?: string
           invoice_number?: string
+          kitchen_id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["dk_purchase_status"]
           subtotal?: number
@@ -1653,11 +2292,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dk_purchases_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_purchases_supplier_id_fkey"
-            columns: ["supplier_id"]
+            columns: ["kitchen_id", "supplier_id"]
             isOneToOne: false
             referencedRelation: "dk_suppliers"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1666,6 +2312,7 @@ export type Database = {
           created_at: string
           id: string
           ingredient_id: string
+          kitchen_id: string
           quantity: number
           recipe_id: string
         }
@@ -1673,6 +2320,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           quantity: number
           recipe_id: string
         }
@@ -1680,30 +2328,31 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           quantity?: number
           recipe_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "dk_recipe_items_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_recipe_items_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            foreignKeyName: "dk_recipe_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_recipe_items_recipe_id_fkey"
-            columns: ["recipe_id"]
+            columns: ["kitchen_id", "recipe_id"]
             isOneToOne: false
             referencedRelation: "dk_recipes"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1713,6 +2362,7 @@ export type Database = {
           created_by: string | null
           id: string
           is_active: boolean
+          kitchen_id: string
           product_id: string
           version: number
         }
@@ -1721,6 +2371,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           product_id: string
           version: number
         }
@@ -1729,6 +2380,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           product_id?: string
           version?: number
         }
@@ -1741,18 +2393,86 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dk_recipes_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "dk_recipes_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_products"
+            referencedRelation: "dk_kitchens"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_recipes_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["kitchen_id", "product_id"]
             isOneToOne: false
-            referencedRelation: "dk_today_menu"
-            referencedColumns: ["product_id"]
+            referencedRelation: "dk_products"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_role_permissions: {
+        Row: {
+          permission_key: string
+          role_id: string
+        }
+        Insert: {
+          permission_key: string
+          role_id: string
+        }
+        Update: {
+          permission_key?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_role_permissions_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "dk_permissions"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_role_permissions_role_id_fkey_v2"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "dk_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_system: boolean
+          key: string
+          name: string
+          organization_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          key: string
+          name: string
+          organization_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          key?: string
+          name?: string
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_roles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1762,6 +2482,7 @@ export type Database = {
           created_at: string
           id: string
           ingredient_id: string
+          kitchen_id: string
           supplier_id: string
         }
         Insert: {
@@ -1769,6 +2490,7 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id: string
+          kitchen_id?: string
           supplier_id: string
         }
         Update: {
@@ -1776,29 +2498,30 @@ export type Database = {
           created_at?: string
           id?: string
           ingredient_id?: string
+          kitchen_id?: string
           supplier_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "dk_supplier_ingredients_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            columns: ["kitchen_id", "ingredient_id"]
             isOneToOne: false
             referencedRelation: "dk_ingredients"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
-            foreignKeyName: "dk_supplier_ingredients_ingredient_id_fkey"
-            columns: ["ingredient_id"]
+            foreignKeyName: "dk_supplier_ingredients_kitchen_id_fkey"
+            columns: ["kitchen_id"]
             isOneToOne: false
-            referencedRelation: "dk_supply_suggestions"
-            referencedColumns: ["ingredient_id"]
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dk_supplier_ingredients_supplier_id_fkey"
-            columns: ["supplier_id"]
+            columns: ["kitchen_id", "supplier_id"]
             isOneToOne: false
             referencedRelation: "dk_suppliers"
-            referencedColumns: ["id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -1810,6 +2533,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          kitchen_id: string
           name: string
           phone: string | null
           tax_id: string | null
@@ -1822,6 +2546,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          kitchen_id?: string
           name: string
           phone?: string | null
           tax_id?: string | null
@@ -1834,12 +2559,21 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          kitchen_id?: string
           name?: string
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_suppliers_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_units: {
         Row: {
@@ -1868,35 +2602,113 @@ export type Database = {
         }
         Relationships: []
       }
+      dk_user_activations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          organization_id: string
+          revoked_at: string | null
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          organization_id: string
+          revoked_at?: string | null
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_user_activations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_user_activations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_user_activations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_users: {
         Row: {
           active: boolean
-          auth_user_id: string
+          auth_user_id: string | null
+          avatar_key: string | null
           created_at: string
+          email: string | null
           full_name: string
           id: string
-          role: Database["public"]["Enums"]["dk_role"]
+          last_account_id: string | null
+          platform_role: string | null
+          role: Database["public"]["Enums"]["dk_role"] | null
           updated_at: string
         }
         Insert: {
           active?: boolean
-          auth_user_id: string
+          auth_user_id?: string | null
+          avatar_key?: string | null
           created_at?: string
+          email?: string | null
           full_name: string
           id?: string
-          role?: Database["public"]["Enums"]["dk_role"]
+          last_account_id?: string | null
+          platform_role?: string | null
+          role?: Database["public"]["Enums"]["dk_role"] | null
           updated_at?: string
         }
         Update: {
           active?: boolean
-          auth_user_id?: string
+          auth_user_id?: string | null
+          avatar_key?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
-          role?: Database["public"]["Enums"]["dk_role"]
+          last_account_id?: string | null
+          platform_role?: string | null
+          role?: Database["public"]["Enums"]["dk_role"] | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dk_users_last_account_id_fkey"
+            columns: ["last_account_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dk_weekly_menu_items: {
         Row: {
@@ -1905,6 +2717,7 @@ export type Database = {
           display_order: number
           id: string
           is_active: boolean
+          kitchen_id: string
           product_id: string
           updated_at: string
         }
@@ -1914,6 +2727,7 @@ export type Database = {
           display_order?: number
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           product_id: string
           updated_at?: string
         }
@@ -1923,3764 +2737,62 @@ export type Database = {
           display_order?: number
           id?: string
           is_active?: boolean
+          kitchen_id?: string
           product_id?: string
           updated_at?: string
         }
         Relationships: [
           {
+            foreignKeyName: "dk_weekly_menu_items_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dk_weekly_menu_items_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["kitchen_id", "product_id"]
             isOneToOne: false
             referencedRelation: "dk_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_weekly_menu_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "dk_today_menu"
-            referencedColumns: ["product_id"]
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
-      }
-      documentos_soporte: {
-        Row: {
-          cancelado_en: string | null
-          comentarios: string | null
-          conductor_id: string | null
-          consecutivo: number
-          created_at: string
-          empresa_transportadora_id: string | null
-          entidad_tipo: string
-          estado: string
-          fecha: string
-          id: string
-          motivo_cancelacion: string | null
-          tercero_nombre: string | null
-          updated_at: string
-          vehiculo_id: string | null
-          vehiculo_referencia_id: string | null
-          viaje_id: string | null
-        }
-        Insert: {
-          cancelado_en?: string | null
-          comentarios?: string | null
-          conductor_id?: string | null
-          consecutivo?: number
-          created_at?: string
-          empresa_transportadora_id?: string | null
-          entidad_tipo?: string
-          estado?: string
-          fecha?: string
-          id?: string
-          motivo_cancelacion?: string | null
-          tercero_nombre?: string | null
-          updated_at?: string
-          vehiculo_id?: string | null
-          vehiculo_referencia_id?: string | null
-          viaje_id?: string | null
-        }
-        Update: {
-          cancelado_en?: string | null
-          comentarios?: string | null
-          conductor_id?: string | null
-          consecutivo?: number
-          created_at?: string
-          empresa_transportadora_id?: string | null
-          entidad_tipo?: string
-          estado?: string
-          fecha?: string
-          id?: string
-          motivo_cancelacion?: string | null
-          tercero_nombre?: string | null
-          updated_at?: string
-          vehiculo_id?: string | null
-          vehiculo_referencia_id?: string | null
-          viaje_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentos_soporte_conductor_id_fkey"
-            columns: ["conductor_id"]
-            isOneToOne: false
-            referencedRelation: "conductores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_empresa_transportadora_id_fkey"
-            columns: ["empresa_transportadora_id"]
-            isOneToOne: false
-            referencedRelation: "empresas_pagadoras"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_vehiculo_referencia_id_fkey"
-            columns: ["vehiculo_referencia_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_vehiculo_referencia_id_fkey"
-            columns: ["vehiculo_referencia_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documentos_soporte_detalles: {
-        Row: {
-          categoria: string
-          created_at: string
-          documento_id: string
-          id: string
-          naturaleza: string | null
-          tipo: string
-          updated_at: string
-          valor: number
-        }
-        Insert: {
-          categoria: string
-          created_at?: string
-          documento_id: string
-          id?: string
-          naturaleza?: string | null
-          tipo: string
-          updated_at?: string
-          valor?: number
-        }
-        Update: {
-          categoria?: string
-          created_at?: string
-          documento_id?: string
-          id?: string
-          naturaleza?: string | null
-          tipo?: string
-          updated_at?: string
-          valor?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentos_soporte_detalles_documento_id_fkey"
-            columns: ["documento_id"]
-            isOneToOne: false
-            referencedRelation: "documentos_soporte"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documentos_soporte_grupos: {
-        Row: {
-          comentarios: string | null
-          consecutivo: number
-          created_at: string
-          id: string
-          nombre: string | null
-          updated_at: string
-        }
-        Insert: {
-          comentarios?: string | null
-          consecutivo?: number
-          created_at?: string
-          id?: string
-          nombre?: string | null
-          updated_at?: string
-        }
-        Update: {
-          comentarios?: string | null
-          consecutivo?: number
-          created_at?: string
-          id?: string
-          nombre?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      documentos_soporte_grupos_items: {
-        Row: {
-          created_at: string
-          documento_id: string
-          grupo_id: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          documento_id: string
-          grupo_id: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          documento_id?: string
-          grupo_id?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentos_soporte_grupos_items_documento_id_fkey"
-            columns: ["documento_id"]
-            isOneToOne: false
-            referencedRelation: "documentos_soporte"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_soporte_grupos_items_grupo_id_fkey"
-            columns: ["grupo_id"]
-            isOneToOne: false
-            referencedRelation: "documentos_soporte_grupos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      empresas_pagadoras: {
-        Row: {
-          activo: boolean
-          created_at: string
-          dias_vencimiento_cartera: number
-          id: string
-          nombre: string
-          nota: string | null
-          updated_at: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          dias_vencimiento_cartera?: number
-          id?: string
-          nombre: string
-          nota?: string | null
-          updated_at?: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          dias_vencimiento_cartera?: number
-          id?: string
-          nombre?: string
-          nota?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      in_agent_executions: {
-        Row: {
-          company_id: string | null
-          completed_at: string | null
-          conversation_id: string | null
-          data_import_ids: Json
-          duration_ms: number | null
-          error_messages: Json
-          estimated_cost_usd: number | null
-          id: string
-          mode: string
-          model: string | null
-          report_id: string | null
-          report_version_id: string | null
-          request_params: Json
-          started_at: string
-          status: string
-          system_version: string | null
-          triggered_by: string | null
-          usage_metadata: Json
-        }
-        Insert: {
-          company_id?: string | null
-          completed_at?: string | null
-          conversation_id?: string | null
-          data_import_ids?: Json
-          duration_ms?: number | null
-          error_messages?: Json
-          estimated_cost_usd?: number | null
-          id: string
-          mode: string
-          model?: string | null
-          report_id?: string | null
-          report_version_id?: string | null
-          request_params?: Json
-          started_at?: string
-          status: string
-          system_version?: string | null
-          triggered_by?: string | null
-          usage_metadata?: Json
-        }
-        Update: {
-          company_id?: string | null
-          completed_at?: string | null
-          conversation_id?: string | null
-          data_import_ids?: Json
-          duration_ms?: number | null
-          error_messages?: Json
-          estimated_cost_usd?: number | null
-          id?: string
-          mode?: string
-          model?: string | null
-          report_id?: string | null
-          report_version_id?: string | null
-          request_params?: Json
-          started_at?: string
-          status?: string
-          system_version?: string | null
-          triggered_by?: string | null
-          usage_metadata?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_agent_executions_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "in_companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_agent_executions_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "in_conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_agent_executions_report_id_fkey"
-            columns: ["report_id"]
-            isOneToOne: false
-            referencedRelation: "in_reports"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_agent_executions_report_version_id_fkey"
-            columns: ["report_version_id"]
-            isOneToOne: false
-            referencedRelation: "in_report_versions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_agent_executions_triggered_by_fkey"
-            columns: ["triggered_by"]
-            isOneToOne: false
-            referencedRelation: "in_users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_companies: {
-        Row: {
-          country: string | null
-          created_at: string
-          id: string
-          industry: string | null
-          name: string
-        }
-        Insert: {
-          country?: string | null
-          created_at?: string
-          id: string
-          industry?: string | null
-          name: string
-        }
-        Update: {
-          country?: string | null
-          created_at?: string
-          id?: string
-          industry?: string | null
-          name?: string
-        }
-        Relationships: []
-      }
-      in_conversations: {
-        Row: {
-          company_id: string | null
-          created_at: string
-          created_by: string | null
-          id: string
-          is_pinned: boolean
-          title: string | null
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          id: string
-          is_pinned?: boolean
-          title?: string | null
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          is_pinned?: boolean
-          title?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_conversations_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "in_companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_conversations_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "in_users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_data_imports: {
-        Row: {
-          company_id: string
-          completed_at: string | null
-          created_at: string
-          data_source_id: string
-          file_hash: string | null
-          id: string
-          imported_by: string | null
-          row_count: number | null
-          source_file_ref: string | null
-          started_at: string | null
-          status: string
-          warning_count: number | null
-          warnings: Json
-        }
-        Insert: {
-          company_id: string
-          completed_at?: string | null
-          created_at?: string
-          data_source_id: string
-          file_hash?: string | null
-          id: string
-          imported_by?: string | null
-          row_count?: number | null
-          source_file_ref?: string | null
-          started_at?: string | null
-          status: string
-          warning_count?: number | null
-          warnings?: Json
-        }
-        Update: {
-          company_id?: string
-          completed_at?: string | null
-          created_at?: string
-          data_source_id?: string
-          file_hash?: string | null
-          id?: string
-          imported_by?: string | null
-          row_count?: number | null
-          source_file_ref?: string | null
-          started_at?: string | null
-          status?: string
-          warning_count?: number | null
-          warnings?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_data_imports_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "in_companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_data_imports_data_source_id_fkey"
-            columns: ["data_source_id"]
-            isOneToOne: false
-            referencedRelation: "in_data_sources"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_data_imports_imported_by_fkey"
-            columns: ["imported_by"]
-            isOneToOne: false
-            referencedRelation: "in_users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_data_sources: {
-        Row: {
-          company_id: string
-          config: Json
-          created_at: string
-          id: string
-          is_active: boolean
-          name: string
-          source_type: string
-        }
-        Insert: {
-          company_id: string
-          config?: Json
-          created_at?: string
-          id: string
-          is_active?: boolean
-          name: string
-          source_type: string
-        }
-        Update: {
-          company_id?: string
-          config?: Json
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name?: string
-          source_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_data_sources_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "in_companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_messages: {
-        Row: {
-          content: string
-          conversation_id: string
-          created_at: string
-          id: string
-          role: string
-        }
-        Insert: {
-          content: string
-          conversation_id: string
-          created_at?: string
-          id: string
-          role: string
-        }
-        Update: {
-          content?: string
-          conversation_id?: string
-          created_at?: string
-          id?: string
-          role?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "in_conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_report_templates: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean
-          key: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id: string
-          is_active?: boolean
-          key: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          key?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      in_report_versions: {
-        Row: {
-          change_summary: string | null
-          created_at: string
-          file_path: string
-          format: string
-          id: string
-          report_id: string
-          specification_json: Json
-          template_id: string | null
-          version: number
-        }
-        Insert: {
-          change_summary?: string | null
-          created_at?: string
-          file_path: string
-          format?: string
-          id: string
-          report_id: string
-          specification_json: Json
-          template_id?: string | null
-          version: number
-        }
-        Update: {
-          change_summary?: string | null
-          created_at?: string
-          file_path?: string
-          format?: string
-          id?: string
-          report_id?: string
-          specification_json?: Json
-          template_id?: string | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_report_versions_report_id_fkey"
-            columns: ["report_id"]
-            isOneToOne: false
-            referencedRelation: "in_reports"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_report_versions_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "in_report_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_reports: {
-        Row: {
-          company: string | null
-          company_id: string | null
-          conversation_id: string
-          created_at: string
-          id: string
-        }
-        Insert: {
-          company?: string | null
-          company_id?: string | null
-          conversation_id: string
-          created_at?: string
-          id: string
-        }
-        Update: {
-          company?: string | null
-          company_id?: string | null
-          conversation_id?: string
-          created_at?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "in_reports_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "in_companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "in_reports_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "in_conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      in_users: {
-        Row: {
-          created_at: string
-          display_name: string | null
-          id: string
-          role: string
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          display_name?: string | null
-          id: string
-          role?: string
-          username: string
-        }
-        Update: {
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          role?: string
-          username?: string
-        }
-        Relationships: []
-      }
-      incidencias: {
-        Row: {
-          activo: boolean
-          created_at: string
-          descripcion: string | null
-          estado: Database["public"]["Enums"]["estado_incidencia"]
-          fecha: string
-          id: string
-          prioridad: Database["public"]["Enums"]["prioridad_incidencia"]
-          resuelta_en: string | null
-          tipo: Database["public"]["Enums"]["tipo_incidencia"]
-          titulo: string
-          updated_at: string
-          vehiculo_id: string | null
-          viaje_id: string | null
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          descripcion?: string | null
-          estado?: Database["public"]["Enums"]["estado_incidencia"]
-          fecha?: string
-          id?: string
-          prioridad?: Database["public"]["Enums"]["prioridad_incidencia"]
-          resuelta_en?: string | null
-          tipo?: Database["public"]["Enums"]["tipo_incidencia"]
-          titulo: string
-          updated_at?: string
-          vehiculo_id?: string | null
-          viaje_id?: string | null
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          descripcion?: string | null
-          estado?: Database["public"]["Enums"]["estado_incidencia"]
-          fecha?: string
-          id?: string
-          prioridad?: Database["public"]["Enums"]["prioridad_incidencia"]
-          resuelta_en?: string | null
-          tipo?: Database["public"]["Enums"]["tipo_incidencia"]
-          titulo?: string
-          updated_at?: string
-          vehiculo_id?: string | null
-          viaje_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "incidencias_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "incidencias_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "incidencias_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "incidencias_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ipler_audit_log: {
-        Row: {
-          action: string
-          actor_id: string | null
-          actor_username: string
-          created_at: string
-          details: Json
-          id: number
-          target: string | null
-        }
-        Insert: {
-          action: string
-          actor_id?: string | null
-          actor_username: string
-          created_at?: string
-          details?: Json
-          id?: never
-          target?: string | null
-        }
-        Update: {
-          action?: string
-          actor_id?: string | null
-          actor_username?: string
-          created_at?: string
-          details?: Json
-          id?: never
-          target?: string | null
-        }
-        Relationships: []
-      }
-      ipler_execution_log: {
-        Row: {
-          candidatos_omitidos: number
-          candidatos_procesados: number
-          created_at: string
-          execution_id: string
-          id: number
-          mensaje: string | null
-          spreadsheet_id: string | null
-          status: string
-          timestamp_fin: string | null
-          timestamp_inicio: string | null
-        }
-        Insert: {
-          candidatos_omitidos?: number
-          candidatos_procesados?: number
-          created_at?: string
-          execution_id: string
-          id?: never
-          mensaje?: string | null
-          spreadsheet_id?: string | null
-          status: string
-          timestamp_fin?: string | null
-          timestamp_inicio?: string | null
-        }
-        Update: {
-          candidatos_omitidos?: number
-          candidatos_procesados?: number
-          created_at?: string
-          execution_id?: string
-          id?: never
-          mensaje?: string | null
-          spreadsheet_id?: string | null
-          status?: string
-          timestamp_fin?: string | null
-          timestamp_inicio?: string | null
-        }
-        Relationships: []
-      }
-      ipler_users: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          must_change_password: boolean
-          role: string
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id: string
-          must_change_password?: boolean
-          role: string
-          username: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          must_change_password?: boolean
-          role?: string
-          username?: string
-        }
-        Relationships: []
-      }
-      ipler_workflow_config: {
-        Row: {
-          computrabajo_email: string
-          computrabajo_password: string | null
-          empresa_cf: string
-          id: string
-          max_candidatos: number
-          oferta_oi: string
-          portal_base_url: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          computrabajo_email: string
-          computrabajo_password?: string | null
-          empresa_cf: string
-          id?: string
-          max_candidatos?: number
-          oferta_oi: string
-          portal_base_url: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          computrabajo_email?: string
-          computrabajo_password?: string | null
-          empresa_cf?: string
-          id?: string
-          max_candidatos?: number
-          oferta_oi?: string
-          portal_base_url?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      mantenimientos: {
-        Row: {
-          activo: boolean
-          created_at: string
-          descripcion: string
-          facturado: boolean
-          fecha: string
-          id: string
-          proveedor: string | null
-          valor: number
-          vehiculo_id: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          descripcion: string
-          facturado?: boolean
-          fecha?: string
-          id?: string
-          proveedor?: string | null
-          valor?: number
-          vehiculo_id: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          descripcion?: string
-          facturado?: boolean
-          fecha?: string
-          id?: string
-          proveedor?: string | null
-          valor?: number
-          vehiculo_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mantenimientos_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "mantenimientos_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      obligaciones: {
-        Row: {
-          activo: boolean
-          concepto_id: string
-          created_at: string
-          id: string
-          mes: string
-          monto: number
-          pagado: boolean
-        }
-        Insert: {
-          activo?: boolean
-          concepto_id: string
-          created_at?: string
-          id?: string
-          mes: string
-          monto?: number
-          pagado?: boolean
-        }
-        Update: {
-          activo?: boolean
-          concepto_id?: string
-          created_at?: string
-          id?: string
-          mes?: string
-          monto?: number
-          pagado?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "obligaciones_concepto_id_fkey"
-            columns: ["concepto_id"]
-            isOneToOne: false
-            referencedRelation: "conceptos_obligacion"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      pagos: {
-        Row: {
-          activo: boolean
-          created_at: string
-          descripcion: string | null
-          fecha: string
-          id: string
-          tipo_transaccion: string
-          valor: number
-          viaje_id: string | null
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          descripcion?: string | null
-          fecha: string
-          id?: string
-          tipo_transaccion?: string
-          valor: number
-          viaje_id?: string | null
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          descripcion?: string | null
-          fecha?: string
-          id?: string
-          tipo_transaccion?: string
-          valor?: number
-          viaje_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pagos_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pagos_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      pagos_conductor: {
-        Row: {
-          comentarios: string | null
-          created_at: string
-          fecha_pago: string
-          id: string
-          tipo_pago: string
-          valor: number
-          viaje_id: string
-        }
-        Insert: {
-          comentarios?: string | null
-          created_at?: string
-          fecha_pago?: string
-          id?: string
-          tipo_pago: string
-          valor?: number
-          viaje_id: string
-        }
-        Update: {
-          comentarios?: string | null
-          created_at?: string
-          fecha_pago?: string
-          id?: string
-          tipo_pago?: string
-          valor?: number
-          viaje_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pagos_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pagos_conductor_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      peajes_transacciones: {
-        Row: {
-          activo: boolean
-          comercio: string | null
-          created_at: string
-          documento_soporte_id: string | null
-          estado_asignacion: string
-          estado_transaccion: string | null
-          fecha_paso: string | null
-          fecha_transaccion: string
-          id: string
-          placa: string | null
-          servicio: string | null
-          updated_at: string
-          valor: number
-          vehiculo_id: string | null
-          viaje_id: string | null
-        }
-        Insert: {
-          activo?: boolean
-          comercio?: string | null
-          created_at?: string
-          documento_soporte_id?: string | null
-          estado_asignacion?: string
-          estado_transaccion?: string | null
-          fecha_paso?: string | null
-          fecha_transaccion: string
-          id?: string
-          placa?: string | null
-          servicio?: string | null
-          updated_at?: string
-          valor: number
-          vehiculo_id?: string | null
-          viaje_id?: string | null
-        }
-        Update: {
-          activo?: boolean
-          comercio?: string | null
-          created_at?: string
-          documento_soporte_id?: string | null
-          estado_asignacion?: string
-          estado_transaccion?: string | null
-          fecha_paso?: string | null
-          fecha_transaccion?: string
-          id?: string
-          placa?: string | null
-          servicio?: string | null
-          updated_at?: string
-          valor?: number
-          vehiculo_id?: string | null
-          viaje_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "peajes_transacciones_documento_soporte_id_fkey"
-            columns: ["documento_soporte_id"]
-            isOneToOne: false
-            referencedRelation: "documentos_soporte"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "peajes_transacciones_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "peajes_transacciones_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "peajes_transacciones_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "v_viajes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "peajes_transacciones_viaje_id_fkey"
-            columns: ["viaje_id"]
-            isOneToOne: false
-            referencedRelation: "viajes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      productos: {
-        Row: {
-          activo: boolean
-          created_at: string
-          id: string
-          nombre: string
-          requiere_frio: boolean
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          id?: string
-          nombre: string
-          requiere_frio?: boolean
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          id?: string
-          nombre?: string
-          requiere_frio?: boolean
-        }
-        Relationships: []
-      }
-      rutas: {
-        Row: {
-          activo: boolean
-          consecutivo: number
-          created_at: string
-          destino: string
-          distancia_km: number | null
-          id: string
-          origen: string
-          peajes: number
-          tiempo_estimado_horas: number | null
-        }
-        Insert: {
-          activo?: boolean
-          consecutivo?: number
-          created_at?: string
-          destino: string
-          distancia_km?: number | null
-          id?: string
-          origen: string
-          peajes?: number
-          tiempo_estimado_horas?: number | null
-        }
-        Update: {
-          activo?: boolean
-          consecutivo?: number
-          created_at?: string
-          destino?: string
-          distancia_km?: number | null
-          id?: string
-          origen?: string
-          peajes?: number
-          tiempo_estimado_horas?: number | null
-        }
-        Relationships: []
-      }
-      salidas_almacen: {
-        Row: {
-          asunto_original: string | null
-          created_at: string
-          empresa_cliente: string | null
-          fecha_solicitud: string | null
-          gmail_message_id: string | null
-          id: number
-          motivo: string | null
-          productos: Json | null
-          resumen_ejecutivo: string | null
-          solicitante_email: string | null
-          solicitante_nombre: string | null
-        }
-        Insert: {
-          asunto_original?: string | null
-          created_at?: string
-          empresa_cliente?: string | null
-          fecha_solicitud?: string | null
-          gmail_message_id?: string | null
-          id?: never
-          motivo?: string | null
-          productos?: Json | null
-          resumen_ejecutivo?: string | null
-          solicitante_email?: string | null
-          solicitante_nombre?: string | null
-        }
-        Update: {
-          asunto_original?: string | null
-          created_at?: string
-          empresa_cliente?: string | null
-          fecha_solicitud?: string | null
-          gmail_message_id?: string | null
-          id?: never
-          motivo?: string | null
-          productos?: Json | null
-          resumen_ejecutivo?: string | null
-          solicitante_email?: string | null
-          solicitante_nombre?: string | null
-        }
-        Relationships: []
-      }
-      sc_auditoria: {
-        Row: {
-          accion: string
-          created_at: string
-          detalle: Json | null
-          id: string
-          informe_id: string | null
-          usuario_id: string | null
-        }
-        Insert: {
-          accion: string
-          created_at?: string
-          detalle?: Json | null
-          id?: string
-          informe_id?: string | null
-          usuario_id?: string | null
-        }
-        Update: {
-          accion?: string
-          created_at?: string
-          detalle?: Json | null
-          id?: string
-          informe_id?: string | null
-          usuario_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_auditoria_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sc_clasificaciones: {
-        Row: {
-          confianza: number | null
-          cuenta_id: string
-          estado: string
-          id: string
-          informe_id: string
-          origen: string
-          razon: string | null
-          rubro_codigo: string | null
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          confianza?: number | null
-          cuenta_id: string
-          estado?: string
-          id?: string
-          informe_id: string
-          origen: string
-          razon?: string | null
-          rubro_codigo?: string | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          confianza?: number | null
-          cuenta_id?: string
-          estado?: string
-          id?: string
-          informe_id?: string
-          origen?: string
-          razon?: string | null
-          rubro_codigo?: string | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_clasificaciones_cuenta_id_fkey"
-            columns: ["cuenta_id"]
-            isOneToOne: true
-            referencedRelation: "sc_cuentas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sc_clasificaciones_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sc_clasificaciones_rubro_codigo_fkey"
-            columns: ["rubro_codigo"]
-            isOneToOne: false
-            referencedRelation: "sc_rubros"
-            referencedColumns: ["codigo"]
-          },
-        ]
-      }
-      sc_cuentas: {
-        Row: {
-          celda_actual: string | null
-          celda_anterior: string | null
-          clave: string | null
-          codigo: string
-          codigo_padre: string | null
-          created_at: string
-          es_hoja: boolean
-          fila_anterior: number | null
-          fila_origen: number | null
-          id: string
-          informe_id: string
-          nit: string | null
-          nivel: string
-          nombre: string
-          saldo_actual: number | null
-          saldo_anterior: number | null
-          saldo_inicial: number | null
-        }
-        Insert: {
-          celda_actual?: string | null
-          celda_anterior?: string | null
-          clave?: string | null
-          codigo: string
-          codigo_padre?: string | null
-          created_at?: string
-          es_hoja?: boolean
-          fila_anterior?: number | null
-          fila_origen?: number | null
-          id?: string
-          informe_id: string
-          nit?: string | null
-          nivel: string
-          nombre: string
-          saldo_actual?: number | null
-          saldo_anterior?: number | null
-          saldo_inicial?: number | null
-        }
-        Update: {
-          celda_actual?: string | null
-          celda_anterior?: string | null
-          clave?: string | null
-          codigo?: string
-          codigo_padre?: string | null
-          created_at?: string
-          es_hoja?: boolean
-          fila_anterior?: number | null
-          fila_origen?: number | null
-          id?: string
-          informe_id?: string
-          nit?: string | null
-          nivel?: string
-          nombre?: string
-          saldo_actual?: number | null
-          saldo_anterior?: number | null
-          saldo_inicial?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_cuentas_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sc_empresas: {
-        Row: {
-          created_at: string
-          id: string
-          nit: string | null
-          nombre: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          nit?: string | null
-          nombre: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          nit?: string | null
-          nombre?: string
-        }
-        Relationships: []
-      }
-      sc_informes: {
-        Row: {
-          aprobado_at: string | null
-          aprobado_por: string | null
-          creado_por: string | null
-          created_at: string
-          empresa_id: string | null
-          estado: string
-          hoja_anterior: string | null
-          hoja_notas: string | null
-          hoja_origen: string | null
-          id: string
-          identificacion: Json | null
-          mapeo_columnas: Json | null
-          nombre_archivo: string
-          periodo_actual: number
-          periodo_anterior: number | null
-          reporte_extraccion: Json | null
-        }
-        Insert: {
-          aprobado_at?: string | null
-          aprobado_por?: string | null
-          creado_por?: string | null
-          created_at?: string
-          empresa_id?: string | null
-          estado?: string
-          hoja_anterior?: string | null
-          hoja_notas?: string | null
-          hoja_origen?: string | null
-          id?: string
-          identificacion?: Json | null
-          mapeo_columnas?: Json | null
-          nombre_archivo: string
-          periodo_actual: number
-          periodo_anterior?: number | null
-          reporte_extraccion?: Json | null
-        }
-        Update: {
-          aprobado_at?: string | null
-          aprobado_por?: string | null
-          creado_por?: string | null
-          created_at?: string
-          empresa_id?: string | null
-          estado?: string
-          hoja_anterior?: string | null
-          hoja_notas?: string | null
-          hoja_origen?: string | null
-          id?: string
-          identificacion?: Json | null
-          mapeo_columnas?: Json | null
-          nombre_archivo?: string
-          periodo_actual?: number
-          periodo_anterior?: number | null
-          reporte_extraccion?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_informes_empresa_id_fkey"
-            columns: ["empresa_id"]
-            isOneToOne: false
-            referencedRelation: "sc_empresas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sc_mapeos_confirmados: {
-        Row: {
-          codigo: string
-          confirmado_por: string | null
-          created_at: string
-          empresa_id: string
-          id: string
-          nombre_norm: string
-          rubro_codigo: string
-        }
-        Insert: {
-          codigo: string
-          confirmado_por?: string | null
-          created_at?: string
-          empresa_id: string
-          id?: string
-          nombre_norm: string
-          rubro_codigo: string
-        }
-        Update: {
-          codigo?: string
-          confirmado_por?: string | null
-          created_at?: string
-          empresa_id?: string
-          id?: string
-          nombre_norm?: string
-          rubro_codigo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_mapeos_confirmados_empresa_id_fkey"
-            columns: ["empresa_id"]
-            isOneToOne: false
-            referencedRelation: "sc_empresas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sc_mapeos_confirmados_rubro_codigo_fkey"
-            columns: ["rubro_codigo"]
-            isOneToOne: false
-            referencedRelation: "sc_rubros"
-            referencedColumns: ["codigo"]
-          },
-        ]
-      }
-      sc_notas_archivo: {
-        Row: {
-          created_at: string
-          fila_fin: number | null
-          fila_inicio: number | null
-          id: string
-          informe_id: string
-          numero: string | null
-          orden: number
-          seccion: string | null
-          titulo: string
-        }
-        Insert: {
-          created_at?: string
-          fila_fin?: number | null
-          fila_inicio?: number | null
-          id?: string
-          informe_id: string
-          numero?: string | null
-          orden: number
-          seccion?: string | null
-          titulo: string
-        }
-        Update: {
-          created_at?: string
-          fila_fin?: number | null
-          fila_inicio?: number | null
-          id?: string
-          informe_id?: string
-          numero?: string | null
-          orden?: number
-          seccion?: string | null
-          titulo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_notas_archivo_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sc_notas_archivo_lineas: {
-        Row: {
-          celda_actual: string | null
-          celda_anterior: string | null
-          etiqueta: string | null
-          fila_origen: number | null
-          id: string
-          informe_id: string
-          nota_id: string
-          orden: number
-          sangria: number
-          tipo: string
-          valor_actual: number | null
-          valor_anterior: number | null
-        }
-        Insert: {
-          celda_actual?: string | null
-          celda_anterior?: string | null
-          etiqueta?: string | null
-          fila_origen?: number | null
-          id?: string
-          informe_id: string
-          nota_id: string
-          orden: number
-          sangria?: number
-          tipo: string
-          valor_actual?: number | null
-          valor_anterior?: number | null
-        }
-        Update: {
-          celda_actual?: string | null
-          celda_anterior?: string | null
-          etiqueta?: string | null
-          fila_origen?: number | null
-          id?: string
-          informe_id?: string
-          nota_id?: string
-          orden?: number
-          sangria?: number
-          tipo?: string
-          valor_actual?: number | null
-          valor_anterior?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_notas_archivo_lineas_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sc_notas_archivo_lineas_nota_id_fkey"
-            columns: ["nota_id"]
-            isOneToOne: false
-            referencedRelation: "sc_notas_archivo"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sc_reglas_mapeo: {
-        Row: {
-          activo: boolean
-          created_at: string
-          id: string
-          origen: string
-          prefijo: string
-          prioridad: number
-          rubro_codigo: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          id?: string
-          origen?: string
-          prefijo: string
-          prioridad?: number
-          rubro_codigo: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          id?: string
-          origen?: string
-          prefijo?: string
-          prioridad?: number
-          rubro_codigo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_reglas_mapeo_rubro_codigo_fkey"
-            columns: ["rubro_codigo"]
-            isOneToOne: false
-            referencedRelation: "sc_rubros"
-            referencedColumns: ["codigo"]
-          },
-        ]
-      }
-      sc_rubros: {
-        Row: {
-          activo: boolean
-          codigo: string
-          created_at: string
-          estado: string
-          id: string
-          naturaleza: string
-          nombre: string
-          nota_numero: number | null
-          orden: number
-          origen: string
-          seccion: string
-        }
-        Insert: {
-          activo?: boolean
-          codigo: string
-          created_at?: string
-          estado: string
-          id?: string
-          naturaleza?: string
-          nombre: string
-          nota_numero?: number | null
-          orden?: number
-          origen?: string
-          seccion: string
-        }
-        Update: {
-          activo?: boolean
-          codigo?: string
-          created_at?: string
-          estado?: string
-          id?: string
-          naturaleza?: string
-          nombre?: string
-          nota_numero?: number | null
-          orden?: number
-          origen?: string
-          seccion?: string
-        }
-        Relationships: []
-      }
-      sc_validaciones: {
-        Row: {
-          bloqueante: boolean
-          codigo: string
-          created_at: string
-          detalle: Json | null
-          id: string
-          informe_id: string
-          ok: boolean
-          titulo: string
-        }
-        Insert: {
-          bloqueante?: boolean
-          codigo: string
-          created_at?: string
-          detalle?: Json | null
-          id?: string
-          informe_id: string
-          ok: boolean
-          titulo: string
-        }
-        Update: {
-          bloqueante?: boolean
-          codigo?: string
-          created_at?: string
-          detalle?: Json | null
-          id?: string
-          informe_id?: string
-          ok?: boolean
-          titulo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sc_validaciones_informe_id_fkey"
-            columns: ["informe_id"]
-            isOneToOne: false
-            referencedRelation: "sc_informes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_archivos_cierre: {
-        Row: {
-          created_at: string
-          errores: Json | null
-          estacion_id: string
-          estado: string
-          fecha: string
-          hash_archivo: string | null
-          hojas_detectadas: Json | null
-          id: string
-          nombre_archivo: string
-          procesado_en: string | null
-          subido_por: string | null
-          tamano_bytes: number | null
-          version: number
-        }
-        Insert: {
-          created_at?: string
-          errores?: Json | null
-          estacion_id: string
-          estado?: string
-          fecha: string
-          hash_archivo?: string | null
-          hojas_detectadas?: Json | null
-          id?: string
-          nombre_archivo: string
-          procesado_en?: string | null
-          subido_por?: string | null
-          tamano_bytes?: number | null
-          version?: number
-        }
-        Update: {
-          created_at?: string
-          errores?: Json | null
-          estacion_id?: string
-          estado?: string
-          fecha?: string
-          hash_archivo?: string | null
-          hojas_detectadas?: Json | null
-          id?: string
-          nombre_archivo?: string
-          procesado_en?: string | null
-          subido_por?: string | null
-          tamano_bytes?: number | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_archivos_cierre_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_archivos_cierre_historial: {
-        Row: {
-          archivo_id: string
-          errores: Json | null
-          estado_resultado: string
-          hash_archivo: string | null
-          id: string
-          procesado_en: string
-          version: number
-        }
-        Insert: {
-          archivo_id: string
-          errores?: Json | null
-          estado_resultado: string
-          hash_archivo?: string | null
-          id?: string
-          procesado_en?: string
-          version: number
-        }
-        Update: {
-          archivo_id?: string
-          errores?: Json | null
-          estado_resultado?: string
-          hash_archivo?: string | null
-          id?: string
-          procesado_en?: string
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_archivos_cierre_historial_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_auditoria: {
-        Row: {
-          accion: string
-          archivo_id: string | null
-          created_at: string
-          created_by: string | null
-          detalle: Json | null
-          entidad: string
-          entidad_id: string | null
-          estacion_id: string
-          id: string
-          nivel: string
-        }
-        Insert: {
-          accion: string
-          archivo_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          detalle?: Json | null
-          entidad: string
-          entidad_id?: string | null
-          estacion_id: string
-          id?: string
-          nivel?: string
-        }
-        Update: {
-          accion?: string
-          archivo_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          detalle?: Json | null
-          entidad?: string
-          entidad_id?: string | null
-          estacion_id?: string
-          id?: string
-          nivel?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_auditoria_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_auditoria_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_ausencias: {
-        Row: {
-          created_at: string
-          estacion_id: string
-          fecha_desde: string
-          fecha_hasta: string
-          id: string
-          nota: string | null
-          promotor_id: string
-          tipo: string
-        }
-        Insert: {
-          created_at?: string
-          estacion_id: string
-          fecha_desde: string
-          fecha_hasta: string
-          id?: string
-          nota?: string | null
-          promotor_id: string
-          tipo: string
-        }
-        Update: {
-          created_at?: string
-          estacion_id?: string
-          fecha_desde?: string
-          fecha_hasta?: string
-          id?: string
-          nota?: string | null
-          promotor_id?: string
-          tipo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_ausencias_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_ausencias_promotor_id_fkey"
-            columns: ["promotor_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_promotores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_balance_diario_producto: {
-        Row: {
-          calculado_en: string
-          estacion_id: string
-          estado: string
-          fecha: string
-          fluctuacion_acumulada: number | null
-          fluctuacion_dia: number | null
-          fluctuacion_valor: number | null
-          id: string
-          inventario_final_real: number | null
-          inventario_inicial: number | null
-          inventario_teorico: number | null
-          precio_vigente: number | null
-          producto_id: string
-          recibos_galones: number
-          ventas_galones: number
-        }
-        Insert: {
-          calculado_en?: string
-          estacion_id: string
-          estado?: string
-          fecha: string
-          fluctuacion_acumulada?: number | null
-          fluctuacion_dia?: number | null
-          fluctuacion_valor?: number | null
-          id?: string
-          inventario_final_real?: number | null
-          inventario_inicial?: number | null
-          inventario_teorico?: number | null
-          precio_vigente?: number | null
-          producto_id: string
-          recibos_galones?: number
-          ventas_galones?: number
-        }
-        Update: {
-          calculado_en?: string
-          estacion_id?: string
-          estado?: string
-          fecha?: string
-          fluctuacion_acumulada?: number | null
-          fluctuacion_dia?: number | null
-          fluctuacion_valor?: number | null
-          id?: string
-          inventario_final_real?: number | null
-          inventario_inicial?: number | null
-          inventario_teorico?: number | null
-          precio_vigente?: number | null
-          producto_id?: string
-          recibos_galones?: number
-          ventas_galones?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_balance_diario_producto_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_balance_diario_producto_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_cierre_diario: {
-        Row: {
-          archivo_id: string | null
-          calculado_en: string
-          certificacion_bancaria: number | null
-          diferencia_caja: number | null
-          diferencia_caja_acumulada: number | null
-          diferencia_certificacion: number | null
-          efectivo_calculado: number | null
-          efectivo_real: number | null
-          estacion_id: string
-          estado: string
-          fecha: string
-          id: string
-          numero_clientes: number | null
-          venta_galones_total: number
-          venta_total: number
-        }
-        Insert: {
-          archivo_id?: string | null
-          calculado_en?: string
-          certificacion_bancaria?: number | null
-          diferencia_caja?: number | null
-          diferencia_caja_acumulada?: number | null
-          diferencia_certificacion?: number | null
-          efectivo_calculado?: number | null
-          efectivo_real?: number | null
-          estacion_id: string
-          estado?: string
-          fecha: string
-          id?: string
-          numero_clientes?: number | null
-          venta_galones_total?: number
-          venta_total?: number
-        }
-        Update: {
-          archivo_id?: string | null
-          calculado_en?: string
-          certificacion_bancaria?: number | null
-          diferencia_caja?: number | null
-          diferencia_caja_acumulada?: number | null
-          diferencia_certificacion?: number | null
-          efectivo_calculado?: number | null
-          efectivo_real?: number | null
-          estacion_id?: string
-          estado?: string
-          fecha?: string
-          id?: string
-          numero_clientes?: number | null
-          venta_galones_total?: number
-          venta_total?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_cierre_diario_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_cierre_diario_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_cuentas_cliente: {
-        Row: {
-          activo: boolean
-          created_at: string
-          estacion_id: string
-          id: string
-          nit: string | null
-          nombre: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          estacion_id: string
-          id?: string
-          nit?: string | null
-          nombre: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          nit?: string | null
-          nombre?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_cuentas_cliente_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_despachos_producto: {
-        Row: {
-          archivo_id: string
-          cantidad: number
-          created_at: string
-          descuento: number | null
-          estacion_id: string
-          fecha: string
-          id: string
-          precio: number | null
-          producto_id: string | null
-          producto_nombre_original: string
-          unidad: string | null
-          venta_total: number | null
-        }
-        Insert: {
-          archivo_id: string
-          cantidad?: number
-          created_at?: string
-          descuento?: number | null
-          estacion_id: string
-          fecha: string
-          id?: string
-          precio?: number | null
-          producto_id?: string | null
-          producto_nombre_original: string
-          unidad?: string | null
-          venta_total?: number | null
-        }
-        Update: {
-          archivo_id?: string
-          cantidad?: number
-          created_at?: string
-          descuento?: number | null
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          precio?: number | null
-          producto_id?: string | null
-          producto_nombre_original?: string
-          unidad?: string | null
-          venta_total?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_despachos_producto_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_despachos_producto_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_despachos_producto_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_efectivo_diario: {
-        Row: {
-          capturado_en: string
-          capturado_por: string | null
-          certificacion_bancaria: number | null
-          efectivo_real: number | null
-          estacion_id: string
-          fecha: string
-          id: string
-          notas: string | null
-          origen: string
-        }
-        Insert: {
-          capturado_en?: string
-          capturado_por?: string | null
-          certificacion_bancaria?: number | null
-          efectivo_real?: number | null
-          estacion_id: string
-          fecha: string
-          id?: string
-          notas?: string | null
-          origen?: string
-        }
-        Update: {
-          capturado_en?: string
-          capturado_por?: string | null
-          certificacion_bancaria?: number | null
-          efectivo_real?: number | null
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          notas?: string | null
-          origen?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_efectivo_diario_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_esquema_reglas: {
-        Row: {
-          created_at: string
-          dia_semana: number | null
-          esquema_id: string
-          estacion_id: string
-          fecha: string | null
-          id: string
-          isla_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          dia_semana?: number | null
-          esquema_id: string
-          estacion_id: string
-          fecha?: string | null
-          id?: string
-          isla_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          dia_semana?: number | null
-          esquema_id?: string
-          estacion_id?: string
-          fecha?: string | null
-          id?: string
-          isla_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_esquema_reglas_esquema_id_fkey"
-            columns: ["esquema_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_esquemas_turno"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_esquema_reglas_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_esquema_reglas_isla_id_fkey"
-            columns: ["isla_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_islas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_esquemas_turno: {
-        Row: {
-          created_at: string
-          es_predeterminado: boolean
-          estacion_id: string
-          id: string
-          nombre: string
-        }
-        Insert: {
-          created_at?: string
-          es_predeterminado?: boolean
-          estacion_id: string
-          id?: string
-          nombre: string
-        }
-        Update: {
-          created_at?: string
-          es_predeterminado?: boolean
-          estacion_id?: string
-          id?: string
-          nombre?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_esquemas_turno_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_estacion_config: {
-        Row: {
-          clave: string
-          created_at: string
-          descripcion: string | null
-          estacion_id: string
-          id: string
-          updated_at: string
-          valor: string
-        }
-        Insert: {
-          clave: string
-          created_at?: string
-          descripcion?: string | null
-          estacion_id: string
-          id?: string
-          updated_at?: string
-          valor: string
-        }
-        Update: {
-          clave?: string
-          created_at?: string
-          descripcion?: string | null
-          estacion_id?: string
-          id?: string
-          updated_at?: string
-          valor?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_estacion_config_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_estaciones: {
-        Row: {
-          activa: boolean
-          bandera: string | null
-          ciudad: string | null
-          created_at: string
-          direccion: string | null
-          email: string | null
-          id: string
-          moneda: string
-          nit: string | null
-          nombre: string
-          razon_social: string | null
-          telefono: string | null
-          zona_horaria: string
-        }
-        Insert: {
-          activa?: boolean
-          bandera?: string | null
-          ciudad?: string | null
-          created_at?: string
-          direccion?: string | null
-          email?: string | null
-          id?: string
-          moneda?: string
-          nit?: string | null
-          nombre: string
-          razon_social?: string | null
-          telefono?: string | null
-          zona_horaria?: string
-        }
-        Update: {
-          activa?: boolean
-          bandera?: string | null
-          ciudad?: string | null
-          created_at?: string
-          direccion?: string | null
-          email?: string | null
-          id?: string
-          moneda?: string
-          nit?: string | null
-          nombre?: string
-          razon_social?: string | null
-          telefono?: string | null
-          zona_horaria?: string
-        }
-        Relationships: []
-      }
-      sjap_facturas_compra: {
-        Row: {
-          cantidad: number
-          capturado_en: string
-          capturado_por: string | null
-          estacion_id: string
-          fecha: string
-          id: string
-          notas: string | null
-          numero_factura: string | null
-          origen: string
-          producto_id: string
-        }
-        Insert: {
-          cantidad: number
-          capturado_en?: string
-          capturado_por?: string | null
-          estacion_id: string
-          fecha: string
-          id?: string
-          notas?: string | null
-          numero_factura?: string | null
-          origen?: string
-          producto_id: string
-        }
-        Update: {
-          cantidad?: number
-          capturado_en?: string
-          capturado_por?: string | null
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          notas?: string | null
-          numero_factura?: string | null
-          origen?: string
-          producto_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_facturas_compra_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_facturas_compra_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_islas: {
-        Row: {
-          activo: boolean
-          created_at: string
-          estacion_id: string
-          id: string
-          nombre: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          estacion_id: string
-          id?: string
-          nombre: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          nombre?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_islas_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_lecturas_inventario: {
-        Row: {
-          capturado_en: string
-          capturado_por: string | null
-          estacion_id: string
-          fecha: string
-          id: string
-          inventario_final_real: number
-          notas: string | null
-          origen: string
-          producto_id: string
-        }
-        Insert: {
-          capturado_en?: string
-          capturado_por?: string | null
-          estacion_id: string
-          fecha: string
-          id?: string
-          inventario_final_real: number
-          notas?: string | null
-          origen?: string
-          producto_id: string
-        }
-        Update: {
-          capturado_en?: string
-          capturado_por?: string | null
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          inventario_final_real?: number
-          notas?: string | null
-          origen?: string
-          producto_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_lecturas_inventario_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_lecturas_inventario_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_medios_pago: {
-        Row: {
-          activo: boolean
-          created_at: string
-          estacion_id: string
-          id: string
-          nombre: string
-          orden: number
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          estacion_id: string
-          id?: string
-          nombre: string
-          orden?: number
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          nombre?: string
-          orden?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_medios_pago_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_movimientos_cuenta_cliente: {
-        Row: {
-          archivo_id: string | null
-          created_at: string
-          cuenta_id: string
-          fecha: string
-          id: string
-          monto: number
-          origen: string
-          tipo: string
-        }
-        Insert: {
-          archivo_id?: string | null
-          created_at?: string
-          cuenta_id: string
-          fecha: string
-          id?: string
-          monto?: number
-          origen?: string
-          tipo: string
-        }
-        Update: {
-          archivo_id?: string | null
-          created_at?: string
-          cuenta_id?: string
-          fecha?: string
-          id?: string
-          monto?: number
-          origen?: string
-          tipo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_movimientos_cuenta_cliente_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_movimientos_cuenta_cliente_cuenta_id_fkey"
-            columns: ["cuenta_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_cuentas_cliente"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_precios_producto: {
-        Row: {
-          created_at: string
-          id: string
-          precio: number
-          producto_id: string
-          vigente_desde: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          precio: number
-          producto_id: string
-          vigente_desde: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          precio?: number
-          producto_id?: string
-          vigente_desde?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_precios_producto_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_presupuesto_mensual: {
-        Row: {
-          anio: number
-          clientes_paso: number | null
-          clientes_propios: number | null
-          compra: number | null
-          created_at: string
-          cumplimiento: number | null
-          estacion_id: string
-          id: string
-          mes: number
-          origen: string
-          pct_clientes_paso: number | null
-          pct_clientes_propios: number | null
-          pct_rumbo: number | null
-          presupuesto_acpm: number | null
-          presupuesto_corriente: number | null
-          presupuesto_extra: number | null
-          presupuesto_total: number | null
-          rumbo: number | null
-          ventas: number | null
-        }
-        Insert: {
-          anio: number
-          clientes_paso?: number | null
-          clientes_propios?: number | null
-          compra?: number | null
-          created_at?: string
-          cumplimiento?: number | null
-          estacion_id: string
-          id?: string
-          mes: number
-          origen?: string
-          pct_clientes_paso?: number | null
-          pct_clientes_propios?: number | null
-          pct_rumbo?: number | null
-          presupuesto_acpm?: number | null
-          presupuesto_corriente?: number | null
-          presupuesto_extra?: number | null
-          presupuesto_total?: number | null
-          rumbo?: number | null
-          ventas?: number | null
-        }
-        Update: {
-          anio?: number
-          clientes_paso?: number | null
-          clientes_propios?: number | null
-          compra?: number | null
-          created_at?: string
-          cumplimiento?: number | null
-          estacion_id?: string
-          id?: string
-          mes?: number
-          origen?: string
-          pct_clientes_paso?: number | null
-          pct_clientes_propios?: number | null
-          pct_rumbo?: number | null
-          presupuesto_acpm?: number | null
-          presupuesto_corriente?: number | null
-          presupuesto_extra?: number | null
-          presupuesto_total?: number | null
-          rumbo?: number | null
-          ventas?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_presupuesto_mensual_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_presupuesto_producto_mensual: {
-        Row: {
-          anio: number
-          created_at: string
-          estacion_id: string
-          id: string
-          mes: number
-          presupuesto: number
-          producto_id: string
-        }
-        Insert: {
-          anio: number
-          created_at?: string
-          estacion_id: string
-          id?: string
-          mes: number
-          presupuesto?: number
-          producto_id: string
-        }
-        Update: {
-          anio?: number
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          mes?: number
-          presupuesto?: number
-          producto_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_presupuesto_producto_mensual_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_presupuesto_producto_mensual_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_productos: {
-        Row: {
-          activo: boolean
-          alias: string[]
-          codigo: string
-          created_at: string
-          estacion_id: string
-          id: string
-          nombre_visible: string
-          orden: number
-          unidad: string
-        }
-        Insert: {
-          activo?: boolean
-          alias?: string[]
-          codigo: string
-          created_at?: string
-          estacion_id: string
-          id?: string
-          nombre_visible: string
-          orden?: number
-          unidad?: string
-        }
-        Update: {
-          activo?: boolean
-          alias?: string[]
-          codigo?: string
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          nombre_visible?: string
-          orden?: number
-          unidad?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_productos_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_promotores: {
-        Row: {
-          activo: boolean
-          created_at: string
-          estacion_id: string
-          id: string
-          nombre: string
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          estacion_id: string
-          id?: string
-          nombre: string
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          nombre?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_promotores_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_sicom_mensual: {
-        Row: {
-          anio: number
-          compras: number | null
-          created_at: string
-          estacion_id: string
-          evaporacion: number | null
-          faltantes: number | null
-          id: string
-          inventario_final_calculado: number | null
-          inventario_final_real: number | null
-          inventario_inicial: number | null
-          mes: number
-          origen: string
-          producto_id: string | null
-          producto_nombre_original: string
-          ventas: number | null
-        }
-        Insert: {
-          anio: number
-          compras?: number | null
-          created_at?: string
-          estacion_id: string
-          evaporacion?: number | null
-          faltantes?: number | null
-          id?: string
-          inventario_final_calculado?: number | null
-          inventario_final_real?: number | null
-          inventario_inicial?: number | null
-          mes: number
-          origen?: string
-          producto_id?: string | null
-          producto_nombre_original: string
-          ventas?: number | null
-        }
-        Update: {
-          anio?: number
-          compras?: number | null
-          created_at?: string
-          estacion_id?: string
-          evaporacion?: number | null
-          faltantes?: number | null
-          id?: string
-          inventario_final_calculado?: number | null
-          inventario_final_real?: number | null
-          inventario_inicial?: number | null
-          mes?: number
-          origen?: string
-          producto_id?: string | null
-          producto_nombre_original?: string
-          ventas?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_sicom_mensual_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_sicom_mensual_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_transacciones: {
-        Row: {
-          archivo_id: string
-          cantidad: number | null
-          categoria: string
-          consecutivo: string | null
-          created_at: string
-          descuento: number | null
-          estacion_id: string
-          fecha: string
-          hora: string | null
-          id: string
-          impuesto_total: number | null
-          prefijo: string | null
-          producto_nombre: string | null
-          promotor_nombre: string | null
-          subtotal: number | null
-          tipo_factura: string | null
-          total: number | null
-          unidad: string | null
-        }
-        Insert: {
-          archivo_id: string
-          cantidad?: number | null
-          categoria: string
-          consecutivo?: string | null
-          created_at?: string
-          descuento?: number | null
-          estacion_id: string
-          fecha: string
-          hora?: string | null
-          id?: string
-          impuesto_total?: number | null
-          prefijo?: string | null
-          producto_nombre?: string | null
-          promotor_nombre?: string | null
-          subtotal?: number | null
-          tipo_factura?: string | null
-          total?: number | null
-          unidad?: string | null
-        }
-        Update: {
-          archivo_id?: string
-          cantidad?: number | null
-          categoria?: string
-          consecutivo?: string | null
-          created_at?: string
-          descuento?: number | null
-          estacion_id?: string
-          fecha?: string
-          hora?: string | null
-          id?: string
-          impuesto_total?: number | null
-          prefijo?: string | null
-          producto_nombre?: string | null
-          promotor_nombre?: string | null
-          subtotal?: number | null
-          tipo_factura?: string | null
-          total?: number | null
-          unidad?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_transacciones_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_transacciones_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_turno_tipos: {
-        Row: {
-          activo: boolean
-          created_at: string
-          esquema_id: string
-          estacion_id: string
-          hora_fin: string
-          hora_inicio: string
-          id: string
-          nombre: string
-          orden: number
-        }
-        Insert: {
-          activo?: boolean
-          created_at?: string
-          esquema_id: string
-          estacion_id: string
-          hora_fin: string
-          hora_inicio: string
-          id?: string
-          nombre: string
-          orden?: number
-        }
-        Update: {
-          activo?: boolean
-          created_at?: string
-          esquema_id?: string
-          estacion_id?: string
-          hora_fin?: string
-          hora_inicio?: string
-          id?: string
-          nombre?: string
-          orden?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_turno_tipos_esquema_id_fkey"
-            columns: ["esquema_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_esquemas_turno"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_turno_tipos_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_turnos_programados: {
-        Row: {
-          created_at: string
-          estacion_id: string
-          estado: string
-          fecha: string
-          id: string
-          isla_id: string
-          promotor_id: string
-          turno_tipo_id: string
-        }
-        Insert: {
-          created_at?: string
-          estacion_id: string
-          estado?: string
-          fecha: string
-          id?: string
-          isla_id: string
-          promotor_id: string
-          turno_tipo_id: string
-        }
-        Update: {
-          created_at?: string
-          estacion_id?: string
-          estado?: string
-          fecha?: string
-          id?: string
-          isla_id?: string
-          promotor_id?: string
-          turno_tipo_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_turnos_programados_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_turnos_programados_isla_id_fkey"
-            columns: ["isla_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_islas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_turnos_programados_promotor_id_fkey"
-            columns: ["promotor_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_promotores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_turnos_programados_turno_tipo_id_fkey"
-            columns: ["turno_tipo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_turno_tipos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_urea_diario: {
-        Row: {
-          clientes_propios_litros: number | null
-          costo_unitario: number | null
-          created_at: string
-          diferencia: number | null
-          estacion_id: string
-          fecha: string
-          id: string
-          inventario_final: number | null
-          inventario_inicial: number | null
-          inventario_teorico: number | null
-          origen: string
-          recibo: number | null
-          rumbo_litros: number | null
-          total: number | null
-          valor: number | null
-          valor_propios: number | null
-          valor_rumbo: number | null
-        }
-        Insert: {
-          clientes_propios_litros?: number | null
-          costo_unitario?: number | null
-          created_at?: string
-          diferencia?: number | null
-          estacion_id: string
-          fecha: string
-          id?: string
-          inventario_final?: number | null
-          inventario_inicial?: number | null
-          inventario_teorico?: number | null
-          origen?: string
-          recibo?: number | null
-          rumbo_litros?: number | null
-          total?: number | null
-          valor?: number | null
-          valor_propios?: number | null
-          valor_rumbo?: number | null
-        }
-        Update: {
-          clientes_propios_litros?: number | null
-          costo_unitario?: number | null
-          created_at?: string
-          diferencia?: number | null
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          inventario_final?: number | null
-          inventario_inicial?: number | null
-          inventario_teorico?: number | null
-          origen?: string
-          recibo?: number | null
-          rumbo_litros?: number | null
-          total?: number | null
-          valor?: number | null
-          valor_propios?: number | null
-          valor_rumbo?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_urea_diario_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_usuarios: {
-        Row: {
-          auth_user_id: string
-          created_at: string
-          estacion_id: string
-          id: string
-          rol: string
-          username: string
-        }
-        Insert: {
-          auth_user_id: string
-          created_at?: string
-          estacion_id: string
-          id?: string
-          rol?: string
-          username: string
-        }
-        Update: {
-          auth_user_id?: string
-          created_at?: string
-          estacion_id?: string
-          id?: string
-          rol?: string
-          username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_usuarios_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_ventas_medio_pago: {
-        Row: {
-          archivo_id: string
-          created_at: string
-          estacion_id: string
-          fecha: string
-          id: string
-          medio_pago: string
-          numero_ventas: number
-          total_ventas: number
-        }
-        Insert: {
-          archivo_id: string
-          created_at?: string
-          estacion_id: string
-          fecha: string
-          id?: string
-          medio_pago: string
-          numero_ventas?: number
-          total_ventas?: number
-        }
-        Update: {
-          archivo_id?: string
-          created_at?: string
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          medio_pago?: string
-          numero_ventas?: number
-          total_ventas?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_ventas_medio_pago_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_ventas_medio_pago_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_ventas_promotor_resumen: {
-        Row: {
-          archivo_id: string
-          created_at: string
-          estacion_id: string
-          fecha: string
-          id: string
-          numero_ventas: number
-          promotor_nombre: string
-          total_ventas: number
-        }
-        Insert: {
-          archivo_id: string
-          created_at?: string
-          estacion_id: string
-          fecha: string
-          id?: string
-          numero_ventas?: number
-          promotor_nombre: string
-          total_ventas?: number
-        }
-        Update: {
-          archivo_id?: string
-          created_at?: string
-          estacion_id?: string
-          fecha?: string
-          id?: string
-          numero_ventas?: number
-          promotor_nombre?: string
-          total_ventas?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_ventas_promotor_resumen_archivo_id_fkey"
-            columns: ["archivo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_archivos_cierre"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_ventas_promotor_resumen_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sjap_ventas_promotor_turno: {
-        Row: {
-          created_at: string
-          estacion_id: string
-          fecha: string
-          galones: number | null
-          id: string
-          isla: string | null
-          numero_clientes: number | null
-          origen: string
-          promotor_id: string | null
-          promotor_nombre: string
-          turno: string | null
-          turno_tipo_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          estacion_id: string
-          fecha: string
-          galones?: number | null
-          id?: string
-          isla?: string | null
-          numero_clientes?: number | null
-          origen?: string
-          promotor_id?: string | null
-          promotor_nombre: string
-          turno?: string | null
-          turno_tipo_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          estacion_id?: string
-          fecha?: string
-          galones?: number | null
-          id?: string
-          isla?: string | null
-          numero_clientes?: number | null
-          origen?: string
-          promotor_id?: string | null
-          promotor_nombre?: string
-          turno?: string | null
-          turno_tipo_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sjap_ventas_promotor_turno_estacion_id_fkey"
-            columns: ["estacion_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_estaciones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_ventas_promotor_turno_promotor_id_fkey"
-            columns: ["promotor_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_promotores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sjap_ventas_promotor_turno_turno_tipo_id_fkey"
-            columns: ["turno_tipo_id"]
-            isOneToOne: false
-            referencedRelation: "sjap_turno_tipos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vehiculos: {
-        Row: {
-          activo: boolean
-          anio: number | null
-          capacidad_kg: number | null
-          conductor_id: string | null
-          created_at: string
-          id: string
-          marca: string | null
-          modelo: string | null
-          placa: string
-          tipo_carroceria: string | null
-          updated_at: string
-        }
-        Insert: {
-          activo?: boolean
-          anio?: number | null
-          capacidad_kg?: number | null
-          conductor_id?: string | null
-          created_at?: string
-          id?: string
-          marca?: string | null
-          modelo?: string | null
-          placa: string
-          tipo_carroceria?: string | null
-          updated_at?: string
-        }
-        Update: {
-          activo?: boolean
-          anio?: number | null
-          capacidad_kg?: number | null
-          conductor_id?: string | null
-          created_at?: string
-          id?: string
-          marca?: string | null
-          modelo?: string | null
-          placa?: string
-          tipo_carroceria?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vehiculos_conductor_id_fkey"
-            columns: ["conductor_id"]
-            isOneToOne: false
-            referencedRelation: "conductores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      viajes: {
-        Row: {
-          anticipo_pagado: boolean
-          cargue_descargue: number
-          cliente_id: string | null
-          comentarios_manifiesto: string | null
-          conductor_id: string | null
-          conductor_nombre: string | null
-          created_at: string
-          destinatario_anticipo: Database["public"]["Enums"]["destinatario_anticipo"]
-          destino: string | null
-          devolucion_conductor: number
-          empresa_pagadora_id: string | null
-          escalas_detalle: string | null
-          estado_liquidacion: Database["public"]["Enums"]["estado_liquidacion"]
-          estado_operativo: Database["public"]["Enums"]["estado_operativo"]
-          estado_pago_conductor: Database["public"]["Enums"]["estado_pago_conductor"]
-          fecha: string
-          fecha_pago_anticipo: string | null
-          fecha_pago_gasto: string | null
-          fecha_pago_pendiente: string | null
-          flete_viaje: number | null
-          id: string
-          motivo_cancelacion: string | null
-          neto_facturado: number | null
-          numero_escalas: number | null
-          numero_manifiesto: string | null
-          origen: string | null
-          otros: number
-          otros_gastos: number
-          pago_conductor: number | null
-          peajes: number
-          peajes_modificado: boolean
-          peajes_motivo_cambio: string | null
-          peso_kg: number | null
-          placa: string | null
-          porcentaje_anticipo: number
-          producto_id: string | null
-          retefuente: number
-          reteica: number
-          ruta_consecutivo: number | null
-          ruta_id: string | null
-          saldo_cliente: number | null
-          tiene_escalas: boolean
-          tipo: Database["public"]["Enums"]["tipo_viaje"]
-          updated_at: string
-          valor_anticipo: number | null
-          valor_pendiente_margen_neto: number | null
-          valor_total_viaje: number
-          vehiculo_id: string | null
-        }
-        Insert: {
-          anticipo_pagado?: boolean
-          cargue_descargue?: number
-          cliente_id?: string | null
-          comentarios_manifiesto?: string | null
-          conductor_id?: string | null
-          conductor_nombre?: string | null
-          created_at?: string
-          destinatario_anticipo?: Database["public"]["Enums"]["destinatario_anticipo"]
-          destino?: string | null
-          devolucion_conductor?: number
-          empresa_pagadora_id?: string | null
-          escalas_detalle?: string | null
-          estado_liquidacion?: Database["public"]["Enums"]["estado_liquidacion"]
-          estado_operativo?: Database["public"]["Enums"]["estado_operativo"]
-          estado_pago_conductor?: Database["public"]["Enums"]["estado_pago_conductor"]
-          fecha?: string
-          fecha_pago_anticipo?: string | null
-          fecha_pago_gasto?: string | null
-          fecha_pago_pendiente?: string | null
-          flete_viaje?: number | null
-          id?: string
-          motivo_cancelacion?: string | null
-          neto_facturado?: number | null
-          numero_escalas?: number | null
-          numero_manifiesto?: string | null
-          origen?: string | null
-          otros?: number
-          otros_gastos?: number
-          pago_conductor?: number | null
-          peajes?: number
-          peajes_modificado?: boolean
-          peajes_motivo_cambio?: string | null
-          peso_kg?: number | null
-          placa?: string | null
-          porcentaje_anticipo?: number
-          producto_id?: string | null
-          retefuente?: number
-          reteica?: number
-          ruta_consecutivo?: number | null
-          ruta_id?: string | null
-          saldo_cliente?: number | null
-          tiene_escalas?: boolean
-          tipo?: Database["public"]["Enums"]["tipo_viaje"]
-          updated_at?: string
-          valor_anticipo?: number | null
-          valor_pendiente_margen_neto?: number | null
-          valor_total_viaje?: number
-          vehiculo_id?: string | null
-        }
-        Update: {
-          anticipo_pagado?: boolean
-          cargue_descargue?: number
-          cliente_id?: string | null
-          comentarios_manifiesto?: string | null
-          conductor_id?: string | null
-          conductor_nombre?: string | null
-          created_at?: string
-          destinatario_anticipo?: Database["public"]["Enums"]["destinatario_anticipo"]
-          destino?: string | null
-          devolucion_conductor?: number
-          empresa_pagadora_id?: string | null
-          escalas_detalle?: string | null
-          estado_liquidacion?: Database["public"]["Enums"]["estado_liquidacion"]
-          estado_operativo?: Database["public"]["Enums"]["estado_operativo"]
-          estado_pago_conductor?: Database["public"]["Enums"]["estado_pago_conductor"]
-          fecha?: string
-          fecha_pago_anticipo?: string | null
-          fecha_pago_gasto?: string | null
-          fecha_pago_pendiente?: string | null
-          flete_viaje?: number | null
-          id?: string
-          motivo_cancelacion?: string | null
-          neto_facturado?: number | null
-          numero_escalas?: number | null
-          numero_manifiesto?: string | null
-          origen?: string | null
-          otros?: number
-          otros_gastos?: number
-          pago_conductor?: number | null
-          peajes?: number
-          peajes_modificado?: boolean
-          peajes_motivo_cambio?: string | null
-          peso_kg?: number | null
-          placa?: string | null
-          porcentaje_anticipo?: number
-          producto_id?: string | null
-          retefuente?: number
-          reteica?: number
-          ruta_consecutivo?: number | null
-          ruta_id?: string | null
-          saldo_cliente?: number | null
-          tiene_escalas?: boolean
-          tipo?: Database["public"]["Enums"]["tipo_viaje"]
-          updated_at?: string
-          valor_anticipo?: number | null
-          valor_pendiente_margen_neto?: number | null
-          valor_total_viaje?: number
-          vehiculo_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "viajes_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_conductor_id_fkey"
-            columns: ["conductor_id"]
-            isOneToOne: false
-            referencedRelation: "conductores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_empresa_pagadora_id_fkey"
-            columns: ["empresa_pagadora_id"]
-            isOneToOne: false
-            referencedRelation: "empresas_pagadoras"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "productos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_ruta_id_fkey"
-            columns: ["ruta_id"]
-            isOneToOne: false
-            referencedRelation: "rutas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      visitas: {
-        Row: {
-          acciones_solicitadas: Json | null
-          acuerdos_compromisos: Json | null
-          consumo_mensual: string | null
-          created_at: string
-          datos_contacto: Json | null
-          fecha_visita: string | null
-          gmail_message_id: string | null
-          id: number
-          nivel_interes: string | null
-          nombre_empresa: string | null
-          persona_contacto: Json | null
-          precio_referencia: string | null
-          producto_marca_competencia: string | null
-          quejas_reclamos: string | null
-          resumen_ejecutivo: string | null
-          sector_actividad: string | null
-          situacion_actual: string | null
-          ubicacion: string | null
-        }
-        Insert: {
-          acciones_solicitadas?: Json | null
-          acuerdos_compromisos?: Json | null
-          consumo_mensual?: string | null
-          created_at?: string
-          datos_contacto?: Json | null
-          fecha_visita?: string | null
-          gmail_message_id?: string | null
-          id?: number
-          nivel_interes?: string | null
-          nombre_empresa?: string | null
-          persona_contacto?: Json | null
-          precio_referencia?: string | null
-          producto_marca_competencia?: string | null
-          quejas_reclamos?: string | null
-          resumen_ejecutivo?: string | null
-          sector_actividad?: string | null
-          situacion_actual?: string | null
-          ubicacion?: string | null
-        }
-        Update: {
-          acciones_solicitadas?: Json | null
-          acuerdos_compromisos?: Json | null
-          consumo_mensual?: string | null
-          created_at?: string
-          datos_contacto?: Json | null
-          fecha_visita?: string | null
-          gmail_message_id?: string | null
-          id?: number
-          nivel_interes?: string | null
-          nombre_empresa?: string | null
-          persona_contacto?: Json | null
-          precio_referencia?: string | null
-          producto_marca_competencia?: string | null
-          quejas_reclamos?: string | null
-          resumen_ejecutivo?: string | null
-          sector_actividad?: string | null
-          situacion_actual?: string | null
-          ubicacion?: string | null
-        }
-        Relationships: []
       }
     }
     Views: {
+      dk_ai_features: {
+        Row: {
+          enabled: boolean | null
+          feature_key: string | null
+          kitchen_id: string | null
+          settings: Json | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_kitchen_features_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "dk_features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_features_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_kitchen_features_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_receivables: {
         Row: {
           balance: number | null
@@ -5695,15 +2807,7 @@ export type Database = {
           status: Database["public"]["Enums"]["dk_order_status"] | null
           total: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dk_orders_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "dk_customers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       dk_supply_suggestions: {
         Row: {
@@ -5724,15 +2828,7 @@ export type Database = {
           supplier_name: string | null
           wasted_30d: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dk_ingredients_primary_supplier_id_fkey"
-            columns: ["primary_supplier_id"]
-            isOneToOne: false
-            referencedRelation: "dk_suppliers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       dk_today_menu: {
         Row: {
@@ -5746,246 +2842,59 @@ export type Database = {
         }
         Relationships: []
       }
-      v_cartera: {
-        Row: {
-          cliente_id: string | null
-          cliente_nombre: string | null
-          empresa_pagadora_id: string | null
-          empresa_pagadora_nombre: string | null
-          estatus_cobro: string | null
-          num_viajes: number | null
-          total_pendiente: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "viajes_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_empresa_pagadora_id_fkey"
-            columns: ["empresa_pagadora_id"]
-            isOneToOne: false
-            referencedRelation: "empresas_pagadoras"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      v_costos_por_concepto: {
-        Row: {
-          mes: string | null
-          num_movimientos: number | null
-          tipo: string | null
-          total_valor: number | null
-        }
-        Relationships: []
-      }
-      v_rentabilidad_vehiculo: {
-        Row: {
-          neto_consolidado: number | null
-          num_viajes: number | null
-          placa: string | null
-          total_anticipo: number | null
-          total_egresos_operacionales: number | null
-          total_facturado: number | null
-          total_ingresos_operacionales: number | null
-          total_margen_neto: number | null
-          vehiculo_id: string | null
-        }
-        Relationships: []
-      }
-      v_rutas_rentabilidad: {
-        Row: {
-          destino: string | null
-          margen_promedio_viaje: number | null
-          neto_consolidado: number | null
-          num_viajes: number | null
-          origen: string | null
-          ruta_consecutivo: number | null
-          total_egresos_operacionales: number | null
-          total_facturado: number | null
-          total_ingresos_operacionales: number | null
-          total_margen_neto: number | null
-        }
-        Relationships: []
-      }
-      v_totales_mes: {
-        Row: {
-          mes: string | null
-          neto_consolidado: number | null
-          num_viajes: number | null
-          rentabilidad_total: number | null
-          total_anticipo: number | null
-          total_egresos_operacionales: number | null
-          total_egresos_otros: number | null
-          total_facturado: number | null
-          total_ingresos_operacionales: number | null
-          total_ingresos_otros: number | null
-          total_margen_neto: number | null
-          total_pendiente_cobro: number | null
-        }
-        Relationships: []
-      }
-      v_totales_semana: {
-        Row: {
-          num_viajes: number | null
-          placa: string | null
-          semana_inicio: string | null
-          total_facturado: number | null
-          total_margen_neto: number | null
-          vehiculo_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      v_viajes: {
-        Row: {
-          anticipo_pagado: boolean | null
-          cargue_descargue: number | null
-          cliente_id: string | null
-          cliente_nombre: string | null
-          comentarios_manifiesto: string | null
-          conductor_id: string | null
-          conductor_nombre: string | null
-          created_at: string | null
-          destinatario_anticipo:
-            | Database["public"]["Enums"]["destinatario_anticipo"]
-            | null
-          destino: string | null
-          devolucion_conductor: number | null
-          dias_vencimiento_cartera: number | null
-          documentos_soporte_activos: number | null
-          edad_viaje_dias: number | null
-          empresa_pagadora_id: string | null
-          empresa_pagadora_nombre: string | null
-          escalas_detalle: string | null
-          estado_liquidacion:
-            | Database["public"]["Enums"]["estado_liquidacion"]
-            | null
-          estado_operativo:
-            | Database["public"]["Enums"]["estado_operativo"]
-            | null
-          estado_pago_conductor:
-            | Database["public"]["Enums"]["estado_pago_conductor"]
-            | null
-          estatus_cobro: string | null
-          fecha: string | null
-          fecha_pago_anticipo: string | null
-          fecha_pago_gasto: string | null
-          fecha_pago_pendiente: string | null
-          flete_viaje: number | null
-          id: string | null
-          motivo_cancelacion: string | null
-          neto_facturado: number | null
-          numero_escalas: number | null
-          numero_manifiesto: string | null
-          origen: string | null
-          otros: number | null
-          otros_gastos: number | null
-          pago_conductor: number | null
-          peajes: number | null
-          peso_kg: number | null
-          placa: string | null
-          porcentaje_anticipo: number | null
-          producto_id: string | null
-          producto_nombre: string | null
-          retefuente: number | null
-          reteica: number | null
-          ruta_consecutivo: number | null
-          ruta_id: string | null
-          saldo_cliente: number | null
-          semana_inicio: string | null
-          tiene_escalas: boolean | null
-          tipo: Database["public"]["Enums"]["tipo_viaje"] | null
-          updated_at: string | null
-          valor_anticipo: number | null
-          valor_pendiente_margen_neto: number | null
-          valor_total_viaje: number | null
-          valor_total_viaje_acumulado_mes: number | null
-          vehiculo_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "viajes_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_conductor_id_fkey"
-            columns: ["conductor_id"]
-            isOneToOne: false
-            referencedRelation: "conductores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_empresa_pagadora_id_fkey"
-            columns: ["empresa_pagadora_id"]
-            isOneToOne: false
-            referencedRelation: "empresas_pagadoras"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "productos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_ruta_id_fkey"
-            columns: ["ruta_id"]
-            isOneToOne: false
-            referencedRelation: "rutas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "v_rentabilidad_vehiculo"
-            referencedColumns: ["vehiculo_id"]
-          },
-          {
-            foreignKeyName: "viajes_vehiculo_id_fkey"
-            columns: ["vehiculo_id"]
-            isOneToOne: false
-            referencedRelation: "vehiculos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
+      dk_accept_activation: { Args: { p_token: string }; Returns: string }
+      dk_activation_preview: {
+        Args: { p_token: string }
+        Returns: {
+          email: string
+          full_name: string
+          has_user: boolean
+          organization_name: string
+          status: string
+        }[]
+      }
+      dk_active_role: { Args: never; Returns: string }
+      dk_admin_kitchens: {
+        Args: never
+        Returns: {
+          active: boolean
+          admins: number
+          created_at: string
+          kitchen_id: string
+          last_order_at: string
+          members_active: number
+          name: string
+          orders_30d: number
+          organization_id: string
+          organization_name: string
+          slug: string
+        }[]
+      }
       dk_advance_kitchen_item: {
         Args: { p_order_item_id: string }
         Returns: undefined
       }
-      dk_ai_feature_allowed: {
-        Args: { p_feature_key: string }
-        Returns: boolean
+      dk_assert_in_active_kitchen: {
+        Args: { p_id: string; p_table: string }
+        Returns: undefined
+      }
+      dk_assign_master_menu: {
+        Args: { p_kitchen_ids: string[]; p_menu_id: string }
+        Returns: number
       }
       dk_calculate_recipe_cost: {
         Args: { p_recipe_id: string }
         Returns: number
       }
+      dk_can: { Args: { p_permission: string }; Returns: boolean }
+      dk_can_manage_org_user: {
+        Args: { p_organization_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      dk_can_see_user: { Args: { p_user_id: string }; Returns: boolean }
+      dk_can_use_feature: { Args: { p_key: string }; Returns: boolean }
       dk_cancel_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: undefined
@@ -6017,24 +2926,83 @@ export type Database = {
         }
         Returns: string
       }
+      dk_create_kitchen: {
+        Args: {
+          p_currency?: string
+          p_icon_key?: string
+          p_name: string
+          p_organization_id?: string
+          p_slug: string
+          p_timezone?: string
+        }
+        Returns: string
+      }
+      dk_create_organization: {
+        Args: {
+          p_address?: string
+          p_category: string
+          p_city?: string
+          p_country?: string
+          p_full_name?: string
+          p_legal_name?: string
+          p_name: string
+          p_phone?: string
+          p_sector: string
+          p_tax_id?: string
+        }
+        Returns: string
+      }
       dk_create_recipe_version: {
         Args: { p_items: Json; p_product_id: string }
         Returns: string
       }
-      dk_current_profile_id: { Args: never; Returns: string }
-      dk_current_role: {
-        Args: never
-        Returns: Database["public"]["Enums"]["dk_role"]
+      dk_create_user: {
+        Args: {
+          p_assignments?: Json
+          p_email: string
+          p_full_name: string
+          p_organization_id: string
+        }
+        Returns: Json
       }
+      dk_current_kitchen_id: { Args: never; Returns: string }
+      dk_current_profile_id: { Args: never; Returns: string }
       dk_dashboard_summary: { Args: never; Returns: Json }
+      dk_default_organization_id: { Args: never; Returns: string }
+      dk_delete_master_menu: { Args: { p_menu_id: string }; Returns: undefined }
+      dk_delete_role: { Args: { p_role_id: string }; Returns: undefined }
+      dk_detach_master_copies: {
+        Args: { p_kitchen_id?: string; p_master_product_ids: string[] }
+        Returns: undefined
+      }
       dk_dispatch_order: {
         Args: { p_notes?: string; p_order_id: string; p_rider_id: string }
         Returns: undefined
       }
+      dk_effective_role: { Args: { p_kitchen_id: string }; Returns: string }
+      dk_feature_available: {
+        Args: { p_key: string; p_organization_id: string }
+        Returns: boolean
+      }
+      dk_feature_enabled: {
+        Args: { p_key: string; p_kitchen_id: string }
+        Returns: boolean
+      }
+      dk_feature_state: { Args: { p_key: string }; Returns: Json }
       dk_find_or_create_customer_by_phone: {
         Args: { p_full_name?: string; p_phone: string }
         Returns: string
       }
+      dk_has_any_profile: { Args: never; Returns: boolean }
+      dk_has_kitchen_permission: {
+        Args: { p_kitchen_id: string; p_permission: string }
+        Returns: boolean
+      }
+      dk_has_org_permission: {
+        Args: { p_organization_id: string; p_permission: string }
+        Returns: boolean
+      }
+      dk_hash_token: { Args: { p_token: string }; Returns: string }
       dk_inventory_signals: {
         Args: {
           p_coverage_days?: number
@@ -6077,8 +3045,56 @@ export type Database = {
           wasted_30d: number
         }[]
       }
+      dk_is_kitchen_member: { Args: { p_kitchen_id: string }; Returns: boolean }
+      dk_is_org_super_admin: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
+      dk_is_staff: { Args: never; Returns: boolean }
+      dk_is_superadmin: { Args: never; Returns: boolean }
+      dk_is_syncing_master: { Args: never; Returns: boolean }
       dk_kitchen_signals: { Args: { p_dish_stall_min?: number }; Returns: Json }
+      dk_kitchen_team: {
+        Args: never
+        Returns: {
+          active: boolean
+          email: string
+          full_name: string
+          is_me: boolean
+          member_since: string
+          role_id: string
+          role_is_system: boolean
+          role_name: string
+          user_id: string
+        }[]
+      }
+      dk_kitchen_today: { Args: never; Returns: string }
       dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
+      dk_my_context: { Args: never; Returns: Json }
+      dk_my_features: { Args: never; Returns: Json }
+      dk_my_kitchens: {
+        Args: never
+        Returns: {
+          active: boolean
+          kitchen_id: string
+          name: string
+          permissions: string[]
+          role_key: string
+          role_name: string
+          slug: string
+        }[]
+      }
+      dk_new_activation: {
+        Args: { p_organization_id: string; p_user_id: string }
+        Returns: string
+      }
+      dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
+      dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
+      dk_org_feature_matrix: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
+      dk_org_users: { Args: { p_organization_id: string }; Returns: Json }
       dk_register_adjustment: {
         Args: {
           p_ingredient_id: string
@@ -6104,6 +3120,10 @@ export type Database = {
           p_reason: Database["public"]["Enums"]["dk_waste_reason"]
         }
         Returns: string
+      }
+      dk_remove_org_member: {
+        Args: { p_organization_id: string; p_user_id: string }
+        Returns: undefined
       }
       dk_report_profitability: {
         Args: { p_from: string; p_to: string }
@@ -6159,50 +3179,121 @@ export type Database = {
           quantity: number
         }[]
       }
+      dk_request_header: { Args: { p_name: string }; Returns: string }
+      dk_require: { Args: { p_permission: string }; Returns: undefined }
+      dk_require_master_menu_manager: {
+        Args: { p_menu_id: string }
+        Returns: undefined
+      }
+      dk_resend_activation: {
+        Args: { p_organization_id: string; p_user_id: string }
+        Returns: string
+      }
       dk_revert_kitchen_item: {
         Args: { p_order_item_id: string }
+        Returns: undefined
+      }
+      dk_save_master_product: {
+        Args: {
+          p_active: boolean
+          p_category: string
+          p_code: string
+          p_description: string
+          p_menu_id: string
+          p_name: string
+          p_price: number
+          p_product_id: string
+          p_recipe: Json
+        }
+        Returns: string
+      }
+      dk_save_role: {
+        Args: {
+          p_description: string
+          p_name: string
+          p_organization_id?: string
+          p_permissions: string[]
+          p_role_id: string
+        }
+        Returns: string
+      }
+      dk_set_kitchen_feature: {
+        Args: {
+          p_enabled: boolean
+          p_key: string
+          p_kitchen_id: string
+          p_settings?: Json
+        }
+        Returns: undefined
+      }
+      dk_set_kitchens_active: {
+        Args: { p_active: boolean; p_kitchen_ids: string[] }
+        Returns: number
+      }
+      dk_set_last_account: {
+        Args: { p_kitchen_id: string }
+        Returns: undefined
+      }
+      dk_set_member_roles: {
+        Args: {
+          p_default_role_id: string
+          p_kitchen_id: string
+          p_role_ids: string[]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      dk_set_org_feature: {
+        Args: { p_available: boolean; p_key: string; p_organization_id: string }
+        Returns: undefined
+      }
+      dk_set_org_member: {
+        Args: {
+          p_active: boolean
+          p_organization_id: string
+          p_user_id: string
+        }
         Returns: undefined
       }
       dk_set_ticket_priority: {
         Args: { p_order_id: string; p_priority: number }
         Returns: undefined
       }
+      dk_slugify: {
+        Args: { p_fallback?: string; p_text: string }
+        Returns: string
+      }
+      dk_sync_master_menu_kitchen: {
+        Args: { p_kitchen_id: string; p_menu_id: string }
+        Returns: undefined
+      }
       dk_today_day_of_week: {
         Args: never
         Returns: Database["public"]["Enums"]["dk_day_of_week"]
       }
-      ipler_dashboard_stats: {
-        Args: { p_tz?: string }
-        Returns: {
-          fallos_recientes: number
-          leads_hoy: number
-          leads_semana: number
-          runs_hoy: number
-          runs_recientes: number
-          tasa_exito_recientes: number
-          total_runs: number
-          ultima_corrida_at: string
-          ultima_corrida_status: string
-        }[]
+      dk_unassign_master_menu: {
+        Args: { p_kitchen_ids: string[]; p_menu_id: string }
+        Returns: number
       }
-      ipler_is_master: { Args: never; Returns: boolean }
-      ipler_log_action: {
-        Args: { p_action: string; p_details?: Json }
+      dk_unique_slug: {
+        Args: { p_base: string; p_table: string }
+        Returns: string
+      }
+      dk_update_my_profile: {
+        Args: { p_avatar_key: string; p_full_name: string }
         Returns: undefined
       }
-      sjap_estacion_de_usuario: { Args: never; Returns: string }
-      sjap_guardar_esquema_turnos: {
-        Args: { p_esquema_id: string; p_turnos: Json }
+      dk_update_pending_user: {
+        Args: {
+          p_email: string
+          p_full_name: string
+          p_organization_id: string
+          p_user_id: string
+        }
         Returns: undefined
       }
-      sjap_rol_de_usuario: { Args: never; Returns: string }
     }
     Enums: {
-      destinatario_anticipo:
-        | "No Pagado"
-        | "Conductor"
-        | "Propietario"
-        | "Administrador(a)"
       dk_day_of_week:
         | "LUNES"
         | "MARTES"
@@ -6234,26 +3325,6 @@ export type Database = {
         | "DELIVERY"
       dk_unit_type: "WEIGHT" | "VOLUME" | "UNIT"
       dk_waste_reason: "VENCIMIENTO" | "DANO" | "ERROR_PREPARACION" | "OTRO"
-      estado_incidencia: "abierta" | "en_proceso" | "resuelta" | "cerrada"
-      estado_liquidacion: "Pendiente" | "Pagada"
-      estado_operativo:
-        | "programado"
-        | "asignado"
-        | "en_transito"
-        | "entregado"
-        | "cancelado"
-        | "con_incidencia"
-      estado_pago_conductor: "Pendiente" | "Completado" | "Particular"
-      prioridad_incidencia: "baja" | "media" | "alta" | "critica"
-      tipo_incidencia:
-        | "mecanica"
-        | "accidente"
-        | "retraso"
-        | "reclamo_cliente"
-        | "clima"
-        | "documentacion"
-        | "otro"
-      tipo_viaje: "Generales" | "Multiparada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -6381,12 +3452,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      destinatario_anticipo: [
-        "No Pagado",
-        "Conductor",
-        "Propietario",
-        "Administrador(a)",
-      ],
       dk_day_of_week: [
         "LUNES",
         "MARTES",
@@ -6421,28 +3486,6 @@ export const Constants = {
       ],
       dk_unit_type: ["WEIGHT", "VOLUME", "UNIT"],
       dk_waste_reason: ["VENCIMIENTO", "DANO", "ERROR_PREPARACION", "OTRO"],
-      estado_incidencia: ["abierta", "en_proceso", "resuelta", "cerrada"],
-      estado_liquidacion: ["Pendiente", "Pagada"],
-      estado_operativo: [
-        "programado",
-        "asignado",
-        "en_transito",
-        "entregado",
-        "cancelado",
-        "con_incidencia",
-      ],
-      estado_pago_conductor: ["Pendiente", "Completado", "Particular"],
-      prioridad_incidencia: ["baja", "media", "alta", "critica"],
-      tipo_incidencia: [
-        "mecanica",
-        "accidente",
-        "retraso",
-        "reclamo_cliente",
-        "clima",
-        "documentacion",
-        "otro",
-      ],
-      tipo_viaje: ["Generales", "Multiparada"],
     },
   },
 } as const

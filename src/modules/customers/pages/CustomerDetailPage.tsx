@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { RegisterPaymentModal } from '@/modules/cartera/components/RegisterPaymentModal'
 import { usePaymentsByCustomer, useReceivables } from '@/modules/cartera/hooks/useReceivables'
 import type { CustomerPayment } from '@/modules/cartera/types'
@@ -15,7 +16,8 @@ import { cardClass } from '@/shared/ui/formClasses'
 import { formatDateTime, formatMoney, initials } from '@/shared/utils/format'
 import { AlertTriangle, Banknote, MapPin, Pencil, Phone, Receipt, StickyNote, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
 import { CustomerStatusBadge } from '../components/CustomerStatusBadge'
 import { useCustomers } from '../hooks/useCustomers'
@@ -24,6 +26,7 @@ import { computeCustomerBalance } from '../lib/balance'
 type TimelineEntry = { date: string } & ({ kind: 'order'; order: Order } | { kind: 'payment'; payment: CustomerPayment })
 
 export function CustomerDetailPage() {
+  const { can } = useActiveKitchen()
   const { id = '' } = useParams<{ id: string }>()
   const { data: customers, isLoading: loadingCustomers } = useCustomers()
   const { data: receivables } = useReceivables()
@@ -62,12 +65,16 @@ export function CustomerDetailPage() {
         meta={<CustomerStatusBadge balance={balance} />}
         actions={
           <>
-            <Button variant="secondary" icon={Pencil} onClick={() => setEditOpen(true)}>
-              Editar
-            </Button>
-            <Button variant="primary" icon={Banknote} onClick={() => setPayOpen(true)} disabled={customerReceivables.length === 0}>
-              Registrar pago
-            </Button>
+            {can('customers.edit') && (
+              <Button variant="secondary" icon={Pencil} onClick={() => setEditOpen(true)}>
+                Editar
+              </Button>
+            )}
+            {can('receivables.collect') && (
+              <Button variant="primary" icon={Banknote} onClick={() => setPayOpen(true)} disabled={customerReceivables.length === 0}>
+                Registrar pago
+              </Button>
+            )}
           </>
         }
       />

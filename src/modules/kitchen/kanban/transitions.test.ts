@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest'
+import type { AccountPermission, Can } from '@/shared/rbac/roles'
 import { canTransition, isForward, nextStatus, prevStatus, transitionAction } from './transitions'
+
+
+// Permisos de operación de las plantillas del sistema (catálogo, ADR 0008).
+const ROLE_PERMISSIONS: Record<string, AccountPermission[]> = {
+  ADMIN: ['orders.create', 'orders.confirm', 'orders.cancel', 'kitchen.prepare', 'kitchen.prioritize', 'dispatch.assign', 'dispatch.deliver'],
+  MANAGER: ['orders.create', 'orders.confirm', 'orders.cancel', 'kitchen.prepare', 'kitchen.prioritize', 'dispatch.assign', 'dispatch.deliver'],
+  CASHIER: ['orders.create', 'orders.confirm', 'orders.cancel', 'dispatch.assign', 'dispatch.deliver'],
+  KITCHEN: ['orders.cancel', 'kitchen.prepare', 'kitchen.prioritize'],
+  DELIVERY: ['dispatch.deliver'],
+}
+const perms =
+  (role: string): Can =>
+  (permission) =>
+    ROLE_PERMISSIONS[role].includes(permission)
 
 describe('nextStatus', () => {
   it('NUEVO avanza a CONFIRMADO', () => {
@@ -114,30 +129,30 @@ describe('canTransition', () => {
     expect(canTransition('CANCELADO', 'CANCELADO')).toBe(false)
   })
 
-  describe('con rol', () => {
+  describe('con los permisos de cada rol', () => {
     it('KITCHEN prepara pero no confirma ni despacha', () => {
-      expect(canTransition('CONFIRMADO', 'EN_PREPARACION', 'KITCHEN')).toBe(true)
-      expect(canTransition('NUEVO', 'CONFIRMADO', 'KITCHEN')).toBe(false)
-      expect(canTransition('LISTO', 'DESPACHADO', 'KITCHEN')).toBe(false)
+      expect(canTransition('CONFIRMADO', 'EN_PREPARACION', perms('KITCHEN'))).toBe(true)
+      expect(canTransition('NUEVO', 'CONFIRMADO', perms('KITCHEN'))).toBe(false)
+      expect(canTransition('LISTO', 'DESPACHADO', perms('KITCHEN'))).toBe(false)
     })
 
     it('CASHIER confirma y despacha pero no prepara', () => {
-      expect(canTransition('NUEVO', 'CONFIRMADO', 'CASHIER')).toBe(true)
-      expect(canTransition('LISTO', 'DESPACHADO', 'CASHIER')).toBe(true)
-      expect(canTransition('CONFIRMADO', 'EN_PREPARACION', 'CASHIER')).toBe(false)
+      expect(canTransition('NUEVO', 'CONFIRMADO', perms('CASHIER'))).toBe(true)
+      expect(canTransition('LISTO', 'DESPACHADO', perms('CASHIER'))).toBe(true)
+      expect(canTransition('CONFIRMADO', 'EN_PREPARACION', perms('CASHIER'))).toBe(false)
     })
 
     it('DELIVERY no mueve columnas ni cancela', () => {
-      expect(canTransition('LISTO', 'DESPACHADO', 'DELIVERY')).toBe(false)
-      expect(canTransition('DESPACHADO', 'CANCELADO', 'DELIVERY')).toBe(false)
+      expect(canTransition('LISTO', 'DESPACHADO', perms('DELIVERY'))).toBe(false)
+      expect(canTransition('DESPACHADO', 'CANCELADO', perms('DELIVERY'))).toBe(false)
     })
 
     it('ADMIN y MANAGER pueden todo lo que el flujo permite', () => {
       for (const role of ['ADMIN', 'MANAGER'] as const) {
-        expect(canTransition('NUEVO', 'CONFIRMADO', role)).toBe(true)
-        expect(canTransition('CONFIRMADO', 'LISTO', role)).toBe(true)
-        expect(canTransition('LISTO', 'DESPACHADO', role)).toBe(true)
-        expect(canTransition('DESPACHADO', 'CANCELADO', role)).toBe(true)
+        expect(canTransition('NUEVO', 'CONFIRMADO', perms(role))).toBe(true)
+        expect(canTransition('CONFIRMADO', 'LISTO', perms(role))).toBe(true)
+        expect(canTransition('LISTO', 'DESPACHADO', perms(role))).toBe(true)
+        expect(canTransition('DESPACHADO', 'CANCELADO', perms(role))).toBe(true)
       }
     })
 

@@ -98,8 +98,19 @@ erDiagram
 ## Lista completa de tablas
 
 ### Identidad / RBAC
-- `dk_users` — perfil de staff, 1:1 con `auth.users`, guarda `role`
+- `dk_users` — perfil de staff, 1:1 con `auth.users`; `avatar_key` = uno de los 20 avatares de personas (ADR 0009)
 - `dk_audit_log` — auditoría genérica (tabla, registro, acción, valores antes/después, usuario, fecha)
+
+### Organizaciones, Cuentas y funciones (ADR 0008 y 0009)
+- `dk_organizations` — el negocio; `owner_user_id` = SUPER_ADMIN (creador, intransferible)
+- `dk_organization_members` — usuario ↔ organización (SUPER_ADMIN o Miembro; activo/pendiente/desactivado)
+- `dk_kitchens` — la **Cuenta** (establecimiento); `icon_key` = uno de los 20 iconos de establecimiento
+- `dk_kitchen_members` / `dk_member_roles` — usuario ↔ Cuenta, con varios roles y uno predeterminado
+- `dk_roles` / `dk_role_permissions` / `dk_permissions` — RBAC: plantillas, roles propios y catálogo de permisos
+- `dk_features` — catálogo de funciones opcionales (IA, voz): permiso para usarla y para activarla, valores por defecto
+- `dk_organization_features` — qué funciones ofrece cada organización (sin fila = valor del catálogo)
+- `dk_kitchen_features` — qué funciones activa cada Cuenta y sus parámetros (antes `dk_ai_features`; queda una vista de compatibilidad con ese nombre)
+- `dk_ai_insights` — análisis de IA (append-only), por Cuenta y función
 
 ### Catálogos base
 - `dk_units` — unidades de medida y su factor de conversión a la unidad base de su tipo
@@ -196,4 +207,4 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
 - `dk_register_waste(ingredient_id, quantity, reason, observation)` → movimiento `MERMA`.
 - `dk_register_adjustment(ingredient_id, quantity, observation)` → movimiento `AJUSTE`.
 - `dk_calculate_recipe_cost(recipe_id)` → función auxiliar usada por el trigger de costeo y por reportes de rentabilidad.
-- `dk_current_role()` → `SECURITY DEFINER`, usada dentro de políticas RLS.
+- ~~`dk_current_role()`~~ → retirada en la Fase 6 de multi-cocina. Hoy las políticas usan `dk_current_kitchen_id()` y `dk_can('módulo.acción')` con el rol activo (ver [ADR 0008](./adr/0008-organizaciones-y-cuentas.md)).

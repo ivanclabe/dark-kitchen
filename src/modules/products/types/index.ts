@@ -16,6 +16,10 @@ export interface Product {
   activeRecipeVersion: number | null
   estimatedCost: number
   active: boolean
+  /** Copia de un plato de un menú maestro (la Cocina solo ajusta precio y disponibilidad). */
+  masterProductId: string | null
+  /** La Cocina fijó su propio precio (la sincronización del maestro no lo cambia). */
+  priceIsLocal: boolean
 }
 
 export interface ProductInput {

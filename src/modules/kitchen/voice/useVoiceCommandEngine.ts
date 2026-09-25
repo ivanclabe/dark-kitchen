@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAdvanceTicketItems, useCancelKitchenOrder, useSetTicketPriority } from '../hooks/useKitchen'
 import type { KitchenTicket } from '../types'
 import { parseVoiceCommand, type VoiceAction } from './commandParser'
-import { speak } from './speak'
+import { useSpeech } from './useSpeech'
 import { useSpeechRecognition } from './speechRecognition'
 
 export type VoicePhase = 'idle' | 'listening' | 'processing' | 'success' | 'error'
@@ -56,6 +56,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   const setPriority = useSetTicketPriority()
   const cancelOrder = useCancelKitchenOrder()
   const { show } = useToast()
+  const voiceOutput = useSpeech()
 
   const [phase, setPhase] = useState<VoicePhase>('idle')
   const [liveTranscript, setLiveTranscript] = useState('')
@@ -80,7 +81,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     setLastMessage(message)
     setPhase(tone)
     show(tone === 'success' ? `✓ ${message}` : message, tone)
-    if (ttsEnabled) speak(message)
+    if (ttsEnabled) voiceOutput.say(message)
     scheduleReset()
   }
 
@@ -194,6 +195,8 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     lastTranscript,
     lastMessage,
     ttsEnabled,
+    /** ¿La Cuenta permite respuestas habladas? (función "Voz de la aplicación") */
+    speechAllowed: voiceOutput.allowed,
     toggleTts,
     start,
     stop: speech.stop,

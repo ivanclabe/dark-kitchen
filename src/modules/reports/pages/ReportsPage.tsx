@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
@@ -240,6 +241,7 @@ function ProfitabilitySummary({ from, to }: { from: string; to: string }) {
 }
 
 export function ReportsPage() {
+  const { can } = useActiveKitchen()
   const [from, setFrom] = useState(() => presetRange('mes').from)
   const [to, setTo] = useState(() => presetRange('mes').to)
   const [tab, setTab] = useState<ReportKey>('ventas')
@@ -272,7 +274,7 @@ export function ReportsPage() {
       </div>
 
       <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
-        <Tabs value={tab} onChange={setTab} items={REPORT_TABS} />
+        <Tabs value={tab} onChange={setTab} items={REPORT_TABS.filter((t) => t.value !== 'rentabilidad' || can('reports.profitability'))} />
       </div>
 
       {tab === 'ventas' && <SalesChart from={from} to={to} />}

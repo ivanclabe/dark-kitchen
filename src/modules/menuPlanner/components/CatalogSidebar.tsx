@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useProductCategories, useProducts } from '@/modules/products/hooks/useProducts'
 import type { Product } from '@/modules/products/types'
 import { Button } from '@/shared/ui/Button'
@@ -20,6 +21,7 @@ export function CatalogSidebar({
   onEditDish: (product: Product) => void
   onCreateDish: () => void
 }) {
+  const { can } = useActiveKitchen()
   const { data: products, isLoading } = useProducts()
   const { data: categories } = useProductCategories()
   const [query, setQuery] = useState('')
@@ -38,9 +40,11 @@ export function CatalogSidebar({
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-neutral-100">Catálogo de platos</h2>
-        <Button variant="secondary" size="sm" icon={Plus} onClick={onCreateDish}>
-          Nuevo
-        </Button>
+        {can('products.create') && (
+          <Button variant="secondary" size="sm" icon={Plus} onClick={onCreateDish}>
+            Nuevo
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -77,6 +81,8 @@ export function CatalogSidebar({
               alreadyOnSelectedDate={selectedDateProductIds.has(product.id)}
               onQuickAdd={() => onQuickAdd(product)}
               onEdit={() => onEditDish(product)}
+              canEdit={can('products.edit')}
+              canPlan={can('menus.edit')}
             />
           ))
         )}

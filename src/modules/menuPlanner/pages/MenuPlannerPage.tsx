@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import type { Product } from '@/modules/products/types'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -23,6 +24,7 @@ import type { MenuPlanItem } from '../types'
 type ViewMode = 'week' | 'month'
 
 export function MenuPlannerPage() {
+  const { can } = useActiveKitchen()
   const [view, setView] = useState<ViewMode>('week')
   const [weekStart, setWeekStart] = useState(() => startOfWeek(todayStr()))
   const [monthAnchor, setMonthAnchor] = useState(todayStr())
@@ -87,7 +89,7 @@ export function MenuPlannerPage() {
         itemsByDate={itemsByDate}
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
-        onOpenItem={setRulesItem}
+        onOpenItem={can('menus.edit') ? setRulesItem : () => {}}
       />
     )
   } else {
@@ -97,7 +99,7 @@ export function MenuPlannerPage() {
         onMonthAnchorChange={setMonthAnchor}
         itemsByDate={itemsByDate}
         onOpenWeek={handleOpenWeekFromMonth}
-        onOpenItem={setRulesItem}
+        onOpenItem={can('menus.edit') ? setRulesItem : () => {}}
       />
     )
   }
@@ -105,7 +107,7 @@ export function MenuPlannerPage() {
   const activeDishName = activeDrag?.kind === 'catalog' ? activeDrag.productName : activeDrag?.kind === 'planItem' ? activeDrag.item.productName : null
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
+    <DndContext sensors={can('menus.edit') ? sensors : []} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
       <div className="flex h-full min-h-0 flex-col gap-4">
         <PageHeader
           title="Planificador de Menús"
@@ -121,9 +123,11 @@ export function MenuPlannerPage() {
                   { value: 'month', label: 'Mes', icon: CalendarRange },
                 ]}
               />
-              <Button variant="secondary" icon={Copy} onClick={() => setCopyOpen(true)}>
-                Copiar
-              </Button>
+              {can('menus.manage') && (
+                <Button variant="secondary" icon={Copy} onClick={() => setCopyOpen(true)}>
+                  Copiar
+                </Button>
+              )}
             </div>
           }
         />

@@ -4,8 +4,10 @@ import {
   createProductCategory,
   listProductCategories,
   listProducts,
+  resetProductPrice,
   setProductActive,
   updateProduct,
+  updateProductPrice,
   uploadProductImage,
 } from '../api/products'
 import type { ProductInput } from '../types'
@@ -41,6 +43,15 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: ProductInput }) => updateProduct(id, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY }),
+  })
+}
+
+/** Precio propio de un plato de menú maestro (o volver al del maestro con price = null). */
+export function useSetSharedProductPrice() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, price }: { id: string; price: number | null }) => (price === null ? resetProductPrice(id) : updateProductPrice(id, price)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY }),
   })
 }

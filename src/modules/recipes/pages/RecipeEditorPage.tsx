@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useIngredients } from '@/modules/supply/hooks/useIngredients'
 import type { Ingredient } from '@/modules/supply/types'
 import { useProducts } from '@/modules/products/hooks/useProducts'
@@ -35,8 +36,11 @@ function RecipeForm({
   activeRecipe: ActiveRecipe | null
   ingredients: Ingredient[]
 }) {
+  const { can } = useActiveKitchen()
   const createVersion = useCreateRecipeVersion(product.id)
   const { show } = useToast()
+  // Consultar la receta (y su costo) no es lo mismo que cambiarla: recipes.edit. Un plato de menú maestro tampoco se edita aquí.
+  const readOnly = Boolean(product.masterProductId) || !can('recipes.edit')
   const [rows, setRows] = useState<DraftRow[]>(() =>
     (activeRecipe?.items ?? []).map((item) => ({
       key: crypto.randomUUID(),
@@ -98,6 +102,7 @@ function RecipeForm({
           options={ingredientOptions}
           placeholder="Nombre o código…"
           emptyMessage="Sin insumos con ese nombre o código"
+          disabled={readOnly}
         />
       ),
       className: 'min-w-56',
@@ -115,6 +120,7 @@ function RecipeForm({
               min="0"
               value={row.quantity || ''}
               onChange={(e) => updateRow(row.key, { quantity: Number(e.target.value) })}
+              disabled={readOnly}
               aria-label={ingredient ? `Cantidad de ${ingredient.name}` : 'Cantidad'}
               className="!mt-0 w-32"
             />
@@ -133,11 +139,12 @@ function RecipeForm({
     {
       key: 'actions',
       header: <span className="sr-only">Acciones</span>,
-      cell: (row) => (
-        <Button variant="link" size="sm" icon={Trash2} className="!text-neutral-400 hover:!text-red-400" onClick={() => removeRow(row.key)}>
-          Quitar
-        </Button>
-      ),
+      cell: (row) =>
+        readOnly ? null : (
+          <Button variant="link" size="sm" icon={Trash2} className="!text-neutral-400 hover:!text-red-400" onClick={() => removeRow(row.key)}>
+            Quitar
+          </Button>
+        ),
       align: 'right',
     },
   ]
@@ -152,11 +159,26 @@ function RecipeForm({
         backTo="/menu-planner"
         backLabel="Volver al planificador"
         actions={
-          <Button variant="primary" icon={Save} onClick={handleSave} loading={createVersion.isPending}>
+          can('recipes.edit') && (
+          <Button
+            variant="primary"
+            icon={Save}
+            onClick={handleSave}
+            loading={createVersion.isPending}
+            disabled={Boolean(product.masterProductId)}
+            title={product.masterProductId ? 'La receta de este plato la define su menú maestro' : undefined}
+          >
             Guardar como nueva versión
           </Button>
+          )
         }
       />
+
+      {product.masterProductId && (
+        <p role="status" className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm text-neutral-300">
+          Este plato viene de un menú maestro: su receta la define el maestro y se actualiza sola. Aquí puedes consultarla y ver su costo.
+        </p>
+      )}
 
       <DataTable
         columns={columns}
@@ -168,9 +190,11 @@ function RecipeForm({
             title="Sin ingredientes todavía"
             description="Agrega los insumos que lleva este plato para calcular su costo."
             action={
-              <Button variant="secondary" size="sm" icon={Plus} onClick={addRow}>
-                Agregar ingrediente
-              </Button>
+              !readOnly && (
+                <Button variant="secondary" size="sm" icon={Plus} onClick={addRow}>
+                  Agregar ingrediente
+                </Button>
+              )
             }
             compact
           />
@@ -179,9 +203,13 @@ function RecipeForm({
           <tr>
             <td className={tdClass} colSpan={columns.length}>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <Button variant="link" size="sm" icon={Plus} onClick={addRow}>
-                  Agregar ingrediente
-                </Button>
+                {readOnly ? (
+                  <span />
+                ) : (
+                  <Button variant="link" size="sm" icon={Plus} onClick={addRow}>
+                    Agregar ingrediente
+                  </Button>
+                )}
                 <span className={typography.small}>
                   Total: <span className="font-medium tabular-nums text-neutral-100">{formatMoney(estimatedCost)}</span>
                 </span>

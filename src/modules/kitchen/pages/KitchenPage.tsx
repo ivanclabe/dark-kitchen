@@ -1,7 +1,6 @@
 import { useDashboardSummary } from '@/modules/dashboard/hooks/useDashboard'
-import { useAuth } from '@/shared/hooks/useAuth'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useNow } from '@/shared/hooks/useNow'
-import { canAccessModule } from '@/shared/rbac/roles'
 import { Button, IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
@@ -84,11 +83,11 @@ function Kpi({ label, value }: { label: string; value: number }) {
  * pedido en su detalle.
  */
 export function KitchenPage() {
-  const { profile } = useAuth()
-  const role = profile?.role ?? null
-  const canConfigure = role === 'ADMIN' || role === 'MANAGER'
-  const canCreate = canPerform(role, 'create')
-  const showSales = canAccessModule(role, 'dashboard')
+  // Permisos del rol en la Cocina activa (ADR 0007): vienen de la base.
+  const { can, canUseFeature } = useActiveKitchen()
+  const canConfigure = can('settings.manage')
+  const canCreate = canPerform(can, 'create')
+  const showSales = can('dashboard.view')
 
   const [searchParams, setSearchParams] = useSearchParams()
   const detailOrderId = searchParams.get('pedido')
@@ -162,14 +161,14 @@ export function KitchenPage() {
 
   const boardActions = useMemo<BoardActions>(
     () => ({
-      role,
+      can,
       density,
       openDetail: (ticket) => setDetailOrder(ticket.orderId),
       requestConfirm: setConfirmTicket,
       requestDispatch: setDispatchTicket,
       requestCancel: setCancelTicket,
     }),
-    [role, density, setDetailOrder],
+    [can, density, setDetailOrder],
   )
 
   function changeView(next: KitchenView) {
@@ -188,7 +187,9 @@ export function KitchenPage() {
     setSearchOpen(false)
   }
 
-  const voiceAvailable = voice.supported && isToday
+  // Comandos de voz: función de la Cuenta (organización ∧ Cuenta ∧ permiso) + soporte del navegador.
+  const voiceCommands = canUseFeature('voice_commands')
+  const voiceAvailable = voiceCommands && voice.supported && isToday
   const menuItems: MenuItem[] = [
     view === 'tablero'
       ? { label: 'Ver tiempos (SLA)', icon: Gauge, onSelect: () => changeView('sla') }
@@ -197,7 +198,7 @@ export function KitchenPage() {
     { label: 'Sonidos y avisos de voz', icon: Bell, checked: soundEnabled, onSelect: toggleSound },
     ...(voiceAvailable
       ? [
-          { label: 'Respuesta hablada', icon: Volume2, checked: voice.ttsEnabled, onSelect: voice.toggleTts },
+          ...(voice.speechAllowed ? [{ label: 'Respuesta hablada', icon: Volume2, checked: voice.ttsEnabled, onSelect: voice.toggleTts }] : []),
           { label: 'Probar comando de texto', icon: Keyboard, onSelect: () => setVoiceTestOpen(true) },
         ]
       : []),
@@ -257,7 +258,7 @@ export function KitchenPage() {
                 <IconButton icon={Search} aria-label="Buscar pedido" onClick={() => setSearchOpen(true)} />
               )}
 
-              <VoiceCommandBar engine={voice} enabled={isToday} testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />
+              {voiceCommands && <VoiceCommandBar engine={voice} enabled={isToday} testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
 
               <Menu
                 items={menuItems}
@@ -331,8 +332,8 @@ export function KitchenPage() {
           setDetailOrder(orderId)
         }}
       />
-      <RidersDrawer open={ridersOpen} onClose={() => setRidersOpen(false)} role={role} />
-      <OrderDetailDrawer orderId={detailOrderId} ticket={liveDetailTicket} role={role} onClose={() => setDetailOrder(null)} />
+      <RidersDrawer open={ridersOpen} onClose={() => setRidersOpen(false)} canManage={can('dispatch.riders')} />
+      <OrderDetailDrawer orderId={detailOrderId} ticket={liveDetailTicket} can={can} onClose={() => setDetailOrder(null)} />
       {confirmTicket && <ConfirmOrderDialog ticket={confirmTicket} onClose={() => setConfirmTicket(null)} />}
       {dispatchTicket && <DispatchDialog ticket={dispatchTicket} onClose={() => setDispatchTicket(null)} />}
       {cancelTicket && <CancelOrderDialog ticket={cancelTicket} onClose={() => setCancelTicket(null)} />}

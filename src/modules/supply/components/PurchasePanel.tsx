@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -20,6 +21,7 @@ const FILTERS: { value: Filter; label: string }[] = [
 ]
 
 export function PurchasePanel({ selectedId, onSelect, onCreate }: { selectedId: string | null; onSelect: (purchase: Purchase) => void; onCreate: () => void }) {
+  const { can } = useActiveKitchen()
   const { data: purchases, isLoading, isError, error, refetch } = usePurchases()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('TODAS')
@@ -44,9 +46,11 @@ export function PurchasePanel({ selectedId, onSelect, onCreate }: { selectedId: 
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-neutral-100">Compras</h2>
-        <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
-          Nueva
-        </Button>
+        {can('purchasing.create') && (
+          <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
+            Nueva
+          </Button>
+        )}
       </div>
 
       <div className="relative">

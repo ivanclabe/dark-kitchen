@@ -24,7 +24,7 @@ const REVERT_ITEM_TARGET: Partial<Record<KitchenOrderStatus, 'PENDIENTE' | 'EN_P
  * irreversibles. Sin estado optimista propio: si algo falla, la tarjeta
  * vuelve a su columna real en el próximo refetch.
  */
-export function useKanbanDragDrop(tickets: KitchenTicket[] | undefined, board: Pick<BoardActions, 'role' | 'requestConfirm' | 'requestDispatch' | 'requestCancel'>) {
+export function useKanbanDragDrop(tickets: KitchenTicket[] | undefined, board: Pick<BoardActions, 'can' | 'requestConfirm' | 'requestDispatch' | 'requestCancel'>) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const { advanceTicketItems } = useAdvanceTicketItems()
   const { revertTicketItems } = useRevertTicketItems()
@@ -54,7 +54,7 @@ export function useKanbanDragDrop(tickets: KitchenTicket[] | undefined, board: P
     const ticket = tickets?.find((t) => t.orderId === active.id)
     if (!ticket) return
 
-    if (!canPerform(board.role, action)) {
+    if (!canPerform(board.can, action)) {
       show(ACTION_DENIED_REASON[action], 'error')
       return
     }

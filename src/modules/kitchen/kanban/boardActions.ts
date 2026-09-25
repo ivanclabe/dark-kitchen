@@ -1,4 +1,4 @@
-import type { Role } from '@/shared/rbac/roles'
+import type { Can } from '@/shared/rbac/roles'
 import { createContext, useContext } from 'react'
 import type { KitchenTicket } from '../types'
 
@@ -9,7 +9,8 @@ import type { KitchenTicket } from '../types'
  * simple y los portales no tienen que pelear con los listeners de arrastre.
  */
 export interface BoardActions {
-  role: Role | null
+  /** Permisos del usuario en la Cocina activa. */
+  can: Can
   density: 'normal' | 'grande'
   openDetail: (ticket: KitchenTicket) => void
   requestConfirm: (ticket: KitchenTicket) => void

@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { ActiveBadge, Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -33,6 +34,7 @@ export function IngredientDetail({
   onEdit: () => void
   onRegisterMovement: (mode: MovementMode) => void
 }) {
+  const { can } = useActiveKitchen()
   const setActive = useSetIngredientActive()
   const { show } = useToast()
   const low = isLowStock(ingredient)
@@ -74,18 +76,26 @@ export function IngredientDetail({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" icon={Trash2} onClick={() => onRegisterMovement('merma')}>
-              Merma
-            </Button>
-            <Button variant="secondary" size="sm" icon={SlidersHorizontal} onClick={() => onRegisterMovement('ajuste')}>
-              Ajuste
-            </Button>
-            <Button variant="secondary" size="sm" icon={Pencil} onClick={onEdit}>
-              Editar
-            </Button>
-            <Button variant="ghost" size="sm" icon={Power} onClick={() => void handleToggleActive()} loading={setActive.isPending}>
-              {ingredient.active ? 'Desactivar' : 'Activar'}
-            </Button>
+            {can('inventory.adjust') && (
+              <>
+                <Button variant="secondary" size="sm" icon={Trash2} onClick={() => onRegisterMovement('merma')}>
+                  Merma
+                </Button>
+                <Button variant="secondary" size="sm" icon={SlidersHorizontal} onClick={() => onRegisterMovement('ajuste')}>
+                  Ajuste
+                </Button>
+              </>
+            )}
+            {can('inventory.edit') && (
+              <>
+                <Button variant="secondary" size="sm" icon={Pencil} onClick={onEdit}>
+                  Editar
+                </Button>
+                <Button variant="ghost" size="sm" icon={Power} onClick={() => void handleToggleActive()} loading={setActive.isPending}>
+                  {ingredient.active ? 'Desactivar' : 'Activar'}
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

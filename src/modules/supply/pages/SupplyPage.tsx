@@ -4,6 +4,7 @@ import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { Boxes, ShoppingCart, Truck, Warehouse } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { IngredientDetail } from '../components/IngredientDetail'
 import { IngredientFormDrawer } from '../components/IngredientFormDrawer'
 import { IngredientPanel } from '../components/IngredientPanel'
@@ -41,6 +42,7 @@ function isView(value: string | undefined): value is SupplyView {
 export function SupplyPage() {
   const { view: viewParam, id } = useParams<{ view?: string; id?: string }>()
   const navigate = useNavigate()
+  const { path } = useActiveKitchen()
   const view: SupplyView = isView(viewParam) ? viewParam : 'stock'
   const selectedId = id ?? null
 
@@ -61,7 +63,7 @@ export function SupplyPage() {
   const selectedSupplier = suppliers?.find((s) => s.id === selectedId) ?? null
 
   function go(nextView: SupplyView, nextId?: string) {
-    navigate(nextId ? `/supply/${nextView}/${nextId}` : `/supply/${nextView}`)
+    navigate(path(nextId ? `/supply/${nextView}/${nextId}` : `/supply/${nextView}`))
   }
 
   function openIngredientDrawer(ingredient: Ingredient | null) {

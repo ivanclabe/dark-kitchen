@@ -1,7 +1,6 @@
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
-import { CheckCircle2, ChefHat, KeyRound, ShieldCheck, Sparkles, Warehouse } from 'lucide-react'
+import { CheckCircle2, ChefHat, KeyRound, ShieldCheck, Warehouse } from 'lucide-react'
 import { FeatureCard } from '../components/FeatureCard'
 import { useAiConnectionStatus } from '../hooks/useAi'
 import { AI_FEATURES } from '../lib/catalog'
@@ -41,13 +40,13 @@ function Section({ title, icon: Icon, area }: { title: string; icon: typeof Ware
 
 /**
  * Configuración de IA: cada función se activa por separado y guarda sus
- * umbrales en dk_ai_features. La IA recomienda y explica; nunca ejecuta
+ * umbrales en la Cuenta (dk_kitchen_features, dentro de lo que ofrece la organización). La IA recomienda y explica; nunca ejecuta
  * compras ni cambia pedidos.
  */
 export function AiSettingsPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <PageHeader title="Configuración de IA" icon={Sparkles} description="Activa cada función por separado y ajusta sus umbrales. Todo se calcula con los datos reales de la operación." />
+    <div className="space-y-6">
+      <p className={typography.small}>Activa cada función por separado y ajusta sus umbrales. Todo se calcula con los datos reales de la operación.</p>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <ConnectionCard />

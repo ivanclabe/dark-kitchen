@@ -1,4 +1,4 @@
-import type { Role } from '@/shared/rbac/roles'
+import type { Can } from '@/shared/rbac/roles'
 import { canPerform, type FlowAction } from '../lib/permissions'
 import type { KitchenOrderStatus, KitchenPrepStatus } from '../types'
 
@@ -67,11 +67,11 @@ export function transitionAction(from: KitchenOrderStatus, to: KitchenOrderStatu
 }
 
 /**
- * ¿Se puede mover? Sin `role` responde solo si la transición existe; con
- * `role` además exige que ese rol pueda ejecutar la acción (ver permissions.ts).
+ * ¿Se puede mover? Sin `can` responde solo si la transición existe; con
+ * `can` (permisos de la Cocina activa) además exige poder ejecutar la acción.
  */
-export function canTransition(from: KitchenOrderStatus, to: KitchenOrderStatus, role?: Role | null): boolean {
+export function canTransition(from: KitchenOrderStatus, to: KitchenOrderStatus, can?: Can | null): boolean {
   const action = transitionAction(from, to)
   if (!action) return false
-  return role === undefined ? true : canPerform(role, action)
+  return can === undefined ? true : canPerform(can, action)
 }

@@ -9,8 +9,9 @@ import { formatDateTime } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { RefreshCw, Sparkles, Workflow } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { useAiFeature, useLatestAiInsight, useRefreshAiInsight, useUpdateAiFeature } from '../hooks/useAi'
-import { settingError, type FeatureDefinition } from '../lib/catalog'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { useLatestAiInsight, useRefreshAiInsight, useUpdateAiFeature } from '../hooks/useAi'
+import { settingError, withDefaults, type FeatureDefinition } from '../lib/catalog'
 import type { AiInsightFeatureKey, AiSettings } from '../types'
 
 function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
@@ -41,12 +42,18 @@ function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
 }
 
 /**
- * Tarjeta de una función de IA: interruptor, umbrales y frecuencia. La
- * edición es local hasta "Guardar" (mismo patrón derivado que el resto de
- * formularios de configuración: sin efecto de sincronización).
+ * Tarjeta de una función de IA en la Cuenta: interruptor, umbrales y
+ * frecuencia. La edición es local hasta "Guardar" (mismo patrón derivado que
+ * el resto de formularios de configuración: sin efecto de sincronización).
+ * Si la organización no la ofrece, no se puede activar (ADR 0009); lo que la
+ * Cuenta tenía guardado se conserva.
  */
 export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
-  const saved = useAiFeature(definition.key)
+  const { feature } = useActiveKitchen()
+  const state = feature(definition.key)
+  const available = state?.available ?? false
+  const canManage = state?.canManage ?? false
+  const saved = { enabled: state?.enabled ?? false, settings: withDefaults(definition.key, state?.settings) }
   const update = useUpdateAiFeature()
   const { show } = useToast()
 
@@ -72,7 +79,10 @@ export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', form.enabled ? 'border-brasa-500/30' : 'border-neutral-800/60')}>
+    <form
+      onSubmit={handleSubmit}
+      className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', form.enabled && available ? 'border-brasa-500/30' : 'border-neutral-800/60')}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -88,8 +98,20 @@ export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
             )}
           </div>
           <p className={clsx('mt-1', typography.caption)}>{definition.description}</p>
+          {!available && (
+            <p className="mt-2 text-xs text-amber-300">
+              Tu organización no tiene disponible esta función{saved.enabled ? ': queda apagada, con su configuración guardada.' : '.'}
+            </p>
+          )}
         </div>
-        <Switch checked={form.enabled} onChange={(enabled) => setEdited({ ...form, enabled })} label={`Activar ${definition.title}`} />
+        <span className={clsx('shrink-0', !available && 'opacity-50')}>
+          <Switch
+            checked={form.enabled}
+            onChange={(enabled) => setEdited({ ...form, enabled })}
+            label={`Activar ${definition.title}`}
+            disabled={!canManage || (!available && !form.enabled)}
+          />
+        </span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -141,7 +163,7 @@ export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
         </div>
       )}
 
-      {definition.usesModel && saved.enabled && <LastRun feature={definition.key as AiInsightFeatureKey} />}
+      {definition.usesModel && state?.usable && <LastRun feature={definition.key as AiInsightFeatureKey} />}
     </form>
   )
 }

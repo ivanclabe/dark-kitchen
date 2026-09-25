@@ -1,13 +1,15 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { Role } from '@/shared/rbac/roles'
 import type { Session, User } from '@supabase/supabase-js'
 import { createContext, use, useEffect, useState, type ReactNode } from 'react'
 
 export interface Profile {
   id: string
   fullName: string
-  role: Role
+  /** Avatar prediseñado elegido (null = el derivado del id). */
+  avatarKey: string | null
   active: boolean
+  /** Superusuario de la plataforma (crea y administra todas las Cocinas). El rol de cada Cocina vive en su membresía. */
+  isSuperadmin: boolean
 }
 
 interface AuthState {
@@ -20,6 +22,8 @@ interface AuthState {
   profileLoading: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
+  /** Vuelve a leer el perfil (p. ej. justo después de aceptar una invitación, que lo crea). */
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -27,7 +31,7 @@ const AuthContext = createContext<AuthState | null>(null)
 async function fetchProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('dk_users')
-    .select('id, full_name, role, active')
+    .select('id, full_name, avatar_key, active, platform_role')
     .eq('auth_user_id', userId)
     .single()
 
@@ -36,8 +40,9 @@ async function fetchProfile(userId: string): Promise<Profile | null> {
   return {
     id: data.id,
     fullName: data.full_name,
-    role: data.role as Role,
+    avatarKey: data.avatar_key,
     active: data.active,
+    isSuperadmin: data.platform_role === 'SUPERADMIN',
   }
 }
 
@@ -89,6 +94,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
   }
 
+  async function refreshProfile() {
+    // La sesión del estado puede no haberse actualizado aún (p. ej. justo después de signUp): se lee la actual.
+    const { data } = await supabase.auth.getSession()
+    if (!data.session) return
+    setProfile(await fetchProfile(data.session.user.id))
+  }
+
   return (
     <AuthContext
       value={{
@@ -99,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profileLoading,
         signIn,
         signOut,
+        refreshProfile,
       }}
     >
       {children}

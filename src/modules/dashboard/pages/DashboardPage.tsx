@@ -36,7 +36,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip as ChartTooltip, XAxis, YAxis } from 'recharts'
 import { useDashboardSummary } from '../hooks/useDashboard'
 import type { DashboardSummary } from '../types'
@@ -638,7 +639,9 @@ function CarteraCard({ summary, liveOps }: { summary: DashboardSummary | undefin
 export function DashboardPage() {
   const { profile } = useAuth()
   const { data, isLoading, isError, error, refetch } = useDashboardSummary()
-  const canSeeLiveOps = profile?.role === 'ADMIN' || profile?.role === 'MANAGER' || profile?.role === 'CASHIER'
+  // Operación en vivo y cartera: quien despacha (Administrador, Gerente, Caja) — permiso de la Cocina activa.
+  const { can } = useActiveKitchen()
+  const canSeeLiveOps = can('dispatch.assign')
   const firstName = profile?.fullName?.split(' ')[0] ?? 'usuario'
 
   return (

@@ -37,7 +37,7 @@ interface InsightItem {
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-dk-kitchen-id, x-dk-role-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -279,16 +279,42 @@ Deno.serve(async (req: Request) => {
     if (!feature || !(feature in ACTIONS)) return json({ error: "Función de IA inválida." }, 400);
 
     // Cliente con la sesión del usuario: RLS y rol de Postgres aplican a todo lo que se lee y escribe.
+    // La Cuenta activa viaja en x-dk-kitchen-id y la base la valida contra el acceso (nunca lo amplía).
+    const kitchenHeader = req.headers.get("x-dk-kitchen-id");
+    // El rol activo (ADR 0008) también viaja: la base lo valida contra los roles asignados.
+    const roleHeader = req.headers.get("x-dk-role-id");
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authorization } },
+      global: {
+        headers: {
+          Authorization: authorization,
+          ...(kitchenHeader ? { "x-dk-kitchen-id": kitchenHeader } : {}),
+          ...(roleHeader ? { "x-dk-role-id": roleHeader } : {}),
+        },
+      },
       auth: { persistSession: false },
     });
 
-    const { data: featureRows, error: featuresError } = await db.from("dk_ai_features").select("feature_key, enabled, settings");
+    // Cocina de la petición (multi-cocina, ADR 0007): configuración y análisis son por Cocina.
+    const { data: kitchenId, error: kitchenError } = await db.rpc("dk_current_kitchen_id");
+    if (kitchenError) return json({ error: kitchenError.message }, 403);
+    if (!kitchenId) return json({ error: "NO_KITCHEN", message: "No hay una Cocina activa para esta sesión." }, 409);
+
+    // Estado efectivo de las funciones en esta Cuenta (ADR 0009): organización ∧ Cuenta ∧ permiso del rol activo,
+    // con los parámetros ya completados desde el catálogo.
+    const { data: featureList, error: featuresError } = await db.rpc("dk_my_features");
     if (featuresError) return json({ error: featuresError.message }, 403);
-    const settings = Object.fromEntries((featureRows ?? []).map((f) => [f.feature_key, (f.settings ?? {}) as Record<string, number>]));
-    const current = (featureRows ?? []).find((f) => f.feature_key === feature);
-    if (!current?.enabled) return json({ error: "FEATURE_DISABLED", message: "Esta función de IA está desactivada." }, 409);
+    const features = (featureList ?? []) as { key: string; available: boolean; enabled: boolean; usable: boolean; settings: Record<string, number> }[];
+    const settings = Object.fromEntries(features.map((f) => [f.key, f.settings ?? {}]));
+    const current = features.find((f) => f.key === feature);
+    if (!current?.usable) {
+      const reason = !current?.available ? "organization" : !current.enabled ? "account" : "permission";
+      const message = {
+        organization: "Tu organización no tiene disponible esta función de IA.",
+        account: "Esta función de IA está desactivada en la Cuenta.",
+        permission: "Tu rol no puede usar esta función de IA.",
+      }[reason];
+      return json({ error: "FEATURE_DISABLED", reason, message }, 409);
+    }
 
     // Frecuencia: reutiliza el último análisis si todavía es vigente.
     const frequencyMin = Number(settings[feature]?.frequency_min ?? 0);
@@ -296,6 +322,7 @@ Deno.serve(async (req: Request) => {
       const { data: last } = await db
         .from("dk_ai_insights")
         .select("*")
+        .eq("kitchen_id", kitchenId)
         .eq("feature_key", feature)
         .in("status", ["ok", "empty"])
         .order("created_at", { ascending: false })
@@ -321,7 +348,7 @@ Deno.serve(async (req: Request) => {
     if (candidates.length === 0) {
       const { data: saved, error } = await db
         .from("dk_ai_insights")
-        .insert({ feature_key: feature, status: "empty", input: payload as Record<string, unknown>, output: { summary: "", items: [] } })
+        .insert({ kitchen_id: kitchenId, feature_key: feature, status: "empty", input: payload as Record<string, unknown>, output: { summary: "", items: [] } })
         .select()
         .single();
       if (error) return json({ error: error.message }, 403);
@@ -338,14 +365,14 @@ Deno.serve(async (req: Request) => {
       const output = validate(feature, raw, new Set(candidates.map((c) => c.id)));
       const { data: saved, error } = await db
         .from("dk_ai_insights")
-        .insert({ feature_key: feature, status: "ok", input: payload as Record<string, unknown>, output, model })
+        .insert({ kitchen_id: kitchenId, feature_key: feature, status: "ok", input: payload as Record<string, unknown>, output, model })
         .select()
         .single();
       if (error) return json({ error: error.message }, 403);
       return json({ insight: saved, cached: false });
     } catch (e) {
       const message = String(e instanceof Error ? e.message : e).slice(0, 500);
-      await db.from("dk_ai_insights").insert({ feature_key: feature, status: "error", input: payload as Record<string, unknown>, model, error: message });
+      await db.from("dk_ai_insights").insert({ kitchen_id: kitchenId, feature_key: feature, status: "error", input: payload as Record<string, unknown>, model, error: message });
       return json({ error: "AI_ERROR", message }, 502);
     }
   } catch (e) {

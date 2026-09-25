@@ -14,13 +14,13 @@ import { useTicketActions } from '../kanban/useTicketActions'
 import { ACTION_DENIED_REASON, canPerform, type FlowAction } from '../lib/permissions'
 import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL, ORDER_STATUS_CONFIG } from '../lib/ticketVisuals'
 import type { KitchenTicket, KitchenTicketItem } from '../types'
-import type { Role } from '@/shared/rbac/roles'
+import type { Can } from '@/shared/rbac/roles'
 
 const KITCHEN_STAGES = new Set(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
 
 /** Botón gateado por rol: deshabilitado con el motivo en el tooltip si tu rol no puede. */
-function GatedButton({ action, userRole, label, ...props }: { action: FlowAction; userRole: Role | null; label: string } & Omit<ButtonProps, 'children' | 'role'>) {
-  const allowed = canPerform(userRole, action)
+function GatedButton({ action, can, label, ...props }: { action: FlowAction; can: Can; label: string } & Omit<ButtonProps, 'children' | 'role'>) {
+  const allowed = canPerform(can, action)
   return (
     <Tooltip label={allowed ? label : ACTION_DENIED_REASON[action]} side="top">
       <Button {...props} disabled={props.disabled || !allowed}>
@@ -34,7 +34,7 @@ function GatedButton({ action, userRole, label, ...props }: { action: FlowAction
  * Todas las acciones del pedido en el tablero — las que antes llenaban el pie
  * de cada tarjeta (prioridad, retroceder, cancelar) más el siguiente paso.
  */
-function TicketActionBar({ ticket, role }: { ticket: KitchenTicket; role: Role | null }) {
+function TicketActionBar({ ticket, can }: { ticket: KitchenTicket; can: Can }) {
   const actions = useTicketActions(ticket)
   const primary = actions.primaryAction
   return (
@@ -42,7 +42,7 @@ function TicketActionBar({ ticket, role }: { ticket: KitchenTicket; role: Role |
       {primary && (
         <GatedButton
           action={primary.action}
-          userRole={role}
+          can={can}
           label={primary.label}
           variant="primary"
           icon={primary.icon}
@@ -51,11 +51,11 @@ function TicketActionBar({ ticket, role }: { ticket: KitchenTicket; role: Role |
           disabled={actions.primaryDisabled}
         />
       )}
-      {actions.revertLabel && <GatedButton action="revert" userRole={role} label={actions.revertLabel} variant="secondary" icon={ChevronLeft} onClick={actions.revert} disabled={actions.busy} />}
+      {actions.revertLabel && <GatedButton action="revert" can={can} label={actions.revertLabel} variant="secondary" icon={ChevronLeft} onClick={actions.revert} disabled={actions.busy} />}
       {actions.canPrioritize && (
         <GatedButton
           action="priority"
-          userRole={role}
+          can={can}
           label={actions.prioritized ? 'Quitar prioridad' : 'Prioritario'}
           variant="secondary"
           icon={Flag}
@@ -64,18 +64,18 @@ function TicketActionBar({ ticket, role }: { ticket: KitchenTicket; role: Role |
         />
       )}
       <div className="ml-auto">
-        <GatedButton action="cancel" userRole={role} label="Cancelar pedido" variant="danger" icon={XCircle} onClick={actions.cancel} />
+        <GatedButton action="cancel" can={can} label="Cancelar pedido" variant="danger" icon={XCircle} onClick={actions.cancel} />
       </div>
     </div>
   )
 }
 
-function ItemRow({ item, orderNumber, role }: { item: KitchenTicketItem; orderNumber: number; role: Role | null }) {
+function ItemRow({ item, orderNumber, can }: { item: KitchenTicketItem; orderNumber: number; can: Can }) {
   const advance = useAdvanceKitchenItem()
   const revert = useRevertKitchenItem()
   const { show } = useToast()
-  const canAdvance = canPerform(role, 'advance')
-  const canRevert = canPerform(role, 'revert')
+  const canAdvance = canPerform(can, 'advance')
+  const canRevert = canPerform(can, 'revert')
   const pending = advance.isPending || revert.isPending
 
   async function run(fn: () => Promise<unknown>, label: string) {
@@ -147,12 +147,13 @@ function ItemRow({ item, orderNumber, role }: { item: KitchenTicketItem; orderNu
 export function OrderDetailDrawer({
   orderId,
   ticket,
-  role,
+  can,
   onClose,
 }: {
   orderId: string | null
   ticket?: KitchenTicket
-  role: Role | null
+  /** Permisos en la Cocina activa. */
+  can: Can
   onClose: () => void
 }) {
   const { data: order } = useOrder(ticket ? '' : (orderId ?? ''))
@@ -165,12 +166,12 @@ export function OrderDetailDrawer({
   return (
     <Drawer open onClose={onClose} title={title} subtitle={subtitle}>
       <div className="space-y-5">
-        {ticket && <TicketActionBar ticket={ticket} role={role} />}
+        {ticket && <TicketActionBar ticket={ticket} can={can} />}
         {ticket && inKitchen && ticket.items.length > 0 && (
           <Card title="Cocina" description="Avanza o corrige plato por plato" icon={ChefHat}>
             <ul className="divide-y divide-neutral-800/60">
               {ticket.items.map((item) => (
-                <ItemRow key={item.id} item={item} orderNumber={ticket.orderNumber} role={role} />
+                <ItemRow key={item.id} item={item} orderNumber={ticket.orderNumber} can={can} />
               ))}
             </ul>
           </Card>

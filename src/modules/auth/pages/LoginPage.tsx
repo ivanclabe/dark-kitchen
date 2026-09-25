@@ -4,16 +4,20 @@ import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
 import { ArrowLeft, Flame } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 
 export function LoginPage() {
   const { session, signIn } = useAuth()
+  const [searchParams] = useSearchParams()
+  // Solo rutas internas (p. ej. volver al enlace de invitación): nunca redirigir fuera de la app.
+  const next = searchParams.get('next')
+  const target = next && next.startsWith('/') && !next.startsWith('//') ? next : '/'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (session) return <Navigate to="/" replace />
+  if (session) return <Navigate to={target} replace />
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -49,9 +53,9 @@ export function LoginPage() {
           </Button>
         </form>
 
-        <Link to="/signup-staff" className="mt-6 block text-center text-sm text-neutral-400 transition-colors hover:text-neutral-200">
-          ¿Eres nuevo en el equipo? <span className="text-brasa-400">Crear cuenta</span>
-        </Link>
+        <p className="mt-6 text-center text-sm text-neutral-500">
+          ¿Eres nuevo en el equipo? Pide a tu administrador una <span className="text-neutral-300">invitación</span>.
+        </p>
         <Link to="/" className="mt-3 flex items-center justify-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-300">
           <ArrowLeft size={14} aria-hidden /> Volver al inicio
         </Link>

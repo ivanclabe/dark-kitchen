@@ -11,3 +11,7 @@ dist
 # VITE_SUPABASE_PUBLISHABLE_KEY en tiempo de build (quedan en el bundle
 # público de todas formas). Solo pasa por la etapa de build; la imagen final
 # contiene únicamente dist/.
+
+# Contraseña de la base del proyecto Supabase (nunca entra a la imagen)
+.supabase-db-password.local
+supabase/.temp

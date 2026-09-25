@@ -5,13 +5,6 @@ export type AiInsightFeatureKey = Exclude<AiFeatureKey, 'kitchen_stall_alerts'>
 
 export type AiSettings = Record<string, number | boolean>
 
-export interface AiFeature {
-  key: AiFeatureKey
-  enabled: boolean
-  settings: AiSettings
-  updatedAt: string
-}
-
 export type InsightPriority = 'alta' | 'media' | 'baja'
 
 export interface InsightItem {

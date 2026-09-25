@@ -1,3 +1,4 @@
+import { PUBLIC_SIGNUP_ENABLED } from '@/modules/signup/api'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { CalendarDays, ChefHat, ChevronRight, Flame, Wallet, Warehouse, type LucideIcon } from 'lucide-react'
 import type { CSSProperties } from 'react'
@@ -58,7 +59,7 @@ export function LandingPage() {
             to={entryHref}
             className="rounded-lg border border-neutral-800 bg-neutral-900/60 px-4 py-2 text-sm font-medium text-neutral-200 backdrop-blur transition-colors hover:border-neutral-700 hover:text-neutral-50"
           >
-            {session ? 'Ir a mi cocina' : 'Iniciar sesión'}
+            {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
           </Link>
         </div>
       </header>
@@ -88,12 +89,20 @@ export function LandingPage() {
             </p>
             <div className="animate-landing-rise mt-9 sm:mt-11" style={delay(240)}>
               <Link
-                to={entryHref}
+                to={session || !PUBLIC_SIGNUP_ENABLED ? entryHref : '/registro'}
                 className="group inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-brasa-500 px-10 text-base font-semibold text-white shadow-[0_12px_40px_-12px_var(--color-brasa-500)] transition-colors hover:bg-brasa-400 sm:w-96 sm:text-lg"
               >
-                {session ? 'Ir a mi cocina' : 'Entrar a mi cocina'}
+                {session ? 'Ir a mi cuenta' : PUBLIC_SIGNUP_ENABLED ? 'Crear mi negocio' : 'Entrar a mi cuenta'}
                 <ChevronRight size={20} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
+              {!session && PUBLIC_SIGNUP_ENABLED && (
+                <p className="mt-4 text-sm text-neutral-500">
+                  ¿Ya tienes usuario?{' '}
+                  <Link to="/login" className="text-neutral-300 hover:text-neutral-100">
+                    Inicia sesión
+                  </Link>
+                </p>
+              )}
             </div>
           </div>
 
@@ -131,7 +140,7 @@ export function LandingPage() {
             <Flame size={14} className="text-brasa-500" aria-hidden /> © {new Date().getFullYear()} Dark Kitchen
           </span>
           <Link to={entryHref} className="transition-colors hover:text-neutral-200">
-            {session ? 'Ir a mi cocina' : 'Iniciar sesión'}
+            {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
           </Link>
         </div>
       </footer>

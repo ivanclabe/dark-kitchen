@@ -1,3 +1,4 @@
+import { getActiveKitchenId } from '@/shared/kitchen/activeKitchen'
 import { supabase } from '@/shared/lib/supabase'
 import type { SlaThresholds } from '../lib/ticketVisuals'
 
@@ -17,12 +18,12 @@ function mapRow(row: SlaSettingsRow): SlaThresholds {
   }
 }
 
-/** Fila única (id=1) — ver migración dk_kitchen_revert_cancel_sla_settings. */
+/** Una fila por Cocina (clave kitchen_id desde multi-cocina, ADR 0007). */
 export async function getKitchenSlaSettings(): Promise<SlaThresholds> {
   const { data, error } = await supabase
     .from('dk_kitchen_sla_settings')
     .select('confirmado_alert_min, en_preparacion_alert_min, listo_alert_min, near_threshold_pct')
-    .eq('id', 1)
+    .eq('kitchen_id', getActiveKitchenId() ?? '')
     .single()
 
   if (error) throw error
@@ -38,7 +39,7 @@ export async function updateKitchenSlaSettings(thresholds: SlaThresholds): Promi
       listo_alert_min: thresholds.listoAlertMin,
       near_threshold_pct: thresholds.nearThresholdPct,
     })
-    .eq('id', 1)
+    .eq('kitchen_id', getActiveKitchenId() ?? '')
 
   if (error) throw error
 }

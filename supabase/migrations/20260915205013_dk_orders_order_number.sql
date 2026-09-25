@@ -19,7 +19,14 @@ from numbered n
 where o.id = n.id;
 
 -- Alinea la secuencia para que el siguiente pedido nuevo no choque con el backfill.
-select setval('dk_order_number_seq', coalesce((select max(order_number) from dk_orders), 999));
+-- (2026-09-24) Ajustado para reproducirse en una base vacía (proyecto propio,
+-- ADR 0007): la versión aplicada originalmente usaba 999 como piso, fuera del
+-- rango de la secuencia (1000..9999). Con pedidos existentes el resultado es
+-- idéntico; sin pedidos, el siguiente número es 1000.
+select case
+  when (select max(order_number) from dk_orders) is null then setval('dk_order_number_seq', 1000, false)
+  else setval('dk_order_number_seq', (select max(order_number) from dk_orders))
+end;
 
 alter table dk_orders alter column order_number set not null;
 

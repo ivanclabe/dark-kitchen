@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
@@ -44,6 +45,7 @@ function TotalRow({ label, value, trailingCols, emphasis = false }: { label: str
 }
 
 export function OrderBuilder({ orderId, statusActions = true }: { orderId: string; /** false cuando quien lo aloja ya ofrece confirmar/cancelar (tablero de Cocina). */ statusActions?: boolean }) {
+  const { can } = useActiveKitchen()
   const { show } = useToast()
 
   const { data: order, isLoading } = useOrder(orderId)
@@ -65,7 +67,10 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
   const [cancelOpen, setCancelOpen] = useState(false)
 
   const isNuevo = order?.status === 'NUEVO'
-  const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status)
+  // Permisos del rol activo (la base los exige igual): editar el borrador, confirmarlo y cancelarlo son acciones distintas.
+  const canEditItems = isNuevo && can('orders.edit')
+  const canConfirm = isNuevo && can('orders.confirm')
+  const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status) && can('orders.cancel')
 
   const productOptions = useMemo(
     () =>
@@ -132,7 +137,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
     { key: 'unit', header: 'Precio unit.', cell: (item) => <span className="tabular-nums text-neutral-400">{formatMoney(item.unitPrice)}</span>, align: 'right' },
     { key: 'total', header: 'Total', cell: (item) => <span className="tabular-nums">{formatMoney(item.lineTotal)}</span>, align: 'right' },
     { key: 'obs', header: 'Observación', cell: (item) => <span className="text-neutral-400">{item.observation ?? <span className="text-neutral-600">—</span>}</span> },
-    ...(isNuevo
+    ...(canEditItems
       ? [
           {
             key: 'actions',
@@ -148,7 +153,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
       : []),
   ]
   // Columnas que quedan a la derecha de "Total" (Observación + Acciones si aplica).
-  const trailingCols = isNuevo ? 2 : 1
+  const trailingCols = canEditItems ? 2 : 1
 
   return (
     <div className="space-y-6">
@@ -167,7 +172,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
         </p>
       )}
 
-      {isNuevo && (
+      {canEditItems && (
         <form onSubmit={handleAddItem} className={`${cardClass} space-y-4`}>
           <FormGrid cols={4}>
             <FormField label="Plato" required className="sm:col-span-2">
@@ -232,14 +237,14 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
         }
       />
 
-      {statusActions && (isNuevo || canCancel) && (
+      {statusActions && (canConfirm || canCancel) && (
         <div className="flex flex-wrap justify-end gap-2">
           {canCancel && (
             <Button variant="danger" icon={XCircle} onClick={() => setCancelOpen(true)}>
               Cancelar pedido
             </Button>
           )}
-          {isNuevo && (
+          {canConfirm && (
             <Button variant="primary" icon={CheckCircle2} onClick={() => setConfirmOpen(true)} disabled={!items?.length}>
               Confirmar pedido
             </Button>

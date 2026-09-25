@@ -3,6 +3,7 @@ import {
   useCreateProductCategory,
   useProductCategories,
   useSetProductActive,
+  useSetSharedProductPrice,
   useUpdateProduct,
   useUploadProductImage,
 } from '@/modules/products/hooks/useProducts'
@@ -13,10 +14,10 @@ import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BookOpen, ImagePlus, Plus, Power } from 'lucide-react'
+import { BookOpen, ImagePlus, Layers, Plus, Power } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -43,6 +44,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
   const { data: categories } = useProductCategories()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
+  const setSharedPrice = useSetSharedProductPrice()
   const createCategory = useCreateProductCategory()
   const setActive = useSetProductActive()
   const uploadImage = useUploadProductImage()
@@ -61,7 +63,16 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
       : emptyValues,
   })
 
+  // Plato de un menú maestro: aquí solo se ajusta el precio (lo demás lo define el maestro).
+  const shared = Boolean(product?.masterProductId)
+
   async function onSubmit(values: FormOutput) {
+    if (product && shared) {
+      if (values.price !== product.price) await setSharedPrice.mutateAsync({ id: product.id, price: values.price })
+      show(`Precio de "${product.name}" actualizado.`)
+      onClose()
+      return
+    }
     const input = {
       code: values.code || null,
       name: values.name,
@@ -87,19 +98,48 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
     setShowNewCategory(false)
   }
 
-  const submitting = createProduct.isPending || updateProduct.isPending
+  const submitting = createProduct.isPending || updateProduct.isPending || setSharedPrice.isPending
 
   return (
     <Drawer open={open} onClose={onClose} title={product ? 'Editar plato' : 'Nuevo plato'} size="sm">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {shared && product && (
+          <div className="space-y-1 rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm">
+            <p className="flex items-center gap-1.5 font-medium text-neutral-100">
+              <Layers size={14} className="text-brasa-400" aria-hidden /> Plato del menú maestro
+            </p>
+            <p className="text-xs text-neutral-400">
+              Nombre, categoría y receta los define el menú maestro. Aquí puedes ajustar el precio y, en el calendario, qué días se ofrece.
+            </p>
+            {product.priceIsLocal && (
+              <button
+                type="button"
+                onClick={() =>
+                  setSharedPrice.mutate(
+                    { id: product.id, price: null },
+                    {
+                      onSuccess: () => {
+                        show('Se usa de nuevo el precio del maestro.')
+                        onClose()
+                      },
+                    },
+                  )
+                }
+                className="text-xs font-medium text-brasa-400 hover:underline"
+              >
+                Usar el precio del menú maestro
+              </button>
+            )}
+          </div>
+        )}
         <FormField label="Nombre" required error={errors.name?.message}>
-          {(a11y) => <Input {...a11y} {...register('name')} />}
+          {(a11y) => <Input {...a11y} {...register('name')} disabled={shared} />}
         </FormField>
-        <FormField label="Código">{(a11y) => <Input {...a11y} {...register('code')} />}</FormField>
+        <FormField label="Código">{(a11y) => <Input {...a11y} {...register('code')} disabled={shared} />}</FormField>
 
         <FormField label="Categoría">
           {(a11y) => (
-            <Select {...a11y} {...register('categoryId')}>
+            <Select {...a11y} {...register('categoryId')} disabled={shared}>
               <option value="">Sin categoría</option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -109,25 +149,29 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
             </Select>
           )}
         </FormField>
-        {showNewCategory ? (
-          <div className="flex items-end gap-2">
-            <FormField label="Nueva categoría" className="flex-1">
-              {(a11y) => <Input {...a11y} value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Ej. Hamburguesas" />}
-            </FormField>
-            <Button variant="secondary" size="sm" onClick={handleAddCategory} loading={createCategory.isPending} disabled={!newCategoryName.trim()}>
-              Crear
-            </Button>
-          </div>
-        ) : (
-          <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
-            + Crear categoría nueva
-          </button>
+        {!shared && (
+          <>
+            {showNewCategory ? (
+              <div className="flex items-end gap-2">
+                <FormField label="Nueva categoría" className="flex-1">
+                  {(a11y) => <Input {...a11y} value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Ej. Hamburguesas" />}
+                </FormField>
+                <Button variant="secondary" size="sm" onClick={handleAddCategory} loading={createCategory.isPending} disabled={!newCategoryName.trim()}>
+                  Crear
+                </Button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
+                + Crear categoría nueva
+              </button>
+            )}
+          </>
         )}
 
         <FormField label="Precio de venta" required error={errors.price?.message}>
           {(a11y) => <Input {...a11y} type="number" step="any" min="0" {...register('price')} />}
         </FormField>
-        <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} />}</FormField>
+        <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
 
         {product && (
           <div className="space-y-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 p-3">
@@ -137,11 +181,13 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
             </div>
             <div className="flex flex-wrap gap-2">
               <Link to={`/recipes/${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
-                <BookOpen size={13} aria-hidden /> {product.activeRecipeVersion ? `Receta v${product.activeRecipeVersion}` : 'Crear receta'}
+                <BookOpen size={13} aria-hidden /> {shared ? 'Ver receta' : product.activeRecipeVersion ? `Receta v${product.activeRecipeVersion}` : 'Crear receta'}
               </Link>
-              <Button variant="secondary" size="sm" icon={Power} onClick={() => setActive.mutate({ id: product.id, active: !product.active })}>
-                {product.active ? 'Desactivar' : 'Activar'}
-              </Button>
+              {!shared && (
+                <Button variant="secondary" size="sm" icon={Power} onClick={() => setActive.mutate({ id: product.id, active: !product.active })}>
+                  {product.active ? 'Desactivar' : 'Activar'}
+                </Button>
+              )}
               <label className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex cursor-pointer items-center gap-1.5`}>
                 <ImagePlus size={13} aria-hidden /> Imagen
                 <input

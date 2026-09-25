@@ -1,29 +1,31 @@
+import { setKitchenFeature } from '@/shared/features/features'
+import { FEATURES_KEY, useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getAiConnectionStatus, getKitchenSignals, getLatestInsight, listAiFeatures, listInventorySignals, requestInsight, updateAiFeature } from '../api/ai'
+import { getAiConnectionStatus, getKitchenSignals, getLatestInsight, listInventorySignals, requestInsight } from '../api/ai'
 import { numberSetting, withDefaults } from '../lib/catalog'
-import type { AiFeature, AiFeatureKey, AiInsightFeatureKey, AiSettings } from '../types'
-
-const FEATURES_KEY = ['ai-features'] as const
+import type { AiFeatureKey, AiInsightFeatureKey, AiSettings } from '../types'
 const INSIGHT_KEY = ['ai-insight'] as const
 // Bajo el prefijo de las sugerencias de Abastecimiento: toda mutación que ya las
 // invalida (compras, mermas, ajustes, consumo en cocina, edición de insumos) refresca también las señales.
 export const INVENTORY_SIGNALS_KEY = ['supply-suggestions', 'signals'] as const
 
-export function useAiFeatures() {
-  return useQuery({ queryKey: FEATURES_KEY, queryFn: listAiFeatures, staleTime: 60_000 })
-}
-
-/** Una función con su configuración ya completada con los valores por defecto. Mientras carga: desactivada. */
+/**
+ * Una función de IA en la Cuenta activa, según el estado efectivo de la base
+ * (organización ∧ Cuenta ∧ permiso del rol activo, ADR 0009). `enabled` =
+ * se puede usar; los parámetros ya vienen completados. Mientras carga: apagada.
+ */
 export function useAiFeature(key: AiFeatureKey): { enabled: boolean; settings: AiSettings; loaded: boolean } {
-  const { data } = useAiFeatures()
-  const row = data?.find((f: AiFeature) => f.key === key)
-  return { enabled: row?.enabled ?? false, settings: withDefaults(key, row?.settings), loaded: data !== undefined }
+  const { feature, features } = useActiveKitchen()
+  const state = feature(key)
+  return { enabled: state?.usable ?? false, settings: withDefaults(key, state?.settings), loaded: features.length > 0 }
 }
 
+/** Activar/desactivar y ajustar una función en la Cuenta activa (la base valida organización y permiso). */
 export function useUpdateAiFeature() {
   const queryClient = useQueryClient()
+  const { kitchen } = useActiveKitchen()
   return useMutation({
-    mutationFn: ({ key, enabled, settings }: { key: AiFeatureKey; enabled: boolean; settings: AiSettings }) => updateAiFeature(key, { enabled, settings }),
+    mutationFn: ({ key, enabled, settings }: { key: AiFeatureKey; enabled: boolean; settings: AiSettings }) => setKitchenFeature(kitchen.id, key, enabled, settings),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
       void queryClient.invalidateQueries({ queryKey: INSIGHT_KEY })

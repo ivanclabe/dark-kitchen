@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { typography } from './typography'
 
 /**

@@ -1,5 +1,4 @@
 import { useCreateRider, useRiders, useSetRiderActive } from '@/modules/delivery/hooks/useDelivery'
-import type { Role } from '@/shared/rbac/roles'
 import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -12,15 +11,11 @@ import { Bike, Plus } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 /** RLS de dk_delivery_riders: solo ADMIN/MANAGER escriben. Antes el formulario se mostraba igual a caja y reparto y fallaba al guardar. */
-function canManageRiders(role: Role | null) {
-  return role === 'ADMIN' || role === 'MANAGER'
-}
-
 /**
  * Domiciliarios — el gestor que vivía en la pantalla Despacho: alta y
  * activar/desactivar. Solo los activos aparecen al despachar un pedido.
  */
-export function RidersDrawer({ open, onClose, role }: { open: boolean; onClose: () => void; role: Role | null }) {
+export function RidersDrawer({ open, onClose, canManage }: { open: boolean; onClose: () => void; /** Permiso dispatch:manage en la Cocina activa. */ canManage: boolean }) {
   const { data: riders } = useRiders()
   const createRider = useCreateRider()
   const setActive = useSetRiderActive()
@@ -28,7 +23,6 @@ export function RidersDrawer({ open, onClose, role }: { open: boolean; onClose: 
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [vehicleType, setVehicleType] = useState('')
-  const canManage = canManageRiders(role)
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault()

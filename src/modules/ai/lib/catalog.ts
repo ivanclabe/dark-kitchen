@@ -33,7 +33,7 @@ const FREQUENCY: SettingField = {
 
 /**
  * Catálogo de funciones de IA. Los valores por defecto coinciden con los
- * sembrados en dk_ai_features (migración dk_ai_layer); si una fila no trae
+ * de dk_features.default_settings (la fuente); aquí son solo el respaldo mientras carga. Si una fila no trae
  * alguna clave, se completa desde aquí.
  */
 export const AI_FEATURES: FeatureDefinition[] = [

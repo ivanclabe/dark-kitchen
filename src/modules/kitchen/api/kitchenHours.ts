@@ -40,14 +40,14 @@ export async function getKitchenSchedule(): Promise<KitchenSchedule> {
 /** Guarda los 7 días de una vez: la plantilla siempre queda completa. */
 export async function saveWeeklyHours(weekly: Record<WeekDay, DayHours>): Promise<void> {
   const rows = WEEK_DAYS.map((day) => ({ day_of_week: day, ...hoursColumns(weekly[day]) }))
-  const { error } = await supabase.from('dk_kitchen_hours').upsert(rows, { onConflict: 'day_of_week' })
+  const { error } = await supabase.from('dk_kitchen_hours').upsert(rows, { onConflict: 'kitchen_id,day_of_week' })
   if (error) throw error
 }
 
 export async function saveHoursException(exception: HoursException): Promise<void> {
   const { error } = await supabase
     .from('dk_kitchen_hour_exceptions')
-    .upsert({ exception_date: exception.date, ...hoursColumns(exception), note: exception.note?.trim() || null }, { onConflict: 'exception_date' })
+    .upsert({ exception_date: exception.date, ...hoursColumns(exception), note: exception.note?.trim() || null }, { onConflict: 'kitchen_id,exception_date' })
   if (error) throw error
 }
 

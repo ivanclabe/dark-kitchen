@@ -1,11 +1,7 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { Json } from '@/types/database'
 import type {
-  AiFeature,
-  AiFeatureKey,
   AiInsight,
   AiInsightFeatureKey,
-  AiSettings,
   InsightItem,
   InsightResult,
   InventorySignal,
@@ -14,25 +10,6 @@ import type {
 } from '../types'
 
 const FUNCTION_NAME = 'dk-ai-insights'
-
-export async function listAiFeatures(): Promise<AiFeature[]> {
-  const { data, error } = await supabase.from('dk_ai_features').select('feature_key, enabled, settings, updated_at')
-  if (error) throw error
-  return data.map((row) => ({
-    key: row.feature_key as AiFeatureKey,
-    enabled: row.enabled,
-    settings: (row.settings ?? {}) as AiSettings,
-    updatedAt: row.updated_at,
-  }))
-}
-
-export async function updateAiFeature(key: AiFeatureKey, patch: { enabled: boolean; settings: AiSettings }): Promise<void> {
-  const { error } = await supabase
-    .from('dk_ai_features')
-    .update({ enabled: patch.enabled, settings: patch.settings as Json })
-    .eq('feature_key', key)
-  if (error) throw error
-}
 
 /** ¿Está cargado el secreto de la IA? La Edge Function responde sin exponer la clave. */
 export async function getAiConnectionStatus(): Promise<{ configured: boolean }> {

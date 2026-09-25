@@ -1,7 +1,7 @@
 import { cardClass } from '@/shared/ui/formClasses'
 import { initials } from '@/shared/utils/format'
 import { MapPin, Phone } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import type { CustomerBalance } from '../lib/balance'
 import type { Customer } from '../types'
 import { CustomerStatusBadge } from './CustomerStatusBadge'

@@ -33,7 +33,7 @@ export const KanbanTicketCard = memo(function KanbanTicketCard({
   const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
   const tier = timeTier(minutesAgoSince(ticket.createdAt, now), alertMinutesFor(ticket.orderStatus, thresholds), thresholds.nearThresholdPct)
   const primary = actions.primaryAction
-  const allowed = primary ? canPerform(board.role, primary.action) : false
+  const allowed = primary ? canPerform(board.can, primary.action) : false
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: ticket.orderId, data: { status: ticket.orderStatus } })
 

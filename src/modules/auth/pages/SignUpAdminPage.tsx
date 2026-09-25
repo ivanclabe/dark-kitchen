@@ -37,11 +37,11 @@ export function SignUpAdminPage() {
 
     const { error: profileError } = await supabase
       .from('dk_users')
-      .insert({ auth_user_id: data.session.user.id, full_name: fullName, role: 'ADMIN' })
+      .insert({ auth_user_id: data.session.user.id, full_name: fullName, platform_role: 'SUPERADMIN' })
 
     if (profileError) {
       setError(
-        'Ya existe un administrador registrado. Pide a un administrador que te cree una cuenta desde el módulo de Usuarios.',
+        'La plataforma ya tiene superusuario. Para entrar a un negocio necesitas que su administrador te agregue.',
       )
       setSubmitting(false)
       return
@@ -58,8 +58,8 @@ export function SignUpAdminPage() {
             <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
           <div>
-            <h1 className={typography.h1}>Crear cuenta de administrador</h1>
-            <p className={`mt-1 ${typography.small}`}>Solo funciona si todavía no existe ningún usuario.</p>
+            <h1 className={typography.h1}>Crear cuenta de superusuario</h1>
+            <p className={`mt-1 ${typography.small}`}>Solo para la primera cuenta de una instalación nueva.</p>
           </div>
         </div>
 

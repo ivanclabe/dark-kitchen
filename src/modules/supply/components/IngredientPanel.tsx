@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -37,6 +38,7 @@ export function IngredientPanel({
   onSelect: (ingredient: Ingredient) => void
   onCreate: () => void
 }) {
+  const { can } = useActiveKitchen()
   const { data: ingredients, isLoading, isError, error, refetch } = useIngredients()
   const { data: categories } = useCategories()
   const [query, setQuery] = useState('')
@@ -70,9 +72,11 @@ export function IngredientPanel({
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-neutral-100">Insumos</h2>
-        <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
-          Nuevo
-        </Button>
+        {can('inventory.create') && (
+          <Button variant="secondary" size="sm" icon={Plus} onClick={onCreate}>
+            Nuevo
+          </Button>
+        )}
       </div>
 
       <div className="relative">

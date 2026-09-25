@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -26,6 +27,7 @@ function ContactRow({ icon: Icon, value }: { icon: typeof Phone; value: string |
 }
 
 export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplier: Supplier; onEdit: () => void; onSelectPurchase: (purchase: Purchase) => void }) {
+  const { can } = useActiveKitchen()
   const { data: purchases } = usePurchases()
   const { data: ingredients } = useIngredients()
   const setActive = useSetSupplierActive()
@@ -61,12 +63,16 @@ export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplie
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" icon={Pencil} onClick={onEdit}>
-              Editar
-            </Button>
-            <Button variant="ghost" size="sm" icon={Power} onClick={() => void handleToggleActive()} loading={setActive.isPending}>
-              {supplier.active ? 'Desactivar' : 'Activar'}
-            </Button>
+            {can('suppliers.edit') && (
+              <>
+                <Button variant="secondary" size="sm" icon={Pencil} onClick={onEdit}>
+                  Editar
+                </Button>
+                <Button variant="ghost" size="sm" icon={Power} onClick={() => void handleToggleActive()} loading={setActive.isPending}>
+                  {supplier.active ? 'Desactivar' : 'Activar'}
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

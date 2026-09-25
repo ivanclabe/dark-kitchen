@@ -1,4 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
+import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
 import type { Attachment, LastIngredientPrice, Purchase, PurchaseInput, PurchaseItem, PurchaseItemInput } from '../types'
 
 interface PurchaseRow {
@@ -174,7 +175,7 @@ export async function listAttachments(purchaseId: string): Promise<Attachment[]>
 }
 
 export async function uploadInvoiceAttachment(purchaseId: string, file: File): Promise<void> {
-  const path = `purchases/${purchaseId}/${Date.now()}-${file.name}`
+  const path = await kitchenFilePath('purchases', purchaseId, file.name)
 
   const { error: uploadError } = await supabase.storage.from('dk-attachments').upload(path, file)
   if (uploadError) throw uploadError

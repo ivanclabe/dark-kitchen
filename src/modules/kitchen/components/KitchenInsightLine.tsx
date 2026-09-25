@@ -4,7 +4,7 @@ import { ACTION_LABEL } from '@/modules/ai/lib/catalog'
 import clsx from 'clsx'
 import { ChevronDown, Sparkles, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { speak } from '../voice/speak'
+import { useSpeech } from '../voice/useSpeech'
 
 const DISMISSED_KEY = 'dk-kitchen-insight-dismissed'
 
@@ -36,6 +36,7 @@ export function KitchenInsightLine({
   onOpenOrder: (orderId: string) => void
 }) {
   const feature = useAiFeature('kitchen_insights')
+  const { say } = useSpeech()
   const enabled = active && feature.enabled
   const { data: result } = useAiInsight('kitchen_insights', enabled, { live: true })
   const [dismissedId, setDismissedId] = useState<string | null>(readDismissed)
@@ -49,8 +50,8 @@ export function KitchenInsightLine({
   useEffect(() => {
     if (!visible || !insight || feature.settings.voice !== true || paused || muted || spokenId.current === insight.id) return
     spokenId.current = insight.id
-    speak(`Sugerencia: ${insight.items[0].title}.`)
-  }, [visible, insight, feature.settings.voice, paused, muted])
+    say(`Sugerencia: ${insight.items[0].title}.`)
+  }, [visible, insight, feature.settings.voice, paused, muted, say])
 
   if (!visible || !insight) return null
 

@@ -1,3 +1,4 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useRecentPayments, useReceivables } from '@/modules/cartera/hooks/useReceivables'
 import type { Receivable } from '@/modules/cartera/types'
 import { Button } from '@/shared/ui/Button'
@@ -21,6 +22,7 @@ type Filter = 'todos' | 'con_saldo' | 'vencidos'
 
 /** Dashboard único de Clientes — fusiona lo que antes eran las pestañas "Cuentas por cobrar" y "Clientes", sin tabla gigante: tarjetas + estado en lenguaje simple. */
 export function CustomersPage() {
+  const { can } = useActiveKitchen()
   const { data: customers, isLoading, isError, error, refetch } = useCustomers()
   const { data: receivables } = useReceivables()
   const { data: recentPayments } = useRecentPayments(8)
@@ -67,9 +69,11 @@ export function CustomersPage() {
         description={customers ? `${customers.length} clientes` : 'Clientes, saldos y pagos en un solo lugar.'}
         icon={Users}
         actions={
-          <Button variant="primary" icon={Plus} onClick={() => setCreateOpen(true)}>
-            Nuevo cliente
-          </Button>
+          can('customers.create') && (
+            <Button variant="primary" icon={Plus} onClick={() => setCreateOpen(true)}>
+              Nuevo cliente
+            </Button>
+          )
         }
       />
 
@@ -110,7 +114,7 @@ export function CustomersPage() {
                 query || filter !== 'todos' ? 'Ajusta la búsqueda o el filtro.' : 'Los clientes también se crean solos al registrar un pedido por WhatsApp.'
               }
               action={
-                !query && filter === 'todos' ? (
+                !query && filter === 'todos' && can('customers.create') ? (
                   <Button variant="primary" size="sm" icon={Plus} onClick={() => setCreateOpen(true)}>
                     Crear el primero
                   </Button>

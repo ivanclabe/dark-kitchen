@@ -1,4 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
+import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
 import type { Product, ProductCategory, ProductInput } from '../types'
 
 interface ProductRow {
@@ -12,12 +13,14 @@ interface ProductRow {
   active_recipe_id: string | null
   estimated_cost: number
   active: boolean
+  master_product_id: string | null
+  price_is_local: boolean
   dk_product_categories: { name: string } | null
   dk_recipes: { version: number } | null
 }
 
 const SELECT = `
-  id, code, name, description, category_id, price, image_path, active_recipe_id, estimated_cost, active,
+  id, code, name, description, category_id, price, image_path, active_recipe_id, estimated_cost, active, master_product_id, price_is_local,
   dk_product_categories ( name ),
   dk_recipes!dk_products_active_recipe_fkey ( version )
 `
@@ -36,6 +39,8 @@ function mapRow(row: ProductRow): Product {
     activeRecipeVersion: row.dk_recipes?.version ?? null,
     estimatedCost: Number(row.estimated_cost),
     active: row.active,
+    masterProductId: row.master_product_id,
+    priceIsLocal: row.price_is_local,
   }
 }
 
@@ -76,6 +81,18 @@ export async function updateProduct(id: string, input: ProductInput): Promise<vo
   if (error) throw error
 }
 
+/** Plato de menú maestro: la Cocina solo cambia el precio (queda como precio propio). */
+export async function updateProductPrice(id: string, price: number): Promise<void> {
+  const { error } = await supabase.from('dk_products').update({ price }).eq('id', id)
+  if (error) throw error
+}
+
+/** Plato de menú maestro: volver al precio del maestro (lo resuelve la base). */
+export async function resetProductPrice(id: string): Promise<void> {
+  const { error } = await supabase.from('dk_products').update({ price_is_local: false }).eq('id', id)
+  if (error) throw error
+}
+
 export async function setProductActive(id: string, active: boolean): Promise<void> {
   const { error } = await supabase.from('dk_products').update({ active }).eq('id', id)
   if (error) throw error
@@ -98,7 +115,7 @@ export async function createProductCategory(name: string): Promise<ProductCatego
 }
 
 export async function uploadProductImage(productId: string, file: File): Promise<void> {
-  const path = `products/${productId}/${Date.now()}-${file.name}`
+  const path = await kitchenFilePath('products', productId, file.name)
   const { error: uploadError } = await supabase.storage.from('dk-attachments').upload(path, file)
   if (uploadError) throw uploadError
 
