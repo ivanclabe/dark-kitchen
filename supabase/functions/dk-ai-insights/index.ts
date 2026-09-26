@@ -303,12 +303,20 @@ Deno.serve(async (req: Request) => {
     // con los parámetros ya completados desde el catálogo.
     const { data: featureList, error: featuresError } = await db.rpc("dk_my_features");
     if (featuresError) return json({ error: featuresError.message }, 403);
-    const features = (featureList ?? []) as { key: string; available: boolean; enabled: boolean; usable: boolean; settings: Record<string, number> }[];
+    const features = (featureList ?? []) as {
+      key: string;
+      includedInPlan: boolean;
+      available: boolean;
+      enabled: boolean;
+      usable: boolean;
+      settings: Record<string, number>;
+    }[];
     const settings = Object.fromEntries(features.map((f) => [f.key, f.settings ?? {}]));
     const current = features.find((f) => f.key === feature);
     if (!current?.usable) {
-      const reason = !current?.available ? "organization" : !current.enabled ? "account" : "permission";
+      const reason = !current?.includedInPlan ? "plan" : !current.available ? "organization" : !current.enabled ? "account" : "permission";
       const message = {
+        plan: "Tu plan no incluye esta función de IA.",
         organization: "Tu organización no tiene disponible esta función de IA.",
         account: "Esta función de IA está desactivada en la Cuenta.",
         permission: "Tu rol no puede usar esta función de IA.",

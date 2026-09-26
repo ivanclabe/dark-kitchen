@@ -112,6 +112,11 @@ erDiagram
 - `dk_kitchen_features` — qué funciones activa cada Cuenta y sus parámetros (antes `dk_ai_features`; queda una vista de compatibilidad con ese nombre)
 - `dk_ai_insights` — análisis de IA (append-only), por Cuenta y función
 
+### Planes y suscripciones (ADR 0010)
+- `dk_plans` — catálogo de planes (precio mensual/anual, prueba, límites `{accounts, users}`, viñetas, CTA, estado, orden). Lectura pública
+- `dk_plan_features` — funciones (`dk_features`) incluidas en cada plan. Lectura pública
+- `dk_subscriptions` — **una por organización** (el plan es de la organización, no del usuario): plan, estado (`trialing`/`active`/`past_due`/`canceled`/`expired`), periodicidad, prueba, período, cancelación y `provider_*` (pagos futuros)
+
 ### Catálogos base
 - `dk_units` — unidades de medida y su factor de conversión a la unidad base de su tipo
 - `dk_ingredient_categories`

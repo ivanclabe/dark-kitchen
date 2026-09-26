@@ -2,7 +2,7 @@ import { hashKey, QueryClient, type QueryKey } from '@tanstack/react-query'
 import { getActiveKitchenId, getActiveRoleId } from '@/shared/kitchen/activeKitchen'
 
 /** Consultas que no pertenecen a una Cuenta (p. ej. el contexto del usuario). */
-const GLOBAL_QUERY_ROOTS = new Set(['my-kitchens'])
+const GLOBAL_QUERY_ROOTS = new Set(['my-kitchens', 'public-plans'])
 
 /**
  * La caché se separa por Cuenta y por rol activo: cada consulta se guarda

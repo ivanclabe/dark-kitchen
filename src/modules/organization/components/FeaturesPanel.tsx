@@ -19,7 +19,7 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { Mic, Sparkles, Store, Workflow } from 'lucide-react'
+import { Lock, Mic, Sparkles, Store, Workflow } from 'lucide-react'
 import { orgKey } from '../hooks/useOrganization'
 
 const CATEGORY_ICON: Record<FeatureCategory, typeof Sparkles> = { ai: Sparkles, voice: Mic, general: Store }
@@ -61,7 +61,7 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
   return (
     <div className="space-y-8">
       <p className={typography.small}>
-        Decide qué funciones ofrece tu organización y en qué cuentas están activadas. Una cuenta no puede activar lo que la organización no ofrece. Los
+        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''} y en qué cuentas están activadas. Una cuenta no puede activar lo que la organización no ofrece. Los
         parámetros de cada función (umbrales, frecuencia) se ajustan dentro de cada cuenta, en Configuración → Funciones.
       </p>
       {data.accounts.length === 0 && <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea una cuenta para activar funciones en ella." compact />}
@@ -127,15 +127,28 @@ function FeatureCard({
           <p className={clsx('mt-1', typography.caption)}>{feature.description}</p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          <Switch checked={feature.available} onChange={onAvailable} label={`Ofrecer ${feature.label} en la organización`} disabled={disabled} />
-          <span className="text-[11px] text-neutral-500">{feature.available ? 'Disponible' : 'No disponible'}</span>
+          {feature.includedInPlan ? (
+            <>
+              <Switch checked={feature.available} onChange={onAvailable} label={`Ofrecer ${feature.label} en la organización`} disabled={disabled} />
+              <span className="text-[11px] text-neutral-500">{feature.available ? 'Disponible' : 'No disponible'}</span>
+            </>
+          ) : (
+            // El plan no la incluye: no se puede ofrecer (la base lo exige igual).
+            <Badge tone="neutral" size="sm" icon={Lock}>
+              {feature.minPlan ? `Incluida en ${feature.minPlan}` : 'No incluida en tu plan'}
+            </Badge>
+          )}
         </div>
       </div>
 
       {accounts.length > 0 && (
         <div className="space-y-2 border-t border-neutral-800/60 pt-3">
           <p className="text-xs text-neutral-500">
-            {feature.available ? `Activada en ${activeIn} de ${accounts.length} ${accounts.length === 1 ? 'cuenta' : 'cuentas'}` : 'Apagada en todas las cuentas mientras no esté disponible.'}
+            {feature.available
+              ? `Activada en ${activeIn} de ${accounts.length} ${accounts.length === 1 ? 'cuenta' : 'cuentas'}`
+              : feature.includedInPlan
+                ? 'Apagada en todas las cuentas mientras no esté disponible.'
+                : 'Tu plan no la incluye: apagada en todas las cuentas.'}
           </p>
           <ul className="grid gap-2 sm:grid-cols-2">
             {accounts.map((a) => {

@@ -100,7 +100,7 @@ export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
           <p className={clsx('mt-1', typography.caption)}>{definition.description}</p>
           {!available && (
             <p className="mt-2 text-xs text-amber-300">
-              Tu organización no tiene disponible esta función{saved.enabled ? ': queda apagada, con su configuración guardada.' : '.'}
+              {state && !state.includedInPlan ? 'Tu plan no incluye esta función' : 'Tu organización no tiene disponible esta función'}{saved.enabled ? ': queda apagada, con su configuración guardada.' : '.'}
             </p>
           )}
         </div>

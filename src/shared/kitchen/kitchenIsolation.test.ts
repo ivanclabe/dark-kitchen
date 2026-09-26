@@ -106,8 +106,8 @@ describe('rol activo', () => {
     const owner = buildActiveKitchen(toKitchenView(ctx, ana, null), {
       organization: { ...ctx.organizations[0], isOwner: true, isSuperAdmin: true },
       features: [
-        { key: 'voice_commands', category: 'voice', label: '', description: '', usesModel: false, available: true, enabled: true, usable: true, canManage: true, settings: {}, updatedAt: null },
-        { key: 'supply_reorder', category: 'ai', label: '', description: '', usesModel: true, available: false, enabled: true, usable: false, canManage: true, settings: {}, updatedAt: null },
+        { key: 'voice_commands', category: 'voice', label: '', description: '', usesModel: false, includedInPlan: true, available: true, enabled: true, usable: true, canManage: true, settings: {}, updatedAt: null },
+        { key: 'supply_reorder', category: 'ai', label: '', description: '', usesModel: true, includedInPlan: true, available: false, enabled: true, usable: false, canManage: true, settings: {}, updatedAt: null },
       ],
     })
     expect(owner.organizationRole).toBe('SUPER_ADMIN')

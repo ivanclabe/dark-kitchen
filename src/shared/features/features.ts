@@ -8,6 +8,7 @@ import type { Json } from '@/types/database'
  *
  *   usable = la organización la ofrece ∧ la Cuenta la activó ∧ el rol activo tiene el permiso
  *
+ * (ADR 0010: el plan es el primer techo: plan ∧ organización ∧ Cuenta ∧ permiso.)
  * La app solo lee ese resultado (dk_my_features): ningún componente decide
  * por su cuenta.
  */
@@ -38,7 +39,9 @@ export interface FeatureState {
   label: string
   description: string
   usesModel: boolean
-  /** ¿La organización la ofrece? */
+  /** ¿El plan de la organización la incluye? (ADR 0010) */
+  includedInPlan: boolean
+  /** ¿Se ofrece? (plan ∧ organización) */
   available: boolean
   /** Valor de la Cuenta (se conserva aunque la organización no la ofrezca). */
   enabled: boolean
@@ -74,7 +77,18 @@ export async function setOrganizationFeature(organizationId: string, key: Featur
 
 /** Matriz de la organización: qué ofrece y qué tiene activado cada Cuenta (solo SUPER_ADMIN). */
 export interface FeatureMatrix {
-  features: { key: FeatureKey; category: FeatureCategory; label: string; description: string; usesModel: boolean; available: boolean }[]
+  plan: { key: string; name: string } | null
+  features: {
+    key: FeatureKey
+    category: FeatureCategory
+    label: string
+    description: string
+    usesModel: boolean
+    includedInPlan: boolean
+    /** Plan más económico que la incluye ("Incluida en Business"). */
+    minPlan: string | null
+    available: boolean
+  }[]
   accounts: { id: string; name: string; slug: string; iconKey: string | null; active: boolean; enabled: Record<FeatureKey, boolean> }[]
 }
 
@@ -102,8 +116,9 @@ export function featureLookup(features: readonly FeatureState[] | undefined): Fe
 }
 
 /** Por qué una función no se puede usar (para explicarlo en pantalla). */
-export function unavailableReason(state: FeatureState | null): 'organization' | 'account' | 'permission' | null {
+export function unavailableReason(state: FeatureState | null): 'plan' | 'organization' | 'account' | 'permission' | null {
   if (!state) return 'organization'
+  if (!state.includedInPlan) return 'plan'
   if (!state.available) return 'organization'
   if (!state.enabled) return 'account'
   if (!state.usable) return 'permission'

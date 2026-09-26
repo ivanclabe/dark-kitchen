@@ -2060,6 +2060,99 @@ export type Database = {
         }
         Relationships: []
       }
+      dk_plan_features: {
+        Row: {
+          feature_key: string
+          plan_key: string
+        }
+        Insert: {
+          feature_key: string
+          plan_key: string
+        }
+        Update: {
+          feature_key?: string
+          plan_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_plan_features_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "dk_features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_plan_features_plan_key_fkey"
+            columns: ["plan_key"]
+            isOneToOne: false
+            referencedRelation: "dk_plans"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      dk_plans: {
+        Row: {
+          badge: string | null
+          contact_url: string | null
+          created_at: string
+          cta: string
+          cta_label: string
+          currency: string
+          description: string
+          highlights: string[]
+          key: string
+          limits: Json
+          name: string
+          price_monthly: number
+          price_yearly: number | null
+          self_serve: boolean
+          sort_order: number
+          status: string
+          trial_days: number
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          contact_url?: string | null
+          created_at?: string
+          cta: string
+          cta_label: string
+          currency?: string
+          description: string
+          highlights?: string[]
+          key: string
+          limits?: Json
+          name: string
+          price_monthly: number
+          price_yearly?: number | null
+          self_serve?: boolean
+          sort_order: number
+          status?: string
+          trial_days?: number
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          contact_url?: string | null
+          created_at?: string
+          cta?: string
+          cta_label?: string
+          currency?: string
+          description?: string
+          highlights?: string[]
+          key?: string
+          limits?: Json
+          name?: string
+          price_monthly?: number
+          price_yearly?: number | null
+          self_serve?: boolean
+          sort_order?: number
+          status?: string
+          trial_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dk_product_categories: {
         Row: {
           created_at: string
@@ -2473,6 +2566,78 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_organizations"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_subscriptions: {
+        Row: {
+          billing_period: string
+          cancel_at_period_end: boolean
+          canceled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string
+          id: string
+          organization_id: string
+          plan_key: string
+          provider: string | null
+          provider_customer_id: string | null
+          provider_subscription_id: string | null
+          started_at: string
+          status: string
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_period?: string
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string
+          id?: string
+          organization_id: string
+          plan_key: string
+          provider?: string | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          started_at?: string
+          status: string
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_period?: string
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string
+          id?: string
+          organization_id?: string
+          plan_key?: string
+          provider?: string | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          started_at?: string
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_subscriptions_plan_key_fkey"
+            columns: ["plan_key"]
+            isOneToOne: false
+            referencedRelation: "dk_plans"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -2939,6 +3104,8 @@ export type Database = {
       }
       dk_create_organization: {
         Args: {
+          p_account_icon?: string
+          p_account_name?: string
           p_address?: string
           p_category: string
           p_city?: string
@@ -2947,6 +3114,7 @@ export type Database = {
           p_legal_name?: string
           p_name: string
           p_phone?: string
+          p_plan?: string
           p_sector: string
           p_tax_id?: string
         }
@@ -3084,6 +3252,7 @@ export type Database = {
           slug: string
         }[]
       }
+      dk_my_subscription: { Args: { p_organization_id: string }; Returns: Json }
       dk_new_activation: {
         Args: { p_organization_id: string; p_user_id: string }
         Returns: string
@@ -3095,6 +3264,14 @@ export type Database = {
         Returns: Json
       }
       dk_org_users: { Args: { p_organization_id: string }; Returns: Json }
+      dk_plan_includes: {
+        Args: { p_feature_key: string; p_organization_id: string }
+        Returns: boolean
+      }
+      dk_plan_limit: {
+        Args: { p_limit: string; p_organization_id: string }
+        Returns: number
+      }
       dk_register_adjustment: {
         Args: {
           p_ingredient_id: string
@@ -3255,6 +3432,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_set_subscription: {
+        Args: {
+          p_billing_period?: string
+          p_organization_id: string
+          p_plan_key: string
+          p_status?: string
+        }
+        Returns: undefined
+      }
       dk_set_ticket_priority: {
         Args: { p_order_id: string; p_priority: number }
         Returns: undefined
@@ -3262,6 +3448,10 @@ export type Database = {
       dk_slugify: {
         Args: { p_fallback?: string; p_text: string }
         Returns: string
+      }
+      dk_subscription_is_current: {
+        Args: { p_organization_id: string }
+        Returns: boolean
       }
       dk_sync_master_menu_kitchen: {
         Args: { p_kitchen_id: string; p_menu_id: string }

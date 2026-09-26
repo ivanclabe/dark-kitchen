@@ -16,6 +16,7 @@ import { ArrowLeft, Pause, Play, Plus, ShieldCheck, Store, TriangleAlert } from 
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { listPlatformKitchens, setKitchensActive, type PlatformKitchen } from '../api'
+import { OrganizationPlansPanel } from '../components/OrganizationPlansPanel'
 
 const PLATFORM_KEY = ['my-kitchens', 'platform'] as const
 
@@ -157,6 +158,8 @@ export function PlatformAdminPage() {
             emptyState={<EmptyState icon={Store} title="Todavía no hay cuentas" compact />}
           />
         )}
+
+        <OrganizationPlansPanel />
       </div>
 
       <ConfirmDialog

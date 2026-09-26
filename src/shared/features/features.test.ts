@@ -9,6 +9,7 @@ const state = (over: Partial<FeatureState>): FeatureState => ({
   label: 'Comandos de voz',
   description: '',
   usesModel: false,
+  includedInPlan: true,
   available: true,
   enabled: true,
   usable: true,
@@ -34,6 +35,7 @@ describe('funciones', () => {
   })
 
   it('explica por qué no se puede usar, en orden de precedencia', () => {
+    expect(unavailableReason(state({ includedInPlan: false, available: false, usable: false }))).toBe('plan')
     expect(unavailableReason(state({ available: false, enabled: false, usable: false }))).toBe('organization')
     expect(unavailableReason(state({ enabled: false, usable: false }))).toBe('account')
     expect(unavailableReason(state({ usable: false }))).toBe('permission')

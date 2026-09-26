@@ -196,7 +196,7 @@
     <span>Por confirmar</span><span>En cola</span><span class="on">Preparando</span><span>Listo</span><span>En ruta</span><span>Entregado</span>
   </div>
   <div class="meta">
-    <div><b>Versión</b>3.1 · Funciones, iconos y avatares</div>
+    <div><b>Versión</b>3.2 · Planes y precios</div>
     <div><b>Fecha</b>Septiembre de 2026</div>
     <div><b>Dirigido a</b>SUPER_ADMIN (creador del negocio), ADMIN y todo el equipo: caja, cocina, inventario y domiciliarios</div>
   </div>
@@ -247,7 +247,7 @@
     <li><a href="#c10"><span class="num">10</span>Configuración de la cuenta<span class="fill"></span><span class="pg" data-for="c10"></span></a></li>
     <li><a href="#c11"><span class="num">11</span>Configuración de la organización<span class="fill"></span><span class="pg" data-for="c11"></span></a>
       <ol>
-        <li><a href="#c11-1">Datos y cuentas<span class="fill"></span><span class="pg" data-for="c11-1"></span></a></li>
+        <li><a href="#c11-1">Datos, plan y cuentas<span class="fill"></span><span class="pg" data-for="c11-1"></span></a></li>
         <li><a href="#c11-2">Funciones de la organización<span class="fill"></span><span class="pg" data-for="c11-2"></span></a></li>
         <li><a href="#c11-3">Menús maestros<span class="fill"></span><span class="pg" data-for="c11-3"></span></a></li>
         <li><a href="#c11-4">SUPER_ADMIN<span class="fill"></span><span class="pg" data-for="c11-4"></span></a></li>
@@ -303,7 +303,19 @@
 <p class="lead">Cómo entrar, cómo elegir la cuenta, cómo está organizada la aplicación, qué puede hacer cada rol y cómo personalizar tu perfil.</p>
 
 <h3 id="c2-1" data-toc="c2-1">2.1 Entrar a la aplicación</h3>
-<p>Al abrir la dirección de la aplicación sin haber iniciado sesión verás la página de presentación de Dark Kitchen.</p>
+<p>Al abrir la dirección de la aplicación sin haber iniciado sesión verás la página de presentación de Dark Kitchen. Arriba tienes <span class="ui">Producto</span>, <span class="ui">Funcionalidades</span>, <span class="ui">Precios</span>, <span class="ui">FAQ</span>, <span class="ui">Iniciar sesión</span> y <span class="ui">Crear cuenta</span> (en el celular, en el menú ☰).</p>
+
+<h4>Ver planes y precios</h4>
+<p>En <span class="ui">Precios</span> (o en la dirección <code>/precios</code>) ves los planes sin registrarte: precio mensual, qué incluye cada uno, sus límites y una tabla para compararlos.</p>
+<table>
+  <thead><tr><th>Plan</th><th>Para quién</th><th>Botón</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Standard</strong></td><td>Un establecimiento: 1 cuenta, hasta 5 usuarios, todos los módulos, voz y alertas de pedidos detenidos.</td><td><span class="ui">Comenzar gratis</span></td></tr>
+    <tr><td><strong>Business</strong> <em>(más popular)</em></td><td>Varios establecimientos: hasta 3 cuentas y 15 usuarios, con inteligencia artificial y menús maestros.</td><td><span class="ui">Comenzar gratis</span></td></tr>
+    <tr><td><strong>Enterprise</strong></td><td>Grupos y cadenas: cuentas y usuarios ilimitados, integraciones y acompañamiento.</td><td><span class="ui">Hablar con ventas</span></td></tr>
+  </tbody>
+</table>
+<p>Standard y Business empiezan con <strong>14 días gratis</strong>, sin tarjeta. Los precios y lo que incluye cada plan pueden cambiar; la página siempre muestra los vigentes.</p>
 
 <h4>Iniciar sesión</h4>
 <ol class="steps">
@@ -313,13 +325,15 @@
 </ol>
 
 <h4>Registrar tu negocio (dueños)</h4>
-<p>Si todavía no usas Dark Kitchen, pulsa <span class="ui">Crear mi negocio</span> en la página de presentación.</p>
+<p>Si todavía no usas Dark Kitchen, pulsa <span class="ui">Crear cuenta</span> (o <span class="ui">Comenzar gratis</span> en el plan que te interese). El registro tiene tres pasos:</p>
 <ol class="steps">
   <li><strong>Tu usuario:</strong> <span class="ui">Tu nombre</span>, <span class="ui">Correo</span> y <span class="ui">Contraseña</span> (mínimo 8 caracteres).</li>
-  <li><strong>Tu negocio:</strong> <span class="ui">Nombre del negocio</span>, <span class="ui">Sector</span>, <span class="ui">Categoría</span>, dirección, ciudad y país. Teléfono, NIT y razón social son opcionales.</li>
+  <li><strong>Tu plan:</strong> si llegaste desde un plan, ya viene elegido y lo ves arriba (<span class="say">Plan seleccionado: Business — $99.900 COP/mes</span>) con <span class="ui">Cambiar plan</span>. Si no, eliges uno en <span class="ui">Elige el plan para tu negocio</span>; no puedes continuar sin elegirlo. Enterprise se contrata con ventas.</li>
+  <li><strong>Tu negocio y tu primera cuenta:</strong> <span class="ui">Nombre del negocio</span>, <span class="ui">Sector</span>, <span class="ui">Categoría</span>, dirección, ciudad y país (teléfono, NIT y razón social son opcionales). En <span class="ui">Tu primera cuenta</span>, su nombre (si lo dejas vacío, usa el del negocio) y su icono.</li>
   <li>Pulsa <span class="ui">Crear mi negocio</span> y revisa tu correo.</li>
-  <li>Abre el enlace del correo: se crean tu organización y tu primera cuenta, y entras directo a ella como <strong>SUPER_ADMIN</strong>. Verás una bienvenida con atajos para empezar.</li>
+  <li>Abre el enlace del correo: se crean juntos tu organización con su plan, tu primera cuenta y tus roles (SUPER_ADMIN + ADMIN), y entras directo. Verás una bienvenida con atajos para empezar.</li>
 </ol>
+<div class="callout tip"><b class="t">Nada queda a medias</b>Hasta que abres el enlace del correo no se crea nada. Si confirmas y cierras antes de terminar, al iniciar sesión se termina de preparar tu negocio.</div>
 <div class="callout info"><b class="t">¿No llega el correo?</b>Revisa la carpeta de spam. En la pantalla “Revisa tu correo” puedes reenviarlo o corregir la dirección.</div>
 
 <h4>Activar tu usuario (personal nuevo)</h4>
@@ -936,11 +950,17 @@
 <!-- =================================================== 11 CONFIGURACIÓN DE LA ORGANIZACIÓN -->
 <p class="chapter-kicker">Capítulo 11</p>
 <h2 class="chapter" id="c11" data-toc="c11">Configuración de la organización</h2>
-<p class="lead">Tu negocio, sus cuentas, las funciones que ofrece y sus menús maestros. Solo para el SUPER_ADMIN: tu avatar → <span class="ui">Configuración de la organización</span>.</p>
+<p class="lead">Tu negocio, su plan, sus cuentas, las funciones que ofrece y sus menús maestros. Solo para el SUPER_ADMIN: tu avatar → <span class="ui">Configuración de la organización</span>.</p>
 
-<h3 id="c11-1" data-toc="c11-1">11.1 Datos y cuentas</h3>
+<h3 id="c11-1" data-toc="c11-1">11.1 Datos, plan y cuentas</h3>
 <p><strong>General:</strong> nombre del negocio, sector, categoría, país, ciudad y dirección; datos legales y de contacto; moneda para las cuentas nuevas. Pulsa <span class="ui">Guardar cambios</span>.</p>
-<p><strong>Cuentas:</strong> todas las cuentas de la organización, con su icono y su estado.</p>
+<p><strong>Plan:</strong> el plan de tu organización (el plan es del negocio, no de una persona), su estado (<span class="ui">Prueba gratis</span>, <span class="ui">Activa</span>…), cuántos días quedan de prueba, los límites y cuánto usas (<span class="say">1 de 3 cuentas</span>, <span class="say">4 de 15 usuarios</span>), qué incluye y qué funciones trae. Para cambiar de plan pulsa <span class="ui">Cambiar de plan</span> y escríbenos.</p>
+<ul>
+  <li>Al llegar al límite de cuentas o de usuarios, todo sigue funcionando; solo no puedes crear más hasta cambiar de plan.</li>
+  <li>Si pasas a un plan menor no se borra nada: se conserva lo que tienes, pero no puedes crear más de lo que el nuevo plan permite, y las funciones que no incluye se apagan (con su configuración guardada, por si vuelves a subir).</li>
+  <li>Cuando termina la prueba gratis se muestra un aviso; por ahora nada se bloquea.</li>
+</ul>
+<p><strong>Cuentas:</strong> todas las cuentas de la organización, con su icono y su estado. Junto a <span class="ui">Nueva cuenta</span> ves cuántas llevas de las que permite tu plan.</p>
 <ul>
   <li><span class="ui">Nueva cuenta</span>: escribe el nombre (el identificador y un icono se proponen solos; con <span class="ui">Cambiar icono</span> eliges otro) y pulsa <span class="ui">Crear cuenta</span>. Nace con su configuración por defecto y entras directo a ella.</li>
   <li><strong>Al crearla quedas como SUPER_ADMIN + ADMIN</strong> de esa cuenta: SUPER_ADMIN por ser el creador de la organización, y ADMIN como rol de la cuenta (lo ves en <span class="ui">Usuarios y permisos</span> y puedes cambiarlo). Esto pasa solo cuando la crea el SUPER_ADMIN.</li>
@@ -949,7 +969,7 @@
 </ul>
 
 <h3 id="c11-2" data-toc="c11-2">11.2 Funciones de la organización</h3>
-<p>En la pestaña <span class="ui">Funciones</span> decides qué funciones opcionales ofrece tu negocio (voz e inteligencia artificial) y en qué cuentas están activadas. Cada función muestra:</p>
+<p>En la pestaña <span class="ui">Funciones</span> decides qué funciones opcionales ofrece tu negocio (voz e inteligencia artificial) y en qué cuentas están activadas. Lo que tu plan no incluye aparece con candado (<span class="say">Incluida en Business</span>) y no se puede ofrecer. Cada función muestra:</p>
 <ul>
   <li><strong>Disponible / No disponible</strong> (arriba a la derecha): si la organización la ofrece.</li>
   <li><strong>Una fila por cuenta</strong> con su interruptor: si está activada en esa cuenta.</li>
@@ -1025,6 +1045,9 @@
   <h4>El micrófono no aparece o no me entiende.</h4>
   <p>Revisa que la cuenta tenga activados los <span class="ui">Comandos de voz</span> (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>) y que tu organización los ofrezca. Usa un navegador con reconocimiento de voz (como Chrome), permite el micrófono y habla cerca, diciendo el número de 4 dígitos y la acción. Solo funciona con los pedidos de hoy.</p>
 
+  <h4>No puedo crear otra cuenta u otro usuario.</h4>
+  <p>Llegaste al límite de tu plan. Míralo en <span class="ui">Configuración de la organización</span> → <span class="ui">Plan</span> y, si necesitas más, pulsa <span class="ui">Cambiar de plan</span>.</p>
+
   <h4>No puedo activar una función: dice que mi organización no la tiene disponible.</h4>
   <p>La organización decide qué funciones ofrece. Pídele al SUPER_ADMIN que la ofrezca en <span class="ui">Configuración de la organización</span> → <span class="ui">Funciones</span>.</p>
 
@@ -1065,11 +1088,13 @@
   <div><dt>Merma</dt><dd>Pérdida de insumos por vencimiento, daño o error.</dd></div>
   <div><dt>Organización</dt><dd>Tu negocio o grupo: agrupa tus cuentas, tus usuarios y tus roles propios.</dd></div>
   <div><dt>Permiso</dt><dd>Una acción concreta que un rol permite (ver pedidos, confirmar compras, ver rentabilidad…).</dd></div>
+  <div><dt>Plan</dt><dd>Lo que contrató tu organización (Standard, Business, Enterprise): precio, límites de cuentas y usuarios, y funciones incluidas. Es del negocio, no de una persona.</dd></div>
   <div><dt>Plantilla</dt><dd>Rol listo para usar, igual en toda la plataforma (ADMIN, CAJA, COCINA…). Se puede duplicar.</dd></div>
   <div><dt>Prioritario</dt><dd>Pedido que pasa primero en su columna. Se ve con borde violeta.</dd></div>
   <div><dt>Receta</dt><dd>Lista de insumos y cantidades de un plato. Tiene versiones.</dd></div>
   <div><dt>Reserva</dt><dd>Insumos apartados al confirmar un pedido, para que no se usen en otro.</dd></div>
   <div><dt>Revisar</dt><dd>Marca de un pedido con devoluciones de inventario que conviene verificar.</dd></div>
+  <div><dt>Prueba gratis</dt><dd>Los primeros 14 días de Standard y Business, sin tarjeta.</dd></div>
   <div><dt>Rol activo</dt><dd>El rol con el que trabajas en este momento, si tienes varios en la cuenta.</dd></div>
   <div><dt>Rol propio</dt><dd>Rol creado por tu organización con los permisos que elija. Sirve en todas sus cuentas.</dd></div>
   <div><dt>SLA</dt><dd>Tiempo máximo esperado en cada etapa. Pasado ese tiempo, el pedido está atrasado.</dd></div>

@@ -32,7 +32,7 @@ reset role;
 select pg_temp.act_as('00000000-0000-0000-0000-0000000f0002');
 set local role authenticated;
 do $$ declare v_slug text; begin
-  v_slug := dk_create_organization('Hamburguesería Centro', 'fast_food', 'burgers', 'Calle 10 #5-20', 'Bogotá', 'CO', '3001234567', null, null, null);
+  v_slug := dk_create_organization('Hamburguesería Centro', 'fast_food', 'burgers', 'Calle 10 #5-20', 'Bogotá', 'CO', '3001234567', null, null, null, 'business');
   insert into _t (area, test, expected, got) values ('Registro', 'Devuelve la primera Cuenta', 'hamburgueseria-centro', v_slug);
   insert into _t (area, test, expected, got) values ('Registro', 'Perfil creado con su nombre y correo', 'Carla Dueña · dueña@burgerxyz.test',
     (select full_name || ' · ' || email from dk_users where auth_user_id = auth.uid()));
@@ -60,7 +60,7 @@ end $$;
 select pg_temp.act_as('00000000-0000-0000-0000-0000000f0003');
 set local role authenticated;
 do $$ declare v_slug text; begin
-  v_slug := dk_create_organization('Hamburguesería Centro', 'restaurant', 'burgers');
+  v_slug := dk_create_organization('Hamburguesería Centro', 'restaurant', 'burgers', p_plan => 'standard');
   insert into _t (area, test, expected, got) values ('Registro', 'Nombre repetido: identificador con sufijo', 'hamburgueseria-centro-2', v_slug);
   insert into _t (area, test, expected, got) values ('Aislamiento', 'No ve la organización del otro dueño', '1', (select count(*)::text from dk_organizations));
   insert into _t (area, test, expected, got) values ('Registro', 'Quien ya es dueño no crea una segunda organización', 'hamburgueseria-centro-2',
@@ -74,7 +74,7 @@ insert into auth.users (id, email, aud, role, email_confirmed_at) values ('00000
 select pg_temp.act_as('00000000-0000-0000-0000-0000000f0004');
 set local role authenticated;
 do $$ begin
-  begin perform dk_create_organization('Con sector raro', 'no_existe', 'burgers');
+  begin perform dk_create_organization('Con sector raro', 'no_existe', 'burgers', p_plan => 'standard');
     insert into _t (area, test, expected, got) values ('Registro', 'Sector que no está en la lista', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Registro', 'Sector que no está en la lista', 'bloqueado', 'bloqueado', sqlerrm); end;
 end $$;

@@ -16,21 +16,24 @@ import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate } from '@/shared/utils/format'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Building2, Crown, Layers, Plus, Sparkles, Store } from 'lucide-react'
+import { atLimit, fetchSubscription } from '@/shared/plans/subscription'
+import { limitLabel } from '@/shared/plans/plans'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Building2, CreditCard, Crown, Layers, Plus, Sparkles, Store } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { setAccountsActive, updateOrganization, type OrgAccount, type OrganizationDetails, type OrganizationInput } from '../api/organization'
 import { AccountEditDrawer } from '../components/AccountEditDrawer'
 import { FeaturesPanel } from '../components/FeaturesPanel'
+import { PlanPanel } from '../components/PlanPanel'
 import { orgKey, useOrgAccounts, useOrganizationDetails, useOrgUsers } from '../hooks/useOrganization'
 import { CATEGORIES, COUNTRIES, SECTORS } from '../lib/business'
 
-type Tab = 'general' | 'accounts' | 'features' | 'menus' | 'ownership'
+type Tab = 'general' | 'plan' | 'accounts' | 'features' | 'menus' | 'ownership'
 
 /**
- * Configuración de la organización (ADR 0008, 10.5 y ADR 0009): datos del
- * negocio, sus Cuentas (con su icono), las funciones que ofrece y activa en
+ * Configuración de la organización (ADR 0008, 10.5; ADR 0009 y 0010): datos
+ * del negocio, su plan, sus Cuentas (con su icono), las funciones que ofrece y activa en
  * cada Cuenta, los menús maestros que comparte y su SUPER_ADMIN. Solo para
  * el SUPER_ADMIN; la base lo exige igual en cada operación.
  */
@@ -45,6 +48,7 @@ export function OrganizationSettingsPage() {
 
   const tabs: TabItem<Tab>[] = [
     { value: 'general', label: 'General', icon: Building2 },
+    { value: 'plan', label: 'Plan', icon: CreditCard },
     { value: 'accounts', label: 'Cuentas', icon: Store },
     ...(permissions.has('features.manage') ? [{ value: 'features' as const, label: 'Funciones', icon: Sparkles }] : []),
     ...(permissions.has('master_menus.manage') ? [{ value: 'menus' as const, label: 'Menús maestros', icon: Layers }] : []),
@@ -61,6 +65,8 @@ export function OrganizationSettingsPage() {
         <ErrorState error={details.error} onRetry={() => void details.refetch()} />
       ) : tab === 'general' ? (
         <GeneralForm key={details.data.id} org={details.data} />
+      ) : tab === 'plan' ? (
+        <PlanPanel organizationId={organizationId} />
       ) : tab === 'accounts' ? (
         <AccountsPanel organizationId={organizationId} organizationName={details.data.name} canCreate={permissions.has('accounts.create')} canManage={permissions.has('accounts.manage')} />
       ) : tab === 'features' ? (
@@ -188,6 +194,10 @@ function AccountsPanel({ organizationId, organizationName, canCreate, canManage 
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<OrgAccount | null>(null)
+  // Límite de Cuentas del plan (la base lo exige igual al crear).
+  const { data: subscription } = useQuery({ queryKey: [...orgKey(organizationId), 'subscription'], queryFn: () => fetchSubscription(organizationId) })
+  const accountLimit = subscription?.limits.accounts ?? null
+  const full = subscription ? atLimit(subscription.usage.accounts, accountLimit) : false
   const [confirm, setConfirm] = useState<{ id: string; name: string; active: boolean } | null>(null)
 
   const toggle = useMutation({
@@ -248,9 +258,16 @@ function AccountsPanel({ organizationId, organizationName, canCreate, canManage 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className={typography.small}>Cada cuenta es un establecimiento con sus propios pedidos, clientes, menú e inventario.</p>
         {canCreate && (
-          <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
-            Nueva cuenta
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            {subscription && accountLimit !== null && (
+              <span className={full ? 'text-sm text-amber-300' : 'text-sm text-neutral-500'}>
+                {subscription.usage.accounts} de {limitLabel(accountLimit, 'cuenta', 'cuentas')} de tu plan {subscription.plan.name}
+              </span>
+            )}
+            <Button variant="primary" icon={Plus} onClick={() => setCreating(true)} disabled={full} title={full ? 'Llegaste al límite de cuentas de tu plan' : undefined}>
+              Nueva cuenta
+            </Button>
+          </div>
         )}
       </div>
       <DataTable columns={columns} rows={accounts} getRowId={(a) => a.id} isLoading={isLoading} error={isError ? error : undefined} onRetry={() => void refetch()} />

@@ -1,10 +1,12 @@
-import { PUBLIC_SIGNUP_ENABLED } from '@/modules/signup/api'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { CalendarDays, ChefHat, ChevronRight, Flame, Wallet, Warehouse, type LucideIcon } from 'lucide-react'
-import type { CSSProperties } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, type CSSProperties } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { DeviceMockups } from '../components/DeviceMockups'
 import { EmberField } from '../components/EmberField'
+import { FaqSection } from '../components/FaqSection'
+import { LandingNav } from '../components/LandingNav'
+import { PricingSection } from '../components/PricingSection'
 
 /** Todo lo que describe esta lista existe hoy en la app — nada de "próximamente" ni cifras inventadas. */
 const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
@@ -43,29 +45,26 @@ function delay(ms: number): CSSProperties {
  */
 export function LandingPage() {
   const { session } = useAuth()
-  const entryHref = session ? '/' : '/login'
+  const { hash } = useLocation()
+
+  // Enlaces a una sección (/#precios, también desde /precios): desplazamiento suave.
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.add('scroll-smooth')
+    return () => root.classList.remove('scroll-smooth')
+  }, [])
+  useEffect(() => {
+    if (!hash) return
+    const id = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView(), 50)
+    return () => window.clearTimeout(id)
+  }, [hash])
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
-      <header className="absolute inset-x-0 top-0 z-20">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-20 sm:px-6">
-          <Link to="/" className="flex items-center gap-2.5" aria-label="Dark Kitchen — inicio">
-            <span className="flex size-8 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
-              <Flame size={16} className="text-white" strokeWidth={2.5} aria-hidden />
-            </span>
-            <span className="text-sm font-semibold tracking-tight">Dark Kitchen</span>
-          </Link>
-          <Link
-            to={entryHref}
-            className="rounded-lg border border-neutral-800 bg-neutral-900/60 px-4 py-2 text-sm font-medium text-neutral-200 backdrop-blur transition-colors hover:border-neutral-700 hover:text-neutral-50"
-          >
-            {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
-          </Link>
-        </div>
-      </header>
+      <LandingNav />
 
       <main>
-        <section className="relative overflow-hidden pt-32 sm:pt-44">
+        <section id="producto" className="relative scroll-mt-16 overflow-hidden pt-32 sm:pt-44">
           <EmberField />
           {/* Resplandor de brasa detrás de los dispositivos. */}
           <div
@@ -89,20 +88,25 @@ export function LandingPage() {
             </p>
             <div className="animate-landing-rise mt-9 sm:mt-11" style={delay(240)}>
               <Link
-                to={session || !PUBLIC_SIGNUP_ENABLED ? entryHref : '/registro'}
+                to={session ? '/' : '/registro'}
                 className="group inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-brasa-500 px-10 text-base font-semibold text-white shadow-[0_12px_40px_-12px_var(--color-brasa-500)] transition-colors hover:bg-brasa-400 sm:w-96 sm:text-lg"
               >
-                {session ? 'Ir a mi cuenta' : PUBLIC_SIGNUP_ENABLED ? 'Crear mi negocio' : 'Entrar a mi cuenta'}
+                {session ? 'Ir a mi cuenta' : 'Crear cuenta gratis'}
                 <ChevronRight size={20} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
-              {!session && PUBLIC_SIGNUP_ENABLED && (
-                <p className="mt-4 text-sm text-neutral-500">
-                  ¿Ya tienes usuario?{' '}
-                  <Link to="/login" className="text-neutral-300 hover:text-neutral-100">
-                    Inicia sesión
-                  </Link>
-                </p>
-              )}
+              <p className="mt-4 text-sm text-neutral-500">
+                <a href="#precios" className="text-neutral-300 hover:text-neutral-100">
+                  Ver planes y precios
+                </a>
+                {!session && (
+                  <>
+                    {' · '}
+                    <Link to="/login" className="text-neutral-300 hover:text-neutral-100">
+                      Iniciar sesión
+                    </Link>
+                  </>
+                )}
+              </p>
             </div>
           </div>
 
@@ -114,7 +118,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="border-t border-neutral-800/60 bg-neutral-950" aria-labelledby="landing-features">
+        <section id="funcionalidades" className="scroll-mt-16 border-t border-neutral-800/60 bg-neutral-950" aria-labelledby="landing-features">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
             <h2 id="landing-features" className="max-w-xl text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
               Todo lo que pasa en tu cocina, en una sola pantalla
@@ -132,6 +136,9 @@ export function LandingPage() {
             </div>
           </div>
         </section>
+
+        <PricingSection />
+        <FaqSection />
       </main>
 
       <footer className="border-t border-neutral-800/60">
@@ -139,9 +146,17 @@ export function LandingPage() {
           <span className="flex items-center gap-2">
             <Flame size={14} className="text-brasa-500" aria-hidden /> © {new Date().getFullYear()} Dark Kitchen
           </span>
-          <Link to={entryHref} className="transition-colors hover:text-neutral-200">
-            {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
-          </Link>
+          <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5 gap-y-2">
+            <a href="#precios" className="transition-colors hover:text-neutral-200">
+              Precios
+            </a>
+            <a href="#faq" className="transition-colors hover:text-neutral-200">
+              FAQ
+            </a>
+            <Link to={session ? '/' : '/login'} className="transition-colors hover:text-neutral-200">
+              {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>

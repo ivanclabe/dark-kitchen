@@ -57,6 +57,8 @@ const loading = <p className="text-neutral-400">Cargando…</p>
 export const router = createBrowserRouter([
   // Pública: presentación del producto, antes de iniciar sesión.
   { path: '/landing', element: <LandingPage /> },
+  // Precios (ADR 0010): enlace para compartir; la landing se ve con o sin sesión en /landing.
+  { path: '/precios', element: <Navigate to={{ pathname: '/landing', hash: '#precios' }} replace /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup-admin', element: <SignUpAdminPage /> },
   // El personal entra por invitación (ADR 0007, Fase 5): el autorregistro abierto ya no existe.

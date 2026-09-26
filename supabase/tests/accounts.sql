@@ -45,6 +45,8 @@ insert into dk_users (id, auth_user_id, full_name, active) values
 insert into dk_organizations (slug, name, owner_user_id, sector, category)
 values ('grupo-b-cuentas', 'Grupo B', '10000000-0000-0000-0000-0000000ac0a0', 'fast_food', 'burgers');
 insert into _ctx values ('orgB', (select id from dk_organizations where slug = 'grupo-b-cuentas'));
+-- Grupo B en Business (3 Cuentas): la prueba crea dos.
+update dk_subscriptions set plan_key = 'business' where organization_id = (select id from _ctx where key = 'orgB');
 
 -- Backfill de la migración
 do $$ begin
@@ -106,7 +108,7 @@ set local role authenticated;
 do $$
 declare v_slug text;
 begin
-  v_slug := dk_create_organization('Taquería Sur', 'fast_food', 'burgers');
+  v_slug := dk_create_organization('Taquería Sur', 'fast_food', 'burgers', p_plan => 'standard');
   insert into _t (area, test, expected, got) values ('Herencia', 'Registro: la primera Cuenta con ADMIN', 'ADMIN',
     pg_temp.roles_of((select id from dk_kitchens where slug = v_slug), dk_current_profile_id()));
 end $$;

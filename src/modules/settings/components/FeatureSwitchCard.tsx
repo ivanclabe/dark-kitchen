@@ -35,6 +35,7 @@ export function FeatureSwitchCard({ featureKey }: { featureKey: FeatureKey }) {
       <div className="min-w-0">
         <h3 className={typography.h3}>{state.label}</h3>
         <p className={clsx('mt-1', typography.caption)}>{state.description}</p>
+        {reason === 'plan' && <p className="mt-2 text-xs text-amber-300">Tu plan no incluye esta función.</p>}
         {reason === 'organization' && (
           <p className="mt-2 text-xs text-amber-300">
             Tu organización no tiene disponible esta función{state.enabled ? ': queda apagada hasta que la ofrezca.' : '.'}
