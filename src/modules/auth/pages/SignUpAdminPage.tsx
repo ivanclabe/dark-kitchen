@@ -41,7 +41,7 @@ export function SignUpAdminPage() {
 
     if (profileError) {
       setError(
-        'La plataforma ya tiene superusuario. Para entrar a un negocio necesitas que su administrador te agregue.',
+        'La plataforma ya tiene su administrador. Para entrar a un negocio necesitas que su SUPER_ADMIN o ADMIN te agregue.',
       )
       setSubmitting(false)
       return
@@ -58,7 +58,7 @@ export function SignUpAdminPage() {
             <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
           <div>
-            <h1 className={typography.h1}>Crear cuenta de superusuario</h1>
+            <h1 className={typography.h1}>Crear el administrador de la plataforma</h1>
             <p className={`mt-1 ${typography.small}`}>Solo para la primera cuenta de una instalación nueva.</p>
           </div>
         </div>

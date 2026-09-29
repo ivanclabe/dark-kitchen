@@ -30,6 +30,8 @@ export type InsightResult =
   | { kind: 'ok'; insight: AiInsight; cached: boolean }
   | { kind: 'not_configured' }
   | { kind: 'disabled' }
+  /** Cuota de IA (ADR 0011): intervalo mínimo o tope en 24 h del plan. */
+  | { kind: 'rate_limited'; reason: 'interval' | 'daily' | null; message: string; retryAfter: number | null }
   | { kind: 'error'; message: string }
 
 /** Fila de dk_inventory_signals, en camelCase. */

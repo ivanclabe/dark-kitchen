@@ -149,3 +149,10 @@ export const ACTION_LABEL: Record<string, string> = {
 }
 
 export const PRIORITY_ORDER: Record<InsightPriority, number> = { alta: 0, media: 1, baja: 2 }
+
+/** "en 2 min", "en 3 h" — cuándo reintentar tras la cuota de IA. */
+export function retryLabel(seconds: number | null): string {
+  if (seconds === null || seconds <= 0) return 'en un momento'
+  if (seconds < 3600) return `en ${Math.max(1, Math.ceil(seconds / 60))} min`
+  return `en ${Math.ceil(seconds / 3600)} h`
+}

@@ -67,6 +67,8 @@ export const ORGANIZATION_PERMISSION_KEYS = [
   'roles.manage',
   'master_menus.manage',
   'features.manage',
+  'observability.view',
+  'billing.view',
 ] as const
 
 export type AccountPermission = (typeof ACCOUNT_PERMISSION_KEYS)[number]

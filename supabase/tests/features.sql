@@ -122,8 +122,6 @@ do $$ begin
   insert into _t (area, test, expected, got) values ('Precedencia', 'Organización apagada: la Cuenta no la usa', 'false · organization',
     pg_temp.feat('supply_reorder', 'usable') || ' · ' || (dk_feature_state('supply_reorder') ->> 'reason'));
   insert into _t (area, test, expected, got) values ('Precedencia', 'La elección de la Cuenta se conserva', 'true', pg_temp.feat('supply_reorder', 'enabled'));
-  insert into _t (area, test, expected, got) values ('Precedencia', 'Vista de compatibilidad con el estado efectivo', 'false',
-    (select enabled::text from dk_ai_features where feature_key = 'supply_reorder'));
   insert into _t (area, test, expected, got) values ('Precedencia', 'Voz apagada por la organización', 'false', pg_temp.feat('voice_commands', 'usable'));
   -- Apagarla en la Cuenta sí se puede; volver a activarla, no.
   perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'voice_commands', false);

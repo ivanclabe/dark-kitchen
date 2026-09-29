@@ -49,11 +49,19 @@ function mapInsight(row: InsightRow): AiInsight {
 export async function requestInsight(feature: AiInsightFeatureKey, force = false): Promise<InsightResult> {
   const { data, error } = await supabase.functions.invoke<{ insight: InsightRow; cached: boolean }>(FUNCTION_NAME, { body: { feature, force } })
   if (error) {
-    let body: { error?: string; message?: string } = {}
+    let body: { error?: string; message?: string; reason?: string | null; retryAfter?: number | null } = {}
     const context = (error as { context?: Response }).context
     if (context && typeof context.json === 'function') body = await context.json().catch(() => ({}))
     if (body.error === 'AI_NOT_CONFIGURED') return { kind: 'not_configured' }
     if (body.error === 'FEATURE_DISABLED') return { kind: 'disabled' }
+    if (body.error === 'AI_RATE_LIMITED') {
+      return {
+        kind: 'rate_limited',
+        reason: body.reason === 'interval' || body.reason === 'daily' ? body.reason : null,
+        message: body.message ?? 'Límite de análisis con IA alcanzado.',
+        retryAfter: typeof body.retryAfter === 'number' ? body.retryAfter : null,
+      }
+    }
     return { kind: 'error', message: body.message ?? body.error ?? error.message }
   }
   if (!data?.insight) return { kind: 'error', message: 'Respuesta vacía del servicio de IA.' }

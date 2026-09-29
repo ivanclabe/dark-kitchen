@@ -1,0 +1,13 @@
+# Dark Kitchen (ADR 0011): la presentación y los precios se indexan; la aplicación no.
+User-agent: *
+Allow: /$
+Allow: /landing
+Allow: /precios
+Allow: /registro$
+Disallow: /k/
+Disallow: /admin
+Disallow: /cuentas
+Disallow: /registro/
+Disallow: /activar/
+Disallow: /login
+Disallow: /signup-admin

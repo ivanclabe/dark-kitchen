@@ -79,10 +79,29 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
         )}
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Usage label="Cuentas" used={sub.usage.accounts} limit={sub.limits.accounts} singular="cuenta" plural="cuentas" />
         <Usage label="Usuarios (activos y pendientes)" used={sub.usage.users} limit={sub.limits.users} singular="usuario" plural="usuarios" />
+        {sub.limits.aiRunsPerDay !== undefined && (
+          <Usage label="Análisis de IA en 24 h (cuenta con más uso)" used={sub.usage.aiRunsMax24h ?? 0} limit={sub.limits.aiRunsPerDay} singular="análisis" plural="análisis" />
+        )}
       </section>
+      {(sub.currentPeriodEnd || sub.startedAt) && (
+        <dl className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+          <div>
+            <dt className="text-neutral-500">Inicio</dt>
+            <dd className="text-neutral-200">{formatDate(sub.startedAt)}</dd>
+          </div>
+          <div>
+            <dt className="text-neutral-500">Periodicidad</dt>
+            <dd className="text-neutral-200">{sub.billingPeriod === 'annual' ? 'Anual' : 'Mensual'}</dd>
+          </div>
+          <div>
+            <dt className="text-neutral-500">{sub.status === 'trialing' ? 'Fin de la prueba' : 'Renovación'}</dt>
+            <dd className="text-neutral-200">{sub.currentPeriodEnd ? formatDate(sub.currentPeriodEnd) : '—'}</dd>
+          </div>
+        </dl>
+      )}
 
       <section className="grid gap-6 sm:grid-cols-2">
         <div>

@@ -8,7 +8,14 @@ import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { UsersAndPermissionsPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
-import { OrganizationSettingsPage } from '@/modules/organization/pages/OrganizationSettingsPage'
+import { OrgAdminLayout } from '@/modules/orgAdmin/OrgAdminLayout'
+import { OrgAccountsPage } from '@/modules/orgAdmin/pages/OrgAccountsPage'
+import { OrgBillingPage } from '@/modules/orgAdmin/pages/OrgBillingPage'
+import { OrgMasterMenusPage } from '@/modules/orgAdmin/pages/OrgMasterMenusPage'
+import { OrgObservabilityPage } from '@/modules/orgAdmin/pages/OrgObservabilityPage'
+import { OrgOverviewPage } from '@/modules/orgAdmin/pages/OrgOverviewPage'
+import { OrgSettingsPage } from '@/modules/orgAdmin/pages/OrgSettingsPage'
+import { OrgTeamPage } from '@/modules/orgAdmin/pages/OrgTeamPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
 import { SignUpConfirmedPage } from '@/modules/signup/pages/SignUpConfirmedPage'
@@ -24,6 +31,8 @@ import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { KitchenEntryRedirect, LegacyKitchenRedirect } from './kitchenEntry'
 import { KitchenScope } from './KitchenScope'
+import { OrgScope } from './OrgScope'
+import { OrgSettingsRedirect } from './orgRedirects'
 import { ProtectedRoute } from './ProtectedRoute'
 
 /** Redirección a una sección de la Cocina activa (las rutas viejas de dentro de la app). */
@@ -102,6 +111,32 @@ export const router = createBrowserRouter([
     ),
   },
 
+  // Centro de administración de la organización (ADR 0012): /o/{organización}/…
+  // Sin Cuenta activa; cada sección exige su permiso de organización.
+  {
+    path: '/o/:orgSlug',
+    element: (
+      <ProtectedRoute>
+        <OrgScope />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        element: <OrgAdminLayout />,
+        children: [
+          { index: true, element: <OrgOverviewPage /> },
+          { path: 'cuentas', element: <OrgAccountsPage /> },
+          { path: 'observabilidad', element: <OrgObservabilityPage /> },
+          { path: 'equipos', element: <OrgTeamPage /> },
+          { path: 'facturacion', element: <OrgBillingPage /> },
+          { path: 'configuracion', element: <OrgSettingsPage /> },
+          { path: 'menus-maestros', element: <OrgMasterMenusPage /> },
+          { path: '*', element: <Navigate to=".." replace /> },
+        ],
+      },
+    ],
+  },
+
   // Toda la app vive dentro de una Cocina (ADR 0007): /k/{slug}/…
   {
     path: '/k/:kitchenSlug',
@@ -142,7 +177,7 @@ export const router = createBrowserRouter([
           // Usuarios y permisos (toda la organización para el SUPER_ADMIN; su Cuenta para el Administrador).
           { path: 'users', element: <UsersAndPermissionsPage /> },
           // Configuración de la organización (SUPER_ADMIN).
-          { path: 'organizacion', element: <OrganizationSettingsPage /> },
+          { path: 'organizacion', element: <OrgSettingsRedirect /> },
           // Configuración de la Cuenta: datos generales y funciones (IA, voz; ADR 0009).
           {
             path: 'settings',

@@ -29,11 +29,16 @@ export interface Subscription {
   billingPeriod: 'monthly' | 'annual'
   startedAt: string
   trialEndsAt: string | null
+  currentPeriodStart?: string | null
   currentPeriodEnd: string | null
   cancelAtPeriodEnd: boolean
-  /** null = ilimitado. */
-  limits: { accounts: number | null; users: number | null }
-  usage: { accounts: number; users: number }
+  canceledAt?: string | null
+  /** false mientras no haya un proveedor de pagos conectado. */
+  paymentsEnabled?: boolean
+  /** null = ilimitado. `aiRunsPerDay` es por Cuenta, en 24 h móviles. */
+  limits: { accounts: number | null; users: number | null; aiRunsPerDay?: number }
+  /** `aiRunsMax24h`: análisis de IA de la Cuenta que más usó en 24 h. */
+  usage: { accounts: number; users: number; aiRunsMax24h?: number }
   features: FeatureKey[]
 }
 

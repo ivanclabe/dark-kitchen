@@ -1,8 +1,9 @@
 import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
-import { KeyRound, Loader2, RefreshCw, Sparkles, TriangleAlert } from 'lucide-react'
+import { Clock, KeyRound, Loader2, RefreshCw, Sparkles, TriangleAlert } from 'lucide-react'
 import { useRefreshAiInsight } from '../hooks/useAi'
-import { ACTION_LABEL } from '../lib/catalog'
+import { useToast } from '@/shared/ui/Toast'
+import { ACTION_LABEL, retryLabel } from '../lib/catalog'
 import type { ReactNode } from 'react'
 import type { AiInsightFeatureKey, InsightItem, InsightPriority, InsightResult } from '../types'
 
@@ -31,7 +32,16 @@ function minutesAgo(iso: string): string {
  */
 export function InsightSummary({ feature, result, isLoading }: { feature: AiInsightFeatureKey; result: InsightResult | undefined; isLoading: boolean }) {
   const refresh = useRefreshAiInsight(feature)
+  const { show } = useToast()
   const busy = isLoading || refresh.isPending
+
+  function reanalyze() {
+    refresh.mutate(undefined, {
+      onSuccess: (r) => {
+        if (r.kind === 'rate_limited') show(`${r.message} Vuelve a intentarlo ${retryLabel(r.retryAfter)}.`, 'error')
+      },
+    })
+  }
 
   let body: ReactNode
   if (busy) body = <span className="inline-flex items-center gap-1.5 text-neutral-400"><Loader2 size={12} className="animate-spin" /> Analizando con IA…</span>
@@ -40,6 +50,12 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
     body = <span className="inline-flex items-center gap-1.5 text-neutral-500"><KeyRound size={12} /> IA no conectada: se muestran solo los datos calculados.</span>
   else if (result.kind === 'error')
     body = <span className="inline-flex items-center gap-1.5 text-amber-300"><TriangleAlert size={12} /> No se pudo analizar con IA. Los datos siguen siendo válidos.</span>
+  else if (result.kind === 'rate_limited')
+    body = (
+      <span className="inline-flex items-center gap-1.5 text-neutral-400">
+        <Clock size={12} /> Análisis con IA en pausa: {result.message} Vuelve {retryLabel(result.retryAfter)}.
+      </span>
+    )
   else if (result.kind === 'disabled') body = null
   else if (result.insight.status === 'empty') body = null
   else
@@ -59,7 +75,7 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
       </p>
       {!busy && result?.kind !== 'not_configured' && (
         <Tooltip label="Volver a analizar" side="top">
-          <button type="button" onClick={() => refresh.mutate()} aria-label="Volver a analizar" className="shrink-0 rounded-full p-1 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200">
+          <button type="button" onClick={reanalyze} aria-label="Volver a analizar" className="shrink-0 rounded-full p-1 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200">
             <RefreshCw size={12} />
           </button>
         </Tooltip>

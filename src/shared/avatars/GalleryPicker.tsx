@@ -30,7 +30,7 @@ function GalleryPicker<K extends string>({
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const index = keys.indexOf(value)
-    const cols = !compact && window.matchMedia('(min-width: 640px)').matches ? 10 : 5
+    const cols = !compact && window.matchMedia?.('(min-width: 640px)').matches ? 10 : 5
     const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key]
     if (delta === undefined) return
     e.preventDefault()

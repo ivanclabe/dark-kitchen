@@ -76,6 +76,8 @@ src/
     delivery/                # despacho / domiciliarios
     customers/
     reports/
+    organization/            # equipos, roles, cuentas, funciones y plan (componentes que reutiliza el centro)
+    orgAdmin/                # centro de administración /o/:org (ADR 0012): layout, Resumen, Observabilidad, Bitácora, Facturación…
   types/
     database.ts             # tipos generados por Supabase CLI (supabase gen types)
 ```
@@ -92,6 +94,8 @@ modules/inventory/
   types/           # tipos de dominio (no confundir con tipos generados de DB)
   schemas/         # validación (zod) de formularios
 ```
+
+**Dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md)).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector y `/admin`, la plataforma.
 
 **Regla dura:** ningún componente React hace `supabase.from(...)` directamente. Todo pasa por `services/` → `repositories/`. Esto es lo que permite mover la lógica de negocio a un RPC sin tocar la UI, y probar `services/` sin renderizar componentes.
 
@@ -190,6 +194,8 @@ Detalle de matriz completa (tabla × acción × rol) en [../docs/adr/0005-rls-st
 - **Organizaciones y Cuentas ([ADR 0007](./adr/0007-multi-cocina.md), [ADR 0008](./adr/0008-organizaciones-y-cuentas.md)).** Cada tabla de negocio tiene `kitchen_id` (la **Cuenta**). La Cuenta activa llega en el encabezado `x-dk-kitchen-id` y el rol activo en `x-dk-role-id`; `dk_effective_role()` los valida (SUPER_ADMIN (creador) de la organización, o miembro con ese rol asignado; sin encabezado no hay Cuenta, cero filas). Los permisos son claves de un catálogo central (`dk_permissions`: `orders.confirm`, `inventory.adjust`…) y las políticas siguen el patrón `USING (kitchen_id = (select dk_current_kitchen_id()) and (select dk_can('orders.view')))`. Los datos de organización se protegen por fila con `dk_has_org_permission(organization_id, 'users.manage')`. El administrador de la plataforma (`dk_users.platform_role = 'SUPERADMIN'`) tiene acceso de soporte a todo.
 - **Funciones opcionales ([ADR 0009](./adr/0009-iconos-avatares-y-funciones.md)).** IA y voz se describen en el catálogo `dk_features`. La organización decide si las ofrece (`dk_organization_features`) y cada Cuenta si las activa (`dk_kitchen_features`). La base resuelve `usable = ofrecida ∧ activada ∧ dk_can(permiso de uso)` con `dk_can_use_feature()`, que protege `dk_ai_insights`. La app lee el resultado de `dk_my_features()` en el contexto activo (`useAppContext().canUseFeature`); ningún componente decide por su cuenta. Escritura solo por RPC (`dk_set_org_feature`, `dk_set_kitchen_feature`), con una guardia que impide activar lo que la organización no ofrece.
 - **Planes ([ADR 0010](./adr/0010-planes-precios-y-onboarding.md)).** El plan es de la **organización** (`dk_subscriptions`, una por organización) y es el primer techo: `usable = plan incluye ∧ organización ofrece ∧ Cuenta activa ∧ permiso`. Los límites de Cuentas (`dk_create_kitchen`) y usuarios (guardia de `dk_organization_members`) salen de `dk_plans.limits`. Los catálogos de planes y funciones se leen sin sesión (landing); nada más se abre a `anon`. El plan elegido en el registro se valida en `dk_create_organization`, que crea organización, suscripción, primera Cuenta y roles en una transacción; antes de confirmar el correo no existe nada en la base. Sin pagos: la plataforma cambia planes con `dk_set_subscription`.
+- **Cuota de IA y políticas sin superposición ([ADR 0011](./adr/0011-consolidacion-y-endurecimiento.md)).** La Edge Function de IA consulta `dk_ai_run_allowed()` antes de llamar al modelo: intervalo mínimo por Cuenta y función, y tope en 24 h del plan. Los parámetros de las funciones se validan contra `dk_features.settings_schema`. Cada tabla tiene como máximo una política permisiva por comando y rol: no hay `FOR ALL` superpuestas, porque la lectura es `ver ∨ editar` en una sola política.
+- **Centro de administración, observabilidad y bitácora ([ADR 0012](./adr/0012-centro-de-administracion.md)).** Dos permisos de organización nuevos: `observability.view` y `billing.view` (catálogo de 59 permisos: 47 de Cuenta y 12 de organización). `dk_audit_log` es de solo agregar (append-only): sin escrituras desde la API y con una guardia de fila y sentencia salvo dentro de la retención (`dk_purge_audit_log`, 400 días, `pg_cron`). Cada fila la clasifica en la base un disparador `BEFORE INSERT` (`event_type`, `category`, `summary`, `result`, `source`). Se lee por Cuenta con `audit.view` o por organización con `observability.view`, con `dk_org_events` (cursor). La observabilidad se consulta con `dk_org_observability` y `dk_account_observability`: `SECURITY DEFINER`, verifican el permiso y que la Cuenta sea de la organización, con ventanas acotadas por índices `(kitchen_id, created_at desc)`. Las fechas se calculan en la zona horaria de cada Cuenta (`dk_kitchen_tz`, `dk_local_start`, `dk_local_date`). La suscripción y `dk_invoices` exigen `billing.view`.
 - *Histórico:* el rol global (`dk_users.role`, `dk_current_role()`) se retiró en la Fase 6 de la ADR 0007; la columna se conserva sin uso.
 - Las tablas puramente transaccionales críticas (`dk_inventory_movements`, `dk_inventory_reservations`) **no reciben `INSERT` directo del cliente** salvo por rol `ADMIN`/`INVENTORY` en casos manuales (compra manual, merma, ajuste); los movimientos derivados de pedidos se generan exclusivamente dentro de los RPC `SECURITY DEFINER`, que se ejecutan con privilegios elevados pero validan el rol del `auth.uid()` que invoca internamente.
 - Storage: buckets privados (`invoices`, `product-images`), políticas por rol igual que las tablas.
@@ -262,6 +268,9 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0004 — Transacciones críticas como RPC de Postgres `SECURITY DEFINER`](./adr/0004-rpc-transactions.md)
 - [ADR 0005 — Estrategia de roles y RLS](./adr/0005-rls-strategy.md)
 - [ADR 0006 — Límite de integración con WhatsApp en esta fase](./adr/0006-whatsapp-boundary.md)
+- [ADR 0007 — Multi-cocina](./adr/0007-multi-cocina.md) · [ADR 0008 — Organizaciones y cuentas](./adr/0008-organizaciones-y-cuentas.md)
+- [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
+- [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 
 ---
 

@@ -2,14 +2,15 @@ import { AccountIcon } from '@/shared/avatars/Avatar'
 import { suggestAccountIcon, type AccountIconKey } from '@/shared/avatars/catalog'
 import { AccountIconPicker } from '@/shared/avatars/GalleryPicker'
 import { MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
+import { supabase } from '@/shared/lib/supabase'
 import { createKitchen } from '@/shared/kitchen/kitchensApi'
 import { slugError, slugify } from '@/shared/kitchen/slug'
 import { Button } from '@/shared/ui/Button'
-import { FormField, Input } from '@/shared/ui/FormField'
+import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 
 /**
@@ -18,6 +19,9 @@ import { useState, type FormEvent } from 'react'
  * numeración desde 1000; las funciones con los valores del catálogo) y, si
  * la crea el SUPER_ADMIN, con él como SUPER_ADMIN + ADMIN (ADR 0009, 3.3).
  * Al crearla se entra a ella (lo decide quien abre el diálogo).
+ *
+ * Sin `organizationId` (la plataforma, ADR 0011 H4) hay que elegir la
+ * organización: nunca se crea en una por defecto sin decirlo.
  */
 export function CreateKitchenDialog({
   organizationId,
@@ -37,13 +41,24 @@ export function CreateKitchenDialog({
   const [slugTouched, setSlugTouched] = useState(false)
   const [icon, setIcon] = useState<AccountIconKey | null>(null)
   const [pickingIcon, setPickingIcon] = useState(false)
+  const [chosenOrg, setChosenOrg] = useState('')
+  const organizations = useQuery({
+    queryKey: ['my-kitchens', 'platform', 'organization-options'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('dk_organizations').select('id, name').order('name')
+      if (error) throw error
+      return data
+    },
+    enabled: !organizationId,
+  })
+  const targetOrg = organizationId ?? (chosenOrg || undefined)
   const effectiveIcon = icon ?? suggestAccountIcon(name)
   const effectiveSlug = slugTouched ? slug : slugify(name)
   const nameError = name.trim().length >= 2 ? null : 'Mínimo 2 caracteres'
-  const error = nameError ?? slugError(effectiveSlug)
+  const error = nameError ?? slugError(effectiveSlug) ?? (targetOrg ? null : 'Elige la organización')
 
   const create = useMutation({
-    mutationFn: () => createKitchen(name.trim(), effectiveSlug, organizationId, effectiveIcon),
+    mutationFn: () => createKitchen(name.trim(), effectiveSlug, targetOrg, effectiveIcon),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
       show(`Cuenta "${name.trim()}" creada.`)
@@ -78,6 +93,20 @@ export function CreateKitchenDialog({
       }
     >
       <form id="create-kitchen-form" onSubmit={handleSubmit} className="space-y-4">
+        {!organizationId && (
+          <FormField label="Organización" required hint="La cuenta usa el plan y los límites de esa organización.">
+            {(a11y) => (
+              <Select {...a11y} value={chosenOrg} onChange={(e) => setChosenOrg(e.target.value)} disabled={organizations.isLoading}>
+                <option value="">Elegir…</option>
+                {(organizations.data ?? []).map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </FormField>
+        )}
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <AccountIcon iconKey={effectiveIcon} size="lg" />

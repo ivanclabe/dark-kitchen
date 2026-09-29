@@ -11,7 +11,7 @@ import { RefreshCw, Sparkles, Workflow } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useLatestAiInsight, useRefreshAiInsight, useUpdateAiFeature } from '../hooks/useAi'
-import { settingError, withDefaults, type FeatureDefinition } from '../lib/catalog'
+import { retryLabel, settingError, withDefaults, type FeatureDefinition } from '../lib/catalog'
 import type { AiInsightFeatureKey, AiSettings } from '../types'
 
 function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
@@ -24,6 +24,7 @@ function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
     if (result.kind === 'ok') show(result.insight.status === 'empty' ? 'Análisis listo: no hay nada que señalar.' : `Análisis listo: ${result.insight.items.length} recomendaciones.`)
     else if (result.kind === 'not_configured') show('La IA no está conectada: falta el secreto DK_ANTHROPIC_API_KEY.', 'error')
     else if (result.kind === 'disabled') show('Activa la función y guarda antes de probarla.', 'error')
+    else if (result.kind === 'rate_limited') show(`${result.message} Vuelve a intentarlo ${retryLabel(result.retryAfter)}.`, 'error')
     else show(result.message, 'error')
   }
 

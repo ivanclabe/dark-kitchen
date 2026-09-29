@@ -367,6 +367,20 @@ Deno.serve(async (req: Request) => {
       return json({ error: "AI_NOT_CONFIGURED", message: "Falta el secreto DK_ANTHROPIC_API_KEY en Supabase > Edge Functions > Secrets." }, 503);
     }
 
+    // Cuota (ADR 0011): la base decide si esta Cuenta puede llamar al modelo ahora —
+    // intervalo mínimo por función (también con "Analizar ahora") y tope en 24 h del plan.
+    const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_allowed", { p_feature_key: feature });
+    if (quotaError) return json({ error: quotaError.message }, 403);
+    const q = (quota ?? {}) as { allowed?: boolean; reason?: string | null; retryAfterSeconds?: number | null };
+    if (!q.allowed) {
+      const message = q.reason === "daily"
+        ? "Esta cuenta llegó al máximo de análisis con IA de su plan en las últimas 24 horas."
+        : q.reason === "interval"
+        ? "Se acaba de analizar. Espera un momento antes de volver a pedirlo."
+        : "Esta función de IA no está disponible.";
+      return json({ error: "AI_RATE_LIMITED", reason: q.reason, retryAfter: q.retryAfterSeconds ?? null, message }, 429);
+    }
+
     const model = feature === "kitchen_insights" ? MODEL_KITCHEN : MODEL_SUPPLY;
     try {
       const raw = await askModel(apiKey, model, feature, payload);

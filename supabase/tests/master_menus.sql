@@ -33,7 +33,7 @@ begin
   insert into _ctx values ('menu', v_menu);
   v_product := dk_save_master_product(v_menu, null, 'BURG-M', 'Burger Maestra', 'La de la casa', 'Hamburguesas', 20000, true,
     '[{"ingredient_code": "PAN-M", "ingredient_name": "Pan brioche", "unit_code": "unidad", "quantity": 1},
-      {"ingredient_code": "CARNE-01", "ingredient_name": "Carne de res", "unit_code": "g", "quantity": 150}]');
+      {"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne de res", "unit_code": "g", "quantity": 150}]');
   insert into _ctx values ('mp', v_product);
   insert into _t (area, test, expected, got) values ('Compartir', 'Compartir con A y B', '2',
     dk_assign_master_menu(v_menu, array[(select id from _ctx where key = 'A'), v_b])::text);
@@ -48,8 +48,8 @@ begin
     (select p.price::int || ' · ' || c.name from dk_products p left join dk_product_categories c on c.id = p.category_id where p.kitchen_id = v_a and p.master_product_id = v_mp));
   insert into _t (area, test, expected, got) values ('Copia', 'A: receta con 2 insumos', '2',
     (select count(*)::text from dk_recipe_items ri join dk_products p on p.active_recipe_id = ri.recipe_id where p.kitchen_id = v_a and p.master_product_id = v_mp));
-  insert into _t (area, test, expected, got) values ('Copia', 'A reutiliza su insumo CARNE-01 (no lo duplica)', '1',
-    (select count(*)::text from dk_ingredients where kitchen_id = v_a and code = 'CARNE-01'));
+  insert into _t (area, test, expected, got) values ('Copia', 'A reutiliza su insumo CARNE-PRB-01 (no lo duplica)', '1',
+    (select count(*)::text from dk_ingredients where kitchen_id = v_a and code = 'CARNE-PRB-01'));
   insert into _t (area, test, expected, got) values ('Copia', 'A crea el insumo que le faltaba (PAN-M)', '1',
     (select count(*)::text from dk_ingredients where kitchen_id = v_a and code = 'PAN-M'));
   insert into _t (area, test, expected, got) values ('Copia', 'B recibe su propia copia con sus propios insumos', '1 plato · 2 insumos',
@@ -86,10 +86,10 @@ do $$ begin
   update dk_master_products set price = 25000 where id = (select id from _ctx where key = 'mp');
   perform dk_save_master_product((select id from _ctx where key = 'menu'), (select id from _ctx where key = 'mp'), 'BURG-M', 'Burger Maestra', 'La de la casa', 'Hamburguesas', 25000, true,
     '[{"ingredient_code": "PAN-M", "ingredient_name": "Pan brioche", "unit_code": "unidad", "quantity": 1},
-      {"ingredient_code": "CARNE-01", "ingredient_name": "Carne de res", "unit_code": "g", "quantity": 180}]');
+      {"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne de res", "unit_code": "g", "quantity": 180}]');
   begin
     perform dk_save_master_product((select id from _ctx where key = 'menu'), null, 'MAL-01', 'Unidad equivocada', null, null, 1000, true,
-      '[{"ingredient_code": "CARNE-01", "ingredient_name": "Carne", "unit_code": "kg", "quantity": 1}]');
+      '[{"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne", "unit_code": "kg", "quantity": 1}]');
     insert into _t (area, test, expected, got) values ('Cambios', 'Receta con unidad distinta a la de la Cocina', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Cambios', 'Receta con unidad distinta a la de la Cocina', 'bloqueado', 'bloqueado', sqlerrm); end;
 end $$;
@@ -102,7 +102,7 @@ begin
     'A ' || (select price::int from dk_products where kitchen_id = v_a and master_product_id = v_mp) || ' · B ' ||
     (select price::int from dk_products where kitchen_id = v_b and master_product_id = v_mp));
   insert into _t (area, test, expected, got) values ('Cambios', 'Receta nueva llega a A (versión 2, 180 g)', 'v2 · 180',
-    (select 'v' || r.version || ' · ' || (select ri.quantity::int from dk_recipe_items ri join dk_ingredients i on i.id = ri.ingredient_id where ri.recipe_id = r.id and i.code = 'CARNE-01')
+    (select 'v' || r.version || ' · ' || (select ri.quantity::int from dk_recipe_items ri join dk_ingredients i on i.id = ri.ingredient_id where ri.recipe_id = r.id and i.code = 'CARNE-PRB-01')
      from dk_products p join dk_recipes r on r.id = p.active_recipe_id where p.kitchen_id = v_a and p.master_product_id = v_mp));
 end $$;
 

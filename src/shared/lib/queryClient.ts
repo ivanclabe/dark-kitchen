@@ -1,4 +1,4 @@
-import { hashKey, QueryClient, type QueryKey } from '@tanstack/react-query'
+import { hashKey, MutationCache, QueryClient, type QueryKey } from '@tanstack/react-query'
 import { getActiveKitchenId, getActiveRoleId } from '@/shared/kitchen/activeKitchen'
 
 /** Consultas que no pertenecen a una Cuenta (p. ej. el contexto del usuario). */
@@ -16,7 +16,14 @@ function kitchenScopedHash(queryKey: QueryKey): string {
   return GLOBAL_QUERY_ROOTS.has(root) ? hashKey(queryKey) : hashKey([getActiveKitchenId(), getActiveRoleId(), ...queryKey])
 }
 
-export const queryClient = new QueryClient({
+export const queryClient: QueryClient = new QueryClient({
+  // "Ventas de hoy" y el resumen se refrescan después de cualquier cambio (crear,
+  // confirmar, cancelar un pedido…), además de cada minuto (ADR 0012, D5).
+  mutationCache: new MutationCache({
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 30_000,

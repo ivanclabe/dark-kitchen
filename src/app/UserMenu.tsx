@@ -1,6 +1,7 @@
 import { Avatar } from '@/shared/avatars/Avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
+import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
 import { canAccessModule } from '@/shared/rbac/roles'
 import { Popover, PopoverItem, PopoverSeparator } from '@/shared/ui/Popover'
 import { ArrowLeftRight, BadgeCheck, Building2, ChevronLeft, ChevronRight, LogOut, Settings, ShieldCheck, UserRound, Users } from 'lucide-react'
@@ -17,7 +18,11 @@ import { AccountList, RoleList, useShowOrganization } from './AccountSwitcher'
 export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' }) {
   const { profile, user, signOut } = useAuth()
   const { kitchen, organization, can, path } = useActiveKitchen()
-  const canConfigureOrg = organization?.permissions.includes('organization.manage') ?? false
+  // La administración de la organización vive en su centro (/o/…, ADR 0012), no dentro de la Cuenta.
+  const canAdminOrg = canOpenAdminCenter(organization)
+  const orgUsers = organization?.permissions.includes('users.view') ?? false
+  // "Equipo de la cuenta": para quien administra el equipo de ESTA Cuenta sin administrar la organización.
+  const canAccountTeam = canAccessModule(can, 'users') && !orgUsers
   const { data: kitchens } = useMyKitchens()
   const navigate = useNavigate()
   const [view, setView] = useState<'main' | 'accounts' | 'roles'>('main')
@@ -104,15 +109,15 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
               </PopoverItem>
             )}
 
-            {(canAccessModule(can, 'users') || canConfigureOrg || profile?.isSuperadmin) && <PopoverSeparator />}
-            {canAccessModule(can, 'users') && (
+            {(canAccountTeam || canAdminOrg || profile?.isSuperadmin) && <PopoverSeparator />}
+            {canAccountTeam && (
               <PopoverItem icon={Users} onSelect={() => go(path('/users'), close)}>
-                Usuarios y permisos
+                Equipo de la cuenta
               </PopoverItem>
             )}
-            {canConfigureOrg && (
-              <PopoverItem icon={Building2} onSelect={() => go(path('/organizacion'), close)}>
-                Configuración de la organización
+            {canAdminOrg && organization && (
+              <PopoverItem icon={Building2} onSelect={() => go(orgPath(organization.slug), close)}>
+                Administración de la organización
               </PopoverItem>
             )}
             {profile?.isSuperadmin && (

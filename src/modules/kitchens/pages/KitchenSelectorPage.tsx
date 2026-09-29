@@ -3,6 +3,7 @@ import { useAuth } from '@/shared/hooks/useAuth'
 import { kitchenPath, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
 import type { MyKitchen, MyOrganization } from '@/shared/kitchen/kitchensApi'
 import { AccountIcon } from '@/shared/avatars/Avatar'
+import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -10,7 +11,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
-import { ArrowRight, ChefHat, Flame, LogOut, Plus, ShieldCheck, Store } from 'lucide-react'
+import { ArrowRight, Building2, ChefHat, Flame, LogOut, Plus, ShieldCheck, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
@@ -85,7 +86,7 @@ export function KitchenSelectorPage() {
               const canCreate = org.permissions.includes('accounts.create')
               return (
                 <section key={org.id} aria-label={org.name} className="space-y-3">
-                  {(showGroupTitles || canCreate) && (
+                  {(showGroupTitles || canCreate || canOpenAdminCenter(org)) && (
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       {showGroupTitles || canCreateSomewhere ? (
                         <h2 className={clsx(typography.h3, 'flex items-center gap-2')}>
@@ -99,11 +100,21 @@ export function KitchenSelectorPage() {
                       ) : (
                         <span />
                       )}
-                      {canCreate && (
-                        <Button variant="secondary" size="sm" icon={Plus} onClick={() => setCreatingIn(org)}>
-                          Nueva cuenta
-                        </Button>
-                      )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {canOpenAdminCenter(org) && (
+                          <Link
+                            to={orgPath(org.slug)}
+                            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-700 px-3 text-sm text-neutral-200 hover:border-neutral-500 hover:text-neutral-50"
+                          >
+                            <Building2 size={14} aria-hidden /> Administrar organización
+                          </Link>
+                        )}
+                        {canCreate && (
+                          <Button variant="secondary" size="sm" icon={Plus} onClick={() => setCreatingIn(org)}>
+                            Nueva cuenta
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   )}
                   {orgKitchens.length === 0 ? (

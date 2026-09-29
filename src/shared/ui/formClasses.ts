@@ -17,7 +17,7 @@ export const linkButtonClass = `inline-flex items-center gap-1 text-sm ${buttonC
 export const iconButtonClass =
   'inline-flex size-10 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 text-neutral-400 transition-colors hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-100 disabled:cursor-not-allowed disabled:opacity-50'
 export const cardClass = 'rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-5 sm:p-6'
-export const tableWrapperClass = 'overflow-x-auto rounded-2xl border border-neutral-800/60 bg-neutral-950'
+export const tableWrapperClass = 'relative overflow-x-auto rounded-2xl border border-neutral-800/60 bg-neutral-950'
 export const thClass = `border-b border-neutral-800/80 bg-neutral-900/40 px-4 py-2.5 text-left ${typography.label} whitespace-nowrap`
 export const tdClass = 'px-4 py-3 text-sm text-neutral-200 align-middle'
 /** Clases del <tbody>: hover de fila + divisores hairline. */

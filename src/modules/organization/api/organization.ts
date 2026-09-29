@@ -25,6 +25,11 @@ export interface OrgUser {
   isOwner: boolean
   isMe: boolean
   activationExpiresAt: string | null
+  /** Incorporación a la organización. */
+  joinedAt?: string | null
+  /** Solo para quien administra usuarios de la organización (ADR 0012). */
+  lastSignInAt?: string | null
+  lastActivityAt?: string | null
   accounts: OrgUserAccount[]
 }
 

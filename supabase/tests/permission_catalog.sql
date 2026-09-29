@@ -101,12 +101,14 @@ insert into _app_keys values
   ('users.manage'),
   ('roles.manage'),
   ('master_menus.manage'),
-  ('features.manage');
+  ('features.manage'),
+  ('observability.view'),
+  ('billing.view');
 -- app-keys:end
 
 -- 1. Catálogo y plantillas (como dueño de la base)
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catálogo', 'Permisos: total · Cuenta · organización', '57 · 47 · 10',
+  insert into _t (area, test, expected, got) values ('Catálogo', 'Permisos: total · Cuenta · organización', '59 · 47 · 12',
     (select count(*) || ' · ' || count(*) filter (where scope = 'account') || ' · ' || count(*) filter (where scope = 'organization') from dk_permissions));
   insert into _t (area, test, expected, got) values ('Catálogo', 'La base y la app tienen las mismas claves (faltan en la app · faltan en la base)', '0 · 0',
     (select count(*) from dk_permissions p where not exists (select 1 from _app_keys a where a.key = p.key))::text || ' · ' ||

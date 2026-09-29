@@ -129,8 +129,11 @@ export type Database = {
       dk_audit_log: {
         Row: {
           action: string
+          category: string | null
           changed_by: string | null
+          context: Json
           created_at: string
+          event_type: string | null
           id: string
           kitchen_id: string | null
           new_data: Json | null
@@ -138,12 +141,18 @@ export type Database = {
           organization_id: string | null
           record_id: string | null
           record_key: string | null
+          result: string
+          source: string
+          summary: string | null
           table_name: string
         }
         Insert: {
           action: string
+          category?: string | null
           changed_by?: string | null
+          context?: Json
           created_at?: string
+          event_type?: string | null
           id?: string
           kitchen_id?: string | null
           new_data?: Json | null
@@ -151,12 +160,18 @@ export type Database = {
           organization_id?: string | null
           record_id?: string | null
           record_key?: string | null
+          result?: string
+          source?: string
+          summary?: string | null
           table_name: string
         }
         Update: {
           action?: string
+          category?: string | null
           changed_by?: string | null
+          context?: Json
           created_at?: string
+          event_type?: string | null
           id?: string
           kitchen_id?: string | null
           new_data?: Json | null
@@ -164,6 +179,9 @@ export type Database = {
           organization_id?: string | null
           record_id?: string | null
           record_key?: string | null
+          result?: string
+          source?: string
+          summary?: string | null
           table_name?: string
         }
         Relationships: [
@@ -408,6 +426,7 @@ export type Database = {
           key: string
           label: string
           manage_permission: string
+          settings_schema: Json
           sort_order: number
           use_permission: string
           uses_model: boolean
@@ -422,6 +441,7 @@ export type Database = {
           key: string
           label: string
           manage_permission: string
+          settings_schema?: Json
           sort_order: number
           use_permission: string
           uses_model?: boolean
@@ -436,6 +456,7 @@ export type Database = {
           key?: string
           label?: string
           manage_permission?: string
+          settings_schema?: Json
           sort_order?: number
           use_permission?: string
           uses_model?: boolean
@@ -782,6 +803,78 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_order_items"
             referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          due_at: string | null
+          id: string
+          issued_at: string
+          number: string
+          organization_id: string
+          paid_at: string | null
+          pdf_url: string | null
+          period_end: string | null
+          period_start: string | null
+          provider: string | null
+          provider_invoice_id: string | null
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          due_at?: string | null
+          id?: string
+          issued_at?: string
+          number: string
+          organization_id: string
+          paid_at?: string | null
+          pdf_url?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          provider_invoice_id?: string | null
+          status: string
+          subscription_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          due_at?: string | null
+          id?: string
+          issued_at?: string
+          number?: string
+          organization_id?: string
+          paid_at?: string | null
+          pdf_url?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          provider_invoice_id?: string | null
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_invoices_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "dk_subscriptions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2925,39 +3018,6 @@ export type Database = {
       }
     }
     Views: {
-      dk_ai_features: {
-        Row: {
-          enabled: boolean | null
-          feature_key: string | null
-          kitchen_id: string | null
-          settings: Json | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dk_kitchen_features_feature_key_fkey"
-            columns: ["feature_key"]
-            isOneToOne: false
-            referencedRelation: "dk_features"
-            referencedColumns: ["key"]
-          },
-          {
-            foreignKeyName: "dk_kitchen_features_kitchen_id_fkey"
-            columns: ["kitchen_id"]
-            isOneToOne: false
-            referencedRelation: "dk_kitchens"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_kitchen_features_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "dk_users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dk_receivables: {
         Row: {
           balance: number | null
@@ -3010,6 +3070,10 @@ export type Database = {
     }
     Functions: {
       dk_accept_activation: { Args: { p_token: string }; Returns: string }
+      dk_account_observability: {
+        Args: { p_kitchen_id: string; p_organization_id: string }
+        Returns: Json
+      }
       dk_activation_preview: {
         Args: { p_token: string }
         Returns: {
@@ -3041,6 +3105,7 @@ export type Database = {
         Args: { p_order_item_id: string }
         Returns: undefined
       }
+      dk_ai_run_allowed: { Args: { p_feature_key: string }; Returns: Json }
       dk_assert_in_active_kitchen: {
         Args: { p_id: string; p_table: string }
         Returns: undefined
@@ -3048,6 +3113,34 @@ export type Database = {
       dk_assign_master_menu: {
         Args: { p_kitchen_ids: string[]; p_menu_id: string }
         Returns: number
+      }
+      dk_audit_classify: {
+        Args: { p: Database["public"]["Tables"]["dk_audit_log"]["Row"] }
+        Returns: {
+          action: string
+          category: string | null
+          changed_by: string | null
+          context: Json
+          created_at: string
+          event_type: string | null
+          id: string
+          kitchen_id: string | null
+          new_data: Json | null
+          old_data: Json | null
+          organization_id: string | null
+          record_id: string | null
+          record_key: string | null
+          result: string
+          source: string
+          summary: string | null
+          table_name: string
+        }
+        SetofOptions: {
+          from: "dk_audit_log"
+          to: "dk_audit_log"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       dk_calculate_recipe_cost: {
         Args: { p_recipe_id: string }
@@ -3156,6 +3249,10 @@ export type Database = {
         Args: { p_key: string; p_kitchen_id: string }
         Returns: boolean
       }
+      dk_feature_settings_error: {
+        Args: { p_feature_key: string; p_settings: Json }
+        Returns: string
+      }
       dk_feature_state: { Args: { p_key: string }; Returns: Json }
       dk_find_or_create_customer_by_phone: {
         Args: { p_full_name?: string; p_phone: string }
@@ -3237,6 +3334,28 @@ export type Database = {
         }[]
       }
       dk_kitchen_today: { Args: never; Returns: string }
+      dk_kitchen_tz: { Args: { p_kitchen_id?: string }; Returns: string }
+      dk_late_orders_count: { Args: { p_kitchen_id: string }; Returns: number }
+      dk_local_date: { Args: { p_at: string; p_tz?: string }; Returns: string }
+      dk_local_start: {
+        Args: { p_day: string; p_tz?: string }
+        Returns: string
+      }
+      dk_log_event: {
+        Args: {
+          p_actor?: string
+          p_context?: Json
+          p_event_type: string
+          p_kitchen_id?: string
+          p_organization_id: string
+          p_record_key?: string
+          p_result?: string
+          p_source?: string
+          p_summary: string
+        }
+        Returns: undefined
+      }
+      dk_log_sign_in: { Args: never; Returns: undefined }
       dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
       dk_my_context: { Args: never; Returns: Json }
       dk_my_features: { Args: never; Returns: Json }
@@ -3259,7 +3378,26 @@ export type Database = {
       }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
+      dk_org_events: {
+        Args: {
+          p_actor?: string
+          p_before_at?: string
+          p_before_id?: string
+          p_category?: string
+          p_from?: string
+          p_kitchen_id?: string
+          p_limit?: number
+          p_organization_id: string
+          p_search?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
       dk_org_feature_matrix: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
+      dk_org_observability: {
         Args: { p_organization_id: string }
         Returns: Json
       }
@@ -3272,6 +3410,7 @@ export type Database = {
         Args: { p_limit: string; p_organization_id: string }
         Returns: number
       }
+      dk_purge_audit_log: { Args: { p_days?: number }; Returns: number }
       dk_register_adjustment: {
         Args: {
           p_ingredient_id: string

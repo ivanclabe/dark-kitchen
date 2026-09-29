@@ -191,12 +191,12 @@
     Dark Kitchen
   </div>
   <h1>Manual de<br/><span>usuario</span></h1>
-  <p class="sub">Guía práctica para operar la plataforma: tu negocio y sus cuentas, pedidos, cocina, despacho, menús, abastecimiento, clientes, reportes, usuarios y permisos.</p>
+  <p class="sub">Guía práctica para operar la plataforma: tu negocio y sus cuentas, pedidos, cocina, despacho, menús, abastecimiento, clientes, reportes, equipos y la administración de la organización.</p>
   <div class="flow">
     <span>Por confirmar</span><span>En cola</span><span class="on">Preparando</span><span>Listo</span><span>En ruta</span><span>Entregado</span>
   </div>
   <div class="meta">
-    <div><b>Versión</b>3.2 · Planes y precios</div>
+    <div><b>Versión</b>3.4 · Centro de administración, observabilidad y bitácora</div>
     <div><b>Fecha</b>Septiembre de 2026</div>
     <div><b>Dirigido a</b>SUPER_ADMIN (creador del negocio), ADMIN y todo el equipo: caja, cocina, inventario y domiciliarios</div>
   </div>
@@ -237,7 +237,7 @@
     <li><a href="#c6"><span class="num">6</span>Abastecimiento<span class="fill"></span><span class="pg" data-for="c6"></span></a></li>
     <li><a href="#c7"><span class="num">7</span>Clientes<span class="fill"></span><span class="pg" data-for="c7"></span></a></li>
     <li><a href="#c8"><span class="num">8</span>Reportes<span class="fill"></span><span class="pg" data-for="c8"></span></a></li>
-    <li><a href="#c9"><span class="num">9</span>Usuarios y permisos<span class="fill"></span><span class="pg" data-for="c9"></span></a>
+    <li><a href="#c9"><span class="num">9</span>Equipos: usuarios y permisos<span class="fill"></span><span class="pg" data-for="c9"></span></a>
       <ol>
         <li><a href="#c9-1">Crear un usuario<span class="fill"></span><span class="pg" data-for="c9-1"></span></a></li>
         <li><a href="#c9-2">Cuentas, roles y estado de un usuario<span class="fill"></span><span class="pg" data-for="c9-2"></span></a></li>
@@ -245,12 +245,17 @@
       </ol>
     </li>
     <li><a href="#c10"><span class="num">10</span>Configuración de la cuenta<span class="fill"></span><span class="pg" data-for="c10"></span></a></li>
-    <li><a href="#c11"><span class="num">11</span>Configuración de la organización<span class="fill"></span><span class="pg" data-for="c11"></span></a>
+    <li><a href="#c11"><span class="num">11</span>Centro de administración de la organización<span class="fill"></span><span class="pg" data-for="c11"></span></a>
       <ol>
-        <li><a href="#c11-1">Datos, plan y cuentas<span class="fill"></span><span class="pg" data-for="c11-1"></span></a></li>
-        <li><a href="#c11-2">Funciones de la organización<span class="fill"></span><span class="pg" data-for="c11-2"></span></a></li>
-        <li><a href="#c11-3">Menús maestros<span class="fill"></span><span class="pg" data-for="c11-3"></span></a></li>
-        <li><a href="#c11-4">SUPER_ADMIN<span class="fill"></span><span class="pg" data-for="c11-4"></span></a></li>
+        <li><a href="#c11-1">Entrar al centro<span class="fill"></span><span class="pg" data-for="c11-1"></span></a></li>
+        <li><a href="#c11-2">Resumen<span class="fill"></span><span class="pg" data-for="c11-2"></span></a></li>
+        <li><a href="#c11-3">Cuentas<span class="fill"></span><span class="pg" data-for="c11-3"></span></a></li>
+        <li><a href="#c11-4">Observabilidad: la operación<span class="fill"></span><span class="pg" data-for="c11-4"></span></a></li>
+        <li><a href="#c11-5">Bitácora: quién hizo qué<span class="fill"></span><span class="pg" data-for="c11-5"></span></a></li>
+        <li><a href="#c11-6">Facturación y plan<span class="fill"></span><span class="pg" data-for="c11-6"></span></a></li>
+        <li><a href="#c11-7">Configuración: general, funciones e integraciones<span class="fill"></span><span class="pg" data-for="c11-7"></span></a></li>
+        <li><a href="#c11-8">Menús maestros<span class="fill"></span><span class="pg" data-for="c11-8"></span></a></li>
+        <li><a href="#c11-9">SUPER_ADMIN<span class="fill"></span><span class="pg" data-for="c11-9"></span></a></li>
       </ol>
     </li>
     <li><a href="#c12"><span class="num">12</span>Preguntas frecuentes<span class="fill"></span><span class="pg" data-for="c12"></span></a></li>
@@ -361,7 +366,7 @@
 <p>Arriba del contenido siempre ves <strong>dónde estás</strong>: la organización (si tienes más de una cuenta), la cuenta y tu rol. Por ejemplo: <span class="say">Grupo XYZ › Hamburguesería Centro · Cocina</span>.</p>
 <ul>
   <li><strong>Para cambiar de cuenta</strong>, pulsa ese indicador (o tu avatar → <span class="ui">Cambiar de cuenta</span>) y elige otra. Llegas a la misma sección en la otra cuenta (si estabas en Abastecimiento, sigues en Abastecimiento), sin cerrar sesión.</li>
-  <li><span class="ui">Todas mis cuentas</span> abre la pantalla <span class="ui">Tus cuentas</span>: una tarjeta por cuenta, con su icono, agrupadas por organización si tienes varias.</li>
+  <li><span class="ui">Todas mis cuentas</span> abre la pantalla <span class="ui">Tus cuentas</span>: una tarjeta por cuenta, con su icono, agrupadas por organización si tienes varias. El SUPER_ADMIN ve además <span class="ui">Administrar organización</span> junto a cada organización (ver <a href="#c11">capítulo 11</a>).</li>
   <li><strong>Al cambiar de cuenta cambian tus permisos:</strong> la aplicación usa los roles que tienes en <em>esa</em> cuenta. Ser ADMIN en una no te hace ADMIN en otra.</li>
   <li>Cada cuenta tiene su propia dirección (<code>/k/nombre-de-la-cuenta</code>): puedes guardarla en favoritos o abrir dos cuentas en pestañas distintas.</li>
   <li>Si solo tienes una cuenta, la aplicación no te muestra nada de organizaciones: entras y trabajas.</li>
@@ -386,7 +391,7 @@
   <li>Tu nombre, tu correo y dónde estás: <span class="ui">Organización</span>, <span class="ui">Cuenta</span> y <span class="ui">Rol activo</span>.</li>
   <li><span class="ui">Cambiar de rol</span> (si tienes varios en esta cuenta) y <span class="ui">Cambiar de cuenta</span> (si tienes varias).</li>
   <li><span class="ui">Mi perfil</span> y <span class="ui">Configuración</span> de la cuenta.</li>
-  <li><span class="ui">Usuarios y permisos</span> y <span class="ui">Configuración de la organización</span>, si tu rol lo permite.</li>
+  <li><span class="ui">Equipo de la cuenta</span> (ADMIN de la cuenta) o <span class="ui">Administración de la organización</span> (SUPER_ADMIN), si tu rol lo permite.</li>
   <li><span class="ui">Cerrar sesión</span>, siempre al final.</li>
 </ul>
 <p>Las opciones que tu rol no permite no aparecen. Los paneles laterales y ventanas se cierran con la <strong>X</strong> o con la tecla <span class="kbd">Esc</span>.</p>
@@ -412,7 +417,7 @@
     <tr><td>Abastecimiento</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
     <tr><td>Clientes</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
     <tr><td>Reportes</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓ <small>sin rentabilidad</small></td><td class="c no">—</td><td class="c yes">✓</td><td class="c no">—</td></tr>
-    <tr><td>Usuarios y permisos</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
+    <tr><td>Equipo de la cuenta</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
     <tr><td>Configuración</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
   </tbody>
 </table>
@@ -454,6 +459,8 @@
   <li><span class="ui">Ventas de hoy</span> con el número de pedidos. El ícono del ojo oculta la cifra si hay gente mirando.</li>
   <li>Accesos directos a <span class="ui">Compras</span>, <span class="ui">Clientes</span> y <span class="ui">Reportes</span>.</li>
 </ul>
+
+<div class="callout info"><b class="t">¿Cuándo se actualiza “Ventas de hoy”?</b>Suma los pedidos creados hoy que no están cancelados, según el día en la <strong>zona horaria de la cuenta</strong> (un pedido de las 11 p. m. cuenta para hoy, no para mañana). Se actualiza cada minuto, al volver a la pestaña y apenas tú creas, confirmas o cancelas un pedido. Los pedidos que registra otra persona o una integración aparecen en el siguiente minuto.</div>
 
 <h3>Ventas del período</h3>
 <p>Elige <span class="ui">7 días</span>, <span class="ui">30 días</span> o <span class="ui">90 días</span>. Verás el total, cuánto subió o bajó frente al período anterior, y las cifras <span class="ui">Pedidos</span>, <span class="ui">Ticket promedio</span>, <span class="ui">Mejor día</span>, <span class="ui">Promedio diario</span> y <span class="ui">Días con ventas</span>.</p>
@@ -765,7 +772,7 @@
 </ol>
 
 <h4>Platos de un menú maestro</h4>
-<p>Algunos platos llegan desde un <strong>menú maestro</strong> que el SUPER_ADMIN comparte con varias cuentas de la organización (ver <a href="#c11-3">11.3</a>). Se reconocen por la etiqueta <span class="ui">Maestro</span>.</p>
+<p>Algunos platos llegan desde un <strong>menú maestro</strong> que el SUPER_ADMIN comparte con varias cuentas de la organización (ver <a href="#c11-8">11.8</a>). Se reconocen por la etiqueta <span class="ui">Maestro</span>.</p>
 <ul>
   <li>Nombre, código, categoría, descripción y receta los define el menú maestro: en la cuenta no se editan, y la receta se puede ver pero no cambiar.</li>
   <li>Sí puedes fijar un <span class="ui">Precio de venta</span> propio para tu cuenta. Con <span class="ui">Usar el precio del menú maestro</span> vuelves al precio que define el maestro.</li>
@@ -869,9 +876,13 @@
 
 <!-- =================================================== 9 USUARIOS Y PERMISOS -->
 <p class="chapter-kicker">Capítulo 9</p>
-<h2 class="chapter" id="c9" data-toc="c9">Usuarios y permisos</h2>
-<p class="lead">Quién trabaja en tu negocio, en qué cuentas y con qué roles. Ábrelo desde tu avatar → <span class="ui">Usuarios y permisos</span>.</p>
-<p>El <strong>SUPER_ADMIN</strong> ve y administra a todos los usuarios de la organización. Quien tiene el rol <strong>ADMIN</strong> en una cuenta ve y administra solo a la gente de esa cuenta. Tiene dos pestañas: <span class="ui">Usuarios</span> y <span class="ui">Roles</span>.</p>
+<h2 class="chapter" id="c9" data-toc="c9">Equipos: usuarios y permisos</h2>
+<p class="lead">Quién trabaja en tu negocio, en qué cuentas y con qué roles. Hay una sola pantalla con dos alcances:</p>
+<ul>
+  <li><strong>SUPER_ADMIN:</strong> <span class="ui">Equipos</span>, en el centro de administración (ver <a href="#c11">capítulo 11</a>). Ve y administra a todas las personas de la organización, en todas sus cuentas. Si abre el equipo desde una cuenta, lo lleva al centro.</li>
+  <li><strong>ADMIN de una cuenta:</strong> tu avatar → <span class="ui">Equipo de la cuenta</span>. Ve y administra solo a la gente de esa cuenta.</li>
+</ul>
+<p>Tiene dos pestañas: <span class="ui">Usuarios</span> y <span class="ui">Roles</span>.</p>
 
 <h3 id="c9-1" data-toc="c9-1">9.1 Crear un usuario</h3>
 <ol class="steps">
@@ -886,7 +897,7 @@
 <p>El ADMIN de una cuenta solo puede dar roles con permisos que él mismo tiene; los demás aparecen deshabilitados.</p>
 
 <h3 id="c9-2" data-toc="c9-2">9.2 Cuentas, roles y estado de un usuario</h3>
-<p>La lista muestra a cada persona con su avatar, correo, <strong>Acceso</strong> (“SUPER_ADMIN · creador · acceso global”, o sus roles en cada cuenta) y <strong>Estado</strong> (Activo, Pendiente o Desactivado). Puedes buscar por nombre o correo y filtrar por cuenta. Pulsa una fila para abrir el usuario.</p>
+<p>La lista muestra a cada persona con su avatar, correo, <strong>Acceso</strong> (“SUPER_ADMIN · creador · acceso global”, o sus roles en cada cuenta) y <strong>Estado</strong> (Activo, Pendiente o Desactivado). En <span class="ui">Equipos</span> ves además la columna <strong>Actividad</strong>: su última actividad (último inicio de sesión o último cambio que hizo) y desde cuándo está en la organización. Puedes buscar por nombre o correo y filtrar por cuenta, rol y estado. Pulsa una fila para abrir el usuario.</p>
 <ul>
   <li><strong>Cambiar cuentas y roles:</strong> marca o desmarca cuentas y roles, y pulsa <span class="ui">Guardar cambios</span>. Aplica de inmediato.</li>
   <li><strong>Permisos efectivos:</strong> en cada cuenta, <span class="ui">Permisos efectivos</span> muestra todo lo que la persona puede llegar a hacer con sus roles, módulo por módulo. Si tiene varios roles, rige el que tenga activo; la lista es el máximo posible.</li>
@@ -936,7 +947,7 @@
   </tbody>
 </table>
 <h4>Integraciones</h4>
-<p>Muestra el <span class="ui">ID de la cuenta</span>, con un botón para copiarlo. Lo necesita quien conecte un sistema externo a esta cuenta, por ejemplo los pedidos por WhatsApp.</p>
+<p>Muestra el <span class="ui">ID de la cuenta</span>, con un botón para copiarlo. Lo necesita quien conecte un sistema externo a esta cuenta, por ejemplo los pedidos por WhatsApp. El SUPER_ADMIN ve los ID de todas las cuentas juntos en el centro de administración (ver <a href="#c11-7">11.7</a>).</p>
 
 <h3>Funciones</h3>
 <p>Activa las funciones que tu organización ofrece a esta cuenta:</p>
@@ -944,32 +955,94 @@
   <li><strong>Voz:</strong> <span class="ui">Comandos de voz</span> (el micrófono de Cocina) y <span class="ui">Voz de la aplicación</span> (respuestas habladas y avisos por voz). Las activa quien tiene el permiso de configuración (ADMIN, GERENTE).</li>
   <li><strong>Inteligencia artificial:</strong> cada función de <strong>Abastecimiento e inventario</strong> y de <strong>Cocina</strong> por separado, con sus umbrales. Arriba se indica si la IA está conectada. Las activa quien tiene el permiso de IA.</li>
 </ul>
-<p>Si una función dice <span class="say">Tu organización no tiene disponible esta función</span>, no se puede activar aquí: lo decide el SUPER_ADMIN (ver <a href="#c11-2">11.2</a>). Lo que la cuenta tenía configurado se conserva y vuelve cuando la organización la ofrezca de nuevo.</p>
+<p>Si una función dice <span class="say">Tu organización no tiene disponible esta función</span>, no se puede activar aquí: lo decide el SUPER_ADMIN (ver <a href="#c11-7">11.7</a>). Lo que la cuenta tenía configurado se conserva y vuelve cuando la organización la ofrezca de nuevo.</p>
 <div class="callout info"><b class="t">La IA recomienda, tú decides</b>La IA explica y sugiere; nunca compra, confirma ni cambia nada por su cuenta.</div>
+<h4>Límites de análisis con IA</h4>
+<ul>
+  <li>Cada función se puede volver a analizar (<span class="ui">Analizar ahora</span> o el botón ↻) como mucho cada <strong>2 minutos</strong>.</li>
+  <li>Cada cuenta tiene un máximo de análisis con IA en 24 horas según su plan: <strong>200</strong> en Business y <strong>1.000</strong> en Enterprise.</li>
+  <li>Al llegar a un límite verás <span class="say">Análisis con IA en pausa</span> con cuándo volver a intentarlo. Mientras tanto se sigue mostrando el último análisis y todas las cifras calculadas por el sistema.</li>
+  <li>Los umbrales tienen rangos (por ejemplo, <span class="ui">Analizar cada</span> entre 5 minutos y 7 días en Abastecimiento). Si escribes un valor fuera del rango, no se guarda y se indica el motivo.</li>
+</ul>
 
-<!-- =================================================== 11 CONFIGURACIÓN DE LA ORGANIZACIÓN -->
+<!-- =================================================== 11 CENTRO DE ADMINISTRACIÓN -->
 <p class="chapter-kicker">Capítulo 11</p>
-<h2 class="chapter" id="c11" data-toc="c11">Configuración de la organización</h2>
-<p class="lead">Tu negocio, su plan, sus cuentas, las funciones que ofrece y sus menús maestros. Solo para el SUPER_ADMIN: tu avatar → <span class="ui">Configuración de la organización</span>.</p>
+<h2 class="chapter" id="c11" data-toc="c11">Centro de administración de la organización</h2>
+<p class="lead">Todo lo que afecta a tu negocio completo, en un solo lugar y fuera de las cuentas: cómo están operando, quién hizo qué, tu equipo, tu plan y la configuración común. Solo para el SUPER_ADMIN.</p>
+<p>La <strong>operación</strong> (pedidos, cocina, inventario) se hace dentro de cada cuenta; la <strong>administración</strong> de la organización, aquí. Son dos contextos distintos: en el centro no hay una cuenta activa, y para operar una pulsas <span class="ui">Ir a una cuenta</span>.</p>
 
-<h3 id="c11-1" data-toc="c11-1">11.1 Datos, plan y cuentas</h3>
-<p><strong>General:</strong> nombre del negocio, sector, categoría, país, ciudad y dirección; datos legales y de contacto; moneda para las cuentas nuevas. Pulsa <span class="ui">Guardar cambios</span>.</p>
-<p><strong>Plan:</strong> el plan de tu organización (el plan es del negocio, no de una persona), su estado (<span class="ui">Prueba gratis</span>, <span class="ui">Activa</span>…), cuántos días quedan de prueba, los límites y cuánto usas (<span class="say">1 de 3 cuentas</span>, <span class="say">4 de 15 usuarios</span>), qué incluye y qué funciones trae. Para cambiar de plan pulsa <span class="ui">Cambiar de plan</span> y escríbenos.</p>
+<h3 id="c11-1" data-toc="c11-1">11.1 Entrar al centro</h3>
+<ul>
+  <li>Desde una cuenta: tu avatar → <span class="ui">Administración de la organización</span>.</li>
+  <li>Desde <span class="ui">Tus cuentas</span>: <span class="ui">Administrar organización</span>, junto al nombre de la organización.</li>
+  <li>Su dirección es <code>/o/nombre-de-la-organización</code> (por ejemplo, <code>/o/grupo-xyz/cuentas</code>). Puedes guardarla en favoritos.</li>
+</ul>
+<p>A la izquierda está su propio menú (en el celular, el botón ☰): <span class="ui">Resumen</span>, <span class="ui">Cuentas</span>, <span class="ui">Observabilidad</span>, <span class="ui">Equipos</span>, <span class="ui">Facturación</span>, <span class="ui">Configuración</span> y <span class="ui">Menús maestros</span>. Arriba ves <span class="say">Administración › Grupo XYZ</span>, el botón <span class="ui">Ir a una cuenta</span> y tu avatar (con <span class="ui">Tus cuentas</span> y <span class="ui">Cerrar sesión</span>).</p>
+<div class="callout info"><b class="t">Las direcciones viejas siguen sirviendo</b>Si tenías guardada la configuración de la organización dentro de una cuenta (<code>/k/…/organizacion</code>), te lleva sola a <span class="ui">Configuración</span> del centro.</div>
+
+<h3 id="c11-2" data-toc="c11-2">11.2 Resumen</h3>
+<p>La respuesta a “¿cómo están operando mis cuentas?”. Todas las cifras son reales, del día en la zona horaria de cada cuenta, y se actualizan cada minuto.</p>
+<ul>
+  <li><strong>Tarjetas:</strong> cuentas activas (y cuántas desactivadas), usuarios activos en 7 días (con inicio de sesión o algún cambio), pedidos y ventas de hoy, y pedidos atrasados ahora según las alertas de tiempo de cada cuenta.</li>
+  <li><strong>Alertas:</strong> solo aparecen si pasan de verdad: cuenta activa sin actividad en 7 días, pedidos atrasados, insumos bajo mínimo, análisis de IA con error, cuota de IA casi agotada, prueba gratis por vencer o vencida, límite del plan alcanzado.</li>
+  <li><strong>Tabla de cuentas:</strong> pedidos y ventas de hoy y de 7 días, pedidos en curso y atrasados, insumos bajo mínimo, análisis de IA en 24 horas y última actividad. Pulsa una cuenta para ver su detalle en Observabilidad.</li>
+  <li><strong>Actividad reciente:</strong> los últimos 10 eventos de la bitácora; <span class="ui">Ver bitácora</span> abre la lista completa.</li>
+</ul>
+
+<h3 id="c11-3" data-toc="c11-3">11.3 Cuentas</h3>
+<p>Todas las cuentas de la organización, con su icono, estado y fecha de creación. Puedes buscar por nombre y filtrar por <span class="ui">Activas</span> o <span class="ui">Desactivadas</span>. Junto a <span class="ui">Nueva cuenta</span> ves cuántas llevas de las que permite tu plan.</p>
+<ul>
+  <li><span class="ui">Nueva cuenta</span>: escribe el nombre (el identificador y un icono se proponen solos; con <span class="ui">Cambiar icono</span> eliges otro) y pulsa <span class="ui">Crear cuenta</span>. Nace con su configuración por defecto y entras directo a ella.</li>
+  <li><strong>Al crearla quedas como SUPER_ADMIN + ADMIN</strong> de esa cuenta: SUPER_ADMIN por ser el creador de la organización, y ADMIN como rol de la cuenta (lo ves en <span class="ui">Equipos</span> y puedes cambiarlo).</li>
+  <li><span class="ui">Entrar</span> abre la cuenta para operarla; <span class="ui">Configurar</span> abre su configuración; <span class="ui">Actividad</span> abre su detalle en Observabilidad.</li>
+  <li><span class="ui">Editar</span> cambia el nombre y el icono. El resto de sus datos se edita dentro de la cuenta (<span class="ui">Configuración</span> → <span class="ui">General</span>).</li>
+  <li><span class="ui">Desactivar</span> la pausa (nadie puede operarla, sus datos se conservan) y <span class="ui">Activar</span> la reanuda.</li>
+</ul>
+
+<h3 id="c11-4" data-toc="c11-4">11.4 Observabilidad: la operación</h3>
+<p>En <span class="ui">Observabilidad</span> hay dos pestañas que responden preguntas distintas: <span class="ui">Operación</span> (“¿cómo está funcionando esta cuenta?”) y <span class="ui">Bitácora</span> (“¿quién hizo qué?”, ver <a href="#c11-5">11.5</a>).</p>
+<p>En <span class="ui">Operación</span> eliges una cuenta y ves:</p>
+<table>
+  <thead><tr><th>Bloque</th><th>Qué muestra</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pedidos</strong></td><td>Hoy y en 7 días (creados, entregados, cancelados, ventas), en curso y atrasados ahora, tiempo medio de preparación y la gráfica de los últimos 7 días.</td></tr>
+    <tr><td><strong>Canales</strong></td><td>Cuántos pedidos llegaron por cada canal (manual o por integraciones como WhatsApp).</td></tr>
+    <tr><td><strong>Inventario</strong></td><td>Movimientos de 7 días por tipo (compras, consumo, mermas, ajustes) e insumos bajo mínimo.</td></tr>
+    <tr><td><strong>Compras y cobros</strong></td><td>Compras confirmadas y en borrador, y cobros a clientes de 7 días.</td></tr>
+    <tr><td><strong>IA</strong></td><td>Análisis correctos y con error en 24 horas, y cuántos quedan de la cuota del plan.</td></tr>
+    <tr><td><strong>Equipo</strong></td><td>Personas con acceso, activas en 7 días y último inicio de sesión.</td></tr>
+    <tr><td><strong>Estado de módulos</strong></td><td>Si la cuenta está activa, si tiene horario y alertas de tiempo configurados, y qué funciones tiene encendidas.</td></tr>
+  </tbody>
+</table>
+<p>Abajo, <strong>Cambios recientes en la cuenta</strong>, con <span class="ui">Ver en la bitácora</span>. Al final, <span class="ui">Qué no se mide todavía</span> explica lo que la aplicación aún no registra (quién está conectado en este momento, errores de integraciones o de la app, operaciones rechazadas por permisos): no se muestran cifras inventadas.</p>
+
+<h3 id="c11-5" data-toc="c11-5">11.5 Bitácora: quién hizo qué</h3>
+<p>La <span class="ui">Bitácora</span> es el registro de lo que pasa en la organización: <strong>quién</strong>, <strong>qué</strong>, <strong>cuándo</strong>, <strong>en qué cuenta</strong> y si <strong>salió bien o falló</strong>. Por ejemplo: <span class="say">Ana Gómez · Asignó el rol CAJA a Luis en Pizzería Norte</span>.</p>
+<ul>
+  <li><strong>Filtros:</strong> buscar en el texto, por categoría (<span class="ui">Cuentas</span>, <span class="ui">Equipo</span>, <span class="ui">Roles y permisos</span>, <span class="ui">Funciones</span>, <span class="ui">IA</span>, <span class="ui">Plan y facturación</span>, <span class="ui">Configuración</span>, <span class="ui">Catálogo</span>, <span class="ui">Operación</span>, <span class="ui">Inicios de sesión</span>…), por cuenta (o toda la organización) y desde una fecha.</li>
+  <li><span class="ui">Ver cambios</span> despliega exactamente qué cambió: el valor anterior → el nuevo.</li>
+  <li>Los eventos que fallaron llevan la marca <span class="ui">Falló</span> (por ejemplo, un análisis de IA que no se pudo completar).</li>
+  <li><span class="ui">Cargar más</span> trae los eventos anteriores.</li>
+</ul>
+<div class="callout tip"><b class="t">Confiable y permanente</b>La bitácora la escribe la base de datos, no la pantalla: nadie puede modificarla ni borrarla, ni siquiera un administrador. Se conservan los últimos 400 días.</div>
+<p>El ADMIN de una cuenta no ve la bitácora de la organización.</p>
+
+<h3 id="c11-6" data-toc="c11-6">11.6 Facturación y plan</h3>
+<p>El plan de tu organización (el plan es del negocio, no de una persona): su nombre, precio, estado (<span class="ui">Prueba gratis</span>, <span class="ui">Activa</span>…), cuántos días quedan de prueba, las fechas de inicio y renovación, los límites y cuánto usas (<span class="say">1 de 3 cuentas</span>, <span class="say">4 de 15 usuarios</span>, análisis de IA de la cuenta que más usó en 24 horas), qué incluye y qué funciones trae. Para cambiar de plan pulsa <span class="ui">Cambiar de plan</span> y escríbenos.</p>
 <ul>
   <li>Al llegar al límite de cuentas o de usuarios, todo sigue funcionando; solo no puedes crear más hasta cambiar de plan.</li>
   <li>Si pasas a un plan menor no se borra nada: se conserva lo que tienes, pero no puedes crear más de lo que el nuevo plan permite, y las funciones que no incluye se apagan (con su configuración guardada, por si vuelves a subir).</li>
   <li>Cuando termina la prueba gratis se muestra un aviso; por ahora nada se bloquea.</li>
+  <li><strong>Facturas y método de pago:</strong> los pagos en línea todavía no están activos, así que verás <span class="say">Aún no hay facturas</span> y <span class="say">Sin método de pago</span>. Cuando se activen, aquí aparecerá cada factura.</li>
 </ul>
-<p><strong>Cuentas:</strong> todas las cuentas de la organización, con su icono y su estado. Junto a <span class="ui">Nueva cuenta</span> ves cuántas llevas de las que permite tu plan.</p>
-<ul>
-  <li><span class="ui">Nueva cuenta</span>: escribe el nombre (el identificador y un icono se proponen solos; con <span class="ui">Cambiar icono</span> eliges otro) y pulsa <span class="ui">Crear cuenta</span>. Nace con su configuración por defecto y entras directo a ella.</li>
-  <li><strong>Al crearla quedas como SUPER_ADMIN + ADMIN</strong> de esa cuenta: SUPER_ADMIN por ser el creador de la organización, y ADMIN como rol de la cuenta (lo ves en <span class="ui">Usuarios y permisos</span> y puedes cambiarlo). Esto pasa solo cuando la crea el SUPER_ADMIN.</li>
-  <li><span class="ui">Editar</span> cambia el nombre y el icono de la cuenta. El resto de sus datos se edita dentro de la cuenta (<span class="ui">Configuración</span> → <span class="ui">General</span>).</li>
-  <li><span class="ui">Entrar</span> abre la cuenta; <span class="ui">Desactivar</span> la pausa (nadie puede operarla, sus datos se conservan) y <span class="ui">Activar</span> la reanuda.</li>
-</ul>
+<p>Solo el SUPER_ADMIN ve el plan y la facturación; el resto del equipo solo ve las funciones que puede usar.</p>
 
-<h3 id="c11-2" data-toc="c11-2">11.2 Funciones de la organización</h3>
-<p>En la pestaña <span class="ui">Funciones</span> decides qué funciones opcionales ofrece tu negocio (voz e inteligencia artificial) y en qué cuentas están activadas. Lo que tu plan no incluye aparece con candado (<span class="say">Incluida en Business</span>) y no se puede ofrecer. Cada función muestra:</p>
+<h3 id="c11-7" data-toc="c11-7">11.7 Configuración: general, funciones e integraciones</h3>
+<p>Lo que aplica a todas las cuentas. Lo propio de cada cuenta (horario, alertas de tiempo, parámetros de la IA, domiciliarios) sigue dentro de esa cuenta.</p>
+<h4>General</h4>
+<p>Nombre del negocio, sector, categoría, país, ciudad y dirección; datos legales y de contacto; moneda para las cuentas nuevas. Pulsa <span class="ui">Guardar cambios</span>.</p>
+<h4>Funciones (IA y voz)</h4>
+<p>Decides qué funciones opcionales ofrece tu negocio y en qué cuentas están activadas. Lo que tu plan no incluye aparece con candado (<span class="say">Incluida en Business</span>) y no se puede ofrecer. Cada función muestra:</p>
 <ul>
   <li><strong>Disponible / No disponible</strong> (arriba a la derecha): si la organización la ofrece.</li>
   <li><strong>Una fila por cuenta</strong> con su interruptor: si está activada en esa cuenta.</li>
@@ -983,8 +1056,10 @@
   </tbody>
 </table>
 <div class="callout tip"><b class="t">Lo de cada cuenta se conserva</b>Si dejas de ofrecer una función y luego la vuelves a ofrecer, cada cuenta vuelve a como la tenía. Los umbrales de la IA se ajustan dentro de cada cuenta (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>).</div>
+<h4>Integraciones</h4>
+<p>El <span class="ui">ID de la cuenta</span> de cada cuenta, con <span class="ui">Copiar</span>. Un sistema externo (por ejemplo, pedidos por WhatsApp) lo envía para saber a qué cuenta pertenece; sin él no ve ni registra nada. <span class="ui">Actividad</span> lleva a la observabilidad de esa cuenta, donde ves los pedidos por canal.</p>
 
-<h3 id="c11-3" data-toc="c11-3">11.3 Menús maestros</h3>
+<h3 id="c11-8" data-toc="c11-8">11.8 Menús maestros</h3>
 <p>Un menú maestro es un conjunto de platos, con su receta, que mantienes en un solo lugar y compartes con las cuentas que elijas.</p>
 <ol class="steps">
   <li>Pulsa <span class="ui">Nuevo menú</span>, escribe el nombre y pulsa <span class="ui">Crear menú</span>.</li>
@@ -998,7 +1073,7 @@
   <li><span class="ui">Dejar de compartir</span>, <span class="ui">Quitar</span> un plato o <span class="ui">Eliminar menú</span>: en las cuentas afectadas los platos quedan como propios, desactivados; su historial se conserva.</li>
 </ul>
 
-<h3 id="c11-4" data-toc="c11-4">11.4 SUPER_ADMIN</h3>
+<h3 id="c11-9" data-toc="c11-9">11.9 SUPER_ADMIN</h3>
 <p>Muestra quién es el <strong>SUPER_ADMIN</strong>: el creador de la organización. Es <strong>único e intransferible</strong> y no se asigna a otras personas, porque tiene acceso global. Para que alguien administre una cuenta, dale el rol <strong>ADMIN</strong> en esa cuenta.</p>
 
 <!-- =================================================== 12 FAQ -->
@@ -1022,10 +1097,10 @@
   <p>No tienes acceso a ella, o te desactivaron o quitaron. Pide al administrador que te la asigne.</p>
 
   <h4>Un compañero nuevo no puede entrar.</h4>
-  <p>Abre su usuario en <span class="ui">Usuarios y permisos</span>: si está <strong>Pendiente</strong>, revisa que el correo sea el correcto y pulsa <span class="ui">Generar enlace nuevo</span> si venció o se perdió.</p>
+  <p>Abre su usuario en <span class="ui">Equipos</span> (o <span class="ui">Equipo de la cuenta</span>): si está <strong>Pendiente</strong>, revisa que el correo sea el correcto y pulsa <span class="ui">Generar enlace nuevo</span> si venció o se perdió.</p>
 
   <h4>No puedo cambiar el nombre o la receta de un plato.</h4>
-  <p>Es un plato de un menú maestro: solo el SUPER_ADMIN lo cambia, en la configuración de la organización. En tu cuenta puedes ajustar su precio y sus días en el calendario. Si no es de un menú maestro, tu rol quizá no tiene el permiso de editar platos o recetas.</p>
+  <p>Es un plato de un menú maestro: solo el SUPER_ADMIN lo cambia, en el centro de administración (<span class="ui">Menús maestros</span>). En tu cuenta puedes ajustar su precio y sus días en el calendario. Si no es de un menú maestro, tu rol quizá no tiene el permiso de editar platos o recetas.</p>
 
   <h4>No veo la pestaña Rentabilidad en Reportes.</h4>
   <p>La rentabilidad muestra costos y tiene su propio permiso. En las plantillas lo tienen ADMIN, GERENTE e INVENTARIO.</p>
@@ -1046,10 +1121,22 @@
   <p>Revisa que la cuenta tenga activados los <span class="ui">Comandos de voz</span> (<span class="ui">Configuración</span> → <span class="ui">Funciones</span>) y que tu organización los ofrezca. Usa un navegador con reconocimiento de voz (como Chrome), permite el micrófono y habla cerca, diciendo el número de 4 dígitos y la acción. Solo funciona con los pedidos de hoy.</p>
 
   <h4>No puedo crear otra cuenta u otro usuario.</h4>
-  <p>Llegaste al límite de tu plan. Míralo en <span class="ui">Configuración de la organización</span> → <span class="ui">Plan</span> y, si necesitas más, pulsa <span class="ui">Cambiar de plan</span>.</p>
+  <p>Llegaste al límite de tu plan. Míralo en el centro de administración → <span class="ui">Facturación</span> y, si necesitas más, pulsa <span class="ui">Cambiar de plan</span>.</p>
 
   <h4>No puedo activar una función: dice que mi organización no la tiene disponible.</h4>
-  <p>La organización decide qué funciones ofrece. Pídele al SUPER_ADMIN que la ofrezca en <span class="ui">Configuración de la organización</span> → <span class="ui">Funciones</span>.</p>
+  <p>La organización decide qué funciones ofrece. Pídele al SUPER_ADMIN que la ofrezca en el centro de administración → <span class="ui">Configuración</span> → <span class="ui">Funciones (IA y voz)</span>.</p>
+
+  <h4>Dice "Análisis con IA en pausa".</h4>
+  <p>Se acaba de analizar esa función (hay que esperar 2 minutos) o la cuenta llegó al máximo de análisis de su plan en 24 horas. El mensaje indica cuándo volver a intentarlo; el último análisis sigue a la vista.</p>
+
+  <h4>¿Quién cambió esto?</h4>
+  <p>El SUPER_ADMIN lo ve en el centro de administración → <span class="ui">Observabilidad</span> → <span class="ui">Bitácora</span>: filtra por cuenta o categoría, o busca por nombre, y pulsa <span class="ui">Ver cambios</span>.</p>
+
+  <h4>“Ventas de hoy” no coincide con lo que esperaba.</h4>
+  <p>Cuenta los pedidos creados hoy, sin cancelados, en la zona horaria de la cuenta (<span class="ui">Configuración</span> → <span class="ui">General</span>). Los pedidos que registra otra persona aparecen en menos de un minuto.</p>
+
+  <h4>No veo “Administración de la organización”.</h4>
+  <p>Es solo para el SUPER_ADMIN. Si eres ADMIN de una cuenta, administras a tu equipo en tu avatar → <span class="ui">Equipo de la cuenta</span>.</p>
 
   <h4>La cantidad sugerida para reponer está vacía.</h4>
   <p>El insumo no tiene mínimo/máximo configurado ni consumo reciente. Configúralos en su ficha.</p>
@@ -1071,7 +1158,9 @@
 <dl class="gloss two-col">
   <div><dt>ADMIN</dt><dd>Rol de cuenta con todas sus opciones y configuraciones. Se asigna a quien administre esa cuenta.</dd></div>
   <div><dt>Avatar</dt><dd>La ilustración de una persona que te identifica. Se elige entre 20 en Mi perfil.</dd></div>
+  <div><dt>Bitácora</dt><dd>Registro permanente de quién hizo qué, cuándo y en qué cuenta. Nadie puede modificarla ni borrarla; se conserva 400 días.</dd></div>
   <div><dt>Borrador</dt><dd>Pedido o compra creado pero aún no confirmado. No afecta el inventario.</dd></div>
+  <div><dt>Centro de administración</dt><dd>Donde el SUPER_ADMIN administra la organización completa (<code>/o/…</code>): resumen, cuentas, observabilidad, equipos, facturación y configuración.</dd></div>
   <div><dt>Cocina (módulo)</dt><dd>El tablero donde se preparan y despachan los pedidos de una cuenta.</dd></div>
   <div><dt>Comanda</dt><dd>La orden que llega a cocina cuando se confirma un pedido.</dd></div>
   <div><dt>Consumo</dt><dd>Salida de insumos cuando un plato se marca listo.</dd></div>
@@ -1086,6 +1175,7 @@
   <div><dt>Margen</dt><dd>Precio de venta menos el costo de los insumos.</dd></div>
   <div><dt>Menú maestro</dt><dd>Platos con receta que el SUPER_ADMIN comparte con varias cuentas de la organización.</dd></div>
   <div><dt>Merma</dt><dd>Pérdida de insumos por vencimiento, daño o error.</dd></div>
+  <div><dt>Observabilidad</dt><dd>Cómo está operando cada cuenta: pedidos, atrasos, inventario, IA y equipo, con datos reales.</dd></div>
   <div><dt>Organización</dt><dd>Tu negocio o grupo: agrupa tus cuentas, tus usuarios y tus roles propios.</dd></div>
   <div><dt>Permiso</dt><dd>Una acción concreta que un rol permite (ver pedidos, confirmar compras, ver rentabilidad…).</dd></div>
   <div><dt>Plan</dt><dd>Lo que contrató tu organización (Standard, Business, Enterprise): precio, límites de cuentas y usuarios, y funciones incluidas. Es del negocio, no de una persona.</dd></div>

@@ -3,7 +3,7 @@ import { FEATURES_KEY, useActiveKitchen } from '@/shared/kitchen/activeKitchenCo
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAiConnectionStatus, getKitchenSignals, getLatestInsight, listInventorySignals, requestInsight } from '../api/ai'
 import { numberSetting, withDefaults } from '../lib/catalog'
-import type { AiFeatureKey, AiInsightFeatureKey, AiSettings } from '../types'
+import type { AiFeatureKey, AiInsightFeatureKey, AiSettings, InsightResult } from '../types'
 const INSIGHT_KEY = ['ai-insight'] as const
 // Bajo el prefijo de las sugerencias de Abastecimiento: toda mutación que ya las
 // invalida (compras, mermas, ajustes, consumo en cocina, edición de insumos) refresca también las señales.
@@ -44,11 +44,18 @@ export function useAiConnectionStatus() {
  * vigente, así que varias pantallas abiertas no multiplican las llamadas al modelo.
  */
 export function useAiInsight(feature: AiInsightFeatureKey, enabled: boolean, options: { live?: boolean } = {}) {
+  const queryClient = useQueryClient()
   const { settings } = useAiFeature(feature)
   const frequencyMs = numberSetting(settings, 'frequency_min', 60) * 60_000
+  const key = [...INSIGHT_KEY, feature]
   return useQuery({
-    queryKey: [...INSIGHT_KEY, feature],
-    queryFn: () => requestInsight(feature),
+    queryKey: key,
+    queryFn: async () => {
+      const result = await requestInsight(feature)
+      // Cuota de IA (ADR 0011): si hay que esperar, se sigue mostrando el último análisis.
+      const previous = queryClient.getQueryData<InsightResult>(key)
+      return result.kind === 'rate_limited' && previous?.kind === 'ok' ? previous : result
+    },
     enabled,
     staleTime: frequencyMs,
     refetchInterval: enabled && options.live ? frequencyMs : false,
@@ -60,7 +67,10 @@ export function useRefreshAiInsight(feature: AiInsightFeatureKey) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => requestInsight(feature, true),
-    onSuccess: (result) => queryClient.setQueryData([...INSIGHT_KEY, feature], result),
+    // Si la cuota no deja analizar, se conserva el análisis anterior (quien llama avisa).
+    onSuccess: (result) => {
+      if (result.kind !== 'rate_limited') queryClient.setQueryData([...INSIGHT_KEY, feature], result)
+    },
   })
 }
 

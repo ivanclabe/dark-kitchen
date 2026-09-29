@@ -81,6 +81,32 @@ erDiagram
         text observation
         timestamptz created_at
     }
+    dk_organizations ||--|| dk_subscriptions : "tiene"
+    dk_subscriptions ||--o{ dk_invoices : "factura"
+    dk_organizations ||--o{ dk_audit_log : "registra"
+    dk_audit_log {
+        uuid id PK
+        uuid organization_id FK
+        uuid kitchen_id FK
+        uuid changed_by FK
+        text action
+        text event_type
+        text category
+        text summary
+        text result
+        text source
+        jsonb context
+        timestamptz created_at
+    }
+    dk_invoices {
+        uuid id PK
+        uuid organization_id FK
+        uuid subscription_id FK
+        text number
+        numeric amount
+        text status
+        timestamptz issued_at
+    }
     dk_orders {
         uuid id PK
         uuid customer_id FK
@@ -99,7 +125,11 @@ erDiagram
 
 ### Identidad / RBAC
 - `dk_users` — perfil de staff, 1:1 con `auth.users`; `avatar_key` = uno de los 20 avatares de personas (ADR 0009)
-- `dk_audit_log` — auditoría genérica (tabla, registro, acción, valores antes/después, usuario, fecha)
+- `dk_audit_log` — **bitácora de solo agregar (append-only, ADR 0012)**:
+  - Columnas: `table_name`, `record_id`/`record_key`, `action` (`INSERT`/`UPDATE`/`DELETE`/`EVENT`), `old_data`/`new_data` (en `UPDATE`, solo las columnas que cambiaron), `changed_by`, `organization_id`, `kitchen_id`, `created_at`. Además: `event_type` (`account.created`, `role.assigned`, `plan.changed`, `auth.signed_in`, `ai.run_failed`…), `category`, `summary` (texto legible), `result` (`success`/`failure`), `source` (`db`/`edge`/`app`) y `context` (jsonb).
+  - Un disparador `BEFORE INSERT` (`dk_audit_classify`) completa `event_type`, `category` y `summary`.
+  - Sin escrituras desde la API. Una guardia bloquea `UPDATE`/`DELETE`/`TRUNCATE` salvo en la retención (`dk_purge_audit_log`, 400 días, `pg_cron`).
+  - Índices: `(organization_id, created_at desc)`, `(organization_id, category, created_at desc)`, `(kitchen_id, created_at desc)`, `(kitchen_id, category, created_at desc)` y `(changed_by, created_at desc)`.
 
 ### Organizaciones, Cuentas y funciones (ADR 0008 y 0009)
 - `dk_organizations` — el negocio; `owner_user_id` = SUPER_ADMIN (creador, intransferible)
@@ -107,15 +137,16 @@ erDiagram
 - `dk_kitchens` — la **Cuenta** (establecimiento); `icon_key` = uno de los 20 iconos de establecimiento
 - `dk_kitchen_members` / `dk_member_roles` — usuario ↔ Cuenta, con varios roles y uno predeterminado
 - `dk_roles` / `dk_role_permissions` / `dk_permissions` — RBAC: plantillas, roles propios y catálogo de permisos
-- `dk_features` — catálogo de funciones opcionales (IA, voz): permiso para usarla y para activarla, valores por defecto
+- `dk_features` — catálogo de funciones opcionales (IA, voz): permiso para usarla y para activarla, valores por defecto y `settings_schema` (tipo y rango de cada parámetro, validado en la base; ADR 0011)
 - `dk_organization_features` — qué funciones ofrece cada organización (sin fila = valor del catálogo)
-- `dk_kitchen_features` — qué funciones activa cada Cuenta y sus parámetros (antes `dk_ai_features`; queda una vista de compatibilidad con ese nombre)
+- `dk_kitchen_features` — qué funciones activa cada Cuenta y sus parámetros (antes `dk_ai_features`; la vista de compatibilidad se retiró en ADR 0011)
 - `dk_ai_insights` — análisis de IA (append-only), por Cuenta y función
 
 ### Planes y suscripciones (ADR 0010)
-- `dk_plans` — catálogo de planes (precio mensual/anual, prueba, límites `{accounts, users}`, viñetas, CTA, estado, orden). Lectura pública
+- `dk_plans` — catálogo de planes (precio mensual/anual, prueba, límites `{accounts, users, ai_runs_per_day}`, viñetas, CTA, estado, orden). Lectura pública
 - `dk_plan_features` — funciones (`dk_features`) incluidas en cada plan. Lectura pública
-- `dk_subscriptions` — **una por organización** (el plan es de la organización, no del usuario): plan, estado (`trialing`/`active`/`past_due`/`canceled`/`expired`), periodicidad, prueba, período, cancelación y `provider_*` (pagos futuros)
+- `dk_subscriptions` — **una por organización** (el plan es de la organización, no del usuario): plan, estado (`trialing`/`active`/`past_due`/`canceled`/`expired`), periodicidad, prueba, período, cancelación y `provider_*` (pagos futuros). Lectura con `billing.view` (ADR 0012)
+- `dk_invoices` — facturas de la suscripción (ADR 0012; **vacía hasta que haya pagos**): `organization_id`, `subscription_id`, `number` (único por organización), período, `amount`, `currency`, `status` (`draft`/`open`/`paid`/`void`/`uncollectible`), `issued_at`, `due_at`, `paid_at`, `provider`, `provider_invoice_id`, `pdf_url`. Lectura con `billing.view`; sin escrituras desde la API; auditada. Índice `(organization_id, issued_at desc)`
 
 ### Catálogos base
 - `dk_units` — unidades de medida y su factor de conversión a la unidad base de su tipo
@@ -200,7 +231,10 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
 1. `dk_trg_movements_update_stock` — `AFTER INSERT` en `dk_inventory_movements` → recalcula/actualiza `dk_ingredient_stock`.
 2. `dk_trg_recipe_cost_recalc` — `AFTER INSERT/UPDATE` en `dk_recipe_items` o cambio de `avg_cost` en `dk_ingredients` → recalcula `dk_products.estimated_cost` de los productos afectados.
 3. `dk_trg_set_updated_at` — genérico, en todas las tablas mutables.
-4. `dk_trg_audit_*` — en tablas sensibles (`dk_ingredients`, `dk_recipes`, `dk_products.price`, `dk_orders`, `dk_purchases`) → inserta en `dk_audit_log`.
+4. `dk_audit_row()` — en las tablas auditadas (Cuentas, miembros, roles, funciones, suscripción, facturas, pedidos, compras, catálogo…) → inserta en `dk_audit_log`. Omite las actualizaciones sin cambios y las que solo cambian la "última cuenta" del usuario. Complementos (ADR 0012):
+   - `dk_trg_audit_log_classify` (`BEFORE INSERT` en la bitácora);
+   - `dk_guard_audit_log` (solo agregar);
+   - `dk_trg_ai_insights_audit_failure` (análisis de IA con error → evento `ai.run_failed`).
 5. `dk_trg_purchase_confirm_guard` — impide editar líneas de una compra ya `CONFIRMADA`.
 
 ## Funciones SQL (RPC) necesarias
@@ -212,4 +246,11 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
 - `dk_register_waste(ingredient_id, quantity, reason, observation)` → movimiento `MERMA`.
 - `dk_register_adjustment(ingredient_id, quantity, observation)` → movimiento `AJUSTE`.
 - `dk_calculate_recipe_cost(recipe_id)` → función auxiliar usada por el trigger de costeo y por reportes de rentabilidad.
+- **Centro de administración (ADR 0012):**
+  - `dk_org_events(org, cuenta, categoría, persona, desde, hasta, texto, cursor, límite)` → bitácora paginada por cursor. Exige `observability.view`.
+  - `dk_org_observability(org)` → totales, cuentas, alertas reales y eventos recientes.
+  - `dk_account_observability(org, cuenta)` → verifica que la Cuenta sea de la organización.
+  - `dk_log_sign_in()` → registra el inicio de sesión, como mucho uno por minuto.
+  - `dk_my_subscription(org)` y `dk_org_users(org)` → la primera exige `billing.view`; la segunda agrega incorporación y última actividad.
+  - Auxiliares de zona horaria: `dk_kitchen_tz`, `dk_local_start`, `dk_local_date`. `dk_dashboard_summary` y los `dk_report_*` calculan "hoy" en la zona de la Cuenta.
 - ~~`dk_current_role()`~~ → retirada en la Fase 6 de multi-cocina. Hoy las políticas usan `dk_current_kitchen_id()` y `dk_can('módulo.acción')` con el rol activo (ver [ADR 0008](./adr/0008-organizaciones-y-cuentas.md)).

@@ -70,8 +70,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession)
+      // Bitácora (ADR 0012): el inicio de sesión lo registra la base (1 por minuto como mucho).
+      if (event === 'SIGNED_IN' && newSession) void supabase.rpc('dk_log_sign_in').then(() => undefined, () => undefined)
       if (newSession) {
         setProfileLoading(true)
         fetchProfile(newSession.user.id)

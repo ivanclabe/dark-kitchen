@@ -96,7 +96,7 @@ begin
     'dk_attachments', 'dk_product_categories', 'dk_products', 'dk_recipes', 'dk_recipe_items', 'dk_menu_plan_items',
     'dk_menus', 'dk_menu_items', 'dk_daily_availability', 'dk_weekly_menu_items', 'dk_customers', 'dk_orders',
     'dk_order_items', 'dk_order_status_history', 'dk_kitchen_tickets', 'dk_delivery_riders', 'dk_deliveries',
-    'dk_order_payments', 'dk_kitchen_sla_settings', 'dk_kitchen_hours', 'dk_kitchen_hour_exceptions', 'dk_ai_features',
+    'dk_order_payments', 'dk_kitchen_sla_settings', 'dk_kitchen_hours', 'dk_kitchen_hour_exceptions', 'dk_kitchen_features',
     'dk_ai_insights', 'dk_audit_log'
   ] loop
     execute format('select count(*) from public.%I where kitchen_id = $1', v_table) into v_count using v_a;
