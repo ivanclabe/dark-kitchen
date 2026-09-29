@@ -38,9 +38,9 @@ export function OrgScope() {
 
   useEffect(() => {
     if (!organization) return
-    document.title = `Administración · ${organization.name} · Dark Kitchen`
+    document.title = `Administración · ${organization.name} · Quanela`
     return () => {
-      document.title = 'Dark Kitchen'
+      document.title = 'Quanela'
     }
   }, [organization])
 

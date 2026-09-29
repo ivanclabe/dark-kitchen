@@ -48,21 +48,26 @@ delete from dk_organization_features where organization_id = (select id from _ct
 -- 0. Data migration: every stored setting is still valid against the new schemas
 insert into _t (area, test, expected, got) values ('Migration', 'Existing account settings are valid', '0',
   (select count(*)::text from dk_kitchen_features where dk_feature_settings_error(feature_key, settings) is not null));
-insert into _t (area, test, expected, got) values ('Migration', 'Platform voice default (today''s behaviour)', 'laura · natural · 1 · 1 · es-CO',
+insert into _t (area, test, expected, got) values ('Migration', 'Platform voice default (today''s behaviour)', 'karen · natural · 1 · 1 · es-CO',
   (select concat_ws(' · ', default_settings ->> 'profile', default_settings ->> 'style', default_settings ->> 'rate', default_settings ->> 'volume', default_settings ->> 'lang')
    from dk_features where key = 'voice_speech'));
+
+insert into _t (area, test, expected, got) values ('Migration', 'No reference to the old voice keys', '0',
+  (select (select count(*) from dk_voice_profiles where key in ('mateo', 'laura', 'alex', 'sofia'))
+        + (select count(*) from dk_kitchen_features where feature_key = 'voice_speech' and settings ->> 'profile' in ('mateo', 'laura', 'alex', 'sofia'))
+        + (select count(*) from dk_organization_features where feature_key = 'voice_speech' and settings ->> 'profile' in ('mateo', 'laura', 'alex', 'sofia')))::text);
 
 -- 1. Catalog and defaults, as the kitchen team
 select pg_temp.act_as('00000000-0000-0000-0000-00000000b0b2', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catalog', 'The team reads the active voices', 'alex · daniel · laura · mateo · sofia',
+  insert into _t (area, test, expected, got) values ('Catalog', 'The team reads the active voices', 'belen · dago · daniel · ivan · karen',
     (select string_agg(key, ' · ' order by key) from dk_voice_profiles));
-  insert into _t (area, test, expected, got) values ('Defaults', 'Account without settings uses the platform default', 'laura · 1 · es-CO',
+  insert into _t (area, test, expected, got) values ('Defaults', 'Account without settings uses the platform default', 'karen · 1 · es-CO',
     pg_temp.voice('profile') || ' · ' || pg_temp.voice('rate') || ' · ' || pg_temp.voice('lang'));
   insert into _t (area, test, expected, got) values ('Permissions', 'The kitchen team uses the voice but cannot configure it', 'true · false',
     pg_temp.feat('voice_speech', 'usable') || ' · ' || pg_temp.feat('voice_speech', 'canConfigure'));
-  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "sofia"}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "belen"}');
     insert into _t (area, test, expected, got) values ('Permissions', 'The kitchen team changes the voice', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Permissions', 'The kitchen team changes the voice', 'blocked', 'blocked', sqlerrm); end;
 end $$;
@@ -90,8 +95,8 @@ set local role authenticated;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Layers', 'Organization default reaches the account', 'daniel · 1.1', pg_temp.voice('profile') || ' · ' || pg_temp.voice('rate'));
   -- 4. Account override (ADMIN)
-  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "sofia", "style": "friendly"}');
-  insert into _t (area, test, expected, got) values ('Layers', 'Account override on top of the organization', 'sofia · friendly · 1.1',
+  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "belen", "style": "friendly"}');
+  insert into _t (area, test, expected, got) values ('Layers', 'Account override on top of the organization', 'belen · friendly · 1.1',
     pg_temp.voice('profile') || ' · ' || pg_temp.voice('style') || ' · ' || pg_temp.voice('rate'));
   insert into _t (area, test, expected, got) values ('Layers', 'Inherited voice stays visible', 'daniel',
     pg_temp.feat('voice_speech', 'inheritedSettings')::jsonb ->> 'profile');
@@ -112,14 +117,14 @@ set local role authenticated;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Override', 'Not allowed: organization voice, cannot configure', 'daniel · false',
     pg_temp.voice('profile') || ' · ' || pg_temp.feat('voice_speech', 'canConfigure'));
-  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "mateo"}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "ivan"}');
     insert into _t (area, test, expected, got) values ('Override', 'Account changes the voice when not allowed', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Override', 'Account changes the voice when not allowed', 'blocked', 'blocked', sqlerrm); end;
 end $$;
 reset role;
 
 select pg_temp.as_owner();
-insert into _t (area, test, expected, got) values ('Override', 'The account choice is kept', 'sofia',
+insert into _t (area, test, expected, got) values ('Override', 'The account choice is kept', 'belen',
   (select settings ->> 'profile' from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'voice_speech'));
 
 -- 6. Platform switches the voice off: nobody speaks, settings kept
@@ -144,10 +149,10 @@ do $$ begin
   perform dk_platform_set_voice_profile('valentina', 'Valentina', 'female', 'calm', 0.95, 'es-MX', '{Dalia,Paulina}', 'Tranquila.', true);
   insert into _t (area, test, expected, got) values ('Catalog', 'Platform adds a voice', 'Valentina · calm · es-MX',
     (select concat_ws(' · ', name, default_style, lang) from dk_voice_profiles where key = 'valentina'));
-  begin perform dk_platform_set_voice_profile('laura', 'Laura', 'female', 'natural', 1, 'es-CO', '{}', '', false);
+  begin perform dk_platform_set_voice_profile('karen', 'Laura', 'female', 'natural', 1, 'es-CO', '{}', '', false);
     insert into _t (area, test, expected, got) values ('Catalog', 'Deactivate the platform default voice', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Catalog', 'Deactivate the platform default voice', 'blocked', 'blocked', sqlerrm); end;
-  perform dk_platform_set_voice_profile('mateo', 'Mateo', 'male', 'energetic', 1.05, 'es-CO', '{Diego}', '', false);
+  perform dk_platform_set_voice_profile('ivan', 'Mateo', 'male', 'energetic', 1.05, 'es-CO', '{Diego}', '', false);
 end $$;
 reset role;
 
@@ -155,7 +160,7 @@ select pg_temp.act_as('00000000-0000-0000-0000-00000000b0b2', (select id from _c
 set local role authenticated;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Catalog', 'Inactive voices are hidden from accounts', 'false',
-    exists (select 1 from dk_voice_profiles where key = 'mateo')::text);
+    exists (select 1 from dk_voice_profiles where key = 'ivan')::text);
 end $$;
 reset role;
 
@@ -166,10 +171,10 @@ do $$ begin
   begin perform dk_platform_set_voice_profile('hack', 'Hack', 'male', 'direct');
     insert into _t (area, test, expected, got) values ('Security', 'An organization owner edits the voice catalog', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Security', 'An organization owner edits the voice catalog', 'blocked', 'blocked', sqlerrm); end;
-  begin perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'voice_speech', '{"profile": "alex"}');
+  begin perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'voice_speech', '{"profile": "dago"}');
     insert into _t (area, test, expected, got) values ('Security', 'Another organization changes the voice of A', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Security', 'Another organization changes the voice of A', 'blocked', 'blocked', sqlerrm); end;
-  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "alex"}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "dago"}');
     insert into _t (area, test, expected, got) values ('Security', 'Another organization changes the voice of account A', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Security', 'Another organization changes the voice of account A', 'blocked', 'blocked', sqlerrm); end;
 end $$;
@@ -179,7 +184,7 @@ reset role;
 select pg_temp.as_owner();
 insert into _t (area, test, expected, got) values ('Audit', 'Account voice change with names', 'true',
   exists (select 1 from dk_audit_log where created_at >= now() and event_type = 'voice.settings_changed'
-          and summary like 'Cambió la voz de cocina de % → Sofía')::text);
+          and summary like 'Cambió la voz de cocina de % → Belen')::text);
 insert into _t (area, test, expected, got) values ('Audit', 'Organization voice change', 'true',
   exists (select 1 from dk_audit_log where created_at >= now() and event_type = 'voice.settings_changed' and summary like 'Cambió la voz de cocina de la organización%')::text);
 insert into _t (area, test, expected, got) values ('Audit', 'Catalog change', 'true',

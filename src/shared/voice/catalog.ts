@@ -59,7 +59,7 @@ export interface KitchenVoiceSettings {
   lang: VoiceLang
 }
 
-export const DEFAULT_VOICE_SETTINGS: KitchenVoiceSettings = { profile: 'laura', style: 'natural', rate: 1, volume: 1, lang: 'es-CO' }
+export const DEFAULT_VOICE_SETTINGS: KitchenVoiceSettings = { profile: 'karen', style: 'natural', rate: 1, volume: 1, lang: 'es-CO' }
 
 export const VOICE_RATE = { min: 0.7, max: 1.5, step: 0.05 } as const
 export const VOICE_VOLUME = { min: 0.1, max: 1, step: 0.05 } as const

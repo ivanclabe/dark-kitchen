@@ -195,7 +195,7 @@ function Phone() {
 
 export function DeviceMockups() {
   return (
-    <div role="img" aria-label="Vista previa de Dark Kitchen: el tablero de Cocina en un computador y el resumen de ventas en el celular" className="relative">
+    <div role="img" aria-label="Vista previa de Quanela: el tablero de Cocina en un computador y el resumen de ventas en el celular" className="relative">
       <Laptop />
       <Phone />
     </div>

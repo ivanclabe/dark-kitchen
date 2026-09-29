@@ -23,11 +23,11 @@ export function LandingNav() {
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-b border-neutral-800/50 bg-neutral-950/75 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <a href="#producto" className="flex items-center gap-2.5" aria-label="Dark Kitchen — inicio" onClick={() => setOpen(false)}>
+        <a href="#producto" className="flex items-center gap-2.5" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
           <span className="flex size-8 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
             <Flame size={16} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
-          <span className="text-sm font-semibold tracking-tight">Dark Kitchen</span>
+          <span className="text-sm font-semibold tracking-tight">Quanela</span>
         </a>
 
         <nav aria-label="Secciones" className="hidden items-center gap-1 md:flex">

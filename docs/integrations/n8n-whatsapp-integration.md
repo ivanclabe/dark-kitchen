@@ -1,4 +1,4 @@
-# Integración conversacional (WhatsApp → n8n → Supabase → Dark Kitchen)
+# Integración conversacional (WhatsApp → n8n → Supabase → Quanela)
 
 > Actualizado para organizaciones, Cuentas y catálogo de permisos (ADR 0008).
 
@@ -17,7 +17,7 @@ CLIENTE → WHATSAPP → N8N
                        ↓
                     SUPABASE (fuente de verdad)
                        ↓
-              DARK KITCHEN APP (React) → KDS / COCINA
+              QUANELA APP (React)      → KDS / COCINA
 ```
 
 React **nunca** llama a WhatsApp ni a Anthropic. n8n **nunca** guarda su propia copia de productos/precios/disponibilidad — siempre consulta Supabase en el momento.

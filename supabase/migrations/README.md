@@ -1,6 +1,6 @@
 # Migrations
 
-Dark Kitchen runs on its **own Supabase project** `dark-kitchen` (ref `cqfzcwpqisaohcjaevxf`, region sa-east-1) since 2026-09-24 (ADR 0007). Until then it lived in the shared project `GreatBoost` (`iosxchnwfvimfgozumqh`) next to other apps, which is why every table, type and function is prefixed `dk_`; the prefix stays.
+Quanela runs on its **own Supabase project** `dark-kitchen` (ref `cqfzcwpqisaohcjaevxf`, region sa-east-1) since 2026-09-24 (ADR 0007). Until then it lived in the shared project `GreatBoost` (`iosxchnwfvimfgozumqh`) next to other apps, which is why every table, type and function is prefixed `dk_`; the prefix stays.
 
 Workflow: add a `<timestamp>_name.sql` file here and apply it with the CLI (the repo is linked to the project):
 

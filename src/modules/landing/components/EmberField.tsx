@@ -23,7 +23,7 @@ interface Ember {
 }
 
 /**
- * Fondo de brasas: la versión Dark Kitchen del cielo estrellado de la
+ * Fondo de brasas: la versión Quanela del cielo estrellado de la
  * referencia. Puntos naranjas que suben y titilan despacio. Decorativo
  * (aria-hidden); con "reducir movimiento" quedan quietos.
  */

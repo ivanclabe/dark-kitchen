@@ -1,4 +1,4 @@
-# Dark Kitchen (ADR 0011): la presentación y los precios se indexan; la aplicación no.
+# Quanela (ADR 0011): la presentación y los precios se indexan; la aplicación no.
 User-agent: *
 Allow: /$
 Allow: /landing

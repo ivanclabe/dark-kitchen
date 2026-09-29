@@ -33,7 +33,7 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
           <span className="flex size-10 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
             <Flame size={20} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
-          <span className="text-lg font-semibold">Dark Kitchen</span>
+          <span className="text-lg font-semibold">Quanela</span>
         </Link>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>
       </div>
@@ -105,7 +105,7 @@ export function SignUpPage() {
       <Shell>
         <h1 className={typography.h2}>El registro abre pronto</h1>
         {selectedPlan && <PlanSummary plan={selectedPlan} />}
-        <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de Dark Kitchen. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
+        <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de Quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
         <div className="flex flex-col gap-2 text-sm">
           {salesUrl && (
             <a href={salesUrl} className="text-brasa-400 hover:underline">
@@ -164,7 +164,7 @@ export function SignUpPage() {
       else setStep('sent')
     } catch (err) {
       const message = getErrorMessage(err, 'No se pudo crear tu usuario')
-      setError(/already registered|already exists/i.test(message) ? 'Ese correo ya tiene usuario en Dark Kitchen. Inicia sesión.' : message)
+      setError(/already registered|already exists/i.test(message) ? 'Ese correo ya tiene usuario en Quanela. Inicia sesión.' : message)
     } finally {
       setBusy(false)
     }
@@ -212,7 +212,7 @@ export function SignUpPage() {
   }
 
   const titles = {
-    user: ['Crea tu usuario', 'Con él entrarás a Dark Kitchen.'],
+    user: ['Crea tu usuario', 'Con él entrarás a Quanela.'],
     plan: ['Elige el plan para tu negocio', 'Empieza gratis; puedes cambiar de plan más adelante.'],
     business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu organización y su primera cuenta.'],
   }[step]

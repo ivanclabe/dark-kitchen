@@ -153,7 +153,7 @@ export function ActivationPage() {
     return (
       <Shell>
         {header}
-        <p className={typography.small}>Ya tienes usuario en Dark Kitchen. Inicia sesión con tu correo para unirte a {preview.organizationName}.</p>
+        <p className={typography.small}>Ya tienes usuario en Quanela. Inicia sesión con tu correo para unirte a {preview.organizationName}.</p>
         <Button variant="primary" size="lg" icon={LogIn} className="w-full" onClick={() => navigate(`/login?next=${encodeURIComponent(`/activar/${token}`)}`)}>
           Iniciar sesión
         </Button>

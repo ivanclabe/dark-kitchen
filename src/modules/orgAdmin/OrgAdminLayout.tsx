@@ -144,11 +144,11 @@ export function OrgAdminLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-950 text-neutral-100">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-neutral-800/60 bg-neutral-950 px-3 py-4 md:flex">
-        <Link to="/cuentas" className="mb-5 flex items-center gap-2.5 px-2" aria-label="Dark Kitchen — tus cuentas">
+        <Link to="/cuentas" className="mb-5 flex items-center gap-2.5 px-2" aria-label="Quanela — tus cuentas">
           <span className="flex size-8 items-center justify-center rounded-xl bg-brasa-500">
             <Flame size={16} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
-          <span className="text-sm font-semibold">Dark Kitchen</span>
+          <span className="text-sm font-semibold">Quanela</span>
         </Link>
         <div className="mb-4 rounded-xl border border-neutral-800/60 bg-neutral-900/50 px-3 py-2.5">
           <p className="flex items-center gap-1.5 text-[11px] font-medium tracking-wide text-brasa-300 uppercase">

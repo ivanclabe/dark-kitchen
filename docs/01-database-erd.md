@@ -1,4 +1,4 @@
-# Database ERD — Dark Kitchen (prefijo `dk_`)
+# Database ERD — Quanela (prefijo `dk_`)
 
 ## Diagrama (mermaid)
 
@@ -150,7 +150,7 @@ erDiagram
   - `depends_on`;
   - `default_settings` y `settings_schema` (tipos number/boolean/string con rangos, `enum` o `ref: voice_profile`).
 - `dk_ai_models` — modelos permitidos (`provider`, `label`, precios USD por millón de tokens, solo para estimar; nulos = sin estimación). Solo la plataforma.
-- `dk_voice_profiles` — catálogo de voces de cocina (Sofía, Laura, Daniel, Mateo, Alex): `gender`, `default_style`, `pitch`, `lang`, `provider = device`, `device_voice_hints`. Lectura: autenticados (solo activas); escritura: plataforma por RPC.
+- `dk_voice_profiles` — catálogo de voces de cocina (Ivan, Karen, Dago, Daniel, Belen): `gender`, `default_style`, `pitch`, `lang`, `provider = device`, `device_voice_hints`. Lectura: autenticados (solo activas); escritura: plataforma por RPC.
 - `dk_organization_features.settings` — valores por defecto de la organización y `allow_account_override`.
 - `dk_kitchen_features.settings` — parámetros de la Cuenta. En `voice_speech` guarda la voz de la Cuenta (`profile`, `style`, `rate`, `volume`, `lang`); no hay tabla de voz aparte.
 - `dk_ai_insights` — agrega `input_tokens`, `output_tokens` y `latency_ms` (desde el ADR 0014).

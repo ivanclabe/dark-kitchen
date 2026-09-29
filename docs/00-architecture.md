@@ -1,8 +1,8 @@
-# DARK KITCHEN — Arquitectura Base (Fase 0)
+# QUANELA — Arquitectura Base (Fase 0)
 
 Estado: **propuesta, pendiente de aprobación**. No se ha escrito código de aplicación todavía.
 
-Prefijo de base de datos propuesto: **`dk_`** (Dark Kitchen). Se usa en todo este documento. Si prefieres otro prefijo, es un cambio mecánico (find/replace) antes de generar las migraciones.
+Prefijo de base de datos propuesto: **`dk_`** (de Dark Kitchen, el nombre original de la app; el prefijo se conserva). Se usa en todo este documento. Si prefieres otro prefijo, es un cambio mecánico (find/replace) antes de generar las migraciones.
 
 ---
 

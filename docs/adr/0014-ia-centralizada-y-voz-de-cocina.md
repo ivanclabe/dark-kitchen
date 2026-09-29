@@ -421,6 +421,8 @@ Cada una se ensaya con `run.py --with …` contra todas las suites; después `db
 - **Componente compartido `Tabs`:** ahora se desplaza dentro de su ancho en pantallas angostas (antes, con 5 pestañas, ensanchaba la página).
 - **Bitácora de la plataforma:** los eventos de plataforma (`feature.platform_changed`, `ai.model_changed`, `ai.model_catalog_changed`, `plan.limits_changed`, `voice.catalog_changed`) no tienen organización. Se ven en Plataforma → IA y voz → Políticas → *Cambios recientes*. `voice.settings_changed` sí aparece en la bitácora de la organización.
 
+- **Nombres de las voces (2026-09-30):** a pedido, el catálogo pasó a **Ivan** (enérgica), **Karen** (natural, por defecto), **Dago** (directa, ahora masculina), **Daniel** (profesional) y **Belen** (amable). La migración `20260930240000_dk_voice_profiles_rename` renombra las claves y actualiza las referencias guardadas, sin perder elecciones.
+
 ### 21.3 Seguridad verificada
 - **Todas las RPC de plataforma** llaman a `dk_require_platform_admin()`, así que el dueño de otra organización recibe un error (probado). `dk_ai_models` no se lee fuera de la plataforma.
 - **Activar por Cuenta** exige `features.manage` de la organización (probado con el ADMIN y con COCINA).

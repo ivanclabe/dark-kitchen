@@ -1,4 +1,4 @@
-// Dark Kitchen — capa de IA para Abastecimiento, Inventario y Cocina.
+// Quanela — capa de IA para Abastecimiento, Inventario y Cocina.
 //
 // Contrato (ver migración dk_ai_layer):
 //   - Entra: la función de IA a analizar. Nada más: los datos NO los manda el

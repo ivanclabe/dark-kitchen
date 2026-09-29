@@ -51,7 +51,7 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
 
   return (
     <form onSubmit={onSubmit} className="max-w-3xl space-y-5">
-      <Card title="Tu negocio" description="Así se identifica tu organización en Dark Kitchen" icon={Building2}>
+      <Card title="Tu negocio" description="Así se identifica tu organización en Quanela" icon={Building2}>
         <FormGrid>
           <FormField label="Nombre" required error={edited ? nameError : null}>
             {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} />}

@@ -16,7 +16,7 @@ const steam = (x: number) => (
   <path d={`M${x} 16c-2-2.5 2-4.5 0-7`} fill="none" stroke="#e7e5e4" strokeWidth="2" strokeLinecap="round" opacity=".7" />
 )
 
-/** Iconos de establecimiento (Cuentas): la galería original de Dark Kitchen. */
+/** Iconos de establecimiento (Cuentas): la galería original de Quanela. */
 export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
   chef: {
     bg: ['#7c2d12', '#c2410c'],

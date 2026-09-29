@@ -5,7 +5,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 /**
  * Metadatos para compartir (ADR 0011, H5): las redes exigen URL absolutas en
- * og:image y og:url. Se toman de VITE_SITE_URL (p. ej. https://darkkitchen.co);
+ * og:image y og:url. Se toman de VITE_SITE_URL (p. ej. https://quanela.co);
  * sin ella quedan relativas.
  */
 function siteUrl(url: string | undefined): Plugin {

@@ -92,7 +92,7 @@ export function TeamView({
         <RolesPanel organizationId={organizationId} roles={roles.data} users={users.data} catalog={catalog.data} canManage={canManageRoles} />
       )}
 
-      <p className={typography.caption}>El equipo de soporte de la plataforma Dark Kitchen puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.</p>
+      <p className={typography.caption}>El equipo de soporte de la plataforma Quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.</p>
     </div>
   )
 }

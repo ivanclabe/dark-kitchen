@@ -63,9 +63,9 @@ export function KitchenScope() {
   useEffect(() => {
     if (!kitchen) return
     writeLastKitchenSlug(kitchen.slug)
-    document.title = `${kitchen.name} · Dark Kitchen`
+    document.title = `${kitchen.name} · Quanela`
     return () => {
-      document.title = 'Dark Kitchen'
+      document.title = 'Quanela'
     }
   }, [kitchen])
 

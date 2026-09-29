@@ -1,4 +1,4 @@
-# Dark Kitchen
+# Quanela
 
 Plataforma operativa para la gestión integral de una dark kitchen (inventario, compras, recetas, menú, pedidos, cocina, despacho, reportes), preparada para una futura integración con WhatsApp.
 

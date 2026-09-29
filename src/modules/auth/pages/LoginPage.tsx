@@ -36,7 +36,7 @@ export function LoginPage() {
             <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
           <div>
-            <h1 className={typography.h1}>Dark Kitchen</h1>
+            <h1 className={typography.h1}>Quanela</h1>
             <p className={`mt-1 ${typography.small}`}>Inicia sesión para continuar</p>
           </div>
         </div>

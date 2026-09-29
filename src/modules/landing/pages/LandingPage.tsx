@@ -37,7 +37,7 @@ function delay(ms: number): CSSProperties {
 }
 
 /**
- * Landing pública de Dark Kitchen. Toma el lenguaje visual de la referencia
+ * Landing pública de Quanela. Toma el lenguaje visual de la referencia
  * (fondo oscuro con partículas, titular enorme centrado, un solo CTA muy
  * visible y el producto en laptop + celular) con la identidad propia de la
  * marca: brasas naranjas en vez de estrellas, el acento "brasa" y capturas
@@ -144,7 +144,7 @@ export function LandingPage() {
       <footer className="border-t border-neutral-800/60">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-sm text-neutral-500 sm:px-6">
           <span className="flex items-center gap-2">
-            <Flame size={14} className="text-brasa-500" aria-hidden /> © {new Date().getFullYear()} Dark Kitchen
+            <Flame size={14} className="text-brasa-500" aria-hidden /> © {new Date().getFullYear()} Quanela
           </span>
           <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5 gap-y-2">
             <a href="#precios" className="transition-colors hover:text-neutral-200">
