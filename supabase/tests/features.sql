@@ -59,19 +59,37 @@ delete from dk_organization_features where organization_id = (select id from _ct
 select pg_temp.act_as('00000000-0000-0000-0000-0000000fe0b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo activo', '7', jsonb_array_length(dk_my_features())::text);
+  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo', '7', jsonb_array_length(dk_my_features())::text);
   insert into _t (area, test, expected, got) values ('Por defecto', 'IA apagada sin fila', 'false · false', pg_temp.feat('supply_reorder', 'enabled') || ' · ' || pg_temp.feat('supply_reorder', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Voz encendida sin fila', 'true', pg_temp.feat('voice_commands', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Parámetros por defecto del catálogo', '7', pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
-  insert into _t (area, test, expected, got) values ('Por defecto', 'ADMIN puede administrarla', 'true', pg_temp.feat('supply_reorder', 'canManage'));
+  -- ADR 0014: el ADMIN de la Cuenta ya no activa; solo ajusta parámetros.
+  insert into _t (area, test, expected, got) values ('Por defecto', 'ADMIN: no activa, sí configura', 'false · true',
+    pg_temp.feat('supply_reorder', 'canManage') || ' · ' || pg_temp.feat('supply_reorder', 'canConfigure'));
+  begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true);
+    insert into _t (area, test, expected, got) values ('Permisos', 'ADMIN activa una función en su Cuenta', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Permisos', 'ADMIN activa una función en su Cuenta', 'bloqueado', 'bloqueado', sqlerrm); end;
+end $$;
+reset role;
 
-  -- 2. ADMIN activa y ajusta parámetros (solo claves conocidas y con su tipo)
+-- 2. SUPER_ADMIN activa y ajusta parámetros (solo claves conocidas y con su tipo)
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
   perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"coverage_days": 10, "hack": 1, "frequency_min": "x"}');
-  insert into _t (area, test, expected, got) values ('Cuenta', 'ADMIN la activa', 'true', pg_temp.feat('supply_reorder', 'usable'));
+end $$;
+reset role;
+
+select pg_temp.act_as('00000000-0000-0000-0000-0000000fe0b1', (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
+  insert into _t (area, test, expected, got) values ('Cuenta', 'El SUPER_ADMIN la activa', 'true', pg_temp.feat('supply_reorder', 'usable'));
   insert into _t (area, test, expected, got) values ('Cuenta', 'Solo guarda claves y tipos válidos', '{"coverage_days": 10}',
     (select settings::text from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'supply_reorder'));
   insert into _t (area, test, expected, got) values ('Cuenta', 'Estado: parámetros = catálogo + Cuenta', '10 · 360',
     (dk_feature_state('supply_reorder') -> 'settings' ->> 'coverage_days') || ' · ' || (dk_feature_state('supply_reorder') -> 'settings' ->> 'frequency_min'));
+  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 11}');
+  insert into _t (area, test, expected, got) values ('Cuenta', 'ADMIN ajusta los parámetros', '11', pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
 
   -- 3. ADMIN no toca la organización
   begin perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'supply_reorder', false);
@@ -97,10 +115,14 @@ do $$ begin
   insert into _t (area, test, expected, got) values ('Permisos', 'COCINA no usa Sugerencias de compra (permiso)', 'false · permission',
     pg_temp.feat('supply_reorder', 'usable') || ' · ' || (dk_feature_state('supply_reorder') ->> 'reason'));
   insert into _t (area, test, expected, got) values ('Permisos', 'COCINA usa los comandos de voz', 'true', pg_temp.feat('voice_commands', 'usable'));
-  insert into _t (area, test, expected, got) values ('Permisos', 'COCINA no administra', 'false', pg_temp.feat('voice_commands', 'canManage'));
+  insert into _t (area, test, expected, got) values ('Permisos', 'COCINA no administra ni configura', 'false · false',
+    pg_temp.feat('voice_commands', 'canManage') || ' · ' || pg_temp.feat('voice_speech', 'canConfigure'));
   begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'voice_commands', false);
     insert into _t (area, test, expected, got) values ('Permisos', 'COCINA apaga la voz de la Cuenta', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Permisos', 'COCINA apaga la voz de la Cuenta', 'bloqueado', 'bloqueado', sqlerrm); end;
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"rate": 1.2}');
+    insert into _t (area, test, expected, got) values ('Permisos', 'COCINA cambia la voz de la Cuenta', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Permisos', 'COCINA cambia la voz de la Cuenta', 'bloqueado', 'bloqueado', sqlerrm); end;
 end $$;
 reset role;
 
@@ -123,18 +145,27 @@ do $$ begin
     pg_temp.feat('supply_reorder', 'usable') || ' · ' || (dk_feature_state('supply_reorder') ->> 'reason'));
   insert into _t (area, test, expected, got) values ('Precedencia', 'La elección de la Cuenta se conserva', 'true', pg_temp.feat('supply_reorder', 'enabled'));
   insert into _t (area, test, expected, got) values ('Precedencia', 'Voz apagada por la organización', 'false', pg_temp.feat('voice_commands', 'usable'));
-  -- Apagarla en la Cuenta sí se puede; volver a activarla, no.
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 13}');
+    insert into _t (area, test, expected, got) values ('Precedencia', 'ADMIN ajusta una función que la organización no ofrece', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Precedencia', 'ADMIN ajusta una función que la organización no ofrece', 'bloqueado', 'bloqueado', sqlerrm); end;
+  begin insert into dk_ai_insights (kitchen_id, feature_key, status, input) values ((select id from _ctx where key = 'A'), 'supply_reorder', 'ok', '{}');
+    insert into _t (area, test, expected, got) values ('Precedencia', 'Guardar un análisis con la función apagada', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Precedencia', 'Guardar un análisis con la función apagada', 'bloqueado', 'bloqueado', sqlerrm); end;
+end $$;
+reset role;
+
+-- El SUPER_ADMIN puede apagarla en la Cuenta, pero no volver a activarla si la organización no la ofrece.
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
   perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'voice_commands', false);
   begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'voice_commands', true);
     insert into _t (area, test, expected, got) values ('Precedencia', 'La Cuenta activa lo que la organización no ofrece', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Precedencia', 'La Cuenta activa lo que la organización no ofrece', 'bloqueado', 'bloqueado', sqlerrm); end;
-  -- Cambiar parámetros de una ya activada sí se puede.
+  -- Cambiar parámetros de una ya activada sí se puede (organización).
   perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"coverage_days": 12}');
   insert into _t (area, test, expected, got) values ('Precedencia', 'Ajustar parámetros sin reactivar', '12',
     (select settings ->> 'coverage_days' from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'supply_reorder'));
-  begin insert into dk_ai_insights (kitchen_id, feature_key, status, input) values ((select id from _ctx where key = 'A'), 'supply_reorder', 'ok', '{}');
-    insert into _t (area, test, expected, got) values ('Precedencia', 'Guardar un análisis con la función apagada', 'bloqueado', 'PERMITIDO');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Precedencia', 'Guardar un análisis con la función apagada', 'bloqueado', 'bloqueado', sqlerrm); end;
 end $$;
 reset role;
 

@@ -1,27 +1,22 @@
+import type { VoiceVerbosity } from '@/shared/voice/catalog'
+import { spokenMinutes, stallAnnouncement, type StallPhraseInput } from '@/shared/voice/kitchenPhrases'
 import type { KitchenSignalOrder, KitchenSignals } from '../types'
+
+export { spokenMinutes }
 
 export interface StallAlert {
   /** Identifica el aviso: cambia si el pedido/plato cambia de estado, así el aviso vuelve a sonar desde cero. */
   key: string
   orderId: string
   orderNumber: number
-  /** Frase completa para la voz. */
+  /** Frase completa (pantalla y registro). */
   message: string
   /** Etiqueta corta para la tarjeta del tablero. */
   short: string
+  /** Datos para armar la frase hablada según el estilo de voz (ADR 0014). */
+  speech: StallPhraseInput
 }
 
-/** Máximo de pedidos que se nombran en una sola locución; el resto se resume. */
-export const MAX_SPOKEN = 3
-
-export function spokenMinutes(minutes: number): string {
-  const m = Math.max(0, Math.round(minutes))
-  if (m < 60) return `${m} ${m === 1 ? 'minuto' : 'minutos'}`
-  const h = Math.floor(m / 60)
-  const rest = m % 60
-  const hours = `${h} ${h === 1 ? 'hora' : 'horas'}`
-  return rest === 0 ? hours : `${hours} y ${rest} ${rest === 1 ? 'minuto' : 'minutos'}`
-}
 
 const ORDER_STATUS_PHRASE: Record<KitchenSignalOrder['status'], string> = {
   CONFIRMADO: 'en cola',
@@ -48,6 +43,7 @@ export function currentStalls(signals: KitchenSignals): StallAlert[] {
           orderNumber: order.orderNumber,
           message: `Pedido ${order.orderNumber}: ${item.product} lleva ${spokenMinutes(item.minutesInStatus)} ${phrase}`,
           short: `${item.product} · ${item.minutesInStatus} min ${phrase}`,
+          speech: { orderNumber: String(order.orderNumber), product: item.product, minutes: item.minutesInStatus, statusPhrase: phrase },
         })
       }
     } else if (order.stalled) {
@@ -57,6 +53,7 @@ export function currentStalls(signals: KitchenSignals): StallAlert[] {
         orderNumber: order.orderNumber,
         message: `Pedido ${order.orderNumber} lleva ${spokenMinutes(order.minutesInStatus)} ${ORDER_STATUS_PHRASE[order.status]}`,
         short: `${order.minutesInStatus} min sin avanzar`,
+        speech: { orderNumber: String(order.orderNumber), product: null, minutes: order.minutesInStatus, statusPhrase: ORDER_STATUS_PHRASE[order.status] },
       })
     }
   }
@@ -74,6 +71,7 @@ export function dueStallAnnouncement(
   lastAnnounced: ReadonlyMap<string, number>,
   now: number,
   repeatMin: number,
+  verbosity: VoiceVerbosity = 'standard',
 ): { text: string | null; due: StallAlert[]; next: Map<string, number> } {
   const next = new Map<string, number>()
   for (const s of stalls) {
@@ -88,8 +86,6 @@ export function dueStallAnnouncement(
   if (due.length === 0) return { text: null, due, next }
 
   for (const s of due) next.set(s.key, now)
-  const spoken = due.slice(0, MAX_SPOKEN).map((s) => s.message)
-  const rest = due.length - spoken.length
-  const tail = rest > 0 ? ` Y ${rest} ${rest === 1 ? 'aviso más' : 'avisos más'} en el tablero.` : ''
-  return { text: `Atención. ${spoken.join('. ')}.${tail}`, due, next }
+  // One short phrase: the stall, or how many and the oldest (ADR 0014, 9.4).
+  return { text: stallAnnouncement(due.map((s) => s.speech), verbosity), due, next }
 }

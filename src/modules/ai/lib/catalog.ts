@@ -105,7 +105,7 @@ export function featureDefinition(key: AiFeatureKey): FeatureDefinition {
 }
 
 /** Completa con los valores por defecto las claves que falten y descarta las que no correspondan. */
-export function withDefaults(key: AiFeatureKey, settings: AiSettings | null | undefined): AiSettings {
+export function withDefaults(key: AiFeatureKey, settings: Readonly<Record<string, unknown>> | null | undefined): AiSettings {
   const def = featureDefinition(key)
   const result: AiSettings = {}
   for (const field of def.fields) {

@@ -12,9 +12,11 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate } from '@/shared/utils/format'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Pause, Play, Plus, ShieldCheck, Store, TriangleAlert } from 'lucide-react'
+import { ArrowLeft, Pause, Play, Plus, ShieldCheck, Sparkles, Store, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Tabs } from '@/shared/ui/Tabs'
+import { PlatformAiPanel } from '../ai/PlatformAiPanel'
 import { listPlatformKitchens, setKitchensActive, type PlatformKitchen } from '../api'
 import { OrganizationPlansPanel } from '../components/OrganizationPlansPanel'
 
@@ -35,6 +37,8 @@ export function PlatformAdminPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirm, setConfirm] = useState<{ active: boolean; ids: string[] } | null>(null)
   const [creating, setCreating] = useState(false)
+  const [params, setParams] = useSearchParams()
+  const tab: 'accounts' | 'ai' = params.get('tab') === 'ai' ? 'ai' : 'accounts'
 
   const toggleActive = useMutation({
     mutationFn: ({ ids, active }: { ids: string[]; active: boolean }) => setKitchensActive(ids, active),
@@ -128,38 +132,57 @@ export function PlatformAdminPage() {
             <h1 className={`flex items-center gap-2 ${typography.h1}`}>
               <ShieldCheck size={22} className="text-brasa-400" aria-hidden /> Plataforma
             </h1>
-            <p className={typography.small}>Todas las cuentas de todas las organizaciones. Los menús maestros se administran en cada organización.</p>
+            <p className={typography.small}>
+              {tab === 'ai' ? 'Control central de la IA y la voz de todas las organizaciones.' : 'Todas las cuentas de todas las organizaciones. Los menús maestros se administran en cada organización.'}
+            </p>
           </div>
-          <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
-            Nueva cuenta
-          </Button>
+          {tab === 'accounts' && (
+            <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
+              Nueva cuenta
+            </Button>
+          )}
         </header>
 
-        {selectedIds.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm">
-            <span className="mr-auto text-neutral-200">{selectedIds.length} seleccionadas</span>
-            <Button size="sm" variant="secondary" icon={Play} onClick={() => setConfirm({ active: true, ids: selectedIds })}>
-              Activar
-            </Button>
-            <Button size="sm" variant="danger" icon={Pause} onClick={() => setConfirm({ active: false, ids: selectedIds })}>
-              Desactivar
-            </Button>
-          </div>
-        )}
+        <Tabs
+          value={tab}
+          onChange={(t) => setParams(t === 'ai' ? { tab: 'ai' } : {}, { replace: true })}
+          items={[
+            { value: 'accounts', label: 'Cuentas', icon: Store },
+            { value: 'ai', label: 'IA y voz', icon: Sparkles },
+          ]}
+        />
 
-        {(
-          <DataTable
-            columns={columns}
-            rows={kitchens}
-            getRowId={(k) => k.id}
-            isLoading={isLoading}
-            error={isError ? error : undefined}
-            onRetry={() => void refetch()}
-            emptyState={<EmptyState icon={Store} title="Todavía no hay cuentas" compact />}
-          />
-        )}
+        {tab === 'ai' ? (
+          <PlatformAiPanel />
+        ) : (
+          <>
+            {selectedIds.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm">
+                <span className="mr-auto text-neutral-200">{selectedIds.length} seleccionadas</span>
+                <Button size="sm" variant="secondary" icon={Play} onClick={() => setConfirm({ active: true, ids: selectedIds })}>
+                  Activar
+                </Button>
+                <Button size="sm" variant="danger" icon={Pause} onClick={() => setConfirm({ active: false, ids: selectedIds })}>
+                  Desactivar
+                </Button>
+              </div>
+            )}
 
-        <OrganizationPlansPanel />
+            {(
+              <DataTable
+                columns={columns}
+                rows={kitchens}
+                getRowId={(k) => k.id}
+                isLoading={isLoading}
+                error={isError ? error : undefined}
+                onRetry={() => void refetch()}
+                emptyState={<EmptyState icon={Store} title="Todavía no hay cuentas" compact />}
+              />
+            )}
+
+            <OrganizationPlansPanel />
+          </>
+        )}
       </div>
 
       <ConfirmDialog

@@ -1,4 +1,4 @@
-import { Activity, Building2, CreditCard, Layers, LayoutGrid, Settings, Store, Users, type LucideIcon } from 'lucide-react'
+import { Activity, Building2, CreditCard, Layers, LayoutGrid, Settings, Sparkles, Store, Users, type LucideIcon } from 'lucide-react'
 
 /**
  * Secciones del centro de administración (ADR 0012). Cada una exige un
@@ -19,7 +19,8 @@ export const ORG_NAV_ITEMS: OrgNavItem[] = [
   { to: '/observabilidad', label: 'Observabilidad', description: 'Operación por cuenta y bitácora', icon: Activity, permissions: ['observability.view'] },
   { to: '/equipos', label: 'Equipos', description: 'Usuarios, roles y permisos', icon: Users, permissions: ['users.view'] },
   { to: '/facturacion', label: 'Facturación', description: 'Plan, límites, uso y facturas', icon: CreditCard, permissions: ['billing.view'] },
-  { to: '/configuracion', label: 'Configuración', description: 'Negocio, funciones (IA y voz) e integraciones', icon: Settings, permissions: ['organization.manage', 'features.manage'] },
+  { to: '/ai', label: 'IA y voz', description: 'Funciones de IA y voz por cuenta, voz de cocina y uso', icon: Sparkles, permissions: ['features.manage'] },
+  { to: '/configuracion', label: 'Configuración', description: 'Datos del negocio e integraciones', icon: Settings, permissions: ['organization.manage'] },
   { to: '/menus-maestros', label: 'Menús maestros', description: 'Platos compartidos entre cuentas', icon: Layers, permissions: ['master_menus.manage'] },
 ]
 

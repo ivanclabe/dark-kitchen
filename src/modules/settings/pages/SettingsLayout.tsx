@@ -10,7 +10,7 @@ export function SettingsLayout() {
   const { pathname } = useLocation()
   const tabs: RouteTabItem[] = [
     ...(can('settings.manage') ? [{ to: path('/settings/general'), label: 'General', icon: Store }] : []),
-    ...(can('ai.manage') || can('settings.manage') ? [{ to: path('/settings/features'), label: 'Funciones', icon: Sparkles }] : []),
+    ...(can('ai.manage') || can('settings.manage') ? [{ to: path('/settings/features'), label: 'IA y voz', icon: Sparkles }] : []),
   ]
 
   if (tabs.length === 0) return <Navigate to={path('/')} replace />

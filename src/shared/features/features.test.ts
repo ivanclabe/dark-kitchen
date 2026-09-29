@@ -9,12 +9,17 @@ const state = (over: Partial<FeatureState>): FeatureState => ({
   label: 'Comandos de voz',
   description: '',
   usesModel: false,
+  platformActive: true,
   includedInPlan: true,
   available: true,
   enabled: true,
   usable: true,
   canManage: false,
+  canConfigure: false,
+  accountOverride: true,
   settings: {},
+  inheritedSettings: {},
+  dependsOn: [],
   updatedAt: null,
   ...over,
 })
@@ -40,5 +45,12 @@ describe('funciones', () => {
     expect(unavailableReason(state({ enabled: false, usable: false }))).toBe('account')
     expect(unavailableReason(state({ usable: false }))).toBe('permission')
     expect(unavailableReason(state({}))).toBeNull()
+  })
+})
+
+describe('ADR 0014: interruptor global de la plataforma', () => {
+  it('apagada por la plataforma: es lo primero que se explica', () => {
+    expect(unavailableReason(state({ platformActive: false, includedInPlan: false, usable: false }))).toBe('platform')
+    expect(featureLookup([state({ platformActive: false, usable: false })]).canUseFeature('voice_commands')).toBe(false)
   })
 })

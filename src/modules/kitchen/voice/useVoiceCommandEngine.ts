@@ -1,10 +1,12 @@
+import { useKitchenVoice, type SpokenText } from '@/shared/voice/hooks'
+import { kitchenPhrases } from '@/shared/voice/kitchenPhrases'
+import { kitchenSpeech } from '@/shared/voice/speechQueue'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useEffect, useRef, useState } from 'react'
 import { useAdvanceTicketItems, useCancelKitchenOrder, useSetTicketPriority } from '../hooks/useKitchen'
 import type { KitchenTicket } from '../types'
 import { parseVoiceCommand, type VoiceAction } from './commandParser'
-import { useSpeech } from './useSpeech'
 import { useSpeechRecognition } from './speechRecognition'
 
 export type VoicePhase = 'idle' | 'listening' | 'processing' | 'success' | 'error'
@@ -56,7 +58,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   const setPriority = useSetTicketPriority()
   const cancelOrder = useCancelKitchenOrder()
   const { show } = useToast()
-  const voiceOutput = useSpeech()
+  const voiceOutput = useKitchenVoice()
 
   const [phase, setPhase] = useState<VoicePhase>('idle')
   const [liveTranscript, setLiveTranscript] = useState('')
@@ -77,11 +79,12 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     resetTimer.current = setTimeout(() => setPhase('idle'), RESULT_DISPLAY_MS)
   }
 
-  function announce(tone: 'success' | 'error', message: string) {
+  /** Screen text stays as is; the spoken version is the short, natural one (ADR 0014). */
+  function announce(tone: 'success' | 'error', message: string, spoken: SpokenText = message) {
     setLastMessage(message)
     setPhase(tone)
     show(tone === 'success' ? `✓ ${message}` : message, tone)
-    if (ttsEnabled) voiceOutput.say(message)
+    if (ttsEnabled) voiceOutput.say(spoken, 'command')
     scheduleReset()
   }
 
@@ -94,31 +97,45 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     const parsed = parseVoiceCommand(transcript)
 
     if (parsed.confidence !== 'high' || !parsed.orderCode || !parsed.action) {
-      announce('error', 'No entendí el comando.')
+      announce('error', 'No entendí el comando.', (v) => kitchenPhrases.notUnderstood(v))
       isProcessingRef.current = false
       return
     }
 
     const ticket = ticketsRef.current?.find((t) => t.orderNumber === Number(parsed.orderCode))
     if (!ticket) {
-      announce('error', `El pedido ${parsed.orderCode} no existe.`)
+      const code = parsed.orderCode
+      announce('error', `El pedido ${code} no existe.`, (v) => kitchenPhrases.orderNotFound(code, v))
       isProcessingRef.current = false
       return
     }
 
+    const code = parsed.orderCode
+    const action = parsed.action
+    // Already in that state: same checks as before, spoken without extra words.
+    const already = (stateWord: string) => {
+      announce('error', `El pedido ${code} ya está ${stateWord}.`, (v) => kitchenPhrases.alreadyInState(code, stateWord, v))
+    }
     try {
-      switch (parsed.action) {
+      switch (action) {
         case 'CONFIRM':
-          throw new Error(`El pedido ${parsed.orderCode} ya está confirmado.`)
+          already('confirmado')
+          return
         case 'START_PREPARATION': {
           const hasPending = ticket.items.some((item) => item.kitchenStatus === 'PENDIENTE')
-          if (!hasPending) throw new Error(`El pedido ${parsed.orderCode} ya está en preparación.`)
+          if (!hasPending) {
+            already('en preparación')
+            return
+          }
           await advanceTicketItems(ticket.items, 'EN_PREPARACION')
           break
         }
         case 'MARK_READY': {
           const hasPending = ticket.items.some((item) => item.kitchenStatus !== 'LISTO')
-          if (!hasPending) throw new Error(`El pedido ${parsed.orderCode} ya está listo.`)
+          if (!hasPending) {
+            already('listo')
+            return
+          }
           await advanceTicketItems(ticket.items, 'LISTO')
           break
         }
@@ -132,9 +149,9 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
           await setPriority.mutateAsync({ orderId: ticket.orderId, priority: 0 })
           break
       }
-      announce('success', `Pedido ${parsed.orderCode} ${ACTION_FEEDBACK[parsed.action]}.`)
+      announce('success', `Pedido ${code} ${ACTION_FEEDBACK[action]}.`, (v) => kitchenPhrases.commandDone(code, action, v))
     } catch (err) {
-      announce('error', getErrorMessage(err, `No se pudo actualizar el pedido ${parsed.orderCode}.`))
+      announce('error', getErrorMessage(err, `No se pudo actualizar el pedido ${code}.`), (v) => kitchenPhrases.commandFailed(code, v))
     } finally {
       isProcessingRef.current = false
     }
@@ -179,6 +196,8 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
   function toggleTts() {
     setTtsEnabled((enabled) => {
       const next = !enabled
+      // Muting stops what is being said and forgets what was waiting (ADR 0014).
+      if (!next) kitchenSpeech.clear()
       try {
         localStorage.setItem(TTS_PREF_KEY, next ? 'on' : 'off')
       } catch {

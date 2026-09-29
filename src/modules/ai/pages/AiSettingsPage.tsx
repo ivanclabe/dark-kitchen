@@ -15,8 +15,8 @@ function ConnectionCard() {
         <p className="font-medium text-neutral-100">{isLoading ? 'Verificando conexión…' : configured ? 'IA conectada' : isError ? 'No se pudo verificar la conexión' : 'IA no conectada'}</p>
         <p className={clsx('mt-0.5', typography.caption)}>
           {configured
-            ? 'Las funciones con IA usan Claude a través de la Edge Function dk-ai-insights.'
-            : 'Carga el secreto DK_ANTHROPIC_API_KEY en Supabase → Edge Functions → Secrets. Mientras tanto, las alertas y listas calculadas por el sistema funcionan igual; solo faltan las explicaciones de la IA.'}
+            ? 'Las funciones con IA usan el modelo que define la plataforma.'
+            : 'La administración de la plataforma todavía no conectó la IA. Mientras tanto, las alertas y listas calculadas por el sistema funcionan igual; solo faltan las explicaciones de la IA.'}
         </p>
       </div>
     </div>
@@ -39,14 +39,15 @@ function Section({ title, icon: Icon, area }: { title: string; icon: typeof Ware
 }
 
 /**
- * Configuración de IA: cada función se activa por separado y guarda sus
- * umbrales en la Cuenta (dk_kitchen_features, dentro de lo que ofrece la organización). La IA recomienda y explica; nunca ejecuta
- * compras ni cambia pedidos.
+ * AI of the account (ADR 0014): each feature shows whether it is active here
+ * (the organization activates it) and its thresholds, stored in the account
+ * within the platform ranges. The AI recommends and explains; it never buys
+ * or changes orders.
  */
 export function AiSettingsPage() {
   return (
     <div className="space-y-6">
-      <p className={typography.small}>Activa cada función por separado y ajusta sus umbrales. Todo se calcula con los datos reales de la operación.</p>
+      <p className={typography.small}>Ajusta los umbrales de las funciones activas en esta cuenta. Todo se calcula con los datos reales de la operación.</p>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <ConnectionCard />

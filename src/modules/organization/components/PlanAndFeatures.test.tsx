@@ -34,10 +34,10 @@ vi.mock('@/shared/features/features', async (original) => ({
   fetchFeatureMatrix: async () => ({
     plan: { key: 'standard', name: 'Standard' },
     features: [
-      { key: 'supply_reorder', category: 'ai', label: 'Sugerencias de compra', description: '', usesModel: true, includedInPlan: false, minPlan: 'Business', available: false },
-      { key: 'voice_commands', category: 'voice', label: 'Comandos de voz', description: '', usesModel: false, includedInPlan: true, minPlan: 'Standard', available: true },
+      { key: 'supply_reorder', category: 'ai', label: 'Sugerencias de compra', description: '', usesModel: true, platformActive: true, includedInPlan: false, minPlan: 'Business', available: false, accountOverride: true, settings: {}, platformSettings: {}, dependsOn: [] },
+      { key: 'voice_commands', category: 'voice', label: 'Comandos de voz', description: '', usesModel: false, platformActive: true, includedInPlan: true, minPlan: 'Standard', available: true, accountOverride: true, settings: {}, platformSettings: {}, dependsOn: [] },
     ],
-    accounts: [{ id: 'k1', name: 'Taquería Sur', slug: 'sur', iconKey: 'taco', active: true, enabled: { supply_reorder: false, voice_commands: true } }],
+    accounts: [{ id: 'k1', name: 'Taquería Sur', slug: 'sur', iconKey: 'taco', active: true, enabled: { supply_reorder: false, voice_commands: true }, customized: [] }],
   }),
 }))
 

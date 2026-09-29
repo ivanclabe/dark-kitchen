@@ -4,12 +4,13 @@ import { useNow } from '@/shared/hooks/useNow'
 import { Button, IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
+import { kitchenSpeech } from '@/shared/voice/speechQueue'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { typography } from '@/shared/ui/typography'
 import { formatDateLong, formatMoney, toDateInput } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { Bell, Bike, CalendarClock, Gauge, History, Kanban, Keyboard, MoreHorizontal, Plus, Search, Settings, Volume2, X, ZoomIn } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { HistoryDrawer } from '../components/HistoryDrawer'
 import { KitchenConfigDrawer, type KitchenConfigTab } from '../components/KitchenConfigDrawer'
@@ -136,6 +137,10 @@ export function KitchenPage() {
   // Mientras el micrófono escucha, los avisos hablados esperan (si no, se transcribirían).
   const voiceBusy = voice.phase === 'listening' || voice.phase === 'processing'
   const { stalledByOrder } = useStallAlerts({ active: isToday, paused: voiceBusy, muted: !soundEnabled })
+  // Muting sounds and spoken alerts also empties the speech queue at once (ADR 0014).
+  useEffect(() => {
+    if (!soundEnabled) kitchenSpeech.clear()
+  }, [soundEnabled])
 
   const kpis = useMemo(() => {
     const count = (status: KitchenOrderStatus) => (flowTickets ?? []).filter((t) => t.orderStatus === status).length

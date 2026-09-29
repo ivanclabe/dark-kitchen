@@ -61,8 +61,8 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
   return (
     <div className="space-y-8">
       <p className={typography.small}>
-        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''} y en qué cuentas están activadas. Una cuenta no puede activar lo que la organización no ofrece. Los
-        parámetros de cada función (umbrales, frecuencia) se ajustan dentro de cada cuenta, en Configuración → Funciones.
+        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''} y en qué cuentas están activadas: solo tú las activas. Cada cuenta ajusta sus
+        umbrales en Configuración → IA y voz.
       </p>
       {data.accounts.length === 0 && <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea una cuenta para activar funciones en ella." compact />}
       {categories.map((category) => {
@@ -107,8 +107,9 @@ function FeatureCard({
   onEnabled: (accountId: string, enabled: boolean) => void
 }) {
   const activeIn = accounts.filter((a) => a.enabled[feature.key]).length
+  const platformOff = !feature.platformActive
   return (
-    <article className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', feature.available ? 'border-brasa-500/30' : 'border-neutral-800/60')}>
+    <article className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', feature.available ? 'border-brasa-500/30' : 'border-neutral-800/60', platformOff && 'opacity-70')}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -125,9 +126,17 @@ function FeatureCard({
               ))}
           </div>
           <p className={clsx('mt-1', typography.caption)}>{feature.description}</p>
+          {feature.dependsOn.length > 0 && (
+            <p className="mt-1 text-[11px] text-neutral-500">Para hablar usa «Voz de la aplicación».</p>
+          )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          {feature.includedInPlan ? (
+          {platformOff ? (
+            // Switched off for the whole platform: nothing to decide here (the database refuses it too).
+            <Badge tone="neutral" size="sm" icon={Lock}>
+              Apagada por la plataforma
+            </Badge>
+          ) : feature.includedInPlan ? (
             <>
               <Switch checked={feature.available} onChange={onAvailable} label={`Ofrecer ${feature.label} en la organización`} disabled={disabled} />
               <span className="text-[11px] text-neutral-500">{feature.available ? 'Disponible' : 'No disponible'}</span>
@@ -144,7 +153,9 @@ function FeatureCard({
       {accounts.length > 0 && (
         <div className="space-y-2 border-t border-neutral-800/60 pt-3">
           <p className="text-xs text-neutral-500">
-            {feature.available
+            {platformOff
+              ? 'La plataforma la apagó para todos. Lo que cada cuenta tenía se conserva y vuelve cuando la reactive.'
+              : feature.available
               ? `Activada en ${activeIn} de ${accounts.length} ${accounts.length === 1 ? 'cuenta' : 'cuentas'}`
               : feature.includedInPlan
                 ? 'Apagada en todas las cuentas mientras no esté disponible.'
@@ -161,7 +172,7 @@ function FeatureCard({
                     checked={enabled}
                     onChange={(value) => onEnabled(a.id, value)}
                     label={`${feature.label} en ${a.name}`}
-                    disabled={disabled || (!feature.available && !enabled)}
+                    disabled={disabled || platformOff || (!feature.available && !enabled)}
                   />
                 </li>
               )

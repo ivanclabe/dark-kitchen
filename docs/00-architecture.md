@@ -77,7 +77,8 @@ src/
     customers/
     reports/
     organization/            # equipos, roles, cuentas, funciones y plan (componentes que reutiliza el centro)
-    orgAdmin/                # centro de administración /o/:org (ADR 0012): layout, Resumen, Observabilidad, Bitácora, Facturación…
+    orgAdmin/                # centro de administración /o/:org (ADR 0012): layout, Resumen, Observabilidad, Bitácora, Facturación, IA y voz…
+    platform/                # plataforma /admin: cuentas de todas las organizaciones y ai/ (control central de IA y voz, ADR 0014)
   types/
     database.ts             # tipos generados por Supabase CLI (supabase gen types)
 ```
@@ -196,6 +197,16 @@ Detalle de matriz completa (tabla × acción × rol) en [../docs/adr/0005-rls-st
 - **Planes ([ADR 0010](./adr/0010-planes-precios-y-onboarding.md)).** El plan es de la **organización** (`dk_subscriptions`, una por organización) y es el primer techo: `usable = plan incluye ∧ organización ofrece ∧ Cuenta activa ∧ permiso`. Los límites de Cuentas (`dk_create_kitchen`) y usuarios (guardia de `dk_organization_members`) salen de `dk_plans.limits`. Los catálogos de planes y funciones se leen sin sesión (landing); nada más se abre a `anon`. El plan elegido en el registro se valida en `dk_create_organization`, que crea organización, suscripción, primera Cuenta y roles en una transacción; antes de confirmar el correo no existe nada en la base. Sin pagos: la plataforma cambia planes con `dk_set_subscription`.
 - **Cuota de IA y políticas sin superposición ([ADR 0011](./adr/0011-consolidacion-y-endurecimiento.md)).** La Edge Function de IA consulta `dk_ai_run_allowed()` antes de llamar al modelo: intervalo mínimo por Cuenta y función, y tope en 24 h del plan. Los parámetros de las funciones se validan contra `dk_features.settings_schema`. Cada tabla tiene como máximo una política permisiva por comando y rol: no hay `FOR ALL` superpuestas, porque la lectura es `ver ∨ editar` en una sola política.
 - **Centro de administración, observabilidad y bitácora ([ADR 0012](./adr/0012-centro-de-administracion.md)).** Dos permisos de organización nuevos: `observability.view` y `billing.view` (catálogo de 59 permisos: 47 de Cuenta y 12 de organización). `dk_audit_log` es de solo agregar (append-only): sin escrituras desde la API y con una guardia de fila y sentencia salvo dentro de la retención (`dk_purge_audit_log`, 400 días, `pg_cron`). Cada fila la clasifica en la base un disparador `BEFORE INSERT` (`event_type`, `category`, `summary`, `result`, `source`). Se lee por Cuenta con `audit.view` o por organización con `observability.view`, con `dk_org_events` (cursor). La observabilidad se consulta con `dk_org_observability` y `dk_account_observability`: `SECURITY DEFINER`, verifican el permiso y que la Cuenta sea de la organización, con ventanas acotadas por índices `(kitchen_id, created_at desc)`. Las fechas se calculan en la zona horaria de cada Cuenta (`dk_kitchen_tz`, `dk_local_start`, `dk_local_date`). La suscripción y `dk_invoices` exigen `billing.view`.
+- **IA administrada centralmente y voz de cocina ([ADR 0014](./adr/0014-ia-centralizada-y-voz-de-cocina.md)).**
+  - **Regla:** `usable = dk_features.active (plataforma) ∧ plan ∧ organización ofrece ∧ Cuenta activada ∧ permiso de uso`.
+  - **Quién decide qué:**
+    - Solo la organización (`features.manage`) o la plataforma activan por Cuenta (`dk_set_kitchen_feature`).
+    - La Cuenta ajusta sus parámetros con `dk_set_kitchen_feature_settings`, solo si la función está activa y la organización lo permite (`allow_account_override`).
+  - **Parámetros por capas:** `dk_features.default_settings` ← `dk_organization_features.settings` ← `dk_kitchen_features.settings`. Los calcula `dk_my_features`.
+  - **Plataforma:** RPC `dk_platform_*`, protegidas con `dk_require_platform_admin()`. Administra catálogo de modelos (`dk_ai_models`, precios solo para estimar), modelo e intervalo por función, límites por plan, catálogo de voces (`dk_voice_profiles`) y uso con tokens.
+  - **Edge Function de IA:** usa el modelo que devuelve `dk_ai_run_allowed` y guarda tokens y latencia. La clave vive solo como secreto.
+  - **Voz:** texto a voz del dispositivo, detrás de un adaptador (`SpeechEngine`) y una única cola con prioridades (`src/shared/voice/speechQueue.ts`). Las frases salen de plantillas, sin modelo de lenguaje.
+  - **Auxiliares SQL internas:** se revocan explícitamente a `anon`/`authenticated`, porque Supabase les concede EXECUTE por defecto.
 - *Histórico:* el rol global (`dk_users.role`, `dk_current_role()`) se retiró en la Fase 6 de la ADR 0007; la columna se conserva sin uso.
 - Las tablas puramente transaccionales críticas (`dk_inventory_movements`, `dk_inventory_reservations`) **no reciben `INSERT` directo del cliente** salvo por rol `ADMIN`/`INVENTORY` en casos manuales (compra manual, merma, ajuste); los movimientos derivados de pedidos se generan exclusivamente dentro de los RPC `SECURITY DEFINER`, que se ejecutan con privilegios elevados pero validan el rol del `auth.uid()` que invoca internamente.
 - Storage: buckets privados (`invoices`, `product-images`), políticas por rol igual que las tablas.
@@ -271,6 +282,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0007 — Multi-cocina](./adr/0007-multi-cocina.md) · [ADR 0008 — Organizaciones y cuentas](./adr/0008-organizaciones-y-cuentas.md)
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
+- [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md)
 
 ---
 

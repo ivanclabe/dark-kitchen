@@ -15,7 +15,6 @@ export interface NavItem {
   modules: ModuleKey[]
   icon: LucideIcon
   matchPrefixes?: string[]
-  highlight?: boolean
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -27,7 +26,6 @@ export const NAV_ITEMS: NavItem[] = [
     modules: ['kitchen'],
     icon: ChefHat,
     matchPrefixes: ['/kitchen', '/orders', '/delivery'],
-    highlight: true,
   },
   {
     to: '/menu-planner',

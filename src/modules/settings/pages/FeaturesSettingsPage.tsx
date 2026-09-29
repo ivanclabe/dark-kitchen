@@ -3,22 +3,25 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
 import { Mic, Sparkles } from 'lucide-react'
-import { FeatureSwitchCard } from '../components/FeatureSwitchCard'
+import { FeatureStatusCard } from '../components/FeatureStatus'
+import { KitchenVoiceCard } from '../components/KitchenVoiceCard'
 
 /**
- * Funciones de la Cuenta (ADR 0009): IA y voz. La organización decide qué
- * ofrece; aquí se activa lo ofrecido. Cada sección según el permiso que la
- * administra (ai.manage para la IA, settings.manage para la voz).
+ * AI and voice of the account (ADR 0014). Activation is decided by the
+ * organization (and the platform above it); here the account sees what is
+ * active and tunes what it is allowed to: AI thresholds (ai.manage) and the
+ * kitchen voice (settings.manage), when the organization permits it.
  */
 export function FeaturesSettingsPage() {
-  const { can, organizationRole } = useActiveKitchen()
+  const { can, organizationRole, feature } = useActiveKitchen()
+  const commands = feature('voice_commands')
   return (
     <div className="space-y-8">
       <p className={typography.small}>
-        Activa las funciones que tu organización ofrece para esta cuenta.
+        Aquí ves qué funciones de IA y voz están activas en esta cuenta y ajustas lo que tu organización permite.
         {organizationRole === 'SUPER_ADMIN'
-          ? ' Qué se ofrece a cada cuenta lo decides en Configuración de la organización → Funciones.'
-          : ' Qué funciones se ofrecen lo decide el SUPER_ADMIN de la organización.'}
+          ? ' Qué se activa en cada cuenta lo decides en Administración de la organización → IA.'
+          : ' Qué se activa en cada cuenta lo decide el SUPER_ADMIN de la organización.'}
       </p>
 
       {can('settings.manage') && (
@@ -26,10 +29,8 @@ export function FeaturesSettingsPage() {
           <h2 className={clsx('flex items-center gap-2', typography.overline)}>
             <Mic size={13} aria-hidden /> Voz
           </h2>
-          <div className="grid gap-4 xl:grid-cols-2">
-            <FeatureSwitchCard featureKey="voice_commands" />
-            <FeatureSwitchCard featureKey="voice_speech" />
-          </div>
+          <KitchenVoiceCard />
+          {commands && <FeatureStatusCard state={commands} />}
         </section>
       )}
 

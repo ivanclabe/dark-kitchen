@@ -1,4 +1,3 @@
-import { FeaturesPanel } from '@/modules/organization/components/FeaturesPanel'
 import { OrgGeneralForm } from '@/modules/organization/components/OrgGeneralForm'
 import { useOrgAccounts, useOrganizationDetails } from '@/modules/organization/hooks/useOrganization'
 import { AccountIcon } from '@/shared/avatars/Avatar'
@@ -12,11 +11,11 @@ import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
-import { Building2, Copy, Plug, Settings, Sparkles } from 'lucide-react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Building2, Copy, Plug, Settings } from 'lucide-react'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import type { OrgAccount } from '@/modules/organization/api/organization'
 
-type Tab = 'general' | 'funciones' | 'integraciones'
+type Tab = 'general' | 'integraciones'
 
 /**
  * Integraciones (ADR 0012): cada integración apunta a una Cuenta con su ID
@@ -83,21 +82,22 @@ function IntegrationsPanel({ organizationId }: { organizationId: string }) {
  * parámetros de IA, domiciliarios) sigue en esa Cuenta.
  */
 export function OrgSettingsPage() {
-  const { organization, can } = useOrgAdmin()
+  const { organization, can, path } = useOrgAdmin()
   const [params, setParams] = useSearchParams()
   const details = useOrganizationDetails(organization.id)
 
   const tabs: TabItem<Tab>[] = [
     ...(can('organization.manage') ? [{ value: 'general' as const, label: 'General', icon: Building2 }] : []),
-    ...(can('features.manage') ? [{ value: 'funciones' as const, label: 'Funciones (IA y voz)', icon: Sparkles }] : []),
     ...(can('organization.manage') ? [{ value: 'integraciones' as const, label: 'Integraciones', icon: Plug }] : []),
   ]
-  const requested = params.get('tab') as Tab | null
+  const requested = params.get('tab') as Tab | 'funciones' | null
+  // ADR 0014: AI and voice moved to their own section.
+  if (requested === 'funciones') return <Navigate to={path('/ai')} replace />
   const tab: Tab = tabs.find((t) => t.value === requested)?.value ?? tabs[0]?.value ?? 'general'
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Configuración" icon={Settings} description="Lo que aplica a todas las cuentas de la organización." />
+      <PageHeader title="Configuración" icon={Settings} description="Datos del negocio e integraciones de todas las cuentas." />
       <Tabs value={tab} onChange={(t) => setParams({ tab: t }, { replace: true })} items={tabs} />
       {tab === 'general' ? (
         details.isLoading ? (
@@ -107,8 +107,6 @@ export function OrgSettingsPage() {
         ) : (
           <OrgGeneralForm key={details.data.id} org={details.data} />
         )
-      ) : tab === 'funciones' ? (
-        <FeaturesPanel organizationId={organization.id} />
       ) : (
         <IntegrationsPanel organizationId={organization.id} />
       )}

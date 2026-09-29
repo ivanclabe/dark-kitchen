@@ -15,8 +15,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
 
-const MODEL_SUPPLY = "claude-sonnet-5";
-const MODEL_KITCHEN = "claude-haiku-4-5-20251001"; // cocina en vivo: rápido y barato
+// ADR 0014: the model of each feature comes from the platform catalog
+// (dk_features.model_key, returned by dk_ai_run_allowed). Nothing is hard-coded.
 const MAX_ITEMS = 12;
 
 type FeatureKey = "supply_reorder" | "supply_perishables" | "supply_slow_movers" | "kitchen_insights";
@@ -215,7 +215,13 @@ async function kitchenCandidates(db: SupabaseClient, settings: Record<string, Re
 // Modelo
 // ---------------------------------------------------------------------------
 
-async function askModel(apiKey: string, model: string, feature: FeatureKey, payload: unknown) {
+interface ModelAnswer {
+  raw: { summary?: unknown; items?: unknown[] };
+  inputTokens: number | null;
+  outputTokens: number | null;
+}
+
+async function askModel(apiKey: string, model: string, feature: FeatureKey, payload: unknown): Promise<ModelAnswer> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
@@ -231,7 +237,11 @@ async function askModel(apiKey: string, model: string, feature: FeatureKey, payl
   if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = await res.json();
   const block = (data.content ?? []).find((c: { type: string; name?: string }) => c.type === "tool_use" && c.name === "registrar_recomendaciones");
-  return (block?.input ?? { summary: "", items: [] }) as { summary?: unknown; items?: unknown[] };
+  return {
+    raw: (block?.input ?? { summary: "", items: [] }) as { summary?: unknown; items?: unknown[] },
+    inputTokens: typeof data.usage?.input_tokens === "number" ? data.usage.input_tokens : null,
+    outputTokens: typeof data.usage?.output_tokens === "number" ? data.usage.output_tokens : null,
+  };
 }
 
 /** Verificación determinística de la salida: ids reales, acción y prioridad válidas, textos acotados. */
@@ -305,6 +315,7 @@ Deno.serve(async (req: Request) => {
     if (featuresError) return json({ error: featuresError.message }, 403);
     const features = (featureList ?? []) as {
       key: string;
+      platformActive?: boolean;
       includedInPlan: boolean;
       available: boolean;
       enabled: boolean;
@@ -314,8 +325,9 @@ Deno.serve(async (req: Request) => {
     const settings = Object.fromEntries(features.map((f) => [f.key, f.settings ?? {}]));
     const current = features.find((f) => f.key === feature);
     if (!current?.usable) {
-      const reason = !current?.includedInPlan ? "plan" : !current.available ? "organization" : !current.enabled ? "account" : "permission";
+      const reason = current && current.platformActive === false ? "platform" : !current?.includedInPlan ? "plan" : !current.available ? "organization" : !current.enabled ? "account" : "permission";
       const message = {
+        platform: "La plataforma tiene apagada esta función de IA.",
         plan: "Tu plan no incluye esta función de IA.",
         organization: "Tu organización no tiene disponible esta función de IA.",
         account: "Esta función de IA está desactivada en la Cuenta.",
@@ -371,7 +383,7 @@ Deno.serve(async (req: Request) => {
     // intervalo mínimo por función (también con "Analizar ahora") y tope en 24 h del plan.
     const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_allowed", { p_feature_key: feature });
     if (quotaError) return json({ error: quotaError.message }, 403);
-    const q = (quota ?? {}) as { allowed?: boolean; reason?: string | null; retryAfterSeconds?: number | null };
+    const q = (quota ?? {}) as { allowed?: boolean; reason?: string | null; retryAfterSeconds?: number | null; model?: string | null };
     if (!q.allowed) {
       const message = q.reason === "daily"
         ? "Esta cuenta llegó al máximo de análisis con IA de su plan en las últimas 24 horas."
@@ -381,20 +393,42 @@ Deno.serve(async (req: Request) => {
       return json({ error: "AI_RATE_LIMITED", reason: q.reason, retryAfter: q.retryAfterSeconds ?? null, message }, 429);
     }
 
-    const model = feature === "kitchen_insights" ? MODEL_KITCHEN : MODEL_SUPPLY;
+    const model = q.model;
+    if (!model) {
+      return json({ error: "AI_MODEL_UNAVAILABLE", message: "La plataforma no tiene un modelo activo para esta función." }, 503);
+    }
+    const startedAt = Date.now();
     try {
-      const raw = await askModel(apiKey, model, feature, payload);
-      const output = validate(feature, raw, new Set(candidates.map((c) => c.id)));
+      const answer = await askModel(apiKey, model, feature, payload);
+      const output = validate(feature, answer.raw, new Set(candidates.map((c) => c.id)));
       const { data: saved, error } = await db
         .from("dk_ai_insights")
-        .insert({ kitchen_id: kitchenId, feature_key: feature, status: "ok", input: payload as Record<string, unknown>, output, model })
+        .insert({
+          kitchen_id: kitchenId,
+          feature_key: feature,
+          status: "ok",
+          input: payload as Record<string, unknown>,
+          output,
+          model,
+          input_tokens: answer.inputTokens,
+          output_tokens: answer.outputTokens,
+          latency_ms: Date.now() - startedAt,
+        })
         .select()
         .single();
       if (error) return json({ error: error.message }, 403);
       return json({ insight: saved, cached: false });
     } catch (e) {
       const message = String(e instanceof Error ? e.message : e).slice(0, 500);
-      await db.from("dk_ai_insights").insert({ kitchen_id: kitchenId, feature_key: feature, status: "error", input: payload as Record<string, unknown>, model, error: message });
+      await db.from("dk_ai_insights").insert({
+        kitchen_id: kitchenId,
+        feature_key: feature,
+        status: "error",
+        input: payload as Record<string, unknown>,
+        model,
+        error: message,
+        latency_ms: Date.now() - startedAt,
+      });
       return json({ error: "AI_ERROR", message }, 502);
     }
   } catch (e) {

@@ -10,6 +10,7 @@ import clsx from 'clsx'
 import { RefreshCw, Sparkles, Workflow } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { FeatureStatusBadge, FeatureUnavailableNote } from '@/modules/settings/components/FeatureStatus'
 import { useLatestAiInsight, useRefreshAiInsight, useUpdateAiFeature } from '../hooks/useAi'
 import { retryLabel, settingError, withDefaults, type FeatureDefinition } from '../lib/catalog'
 import type { AiInsightFeatureKey, AiSettings } from '../types'
@@ -22,8 +23,8 @@ function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
   async function runNow() {
     const result = await refresh.mutateAsync()
     if (result.kind === 'ok') show(result.insight.status === 'empty' ? 'Análisis listo: no hay nada que señalar.' : `Análisis listo: ${result.insight.items.length} recomendaciones.`)
-    else if (result.kind === 'not_configured') show('La IA no está conectada: falta el secreto DK_ANTHROPIC_API_KEY.', 'error')
-    else if (result.kind === 'disabled') show('Activa la función y guarda antes de probarla.', 'error')
+    else if (result.kind === 'not_configured') show('La IA todavía no está conectada en la plataforma.', 'error')
+    else if (result.kind === 'disabled') show('Esta función no está activa en la cuenta.', 'error')
     else if (result.kind === 'rate_limited') show(`${result.message} Vuelve a intentarlo ${retryLabel(result.retryAfter)}.`, 'error')
     else show(result.message, 'error')
   }
@@ -43,47 +44,48 @@ function LastRun({ feature }: { feature: AiInsightFeatureKey }) {
 }
 
 /**
- * Tarjeta de una función de IA en la Cuenta: interruptor, umbrales y
- * frecuencia. La edición es local hasta "Guardar" (mismo patrón derivado que
- * el resto de formularios de configuración: sin efecto de sincronización).
- * Si la organización no la ofrece, no se puede activar (ADR 0009); lo que la
- * Cuenta tenía guardado se conserva.
+ * An AI feature in the account (ADR 0014): status (activated by the
+ * organization), thresholds and frequency. The account tunes them only when
+ * the feature is active and the organization allows it; editing is local
+ * until "Guardar". Settings the organization chose are the starting point.
  */
 export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
   const { feature } = useActiveKitchen()
   const state = feature(definition.key)
-  const available = state?.available ?? false
-  const canManage = state?.canManage ?? false
-  const saved = { enabled: state?.enabled ?? false, settings: withDefaults(definition.key, state?.settings) }
+  const editable = Boolean(state?.canConfigure && state.usable)
+  const saved = withDefaults(definition.key, state?.settings)
+  const inherited = withDefaults(definition.key, state?.inheritedSettings)
+  const customized = definition.fields.some((f) => saved[f.key] !== inherited[f.key])
   const update = useUpdateAiFeature()
   const { show } = useToast()
 
-  const [edited, setEdited] = useState<{ enabled: boolean; settings: AiSettings } | null>(null)
-  const form = edited ?? { enabled: saved.enabled, settings: saved.settings }
-  const errors = Object.fromEntries(definition.fields.map((f) => [f.key, settingError(f, form.settings[f.key])]))
+  const [edited, setEdited] = useState<AiSettings | null>(null)
+  const form = edited ?? saved
+  const errors = Object.fromEntries(definition.fields.map((f) => [f.key, settingError(f, form[f.key])]))
   const hasErrors = Object.values(errors).some(Boolean)
 
   function setSetting(key: string, value: number | boolean) {
-    setEdited({ ...form, settings: { ...form.settings, [key]: value } })
+    setEdited({ ...form, [key]: value })
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (hasErrors) return
+  async function save(settings: AiSettings) {
     try {
-      await update.mutateAsync({ key: definition.key, enabled: form.enabled, settings: form.settings })
-      show(`${definition.title}: ${form.enabled ? 'activada' : 'desactivada'}.`)
+      await update.mutateAsync({ key: definition.key, settings })
+      show(Object.keys(settings).length === 0 ? `${definition.title}: vuelve a los valores de la organización.` : `${definition.title}: guardado.`)
       setEdited(null)
     } catch (err) {
       show(getErrorMessage(err, 'No se pudo guardar la configuración'), 'error')
     }
   }
 
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (hasErrors || !edited) return
+    await save(edited)
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', form.enabled && available ? 'border-brasa-500/30' : 'border-neutral-800/60')}
-    >
+    <form onSubmit={handleSubmit} className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', state?.usable ? 'border-brasa-500/30' : 'border-neutral-800/60')}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -99,68 +101,75 @@ export function FeatureCard({ definition }: { definition: FeatureDefinition }) {
             )}
           </div>
           <p className={clsx('mt-1', typography.caption)}>{definition.description}</p>
-          {!available && (
-            <p className="mt-2 text-xs text-amber-300">
-              {state && !state.includedInPlan ? 'Tu plan no incluye esta función' : 'Tu organización no tiene disponible esta función'}{saved.enabled ? ': queda apagada, con su configuración guardada.' : '.'}
-            </p>
+          {state && <FeatureUnavailableNote state={state} className="mt-2" />}
+          {state?.usable && !state.canConfigure && (
+            <p className="mt-2 text-xs text-neutral-500">{state.accountOverride ? 'Tu rol no puede cambiar estos umbrales.' : 'Tu organización define estos umbrales para todas sus cuentas.'}</p>
           )}
         </div>
-        <span className={clsx('shrink-0', !available && 'opacity-50')}>
-          <Switch
-            checked={form.enabled}
-            onChange={(enabled) => setEdited({ ...form, enabled })}
-            label={`Activar ${definition.title}`}
-            disabled={!canManage || (!available && !form.enabled)}
-          />
-        </span>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        {definition.fields.map((field) =>
-          field.type === 'boolean' ? (
-            <label key={field.key} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 px-3 py-2.5 text-sm text-neutral-300">
-              {field.label}
-              <Switch checked={form.settings[field.key] === true} onChange={(v) => setSetting(field.key, v)} label={field.label} />
-            </label>
-          ) : (
-            <div key={field.key}>
-              <label className="block text-xs text-neutral-400" htmlFor={`${definition.key}-${field.key}`}>
-                {field.label}
-              </label>
-              <div className="mt-1 flex items-center gap-2">
-                <Input
-                  id={`${definition.key}-${field.key}`}
-                  type="number"
-                  inputMode="numeric"
-                  min={field.min}
-                  max={field.max}
-                  value={String(form.settings[field.key])}
-                  onChange={(e) => setSetting(field.key, e.target.value === '' ? Number.NaN : Number(e.target.value))}
-                  aria-invalid={errors[field.key] ? true : undefined}
-                  className="!mt-0 w-28"
-                />
-                {field.unit && <span className="text-xs text-neutral-500">{field.unit}</span>}
-              </div>
-              {errors[field.key] ? (
-                <p role="alert" className="mt-1 text-xs text-red-400">
-                  {errors[field.key]}
-                </p>
-              ) : (
-                field.hint && <p className={clsx('mt-1', typography.caption)}>{field.hint}</p>
-              )}
-            </div>
-          ),
+        {state && (
+          <span className="shrink-0">
+            <FeatureStatusBadge state={state} />
+          </span>
         )}
       </div>
 
-      {edited && (
-        <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setEdited(null)} disabled={update.isPending}>
-            Descartar
-          </Button>
-          <Button type="submit" variant="primary" size="sm" loading={update.isPending} disabled={hasErrors}>
-            Guardar
-          </Button>
+      {state?.usable && (
+        <fieldset disabled={!editable || update.isPending} className="grid gap-3 sm:grid-cols-2">
+          {definition.fields.map((field) =>
+            field.type === 'boolean' ? (
+              <label key={field.key} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 px-3 py-2.5 text-sm text-neutral-300">
+                {field.label}
+                <Switch checked={form[field.key] === true} onChange={(v) => setSetting(field.key, v)} label={field.label} disabled={!editable} />
+              </label>
+            ) : (
+              <div key={field.key}>
+                <label className="block text-xs text-neutral-400" htmlFor={`${definition.key}-${field.key}`}>
+                  {field.label}
+                </label>
+                <div className="mt-1 flex items-center gap-2">
+                  <Input
+                    id={`${definition.key}-${field.key}`}
+                    type="number"
+                    inputMode="numeric"
+                    min={field.min}
+                    max={field.max}
+                    value={String(form[field.key])}
+                    onChange={(e) => setSetting(field.key, e.target.value === '' ? Number.NaN : Number(e.target.value))}
+                    aria-invalid={errors[field.key] ? true : undefined}
+                    className="!mt-0 w-28"
+                  />
+                  {field.unit && <span className="text-xs text-neutral-500">{field.unit}</span>}
+                </div>
+                {errors[field.key] ? (
+                  <p role="alert" className="mt-1 text-xs text-red-400">
+                    {errors[field.key]}
+                  </p>
+                ) : (
+                  field.hint && <p className={clsx('mt-1', typography.caption)}>{field.hint}</p>
+                )}
+              </div>
+            ),
+          )}
+        </fieldset>
+      )}
+
+      {editable && (edited || customized) && (
+        <div className="flex flex-wrap justify-end gap-2">
+          {!edited && customized && (
+            <Button variant="ghost" size="sm" onClick={() => void save({})} loading={update.isPending}>
+              Usar los valores de la organización
+            </Button>
+          )}
+          {edited && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setEdited(null)} disabled={update.isPending}>
+                Descartar
+              </Button>
+              <Button type="submit" variant="primary" size="sm" loading={update.isPending} disabled={hasErrors}>
+                Guardar
+              </Button>
+            </>
+          )}
         </div>
       )}
 

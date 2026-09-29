@@ -35,21 +35,32 @@ insert into _t (area, test, expected, got) values ('Planes', 'Tope diario en el 
 delete from dk_ai_insights where kitchen_id = (select id from _ctx where key = 'A');
 
 -- 1. Rangos de parámetros
+-- ADR 0014: activar es de la organización; aquí se activa como dueño de la base
+-- y el ADMIN de la Cuenta solo ajusta los parámetros.
+select pg_temp.as_owner();
+do $$
+declare v_key text;
+begin
+  foreach v_key in array array['supply_reorder', 'supply_perishables', 'supply_slow_movers'] loop
+    update dk_kitchen_features set enabled = true where kitchen_id = (select id from _ctx where key = 'A') and feature_key = v_key;
+    if not found then
+      insert into dk_kitchen_features (kitchen_id, feature_key, enabled) values ((select id from _ctx where key = 'A'), v_key, true);
+    end if;
+  end loop;
+end $$;
 select pg_temp.act_as('00000000-0000-0000-0000-0000000a1a01', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"frequency_min": 0}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"frequency_min": 0}');
     insert into _t (area, test, expected, got) values ('Rangos', 'Frecuencia 0 (anularía la caché)', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Rangos', 'Frecuencia 0 (anularía la caché)', 'bloqueado', 'bloqueado', sqlerrm); end;
-  begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"frequency_min": -30}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"frequency_min": -30}');
     insert into _t (area, test, expected, got) values ('Rangos', 'Frecuencia negativa', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Rangos', 'Frecuencia negativa', 'bloqueado', 'bloqueado', sqlerrm); end;
-  begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"coverage_days": 91}');
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 91}');
     insert into _t (area, test, expected, got) values ('Rangos', 'Cobertura sobre el máximo', 'bloqueado', 'PERMITIDO');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Rangos', 'Cobertura sobre el máximo', 'bloqueado', 'bloqueado', sqlerrm); end;
-  perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true, '{"frequency_min": 5, "coverage_days": 90}');
-  perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_perishables', true);
-  perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_slow_movers', true);
+  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"frequency_min": 5, "coverage_days": 90}');
   insert into _t (area, test, expected, got) values ('Rangos', 'Valores en los bordes del rango', '5 · 90',
     (select (settings ->> 'frequency_min') || ' · ' || (settings ->> 'coverage_days') from dk_kitchen_features
      where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'supply_reorder'));

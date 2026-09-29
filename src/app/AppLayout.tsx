@@ -64,7 +64,7 @@ export function AppLayout() {
                     'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
                     active
                       ? 'bg-brasa-500/10 text-brasa-400'
-                      : clsx('text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100', item.highlight && 'ring-1 ring-inset ring-brasa-500/30'),
+                      : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
                   )}
                 >
                   <Icon size={19} strokeWidth={2} aria-hidden />

@@ -14,6 +14,7 @@ import { OrgBillingPage } from '@/modules/orgAdmin/pages/OrgBillingPage'
 import { OrgMasterMenusPage } from '@/modules/orgAdmin/pages/OrgMasterMenusPage'
 import { OrgObservabilityPage } from '@/modules/orgAdmin/pages/OrgObservabilityPage'
 import { OrgOverviewPage } from '@/modules/orgAdmin/pages/OrgOverviewPage'
+import { OrgAiPage } from '@/modules/orgAdmin/pages/OrgAiPage'
 import { OrgSettingsPage } from '@/modules/orgAdmin/pages/OrgSettingsPage'
 import { OrgTeamPage } from '@/modules/orgAdmin/pages/OrgTeamPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
@@ -129,6 +130,7 @@ export const router = createBrowserRouter([
           { path: 'observabilidad', element: <OrgObservabilityPage /> },
           { path: 'equipos', element: <OrgTeamPage /> },
           { path: 'facturacion', element: <OrgBillingPage /> },
+          { path: 'ai', element: <OrgAiPage /> },
           { path: 'configuracion', element: <OrgSettingsPage /> },
           { path: 'menus-maestros', element: <OrgMasterMenusPage /> },
           { path: '*', element: <Navigate to=".." replace /> },

@@ -6,9 +6,10 @@ import type { Json } from '@/types/database'
  * (dk_features); estas claves son las que la app conoce. La base decide si
  * una función se puede usar:
  *
- *   usable = la organización la ofrece ∧ la Cuenta la activó ∧ el rol activo tiene el permiso
+ *   usable = platform.active ∧ plan ∧ organization offers ∧ account enabled ∧ use permission
  *
- * (ADR 0010: el plan es el primer techo: plan ∧ organización ∧ Cuenta ∧ permiso.)
+ * (ADR 0014: the platform switch comes first; activating per account is an
+ * organization decision; accounts only tune the settings they are allowed to.)
  * La app solo lee ese resultado (dk_my_features): ningún componente decide
  * por su cuenta.
  */
@@ -24,7 +25,8 @@ export const FEATURE_KEYS = [
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number]
 export type FeatureCategory = 'ai' | 'voice' | 'general'
-export type FeatureSettings = Record<string, number | boolean>
+export type FeatureSettings = Record<string, number | boolean | string>
+export type UnavailableReason = 'platform' | 'plan' | 'organization' | 'account' | 'permission'
 
 export const FEATURE_CATEGORY_LABEL: Record<FeatureCategory, string> = {
   ai: 'Inteligencia artificial',
@@ -39,6 +41,8 @@ export interface FeatureState {
   label: string
   description: string
   usesModel: boolean
+  /** Platform-wide switch (ADR 0014). */
+  platformActive: boolean
   /** ¿El plan de la organización la incluye? (ADR 0010) */
   includedInPlan: boolean
   /** ¿Se ofrece? (plan ∧ organización) */
@@ -47,10 +51,17 @@ export interface FeatureState {
   enabled: boolean
   /** Resultado final: organización ∧ Cuenta ∧ permiso del rol activo. */
   usable: boolean
-  /** ¿Quien consulta puede activarla/desactivarla en esta Cuenta? */
+  /** Can the caller activate/deactivate it in this account? (organization only, ADR 0014) */
   canManage: boolean
-  /** Parámetros: los del catálogo completados con los de la Cuenta. */
+  /** Can the caller change its operational settings here? */
+  canConfigure: boolean
+  /** Does the organization let each account customize it? */
+  accountOverride: boolean
+  /** Effective settings: platform ← organization ← account (if allowed). */
   settings: FeatureSettings
+  /** Platform ← organization, without the account layer. */
+  inheritedSettings: FeatureSettings
+  dependsOn: FeatureKey[]
   updatedAt: string | null
 }
 
@@ -70,6 +81,18 @@ export async function setKitchenFeature(kitchenId: string, key: FeatureKey, enab
   if (error) throw error
 }
 
+/** Operational settings of an account (no activation). `{}` = back to the inherited values. */
+export async function setKitchenFeatureSettings(kitchenId: string, key: FeatureKey, settings: FeatureSettings): Promise<void> {
+  const { error } = await supabase.rpc('dk_set_kitchen_feature_settings', { p_kitchen_id: kitchenId, p_key: key, p_settings: settings as Json })
+  if (error) throw error
+}
+
+/** Organization defaults of a feature and whether each account may customize it. */
+export async function setOrganizationFeatureSettings(organizationId: string, key: FeatureKey, settings: FeatureSettings & { allow_account_override?: boolean }): Promise<void> {
+  const { error } = await supabase.rpc('dk_set_org_feature_settings', { p_organization_id: organizationId, p_key: key, p_settings: settings as Json })
+  if (error) throw error
+}
+
 export async function setOrganizationFeature(organizationId: string, key: FeatureKey, available: boolean): Promise<void> {
   const { error } = await supabase.rpc('dk_set_org_feature', { p_organization_id: organizationId, p_key: key, p_available: available })
   if (error) throw error
@@ -84,12 +107,27 @@ export interface FeatureMatrix {
     label: string
     description: string
     usesModel: boolean
+    platformActive: boolean
     includedInPlan: boolean
     /** Plan más económico que la incluye ("Incluida en Business"). */
     minPlan: string | null
     available: boolean
+    accountOverride: boolean
+    /** Platform ← organization settings. */
+    settings: FeatureSettings
+    platformSettings: FeatureSettings
+    dependsOn: FeatureKey[]
   }[]
-  accounts: { id: string; name: string; slug: string; iconKey: string | null; active: boolean; enabled: Record<FeatureKey, boolean> }[]
+  accounts: {
+    id: string
+    name: string
+    slug: string
+    iconKey: string | null
+    active: boolean
+    enabled: Record<FeatureKey, boolean>
+    /** Features whose settings this account customized. */
+    customized: FeatureKey[]
+  }[]
 }
 
 export async function fetchFeatureMatrix(organizationId: string): Promise<FeatureMatrix> {
@@ -116,11 +154,21 @@ export function featureLookup(features: readonly FeatureState[] | undefined): Fe
 }
 
 /** Por qué una función no se puede usar (para explicarlo en pantalla). */
-export function unavailableReason(state: FeatureState | null): 'plan' | 'organization' | 'account' | 'permission' | null {
+export function unavailableReason(state: FeatureState | null): UnavailableReason | null {
   if (!state) return 'organization'
+  if (!state.platformActive) return 'platform'
   if (!state.includedInPlan) return 'plan'
   if (!state.available) return 'organization'
   if (!state.enabled) return 'account'
   if (!state.usable) return 'permission'
   return null
+}
+
+/** Why a feature is off, in plain language (who can turn it on). */
+export const UNAVAILABLE_MESSAGE: Record<UnavailableReason, string> = {
+  platform: 'La plataforma tiene apagada esta función por ahora.',
+  plan: 'Tu plan no incluye esta función.',
+  organization: 'Tu organización no ofrece esta función.',
+  account: 'No está activa en esta cuenta. La activa el SUPER_ADMIN de la organización.',
+  permission: 'Tu rol activo no puede usar esta función.',
 }

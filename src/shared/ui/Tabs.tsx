@@ -44,7 +44,8 @@ export function Tabs<T extends string>({
     <div
       role="tablist"
       onKeyDown={handleKeyDown}
-      className="inline-flex items-center gap-1 rounded-full border border-neutral-800/60 bg-neutral-900/60 p-1"
+      // On narrow screens the tabs scroll inside their own width instead of widening the page.
+      className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-neutral-800/60 bg-neutral-900/60 p-1 [scrollbar-width:none]"
     >
       {items.map((item) => {
         const Icon = item.icon
@@ -60,7 +61,7 @@ export function Tabs<T extends string>({
             aria-selected={active}
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(item.value)}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
+            className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
               active ? 'bg-brasa-500 text-white' : 'text-neutral-400 hover:text-neutral-200'
             }`}
           >

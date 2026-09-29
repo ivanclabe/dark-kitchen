@@ -1,4 +1,4 @@
-import { setKitchenFeature } from '@/shared/features/features'
+import { setKitchenFeatureSettings } from '@/shared/features/features'
 import { FEATURES_KEY, useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAiConnectionStatus, getKitchenSignals, getLatestInsight, listInventorySignals, requestInsight } from '../api/ai'
@@ -20,12 +20,12 @@ export function useAiFeature(key: AiFeatureKey): { enabled: boolean; settings: A
   return { enabled: state?.usable ?? false, settings: withDefaults(key, state?.settings), loaded: features.length > 0 }
 }
 
-/** Activar/desactivar y ajustar una función en la Cuenta activa (la base valida organización y permiso). */
+/** Operational settings of a feature in the active account (ADR 0014: no activation here; the database checks organization and permission). */
 export function useUpdateAiFeature() {
   const queryClient = useQueryClient()
   const { kitchen } = useActiveKitchen()
   return useMutation({
-    mutationFn: ({ key, enabled, settings }: { key: AiFeatureKey; enabled: boolean; settings: AiSettings }) => setKitchenFeature(kitchen.id, key, enabled, settings),
+    mutationFn: ({ key, settings }: { key: AiFeatureKey; settings: AiSettings }) => setKitchenFeatureSettings(kitchen.id, key, settings),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
       void queryClient.invalidateQueries({ queryKey: INSIGHT_KEY })

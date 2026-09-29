@@ -62,13 +62,21 @@ describe('currentStalls', () => {
 })
 
 describe('dueStallAnnouncement', () => {
-  const a = { key: 'a', orderId: 'o1', orderNumber: 1, message: 'Pedido 1 lleva 20 minutos en cola', short: '' }
-  const b = { key: 'b', orderId: 'o2', orderNumber: 2, message: 'Pedido 2 lleva 25 minutos en cola', short: '' }
+  const stall = (key: string, orderNumber: number, minutes: number, product: string | null = null) => ({
+    key,
+    orderId: `o${orderNumber}`,
+    orderNumber,
+    message: '',
+    short: '',
+    speech: { orderNumber: String(orderNumber), product, minutes, statusPhrase: 'en cola' },
+  })
+  const a = stall('a', 1, 20)
+  const b = stall('b', 2, 25)
   const T = 1_000_000
 
-  it('avisa lo nuevo y lo registra', () => {
+  it('avisa lo nuevo, corto y sin palabras de más, y lo registra', () => {
     const result = dueStallAnnouncement([a], new Map(), T, 5)
-    expect(result.text).toBe('Atención. Pedido 1 lleva 20 minutos en cola.')
+    expect(result.text).toBe('Pedido 1: 20 minutos en cola.')
     expect(result.next.get('a')).toBe(T)
   })
 
@@ -84,9 +92,13 @@ describe('dueStallAnnouncement', () => {
     expect(result.next.has('b')).toBe(true)
   })
 
-  it('resume cuando hay más de tres avisos a la vez', () => {
-    const many = [1, 2, 3, 4, 5].map((n) => ({ key: `k${n}`, orderId: `o${n}`, orderNumber: n, message: `Pedido ${n} detenido`, short: '' }))
-    const { text } = dueStallAnnouncement(many, new Map(), T, 5)
-    expect(text).toBe('Atención. Pedido 1 detenido. Pedido 2 detenido. Pedido 3 detenido. Y 2 avisos más en el tablero.')
+  it('con varios pedidos dice cuántos y el más antiguo', () => {
+    const many = [stall('k1', 1, 12), stall('k2', 2, 18, 'Hamburguesa doble'), stall('k3', 3, 9)]
+    expect(dueStallAnnouncement(many, new Map(), T, 5).text).toBe('Tres pedidos detenidos. El más antiguo, 2: Hamburguesa doble, 18 minutos en cola.')
+  })
+
+  it('estilo mínimo: solo lo esencial', () => {
+    expect(dueStallAnnouncement([a], new Map(), T, 5, 'minimal').text).toBe('1, 20 minutos.')
+    expect(dueStallAnnouncement([a, b], new Map(), T, 5, 'minimal').text).toBe('2 detenidos. 2, 25 minutos.')
   })
 })

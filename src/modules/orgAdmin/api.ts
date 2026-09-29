@@ -204,3 +204,20 @@ export async function fetchInvoices(organizationId: string): Promise<Invoice[]> 
 export async function logSignIn(): Promise<void> {
   await supabase.rpc('dk_log_sign_in')
 }
+
+// ---------------------------------------------------------------------------
+// AI usage of the organization (ADR 0014; no costs: those are the platform's)
+// ---------------------------------------------------------------------------
+export interface OrgAiUsage {
+  days: number
+  dailyLimit: number
+  totals: { runs: number; errors: number; runs24h: number }
+  byFeature: { key: string; label: string | null; runs: number; errors: number }[]
+  byAccount: { id: string; name: string; iconKey: string | null; runs: number; errors: number; runs24h: number }[]
+}
+
+export async function fetchOrgAiUsage(organizationId: string, days = 30): Promise<OrgAiUsage> {
+  const { data, error } = await supabase.rpc('dk_org_ai_usage', { p_organization_id: organizationId, p_days: days })
+  if (error) throw error
+  return data as unknown as OrgAiUsage
+}

@@ -142,6 +142,19 @@ erDiagram
 - `dk_kitchen_features` — qué funciones activa cada Cuenta y sus parámetros (antes `dk_ai_features`; la vista de compatibilidad se retiró en ADR 0011)
 - `dk_ai_insights` — análisis de IA (append-only), por Cuenta y función
 
+### IA y voz (ADR 0014)
+- `dk_features` — catálogo de funciones (IA y voz):
+  - `active` = interruptor global de la plataforma;
+  - `model_key` (FK `dk_ai_models`);
+  - `min_interval_seconds` (intervalo propio; nulo = el del plan);
+  - `depends_on`;
+  - `default_settings` y `settings_schema` (tipos number/boolean/string con rangos, `enum` o `ref: voice_profile`).
+- `dk_ai_models` — modelos permitidos (`provider`, `label`, precios USD por millón de tokens, solo para estimar; nulos = sin estimación). Solo la plataforma.
+- `dk_voice_profiles` — catálogo de voces de cocina (Sofía, Laura, Daniel, Mateo, Alex): `gender`, `default_style`, `pitch`, `lang`, `provider = device`, `device_voice_hints`. Lectura: autenticados (solo activas); escritura: plataforma por RPC.
+- `dk_organization_features.settings` — valores por defecto de la organización y `allow_account_override`.
+- `dk_kitchen_features.settings` — parámetros de la Cuenta. En `voice_speech` guarda la voz de la Cuenta (`profile`, `style`, `rate`, `volume`, `lang`); no hay tabla de voz aparte.
+- `dk_ai_insights` — agrega `input_tokens`, `output_tokens` y `latency_ms` (desde el ADR 0014).
+
 ### Planes y suscripciones (ADR 0010)
 - `dk_plans` — catálogo de planes (precio mensual/anual, prueba, límites `{accounts, users, ai_runs_per_day}`, viñetas, CTA, estado, orden). Lectura pública
 - `dk_plan_features` — funciones (`dk_features`) incluidas en cada plan. Lectura pública
@@ -253,4 +266,10 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
   - `dk_log_sign_in()` → registra el inicio de sesión, como mucho uno por minuto.
   - `dk_my_subscription(org)` y `dk_org_users(org)` → la primera exige `billing.view`; la segunda agrega incorporación y última actividad.
   - Auxiliares de zona horaria: `dk_kitchen_tz`, `dk_local_start`, `dk_local_date`. `dk_dashboard_summary` y los `dk_report_*` calculan "hoy" en la zona de la Cuenta.
+- **IA y voz (ADR 0014):**
+  - `dk_platform_ai_overview()`, `dk_platform_set_feature(key, active, model, interval, defaults)`, `dk_platform_set_model(…)`, `dk_platform_set_plan_ai_limits(plan, runs, interval)`, `dk_platform_set_voice_profile(…)` y `dk_platform_ai_usage(days)`: solo plataforma.
+  - `dk_set_kitchen_feature` (activación, solo organización o plataforma) y `dk_set_kitchen_feature_settings` (parámetros de la Cuenta).
+  - `dk_set_org_feature_settings` (valores y política de la organización).
+  - `dk_org_ai_usage(org, days)`.
+  - `dk_ai_run_allowed` devuelve además el modelo.
 - ~~`dk_current_role()`~~ → retirada en la Fase 6 de multi-cocina. Hoy las políticas usan `dk_current_kitchen_id()` y `dk_can('módulo.acción')` con el rol activo (ver [ADR 0008](./adr/0008-organizaciones-y-cuentas.md)).

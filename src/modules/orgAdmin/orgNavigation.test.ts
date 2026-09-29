@@ -13,7 +13,7 @@ describe('centro de administración (ADR 0012)', () => {
   })
 
   it('el SUPER_ADMIN ve todas las secciones; empieza en el Resumen', () => {
-    expect(visibleOrgNav(can(ALL)).map((i) => i.label)).toEqual(['Resumen', 'Cuentas', 'Observabilidad', 'Equipos', 'Facturación', 'Configuración', 'Menús maestros'])
+    expect(visibleOrgNav(can(ALL)).map((i) => i.label)).toEqual(['Resumen', 'Cuentas', 'Observabilidad', 'Equipos', 'Facturación', 'IA y voz', 'Configuración', 'Menús maestros'])
     expect(orgHomeSection(can(ALL))).toBe('/')
   })
 
@@ -29,5 +29,13 @@ describe('centro de administración (ADR 0012)', () => {
   it('arma las rutas del centro', () => {
     expect(orgPath('grupo-xyz')).toBe('/o/grupo-xyz')
     expect(orgPath('grupo-xyz', '/equipos')).toBe('/o/grupo-xyz/equipos')
+  })
+})
+
+describe('IA y voz (ADR 0014)', () => {
+  it('solo con features.manage; Configuración queda para los datos del negocio', () => {
+    expect(visibleOrgNav(can(['features.manage'])).map((i) => i.to)).toEqual(['/ai'])
+    expect(visibleOrgNav(can(['organization.manage'])).map((i) => i.to)).toEqual(['/configuracion'])
+    expect(isOrgSectionAllowed('/ai', can(['organization.manage']))).toBe(false)
   })
 })

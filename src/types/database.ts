@@ -22,9 +22,12 @@ export type Database = {
           feature_key: string
           id: string
           input: Json
+          input_tokens: number | null
           kitchen_id: string
+          latency_ms: number | null
           model: string | null
           output: Json | null
+          output_tokens: number | null
           status: string
         }
         Insert: {
@@ -34,9 +37,12 @@ export type Database = {
           feature_key: string
           id?: string
           input: Json
+          input_tokens?: number | null
           kitchen_id?: string
+          latency_ms?: number | null
           model?: string | null
           output?: Json | null
+          output_tokens?: number | null
           status: string
         }
         Update: {
@@ -46,9 +52,12 @@ export type Database = {
           feature_key?: string
           id?: string
           input?: Json
+          input_tokens?: number | null
           kitchen_id?: string
+          latency_ms?: number | null
           model?: string | null
           output?: Json | null
+          output_tokens?: number | null
           status?: string
         }
         Relationships: [
@@ -71,6 +80,53 @@ export type Database = {
             columns: ["kitchen_id"]
             isOneToOne: false
             referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_ai_models: {
+        Row: {
+          active: boolean
+          created_at: string
+          input_price_per_mtok: number | null
+          key: string
+          label: string
+          output_price_per_mtok: number | null
+          provider: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          input_price_per_mtok?: number | null
+          key: string
+          label: string
+          output_price_per_mtok?: number | null
+          provider: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          input_price_per_mtok?: number | null
+          key?: string
+          label?: string
+          output_price_per_mtok?: number | null
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ai_models_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
             referencedColumns: ["id"]
           },
         ]
@@ -422,10 +478,13 @@ export type Database = {
           default_available: boolean
           default_enabled: boolean
           default_settings: Json
+          depends_on: string[]
           description: string
           key: string
           label: string
           manage_permission: string
+          min_interval_seconds: number | null
+          model_key: string | null
           settings_schema: Json
           sort_order: number
           use_permission: string
@@ -437,10 +496,13 @@ export type Database = {
           default_available?: boolean
           default_enabled?: boolean
           default_settings?: Json
+          depends_on?: string[]
           description: string
           key: string
           label: string
           manage_permission: string
+          min_interval_seconds?: number | null
+          model_key?: string | null
           settings_schema?: Json
           sort_order: number
           use_permission: string
@@ -452,10 +514,13 @@ export type Database = {
           default_available?: boolean
           default_enabled?: boolean
           default_settings?: Json
+          depends_on?: string[]
           description?: string
           key?: string
           label?: string
           manage_permission?: string
+          min_interval_seconds?: number | null
+          model_key?: string | null
           settings_schema?: Json
           sort_order?: number
           use_permission?: string
@@ -467,6 +532,13 @@ export type Database = {
             columns: ["manage_permission"]
             isOneToOne: false
             referencedRelation: "dk_permissions"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_features_model_key_fkey"
+            columns: ["model_key"]
+            isOneToOne: false
+            referencedRelation: "dk_ai_models"
             referencedColumns: ["key"]
           },
           {
@@ -1949,6 +2021,7 @@ export type Database = {
           available: boolean
           feature_key: string
           organization_id: string
+          settings: Json
           updated_at: string
           updated_by: string | null
         }
@@ -1956,6 +2029,7 @@ export type Database = {
           available: boolean
           feature_key: string
           organization_id: string
+          settings?: Json
           updated_at?: string
           updated_by?: string | null
         }
@@ -1963,6 +2037,7 @@ export type Database = {
           available?: boolean
           feature_key?: string
           organization_id?: string
+          settings?: Json
           updated_at?: string
           updated_by?: string | null
         }
@@ -2968,6 +3043,65 @@ export type Database = {
           },
         ]
       }
+      dk_voice_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          default_style: string
+          description: string
+          device_voice_hints: string[]
+          gender: string
+          key: string
+          lang: string
+          name: string
+          pitch: number
+          provider: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          default_style: string
+          description?: string
+          device_voice_hints?: string[]
+          gender: string
+          key: string
+          lang?: string
+          name: string
+          pitch?: number
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          default_style?: string
+          description?: string
+          device_voice_hints?: string[]
+          gender?: string
+          key?: string
+          lang?: string
+          name?: string
+          pitch?: number
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_voice_profiles_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_weekly_menu_items: {
         Row: {
           created_at: string
@@ -3245,8 +3379,25 @@ export type Database = {
         Args: { p_key: string; p_organization_id: string }
         Returns: boolean
       }
+      dk_feature_clean_settings: {
+        Args: { p_key: string; p_settings: Json }
+        Returns: Json
+      }
+      dk_feature_config_issues: { Args: { p_key: string }; Returns: Json }
+      dk_feature_effective_settings: {
+        Args: { p_key: string; p_kitchen_id: string }
+        Returns: Json
+      }
       dk_feature_enabled: {
         Args: { p_key: string; p_kitchen_id: string }
+        Returns: boolean
+      }
+      dk_feature_inherited_settings: {
+        Args: { p_key: string; p_organization_id: string }
+        Returns: Json
+      }
+      dk_feature_override_allowed: {
+        Args: { p_key: string; p_organization_id: string }
         Returns: boolean
       }
       dk_feature_settings_error: {
@@ -3378,6 +3529,10 @@ export type Database = {
       }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
+      dk_org_ai_usage: {
+        Args: { p_days?: number; p_organization_id: string }
+        Returns: Json
+      }
       dk_org_events: {
         Args: {
           p_actor?: string
@@ -3409,6 +3564,50 @@ export type Database = {
       dk_plan_limit: {
         Args: { p_limit: string; p_organization_id: string }
         Returns: number
+      }
+      dk_platform_ai_overview: { Args: never; Returns: Json }
+      dk_platform_ai_usage: { Args: { p_days?: number }; Returns: Json }
+      dk_platform_set_feature: {
+        Args: {
+          p_active?: boolean
+          p_default_settings?: Json
+          p_key: string
+          p_min_interval_seconds?: number
+          p_model_key?: string
+        }
+        Returns: undefined
+      }
+      dk_platform_set_model: {
+        Args: {
+          p_active?: boolean
+          p_input_price_per_mtok?: number
+          p_key: string
+          p_label: string
+          p_output_price_per_mtok?: number
+        }
+        Returns: undefined
+      }
+      dk_platform_set_plan_ai_limits: {
+        Args: {
+          p_ai_min_interval_seconds?: number
+          p_ai_runs_per_day: number
+          p_plan_key: string
+        }
+        Returns: undefined
+      }
+      dk_platform_set_voice_profile: {
+        Args: {
+          p_active?: boolean
+          p_default_style: string
+          p_description?: string
+          p_device_voice_hints?: string[]
+          p_gender: string
+          p_key: string
+          p_lang?: string
+          p_name: string
+          p_pitch?: number
+        }
+        Returns: undefined
       }
       dk_purge_audit_log: { Args: { p_days?: number }; Returns: number }
       dk_register_adjustment: {
@@ -3501,6 +3700,7 @@ export type Database = {
         Args: { p_menu_id: string }
         Returns: undefined
       }
+      dk_require_platform_admin: { Args: never; Returns: undefined }
       dk_resend_activation: {
         Args: { p_organization_id: string; p_user_id: string }
         Returns: string
@@ -3542,6 +3742,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_set_kitchen_feature_settings: {
+        Args: { p_key: string; p_kitchen_id: string; p_settings: Json }
+        Returns: undefined
+      }
       dk_set_kitchens_active: {
         Args: { p_active: boolean; p_kitchen_ids: string[] }
         Returns: number
@@ -3561,6 +3765,10 @@ export type Database = {
       }
       dk_set_org_feature: {
         Args: { p_available: boolean; p_key: string; p_organization_id: string }
+        Returns: undefined
+      }
+      dk_set_org_feature_settings: {
+        Args: { p_key: string; p_organization_id: string; p_settings: Json }
         Returns: undefined
       }
       dk_set_org_member: {
