@@ -48,7 +48,10 @@ interface CreatePayload {
   confirmSimilar?: boolean;
 }
 
-type Body = { action: "create_organization"; payload: CreatePayload } | { action: "resend_invitation"; organizationId: string };
+type Body =
+  | { action: "create_organization"; payload: CreatePayload }
+  | { action: "resend_invitation"; organizationId: string }
+  | { action: "password_link"; userId: string };
 
 Deno.serve(async (req: Request) => {
   const cors = corsFor(req);
@@ -69,6 +72,17 @@ Deno.serve(async (req: Request) => {
     body = await req.json();
   } catch {
     return json({ error: "Solicitud inválida" }, 400);
+  }
+
+  if (body.action === "password_link") {
+    // "Enlace para crear contraseña": nothing is e-mailed; the portal shares it by hand.
+    const { data, error } = await asCaller.rpc("dk_ga_password_link_target", { p_user_id: body.userId });
+    if (error) return json({ error: error.message, code: error.code }, error.code === "42501" ? 403 : 400);
+    const t = data as { email: string; name: string; mode: "activation" | "reset"; token: string | null };
+    const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+    const link = t.mode === "activation" ? await accessLink(admin, t.email, t.name, `${APP_URL}/activar/${t.token}`) : await recoveryLink(admin, t.email);
+    if (!link) return json({ error: "No se pudo generar el enlace" }, 500);
+    return json({ email: t.email, name: t.name, mode: t.mode, link });
   }
 
   let organizationId: string;
@@ -167,4 +181,12 @@ async function accessLink(admin: any, email: string, name: string, activationUrl
   // They already have a login (invited before, or signed up): a sign-in link instead.
   const magic = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: activationUrl } });
   return magic.error ? null : withHash(magic.data?.properties?.hashed_token, "magiclink");
+}
+
+/** Set-a-new-password link for someone who already has a login; nothing is e-mailed. */
+// deno-lint-ignore no-explicit-any
+async function recoveryLink(admin: any, email: string): Promise<string | null> {
+  const { data, error } = await admin.auth.admin.generateLink({ type: "recovery", email });
+  const hash = data?.properties?.hashed_token;
+  return error || !hash ? null : `${APP_URL}/set-password?token_hash=${encodeURIComponent(hash)}&type=recovery`;
 }

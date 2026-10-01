@@ -1,5 +1,6 @@
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
+import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
 import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
 import { MenuPlannerPage } from '@/modules/menuPlanner/pages/MenuPlannerPage'
@@ -69,6 +70,8 @@ export const router = createBrowserRouter([
   // Precios (ADR 0010): enlace para compartir; la landing se ve con o sin sesión en /landing.
   { path: '/precios', element: <Navigate to={{ pathname: '/landing', hash: '#precios' }} replace /> },
   { path: '/login', element: <LoginPage /> },
+  // Link to create or change the password, shared from the Global Admin portal (ADR 0019).
+  { path: '/set-password', element: <SetPasswordPage /> },
   { path: '/signup-admin', element: <SignUpAdminPage /> },
   // El personal entra por invitación (ADR 0007, Fase 5): el autorregistro abierto ya no existe.
   { path: '/signup-staff', element: <Navigate to="/login" replace /> },

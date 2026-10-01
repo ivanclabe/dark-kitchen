@@ -206,6 +206,7 @@ El registro público sigue igual para quien lo usa.
 | Botón «Aún no tengo contraseña: envíame un enlace» en la activación | Si el enlace de invitación de Supabase vence (24 h) antes que el de activación (7 días), la persona no queda bloqueada |
 | `dist-admin` en `.gitignore` | Salida del build local del portal |
 | Si el correo falla, el enlace para copiar es un **enlace de acceso de un solo uso** (`generateLink`, no envía correo) que lleva a «Crea tu contraseña», en vez de `/activar/…` | Sin sesión, `/activar/…` pedía otro correo y chocaba con el límite de Supabase. Solo lo ve el Global Admin (rol + MFA) y el fallo queda auditado |
+| Botón **«Enlace para crear contraseña»** (detalle de organización, su pestaña Usuarios y ficha en Users): `dk_ga_password_link_target` decide activación (`/activar/{token}`) o cambio (`/set-password`, página nueva en Quanela); se copia o se comparte por WhatsApp, sin correo | Pedido del usuario: compartir el enlace a mano mientras no hay SMTP. No aplica a Global Admins ni a usuarios desactivados; cada enlace nuevo invalida el anterior y queda auditado (`global_admin.password_link_created`) |
 
 ### 11.3 Validación de los 20 puntos
 | # | Punto | Estado | Cómo se comprobó |

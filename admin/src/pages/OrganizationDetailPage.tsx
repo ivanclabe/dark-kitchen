@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Activity, Building2, Copy, Mail, Power, Settings2, Sparkles, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
+import { PasswordLinkButton } from '../components/PasswordLinkButton'
 import { ActivityFeed, ConfirmByName, Metric, PageTitle, Panel, StatusPill } from '../components/ui'
 import { fetchOrganization, resendInvitation, setOrganizationActive, type OrganizationDetail } from '../lib/api'
 import { featureLabel } from '../lib/features'
@@ -79,6 +80,7 @@ export function OrganizationDetailPage() {
         description={`Creada el ${formatShortDate(org.createdAt)} · ${org.plan.name ?? 'sin plan'}${org.plan.status === 'trialing' ? ` (prueba hasta ${formatShortDate(org.plan.trialEndsAt)})` : ''}`}
         actions={
           <>
+            {org.admin.id && <PasswordLinkButton userId={org.admin.id} />}
             {!org.admin.activated && (
               <Button variant="secondary" icon={Mail} onClick={() => resend.mutate()} loading={resend.isPending}>
                 Reenviar invitación
@@ -208,6 +210,7 @@ function UsersTab({ org }: { org: OrganizationDetail }) {
               </span>
             </span>
             <span className="text-xs text-neutral-500">{u.lastSignInAt ? `Último ingreso ${timeAgo(u.lastSignInAt).toLowerCase()}` : 'Nunca ingresó'}</span>
+            {u.activeProfile && <PasswordLinkButton userId={u.id} variant="ghost" size="sm" />}
             <StatusPill tone={u.status === 'active' && u.activeProfile ? 'good' : 'warn'}>{!u.activeProfile ? 'Desactivado' : u.status === 'active' ? 'Activo' : 'Pendiente'}</StatusPill>
           </li>
         ))}

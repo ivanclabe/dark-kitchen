@@ -234,3 +234,14 @@ export async function fetchPlans(): Promise<PlanOption[]> {
   if (error) throw error
   return (data ?? []).map((p) => ({ key: p.key, name: p.name, status: p.status, trialDays: p.trial_days }))
 }
+
+export interface PasswordLink {
+  email: string
+  name: string
+  /** activation: never activated (opens /activar); reset: already has a login (opens /set-password). */
+  mode: 'activation' | 'reset'
+  link: string
+}
+
+/** One-time link for the person to create their own password; nothing is e-mailed. */
+export const createPasswordLink = (userId: string) => invoke<PasswordLink>({ action: 'password_link', userId })

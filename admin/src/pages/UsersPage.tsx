@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Search, ShieldCheck, Users } from 'lucide-react'
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { PasswordLinkButton } from '../components/PasswordLinkButton'
 import { ActivityFeed, PageTitle, StatusPill } from '../components/ui'
 import { fetchUser, fetchUsers, type UserRow } from '../lib/api'
 import { featureLabel } from '../lib/features'
@@ -154,6 +155,7 @@ function UserDrawer({ id, onClose }: { id: string; onClose: () => void }) {
             <StatusPill tone={STATUS[u.status].tone}>{STATUS[u.status].label}</StatusPill>
             {u.globalAdmin && <StatusPill tone="brand">Global Admin</StatusPill>}
           </div>
+          {!u.globalAdmin && u.status !== 'disabled' && <PasswordLinkButton userId={u.id} />}
           <dl className="space-y-1.5">
             <div className="flex justify-between gap-4">
               <dt className="text-neutral-500">Creado</dt>

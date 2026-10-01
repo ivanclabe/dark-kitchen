@@ -3529,6 +3529,7 @@ export type Database = {
       }
       dk_ga_organizations: { Args: never; Returns: Json }
       dk_ga_overview: { Args: { p_from: string; p_to: string }; Returns: Json }
+      dk_ga_password_link_target: { Args: { p_user_id: string }; Returns: Json }
       dk_ga_resend_invitation: {
         Args: { p_organization_id: string }
         Returns: Json
