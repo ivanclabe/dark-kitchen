@@ -6,7 +6,7 @@ import type { TenantPublic, TenantStatus } from './resolve'
 /**
  * The tenant of this page (ADR 0021), resolved ONCE from the host by
  * TenantProvider. Every module asks here instead of deciding by itself:
- *   - mode 'tenant': {slug}.quanela.com — the organization, the person's
+ *   - mode 'tenant': {code}.quanela.com — the organization, the person's
  *     membership in it and its accounts;
  *   - mode 'root': quanela.com — no organization (landing, sign-up, list);
  *   - mode 'path': other hosts (previews) — the app works by path as before.
@@ -14,11 +14,11 @@ import type { TenantPublic, TenantStatus } from './resolve'
 export interface TenantValue {
   host: HostKind
   mode: HostKind['kind']
-  /** The subdomain (only in 'tenant' mode). */
-  slug: string | null
+  /** The organization's code from the subdomain (only in 'tenant' mode). */
+  code: string | null
   status: TenantStatus | 'loading' | 'error' | 'none'
   tenant: TenantPublic | null
-  organization: { id: string | null; slug: string; name: string } | null
+  organization: { id: string | null; code: string; name: string } | null
   membership: MyOrganization | null
   accounts: MyAccountRow[]
   retry: () => void

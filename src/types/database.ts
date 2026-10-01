@@ -2127,42 +2127,6 @@ export type Database = {
           },
         ]
       }
-      dk_organization_slug_aliases: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          organization_id: string
-          slug: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          organization_id: string
-          slug: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          organization_id?: string
-          slug?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dk_organization_slug_aliases_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "dk_users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dk_organization_slug_aliases_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "dk_organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dk_organizations: {
         Row: {
           active: boolean
@@ -2183,6 +2147,7 @@ export type Database = {
           sector: string | null
           slug: string
           tax_id: string | null
+          tenant_code: string
           updated_at: string
         }
         Insert: {
@@ -2204,6 +2169,7 @@ export type Database = {
           sector?: string | null
           slug: string
           tax_id?: string | null
+          tenant_code: string
           updated_at?: string
         }
         Update: {
@@ -2225,6 +2191,7 @@ export type Database = {
           sector?: string | null
           slug?: string
           tax_id?: string | null
+          tenant_code?: string
           updated_at?: string
         }
         Relationships: [
@@ -3749,10 +3716,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      dk_ga_set_organization_slug: {
-        Args: { p_organization_id: string; p_slug: string }
-        Returns: Json
-      }
       dk_ga_user_detail: { Args: { p_user_id: string }; Returns: Json }
       dk_ga_users: { Args: never; Returns: Json }
       dk_has_any_profile: { Args: never; Returns: boolean }
@@ -3876,6 +3839,7 @@ export type Database = {
         Args: { p_organization_id: string; p_user_id: string }
         Returns: string
       }
+      dk_new_tenant_code: { Args: never; Returns: string }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
       dk_order_search: {
@@ -4220,7 +4184,7 @@ export type Database = {
         Args: { p_kitchen_id: string; p_menu_id: string }
         Returns: undefined
       }
-      dk_tenant_public: { Args: { p_slug: string }; Returns: Json }
+      dk_tenant_public: { Args: { p_code: string }; Returns: Json }
       dk_today_day_of_week: {
         Args: never
         Returns: Database["public"]["Enums"]["dk_day_of_week"]

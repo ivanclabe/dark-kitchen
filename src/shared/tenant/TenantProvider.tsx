@@ -2,33 +2,34 @@ import { useAuth } from '@/shared/hooks/useAuth'
 import { useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, Building2, Flame, LogOut, SearchX } from 'lucide-react'
-import { useEffect, useMemo, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { currentHost, rootUrl, tenantHostLabel, tenantUrl } from './host'
 import { fetchTenantPublic, tenantAccess } from './resolve'
 import { TenantContext, useTenant, type TenantValue } from './tenantContext'
 
 /**
- * Resolves the tenant of the page ONCE (ADR 0021): host → organization
- * (public data) → the person's membership in it (dk_my_context). Mounted
- * above the router; the gate (TenantGate) decides what to show.
+ * Resolves the tenant of the page ONCE (ADR 0021/0022): host → organization
+ * by its code (public data) → the person's membership in it
+ * (dk_my_context). Mounted above the router; the gate (TenantGate) decides
+ * what to show.
  */
 export function TenantProvider({ children }: { children: ReactNode }) {
   const host = useMemo(() => currentHost(), [])
-  const slug = host.kind === 'tenant' ? host.slug : null
+  const code = host.kind === 'tenant' ? host.code : null
   const { session, profile, loading } = useAuth()
   const publicQuery = useQuery({
-    queryKey: ['tenant-public', slug],
-    queryFn: () => fetchTenantPublic(slug!),
-    enabled: Boolean(slug),
+    queryKey: ['tenant-public', code],
+    queryFn: () => fetchTenantPublic(code!),
+    enabled: Boolean(code),
     staleTime: 5 * 60_000,
     retry: 1,
   })
   const ctxQuery = useMyContext()
 
   const value = useMemo<TenantValue>(() => {
-    const base = { host, mode: host.kind, slug, tenant: publicQuery.data ?? null, organization: null, membership: null, accounts: [], retry: () => void publicQuery.refetch() }
-    if (!slug) return { ...base, status: 'none' }
+    const base = { host, mode: host.kind, code, tenant: publicQuery.data ?? null, organization: null, membership: null, accounts: [], retry: () => void publicQuery.refetch() }
+    if (!code) return { ...base, status: 'none' }
     if (publicQuery.isLoading || loading) return { ...base, status: 'loading' }
     if (publicQuery.isError || !publicQuery.data) return { ...base, status: 'error' }
     const tenant = publicQuery.data
@@ -38,11 +39,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     return {
       ...base,
       status: access.status,
-      organization: tenant.exists ? { id: access.membership?.id ?? null, slug: tenant.slug ?? slug, name: tenant.name ?? slug } : null,
+      organization: tenant.exists ? { id: access.membership?.id ?? null, code: tenant.code ?? code, name: tenant.name ?? code } : null,
       membership: access.membership,
       accounts: access.accounts,
     }
-  }, [host, slug, publicQuery, loading, session, profile?.active, ctxQuery.isLoading, ctxQuery.data])
+  }, [host, code, publicQuery, loading, session, profile?.active, ctxQuery.isLoading, ctxQuery.data])
 
   return <TenantContext value={value}>{children}</TenantContext>
 }
@@ -74,24 +75,17 @@ const linkClass = 'inline-flex items-center justify-center gap-1.5 rounded-full 
  */
 export function TenantGate() {
   const tenant = useTenant()
-  const { pathname, search } = useLocation()
+  const { pathname } = useLocation()
   const { signOut } = useAuth()
   const { data: ctx } = useMyContext()
   const open = OPEN_PATHS.some((p) => pathname === p || pathname.startsWith(p))
 
-  // A renamed subdomain goes to the current one, same path.
-  const redirect = tenant.status === 'redirect' && tenant.tenant?.redirectTo ? tenantUrl(tenant.tenant.redirectTo, `${pathname}${search}`) : null
-  useEffect(() => {
-    if (redirect) window.location.replace(redirect)
-  }, [redirect])
-
   if (tenant.mode !== 'tenant' || open) return <Outlet />
-  const label = tenant.slug ? tenantHostLabel(tenant.slug) : ''
+  const label = tenant.code ? tenantHostLabel(tenant.code) : ''
   const home = rootUrl('/') ?? '/'
 
   switch (tenant.status) {
     case 'loading':
-    case 'redirect':
       return <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-400">Cargando…</div>
     case 'error':
       return (
@@ -123,7 +117,7 @@ export function TenantGate() {
         </Screen>
       )
     case 'no_access': {
-      const others = (ctx?.organizations ?? []).filter((o) => o.status === 'active' && o.active && o.slug !== tenant.slug)
+      const others = (ctx?.organizations ?? []).filter((o) => o.status === 'active' && o.active && o.tenantCode !== tenant.code)
       return (
         <Screen icon={AlertTriangle} title={`No tienes acceso a ${tenant.organization?.name ?? label}`}>
           <p>Tu usuario no pertenece a esta organización, o tu acceso todavía no está activo. Pide a su administrador que te agregue al equipo.</p>
@@ -132,8 +126,8 @@ export function TenantGate() {
               <p className="text-neutral-300">Tus organizaciones:</p>
               <div className="flex flex-col items-center gap-2">
                 {others.map((o) => (
-                  <a key={o.id} href={tenantUrl(o.slug, '/') ?? '/'} className={linkClass}>
-                    <Flame size={14} className="text-brasa-400" aria-hidden /> {o.name}
+                  <a key={o.id} href={tenantUrl(o.tenantCode, '/') ?? '/'} className={linkClass}>
+                    <Flame size={14} className="text-brasa-400" aria-hidden /> {o.name} <span className="font-mono text-xs text-neutral-500">{o.tenantCode}</span>
                   </a>
                 ))}
               </div>

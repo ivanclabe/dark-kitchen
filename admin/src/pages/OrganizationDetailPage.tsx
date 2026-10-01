@@ -100,7 +100,7 @@ export function OrganizationDetailPage() {
         }
       />
 
-      <SubdomainBar organizationId={org.id} slug={org.slug} />
+      <SubdomainBar code={org.tenantCode} />
 
       {manualLink && (
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">

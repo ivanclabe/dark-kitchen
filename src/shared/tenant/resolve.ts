@@ -5,15 +5,14 @@ import { currentHost, type HostKind } from './host'
 /** What anyone may know about a subdomain (dk_tenant_public): nothing else is public. */
 export interface TenantPublic {
   exists: boolean
-  slug?: string
+  /** The organization's code (A7K92P). */
+  code?: string
   name?: string | null
   active?: boolean | null
-  /** The subdomain changed: go to this one. */
-  redirectTo?: string | null
 }
 
-export async function fetchTenantPublic(slug: string): Promise<TenantPublic> {
-  const { data, error } = await supabase.rpc('dk_tenant_public', { p_slug: slug })
+export async function fetchTenantPublic(code: string): Promise<TenantPublic> {
+  const { data, error } = await supabase.rpc('dk_tenant_public', { p_code: code })
   if (error) throw error
   return (data ?? { exists: false }) as unknown as TenantPublic
 }
@@ -25,10 +24,10 @@ export async function fetchTenantPublic(slug: string): Promise<TenantPublic> {
  */
 export async function resolveOrganizationFromHost(host: HostKind = currentHost()): Promise<{ host: HostKind; tenant: TenantPublic | null }> {
   if (host.kind !== 'tenant') return { host, tenant: null }
-  return { host, tenant: await fetchTenantPublic(host.slug) }
+  return { host, tenant: await fetchTenantPublic(host.code) }
 }
 
-export type TenantStatus = 'not_found' | 'redirect' | 'inactive' | 'signed_out' | 'no_access' | 'ready'
+export type TenantStatus = 'not_found' | 'inactive' | 'signed_out' | 'no_access' | 'ready'
 
 export interface TenantAccess {
   status: TenantStatus
@@ -46,10 +45,10 @@ export interface TenantAccess {
 export function tenantAccess(tenant: TenantPublic, signedIn: boolean, ctx: MyContext | null | undefined): TenantAccess {
   const none = { membership: null, accounts: [] }
   if (!tenant.exists) return { status: 'not_found', ...none }
-  if (tenant.redirectTo) return { status: 'redirect', ...none }
   if (tenant.active === false) return { status: 'inactive', ...none }
   if (!signedIn) return { status: 'signed_out', ...none }
-  const membership = ctx?.organizations.find((o) => o.slug === tenant.slug) ?? null
+  // The code identifies the organization; the membership decides access (ADR 0022, 10).
+  const membership = ctx?.organizations.find((o) => o.tenantCode === tenant.code) ?? null
   if (!membership || membership.status !== 'active') return { status: 'no_access', membership, accounts: [] }
   const accounts = (ctx?.accounts ?? []).filter((a) => a.organizationId === membership.id && (a.active || ctx?.profile.isPlatformAdmin))
   // Someone with no account can still be useful to the organization (its administration center).

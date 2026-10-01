@@ -113,12 +113,12 @@ modules/inventory/
 - **Abastecimiento no cambia.** Pedidos solo refresca sus cachés de stock después de cambiar un pedido.
 - **`/` de la cuenta es «tu inicio».** Caja → Pedidos, cocina → Cocina, domiciliario → Despacho, administración → `/dashboard`.
 
-**Un subdominio por organización ([ADR 0021](./adr/0021-subdominios-por-organizacion.md)).**
-- **Dominios.** `{slug}.quanela.com` es la organización; `quanela.com` es la landing, el registro y el login general. Un solo despliegue con el dominio comodín `*.quanela.com`; el dominio raíz sale de `VITE_TENANT_ROOT_DOMAIN`.
+**Un subdominio por organización ([ADR 0021](./adr/0021-subdominios-por-organizacion.md) y [ADR 0022](./adr/0022-codigo-de-tenant.md)).**
+- **Dominios.** `{código}.quanela.com` es la organización (código de 6 caracteres que genera la base, p. ej. `a7k92p`; nunca el nombre); `quanela.com` es la landing, el registro y el login general. Un solo despliegue con el dominio comodín `*.quanela.com`; el dominio raíz sale de `VITE_TENANT_ROOT_DOMAIN`.
 - **Resolución del tenant.** `src/shared/tenant` lee el host, y `dk_tenant_public` dice si la organización existe y está activa. `TenantProvider`/`useTenant()` es el único contexto de organización; `TenantGate` exige la membresía antes de montar cualquier ruta.
 - **Cuenta en la URL y redirección.** La cuenta sigue en la ruta (`/k/{cuenta}`). Una cuenta u organización de otro tenant lleva a su subdominio.
 - **Sesión compartida.** La sesión es una cookie de `.quanela.com`, compartida por todas tus organizaciones. En `*.localhost` es por subdominio.
-- **`slug` inmutable.** Solo el Global Admin lo cambia, y el anterior queda como alias que redirige.
+- **Código inmutable.** El código lo genera la base al crear la organización y nadie lo cambia. El `slug` queda como dato interno (`/o/{slug}`).
 - **Autoridad de los datos.** Sigue siendo la RLS por cuenta y membresía.
 
 **Personal y Turnos.**
@@ -334,7 +334,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 - [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
-- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md)
 
 ---
 

@@ -22,7 +22,7 @@ export function OrgScope() {
   const allowed = canOpenAdminCenter(organization)
   // ADR 0021: the administration center of an organization lives on its subdomain.
   const { pathname, search } = useLocation()
-  const crossHost = organization ? hostRedirectFor(organization.slug, `${pathname}${search}`) : null
+  const crossHost = organization ? hostRedirectFor(organization.tenantCode, `${pathname}${search}`) : null
   useEffect(() => {
     if (crossHost) window.location.replace(crossHost)
   }, [crossHost])

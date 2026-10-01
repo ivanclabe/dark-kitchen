@@ -1,6 +1,8 @@
 # ADR 0021: Un subdominio por organización (`{organización}.quanela.com`)
 
 ## Estado
+> **Modificada por la [ADR 0022](./0022-codigo-de-tenant.md):** el subdominio es un código de 6 caracteres (`{código}.quanela.com`), no el `slug`; ya no hay cambio de subdominio ni alias. El resto sigue vigente.
+
 **Aprobada (2026-10-01) con las recomendaciones D1–D10, y ejecutada.** Resultados en la sección 12; lo que falta de tu parte, en la 11.
 
 Reglas que se mantienen:

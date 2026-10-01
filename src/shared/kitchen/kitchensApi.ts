@@ -12,6 +12,8 @@ export interface AccountRole {
 export interface MyOrganization {
   id: string
   slug: string
+  /** Public 6-character code: the subdomain {code}.quanela.com (ADR 0022). */
+  tenantCode: string
   name: string
   active: boolean
   isOwner: boolean

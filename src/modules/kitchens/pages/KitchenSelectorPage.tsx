@@ -38,8 +38,8 @@ export function KitchenSelectorPage() {
   const onTenant = tenant.mode === 'tenant'
   // On an organization's subdomain, only its accounts; the others are links to their subdomains (ADR 0021).
   const allOrganizations = ctx?.organizations ?? []
-  const organizations = onTenant ? allOrganizations.filter((o) => o.slug === tenant.slug) : allOrganizations
-  const otherOrganizations = onTenant ? allOrganizations.filter((o) => o.slug !== tenant.slug && o.status === 'active' && o.active) : []
+  const organizations = onTenant ? allOrganizations.filter((o) => o.tenantCode === tenant.code) : allOrganizations
+  const otherOrganizations = onTenant ? allOrganizations.filter((o) => o.tenantCode !== tenant.code && o.status === 'active' && o.active) : []
   const groups = organizations
     .map((org) => ({ org, kitchens: (kitchens ?? []).filter((k) => k.organizationId === org.id) }))
     .filter((g) => g.kitchens.length > 0 || g.org.permissions.includes('accounts.create'))
@@ -93,7 +93,7 @@ export function KitchenSelectorPage() {
                       {showGroupTitles || canCreateSomewhere ? (
                         <h2 className={clsx(typography.h3, 'flex items-center gap-2')}>
                           {org.name}
-                          {tenant.mode !== 'path' && <span className="font-mono text-xs font-normal text-neutral-500">{tenantHostLabel(org.slug)}</span>}
+                          {tenant.mode !== 'path' && <span className="font-mono text-xs font-normal text-neutral-500">{tenantHostLabel(org.tenantCode)}</span>}
                           {org.isSuperAdmin && (
                             <Badge tone="brand" size="sm">
                               SUPER_ADMIN
@@ -143,11 +143,11 @@ export function KitchenSelectorPage() {
             {otherOrganizations.map((o) => (
               <li key={o.id}>
                 <a
-                  href={tenantUrl(o.slug, '/') ?? '/'}
+                  href={tenantUrl(o.tenantCode, '/') ?? '/'}
                   className="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-500 hover:text-neutral-50"
                 >
                   <Building2 size={14} aria-hidden /> {o.name}
-                  <span className="font-mono text-xs text-neutral-500">{tenantHostLabel(o.slug)}</span>
+                  <span className="font-mono text-xs text-neutral-500">{tenantHostLabel(o.tenantCode)}</span>
                   <ExternalLink size={12} className="text-neutral-500" aria-hidden />
                 </a>
               </li>

@@ -36,8 +36,8 @@ export function KitchenEntryRedirect() {
   const { data: ctx, isLoading } = useMyContext()
   const tenant = useTenant()
   const kitchen = ctx ? defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null) : null
-  const orgSlug = kitchen ? ctx?.organizations.find((o) => o.id === kitchen.organizationId)?.slug : null
-  const crossHost = kitchen ? hostRedirectFor(orgSlug, kitchenPath(kitchen.slug, '/')) : null
+  const orgCode = kitchen ? ctx?.organizations.find((o) => o.id === kitchen.organizationId)?.tenantCode : null
+  const crossHost = kitchen ? hostRedirectFor(orgCode, kitchenPath(kitchen.slug, '/')) : null
   useEffect(() => {
     if (crossHost) window.location.replace(crossHost)
   }, [crossHost])

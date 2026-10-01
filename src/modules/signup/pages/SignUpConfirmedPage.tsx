@@ -31,7 +31,7 @@ export function SignUpConfirmedPage() {
   const [planOverride, setPlanOverride] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
   // Created: the organization's own address (ADR 0021), shown before entering.
-  const [created, setCreated] = useState<{ orgName: string; orgSlug: string; accountSlug: string } | null>(null)
+  const [created, setCreated] = useState<{ orgName: string; orgCode: string; accountSlug: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const started = useRef(-1)
   const pending = pendingOrganizationOf(session?.user.user_metadata)
@@ -51,7 +51,7 @@ export function SignUpConfirmedPage() {
         const account = ctx?.accounts.find((a) => a.slug === slug)
         const org = ctx?.organizations.find((o) => o.id === account?.organizationId)
         // With subdomains, show "your Quanela space" first; otherwise straight in, as before.
-        if (org && tenantUrl(org.slug)) setCreated({ orgName: org.name, orgSlug: org.slug, accountSlug: slug })
+        if (org && tenantUrl(org.tenantCode)) setCreated({ orgName: org.name, orgCode: org.tenantCode, accountSlug: slug })
         else navigate(`${kitchenPath(slug, '/')}?bienvenida=1`, { replace: true })
       })
       .catch((err) => {
@@ -77,20 +77,24 @@ export function SignUpConfirmedPage() {
   // Sin sesión (enlace vencido o abierto en otro navegador): iniciar sesión termina el proceso.
   if (!session) return <Navigate to={`/login?next=${encodeURIComponent('/registro/confirmado')}`} replace />
   if (created) {
-    const url = tenantUrl(created.orgSlug, `${kitchenPath(created.accountSlug, '/')}?bienvenida=1`)!
+    const url = tenantUrl(created.orgCode, `${kitchenPath(created.accountSlug, '/')}?bienvenida=1`)!
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-neutral-100">
         <div className="w-full max-w-md space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
           <CheckCircle2 size={28} className="mx-auto text-emerald-400" aria-hidden />
           <div>
-            <h1 className={typography.h2}>{created.orgName} está lista</h1>
-            <p className={`mt-1 ${typography.small}`}>Tu espacio Quanela tiene su propia dirección. Guárdala: tu equipo entra por ahí.</p>
+            <h1 className={typography.h2}>Tu organización ha sido creada</h1>
+            <p className={`mt-1 ${typography.small}`}>{created.orgName} tiene su propia dirección. Guárdala: tu equipo entra por ahí.</p>
           </div>
+          <p className="text-sm text-neutral-400">
+            Código: <span className="font-mono text-base font-semibold tracking-widest text-neutral-50">{created.orgCode}</span>
+          </p>
+          <p className="text-xs text-neutral-500">Tu espacio Quanela:</p>
           <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2.5">
-            <span className="truncate font-mono text-sm text-brasa-300">{tenantHostLabel(created.orgSlug)}</span>
+            <span className="truncate font-mono text-sm text-brasa-300">{tenantHostLabel(created.orgCode)}</span>
             <button
               type="button"
-              onClick={() => void navigator.clipboard.writeText(`https://${tenantHostLabel(created.orgSlug)}`).then(() => setCopied(true))}
+              onClick={() => void navigator.clipboard.writeText(`https://${tenantHostLabel(created.orgCode)}`).then(() => setCopied(true))}
               aria-label="Copiar la dirección"
               className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
             >

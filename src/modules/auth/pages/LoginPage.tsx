@@ -43,9 +43,9 @@ export function LoginPage() {
           <div>
             <h1 className={typography.h1}>{orgName ?? 'Quanela'}</h1>
             <p className={`mt-1 ${typography.small}`}>
-              {orgName && tenant.slug ? (
+              {orgName && tenant.code ? (
                 <>
-                  Inicia sesión en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.slug)}</span>
+                  Inicia sesión en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.code)}</span>
                 </>
               ) : (
                 'Inicia sesión para continuar'

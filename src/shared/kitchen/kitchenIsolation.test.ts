@@ -50,7 +50,7 @@ describe('rol activo', () => {
   const ctx: MyContext = {
     profile: { id: 'u1', fullName: 'Juan', avatarKey: null, active: true, isPlatformAdmin: false, lastAccountId: null },
     accountPermissions: ['orders.view', 'orders.create', 'kitchen.prepare', 'team.manage'],
-    organizations: [{ id: 'o1', slug: 'grupo', name: 'Grupo XYZ', active: true, isOwner: false, isSuperAdmin: false, status: 'active', permissions: [] }],
+    organizations: [{ id: 'o1', slug: 'grupo', tenantCode: 'GR8P2X', name: 'Grupo XYZ', active: true, isOwner: false, isSuperAdmin: false, status: 'active', permissions: [] }],
     accounts: [],
   }
   const juan: MyAccountRow = {

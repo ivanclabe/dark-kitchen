@@ -32,7 +32,7 @@ export function KitchenScope() {
   // ADR 0021: an account lives on its organization's subdomain. Opened from
   // another one (or from the root domain), the same path goes there.
   const { pathname, search } = useLocation()
-  const crossHost = account ? hostRedirectFor(organization?.slug, `${pathname}${search}`) : null
+  const crossHost = account ? hostRedirectFor(organization?.tenantCode, `${pathname}${search}`) : null
 
   const setActiveRole = useCallback(
     (roleId: string) => {

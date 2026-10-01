@@ -45,7 +45,7 @@ export function OrganizationsPage() {
       if (ai === 'with' && o.aiFeatures.length === 0) return false
       if (ai === 'without' && o.aiFeatures.length > 0) return false
       if (!needle) return true
-      return [o.name, o.slug, o.admin.email, o.admin.name, o.city, o.taxId].some((v) => v?.toLowerCase().includes(needle))
+      return [o.name, o.tenantCode, o.slug, o.admin.email, o.admin.name, o.city, o.taxId].some((v) => v?.toLowerCase().includes(needle))
     })
     const byTime = (v: string | null) => (v ? new Date(v).getTime() : 0)
     return [...filtered].sort((a, b) =>
@@ -64,18 +64,19 @@ export function OrganizationsPage() {
         </span>
       ),
     },
+    { key: 'code', header: 'Código', cell: (o) => <span className="font-mono text-xs font-semibold tracking-wider text-neutral-100">{o.tenantCode}</span> },
     {
       key: 'subdomain',
       header: 'Subdominio',
       hideBelow: 'md',
       cell: (o) => {
-        const url = tenantUrl(o.slug)
+        const url = tenantUrl(o.tenantCode)
         return url ? (
-          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono text-[11px] text-brasa-300 hover:underline">
-            {tenantHost(o.slug)}
+          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono text-[11px] text-brasa-300 hover:underline" title="Abrir organización">
+            {tenantHost(o.tenantCode)}
           </a>
         ) : (
-          <span className="font-mono text-[11px] text-neutral-400">{o.slug}</span>
+          <span className="font-mono text-[11px] text-neutral-400">{tenantHost(o.tenantCode)}</span>
         )
       },
     },
@@ -139,7 +140,7 @@ export function OrganizationsPage() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative min-w-56 flex-1">
           <Search size={14} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500" aria-hidden />
-          <Input value={q} onChange={(e) => set('q', e.target.value, '')} placeholder="Buscar por nombre, correo, ciudad o NIT" aria-label="Buscar organizaciones" className="!mt-0 pl-9" />
+          <Input value={q} onChange={(e) => set('q', e.target.value, '')} placeholder="Buscar por nombre, código, correo, ciudad o NIT" aria-label="Buscar organizaciones" className="!mt-0 pl-9" />
         </div>
         <Select aria-label="Estado" value={status} onChange={(e) => set('status', e.target.value, 'all')} className="!mt-0 w-auto">
           <option value="all">Todos los estados</option>

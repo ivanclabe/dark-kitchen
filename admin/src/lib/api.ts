@@ -47,6 +47,8 @@ export interface OrganizationRow {
   id: string
   name: string
   slug: string
+  /** Public 6-character code: the subdomain {code}.quanela.com (ADR 0022). */
+  tenantCode: string
   active: boolean
   createdAt: string
   country: string | null
@@ -195,6 +197,7 @@ export interface InvitationResult {
 export interface CreatedOrganization {
   organizationId: string
   organizationSlug: string
+  tenantCode: string
   accountSlug: string
   adminProfileId: string
   adminEmail: string
@@ -245,7 +248,3 @@ export interface PasswordLink {
 
 /** One-time link for the person to create their own password; nothing is e-mailed. */
 export const createPasswordLink = (userId: string) => invoke<PasswordLink>({ action: 'password_link', userId })
-
-/** Change the subdomain of an organization (the old one stays as an alias that redirects). */
-export const setOrganizationSlug = (organizationId: string, slug: string) =>
-  rpc<{ slug: string; previous?: string; changed: boolean }>('dk_ga_set_organization_slug', { p_organization_id: organizationId, p_slug: slug })

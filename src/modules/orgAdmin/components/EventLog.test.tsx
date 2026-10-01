@@ -31,7 +31,7 @@ const ev = (id: string, summary: string, over: Partial<AuditEvent> = {}): AuditE
 })
 
 const org: OrgAdminContext = {
-  organization: { id: 'o1', slug: 'grupo', name: 'Grupo XYZ', active: true, isOwner: true, isSuperAdmin: true, status: 'active', permissions: ['observability.view'] },
+  organization: { id: 'o1', slug: 'grupo', tenantCode: 'GR8P2X', name: 'Grupo XYZ', active: true, isOwner: true, isSuperAdmin: true, status: 'active', permissions: ['observability.view'] },
   can: () => true,
   path: (to) => `/o/grupo${to}`,
   accounts: [],

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { parseHost, sharedCookieDomain } from './host'
 
-describe('parseHost (ADR 0021)', () => {
-  it('a subdomain of the root domain is an organization', () => {
-    expect(parseHost('dark-kitchen.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', slug: 'dark-kitchen' })
-    expect(parseHost('Dark-Kitchen.Quanela.com.', 'quanela.com')).toEqual({ kind: 'tenant', slug: 'dark-kitchen' })
+describe('parseHost (ADR 0021/0022)', () => {
+  it('a subdomain of the root domain is an organization code, in uppercase', () => {
+    expect(parseHost('a7k92p.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', code: 'A7K92P' })
+    expect(parseHost('A7K92P.Quanela.com.', 'quanela.com')).toEqual({ kind: 'tenant', code: 'A7K92P' })
+  })
+
+  it('a name-like subdomain is read as a label; the database says it does not exist', () => {
+    expect(parseHost('dark-kitchen.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', code: 'DARK-KITCHEN' })
   })
 
   it('the root and www are the platform', () => {
@@ -17,12 +21,12 @@ describe('parseHost (ADR 0021)', () => {
     expect(parseHost('127.0.0.1', 'quanela.com')).toEqual({ kind: 'path' })
     expect(parseHost('a.b.quanela.com', 'quanela.com')).toEqual({ kind: 'path' })
     expect(parseHost('evilquanela.com', 'quanela.com')).toEqual({ kind: 'path' })
-    expect(parseHost('dark-kitchen.quanela.com', '')).toEqual({ kind: 'path' })
+    expect(parseHost('a7k92p.quanela.com', '')).toEqual({ kind: 'path' })
   })
 
   it('works with *.localhost in development', () => {
     expect(parseHost('localhost', 'localhost')).toEqual({ kind: 'root' })
-    expect(parseHost('org-a.localhost', 'localhost')).toEqual({ kind: 'tenant', slug: 'org-a' })
+    expect(parseHost('x4m8q2.localhost', 'localhost')).toEqual({ kind: 'tenant', code: 'X4M8Q2' })
   })
 
   it('shares the session cookie only on a real domain', () => {

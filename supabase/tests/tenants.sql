@@ -54,49 +54,86 @@ insert into _t (area, test, expected, got) values
 insert into _t (area, test, expected, got) values ('Reserved', 'Saving a reserved slug', 'blocked',
   pg_temp.blocked($q$update dk_organizations set slug = 'www' where id = (select id from _ctx where key = 'orgA')$q$));
 
--- 2. Public resolution (anonymous)
+-- 2. Tenant codes (ADR 0022)
+insert into _ctx (key, txt) values ('codeA', (select tenant_code from dk_organizations where id = pg_temp.k('orgA')));
+insert into _ctx (key, txt) values ('codeB', (select tenant_code from dk_organizations where id = pg_temp.k('orgB')));
+insert into _t (area, test, expected, got) values
+  ('Code', 'Existing organizations have a code', '0', (select count(*)::text from dk_organizations where tenant_code is null)),
+  ('Code', 'Format: 6 chars, no confusables, letter and digit', 'true',
+    (select bool_and(tenant_code ~ '^[2-9A-HJKMNP-Z]{6}$' and tenant_code ~ '[A-Z]' and tenant_code ~ '[0-9]') from dk_organizations)::text),
+  ('Code', 'All codes are different', 'true', ((select count(distinct tenant_code) from dk_organizations) = (select count(*) from dk_organizations))::text),
+  ('Code', '200 generated codes are valid and different', '200',
+    (select count(distinct c)::text from (select dk_new_tenant_code() c from generate_series(1, 200)) x where c ~ '^[2-9A-HJKMNP-Z]{6}$' and c ~ '[A-Z]' and c ~ '[0-9]')),
+  ('Code', 'The code does not come from the name', 'false',
+    (select bool_or(position(lower(tenant_code) in lower(name)) > 0) from dk_organizations)::text);
+-- A client cannot choose it: the database always generates it.
+insert into dk_organizations (slug, name, owner_user_id, tenant_code)
+  values ('org-codigo-forzado', 'Org Código Forzado', '10000000-0000-0000-0000-000000021a02', (select txt from _ctx where key = 'codeA'));
+insert into _t (area, test, expected, got) values ('Code', 'A code sent on insert is ignored (no duplicates)', 'true',
+  ((select tenant_code from dk_organizations where slug = 'org-codigo-forzado') <> (select txt from _ctx where key = 'codeA'))::text);
+insert into _t (area, test, expected, got) values ('Code', 'UNIQUE is the last guard', 'blocked',
+  pg_temp.blocked($q$alter table dk_organizations disable trigger dk_trg_organizations_tenant_code; insert into dk_organizations (slug, name, owner_user_id, tenant_code) values ('dup-code', 'Dup', (select id from dk_users where email = 'multi.tenant@prueba.test'), (select txt from _ctx where key = 'codeA'))$q$));
+alter table dk_organizations enable trigger dk_trg_organizations_tenant_code;
+
+-- 3. Public resolution by code (anonymous)
 set local role anon;
 insert into _t (area, test, expected, got) values
-  ('Public', 'Existing subdomain: name and active', 'true · Dark Kitchen · true',
-    (select (v ->> 'exists') || ' · ' || (v ->> 'name') || ' · ' || (v ->> 'active') from (select dk_tenant_public('dark-kitchen') v) x)),
-  ('Public', 'Unknown subdomain', 'false', dk_tenant_public('no-existe-esta-org') ->> 'exists'),
+  ('Public', 'Code resolves: name and active', 'true · Dark Kitchen · true',
+    (select (v ->> 'exists') || ' · ' || (v ->> 'name') || ' · ' || (v ->> 'active') from (select dk_tenant_public((select txt from _ctx where key = 'codeA')) v) x)),
+  ('Public', 'Lowercase code (as in the subdomain) resolves too', 'true', dk_tenant_public(lower((select txt from _ctx where key = 'codeA'))) ->> 'exists'),
+  ('Public', 'The name-based subdomain does not resolve (no fallback)', 'false', dk_tenant_public('dark-kitchen') ->> 'exists'),
+  ('Public', 'Unknown code', 'false', dk_tenant_public('ZZ99ZZ') ->> 'exists'),
   ('Public', 'Invalid text', 'false', dk_tenant_public('<script>') ->> 'exists'),
-  ('Public', 'No internal ids', 'false', (dk_tenant_public('dark-kitchen') ? 'id')::text);
+  ('Public', 'No internal ids', 'false', (dk_tenant_public((select txt from _ctx where key = 'codeA')) ? 'id')::text);
 reset role;
 
--- 3. The slug cannot be changed by the organization (nor by a superadmin directly)
+-- 4. Nobody changes the code (nor the internal slug)
 select pg_temp.act_as(pg_temp.k('ivan'), pg_temp.k('A'));
 set local role authenticated;
 insert into _t (area, test, expected, got) values
-  ('Immutable', 'Direct update of the slug (even platform admin)', 'blocked',
-    pg_temp.blocked($q$update dk_organizations set slug = 'otro-nombre' where id = (select id from _ctx where key = 'orgA')$q$));
+  ('Immutable', 'Code (even a platform admin)', 'blocked', pg_temp.blocked($q$update dk_organizations set tenant_code = 'AB23CD' where id = (select id from _ctx where key = 'orgA')$q$)),
+  ('Immutable', 'Slug (even a platform admin)', 'blocked', pg_temp.blocked($q$update dk_organizations set slug = 'otro-nombre' where id = (select id from _ctx where key = 'orgA')$q$)),
+  ('Immutable', 'Renaming keeps the code', 'true',
+    (select pg_temp.blocked($q$update dk_organizations set name = 'Dark Kitchen Renombrada' where id = (select id from _ctx where key = 'orgA')$q$) = 'ALLOWED'
+       and (select tenant_code from dk_organizations where id = pg_temp.k('orgA')) = (select txt from _ctx where key = 'codeA'))::text);
+reset role;
+update dk_organizations set name = 'Dark Kitchen' where id = pg_temp.k('orgA');
+
+-- 4b. Both creation paths generate a code: the Global Admin portal and the public sign-up
+select pg_temp.act_as(pg_temp.k('ivan'), null, 'aal2');
+set local role authenticated;
+do $$
+declare v jsonb;
+begin
+  v := dk_ga_create_organization('Portal Código', 'restaurant', 'grill', 'Ana Código', 'ana.codigo@prueba.test',
+                                  (select key from dk_plans where status = 'public' and self_serve order by sort_order limit 1));
+  insert into _t (area, test, expected, got) values ('Create', 'Portal: the summary carries the code', 'true',
+    ((v ->> 'tenantCode') ~ '^[2-9A-HJKMNP-Z]{6}$' and (v ->> 'tenantCode') = (select tenant_code from dk_organizations where id = (v ->> 'organizationId')::uuid))::text);
+  insert into _t (area, test, expected, got) values ('Create', 'Portal: the list carries the code', 'true',
+    exists (select 1 from jsonb_array_elements(dk_ga_organizations()) e where e ->> 'tenantCode' = v ->> 'tenantCode')::text);
+end $$;
+reset role;
+insert into auth.users (id, email, aud, role, email_confirmed_at) values ('00000000-0000-0000-0000-000000021a03', 'registro.codigo@prueba.test', 'authenticated', 'authenticated', now());
+select pg_temp.act_as('00000000-0000-0000-0000-000000021a03', null);
+set local role authenticated;
+do $$
+declare v_slug text;
+begin
+  v_slug := dk_create_organization('Registro Código', 'restaurant', 'grill', p_full_name => 'Registro Código', p_plan => (select key from dk_plans where status = 'public' and self_serve order by sort_order limit 1));
+  insert into _t (area, test, expected, got) values ('Create', 'Sign-up: the organization gets a code', 'true',
+    ((select o.tenant_code from dk_organizations o join dk_kitchens k on k.organization_id = o.id where k.slug = v_slug) ~ '^[2-9A-HJKMNP-Z]{6}$')::text);
+  insert into _t (area, test, expected, got) values ('Create', 'Sign-up: my context carries the code', 'true',
+    exists (select 1 from jsonb_array_elements(dk_my_context() -> 'organizations') o where o ->> 'name' = 'Registro Código' and (o ->> 'tenantCode') is not null)::text);
+end $$;
 reset role;
 
--- 4. Change by the Global Admin, with alias and redirect
-select pg_temp.act_as(pg_temp.k('ivan'), null, 'aal1');
-set local role authenticated;
-insert into _t (area, test, expected, got) values ('Change', 'Without MFA', 'blocked',
-  pg_temp.blocked($q$select dk_ga_set_organization_slug((select id from _ctx where key = 'orgB'), 'julian-burgers')$q$));
-reset role;
-select pg_temp.act_as(pg_temp.k('ivan'), null, 'aal2');
+-- 4c. Knowing the code does not grant access (ADR 0022, 10)
+select pg_temp.act_as('00000000-0000-0000-0000-000000021a02', pg_temp.k('B'));
 set local role authenticated;
 insert into _t (area, test, expected, got) values
-  ('Change', 'Reserved', 'blocked', pg_temp.blocked($q$select dk_ga_set_organization_slug((select id from _ctx where key = 'orgB'), 'api')$q$)),
-  ('Change', 'Taken by another organization', 'blocked', pg_temp.blocked($q$select dk_ga_set_organization_slug((select id from _ctx where key = 'orgB'), 'dark-kitchen')$q$)),
-  ('Change', 'Invalid format', 'blocked', pg_temp.blocked($q$select dk_ga_set_organization_slug((select id from _ctx where key = 'orgB'), 'Julian Burgers')$q$)),
-  ('Change', 'Global Admin changes it', 'julian-burgers', dk_ga_set_organization_slug(pg_temp.k('orgB'), 'julian-burgers') ->> 'slug');
+  ('Code', 'Knowing the code of B gives nothing without membership', '0',
+    (select count(*)::text from dk_customers where id = '30000000-0000-0000-0000-000000021a0b'));
 reset role;
-insert into _t (area, test, expected, got) values
-  ('Change', 'Old subdomain redirects', 'julian-burgers', dk_tenant_public('julian-hamburguesas') ->> 'redirectTo'),
-  ('Change', 'Old subdomain cannot be taken by a new organization', 'julian-hamburguesas-2', dk_unique_slug('julian-hamburguesas', 'organizations')),
-  ('Change', 'Recorded by the portal', '1', (select count(*)::text from dk_audit_log where event_type = 'global_admin.organization_slug_changed' and organization_id = pg_temp.k('orgB')));
-select pg_temp.act_as(pg_temp.k('ivan'), null, 'aal2');
-set local role authenticated;
-insert into _t (area, test, expected, got) values ('Change', 'Going back to the old one', 'julian-hamburguesas',
-  dk_ga_set_organization_slug(pg_temp.k('orgB'), 'julian-hamburguesas') ->> 'slug');
-reset role;
-insert into _t (area, test, expected, got) values ('Change', '... removes its alias (no redirect) and keeps the other as alias', 'null · julian-hamburguesas',
-  coalesce(dk_tenant_public('julian-hamburguesas') ->> 'redirectTo', 'null') || ' · ' || coalesce(dk_tenant_public('julian-burgers') ->> 'redirectTo', 'null'));
 
 -- 5. One identity, two memberships: the role depends on the organization (account)
 select pg_temp.act_as('00000000-0000-0000-0000-000000021a01', pg_temp.k('A'));

@@ -19,7 +19,7 @@ const { OrgScope } = await import('./OrgScope')
 const ctx = (orgPermissions: string[]): MyContext => ({
   profile: { id: 'u1', fullName: 'Ana', avatarKey: null, active: true, isPlatformAdmin: false, lastAccountId: null },
   accountPermissions: [],
-  organizations: [{ id: 'o1', slug: 'grupo', name: 'Grupo XYZ', active: true, isOwner: true, isSuperAdmin: true, status: 'active', permissions: orgPermissions }],
+  organizations: [{ id: 'o1', slug: 'grupo', tenantCode: 'GR8P2X', name: 'Grupo XYZ', active: true, isOwner: true, isSuperAdmin: true, status: 'active', permissions: orgPermissions }],
   accounts: [{ id: 'k1', slug: 'centro', name: 'Centro', organizationId: 'o1', iconKey: null, active: true, superAdmin: true, defaultRoleId: null, roles: [] }],
 })
 

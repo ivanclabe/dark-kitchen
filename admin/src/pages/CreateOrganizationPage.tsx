@@ -12,7 +12,7 @@ import { PageTitle, Panel, StatusPill } from '../components/ui'
 import { checkNewOrganization, createOrganization, fetchPlans, type CreatedOrganization, type NewOrganizationCheck, type NewOrganizationInput } from '../lib/api'
 import { EMPTY_ORGANIZATION as EMPTY, validateStep } from '../lib/createOrganization'
 import { formatDateTimeShort } from '../lib/format'
-import { tenantHost } from '../lib/tenant'
+import { tenantHost, tenantUrl } from '../lib/tenant'
 
 type Step = 'business' | 'admin' | 'review' | 'done'
 
@@ -335,7 +335,8 @@ function Result({ result, planName, onAnother, onOpen }: { result: CreatedOrgani
         </div>
       </div>
       <dl className="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-        <Row label="Subdominio" value={tenantHost(result.organizationSlug)} />
+        <Row label="Código" value={result.tenantCode} />
+        <Row label="Subdominio" value={tenantHost(result.tenantCode)} />
         <Row label="Plan" value={planName} />
         <Row label="Creada" value={formatDateTimeShort(result.createdAt)} />
         <Row label="Administrador" value={result.adminName} />
@@ -371,6 +372,16 @@ function Result({ result, planName, onAnother, onOpen }: { result: CreatedOrgani
         <Button variant="ghost" onClick={onAnother}>
           Crear otra
         </Button>
+        {tenantUrl(result.tenantCode) && (
+          <a
+            href={tenantUrl(result.tenantCode)!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center rounded-xl border border-console-700 px-4 text-sm font-medium text-neutral-200 hover:bg-console-800"
+          >
+            Abrir organización
+          </a>
+        )}
         <Button variant="primary" onClick={onOpen}>
           Ver organización
         </Button>
