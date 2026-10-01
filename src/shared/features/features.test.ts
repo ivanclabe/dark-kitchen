@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
-// La migración del catálogo como texto (Vite ?raw).
-import catalogSql from '../../../supabase/migrations/20260926110000_dk_feature_catalog.sql?raw'
 import { FEATURE_KEYS, featureLookup, unavailableReason, type FeatureState } from './features'
+
+// Every migration as text (Vite ?raw): features are seeded by the catalog and by later ones (e.g. ADR 0016).
+const migrations = import.meta.glob<string>('../../../supabase/migrations/*.sql', { query: '?raw', import: 'default', eager: true })
+const catalogSql = Object.values(migrations).join('\n')
 
 const state = (over: Partial<FeatureState>): FeatureState => ({
   key: 'voice_commands',
@@ -26,7 +28,7 @@ const state = (over: Partial<FeatureState>): FeatureState => ({
 
 describe('funciones', () => {
   it('la app conoce las mismas claves que siembra la migración del catálogo', () => {
-    const seeded = [...catalogSql.matchAll(/^\s+\('([a-z_]+)', '(?:ai|voice|general)'/gm)].map((m) => m[1])
+    const seeded = [...catalogSql.matchAll(/^\s+\(?'([a-z_]+)', '(?:ai|voice|general)'/gm)].map((m) => m[1])
     expect(seeded.sort()).toEqual([...FEATURE_KEYS].sort())
   })
 

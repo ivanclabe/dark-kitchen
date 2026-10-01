@@ -140,8 +140,8 @@ export function FeatureDrawer({
         {editableDefaults.length > 0 && (
           <section className="space-y-4 rounded-2xl border border-neutral-800/60 p-4">
             <div>
-              <h3 className={typography.h3}>Valores por defecto</h3>
-              <p className={typography.caption}>Punto de partida de todas las cuentas. Cada organización y cuenta puede ajustarlos dentro de los rangos.</p>
+              <h3 className={typography.h3}>Valores de fábrica</h3>
+              <p className={typography.caption}>Lo que recibe cada organización mientras no ajuste los suyos. Cada organización los configura en su espacio «IA y voz», con excepciones por cuenta.</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {editableDefaults.map(([key, rule]) => {

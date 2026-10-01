@@ -1,36 +1,40 @@
+import { engineFor, type RecognitionSession } from '@/shared/voice/recognition/engines'
+import { useRecognizerPreference } from '@/shared/voice/recognition/preference'
+import { loadVoskModel } from '@/shared/voice/recognition/voskModel'
 import { useEffect, useRef, useState } from 'react'
 
-const SPEECH_RECOGNITION_CTOR =
-  typeof window !== 'undefined' ? (window.SpeechRecognition ?? window.webkitSpeechRecognition) : undefined
-
-export const isSpeechRecognitionSupported = !!SPEECH_RECOGNITION_CTOR
-
 /**
- * Envuelve el Web Speech API (SpeechRecognition) del navegador. No sabe
- * nada de pedidos ni comandos — solo entrega transcripts de texto. Si el
- * navegador no lo soporta (Firefox, la mayoría de navegadores embebidos de
- * Smart TV), `supported` queda en false y start()/stop() no hacen nada; el
- * resto del KDS sigue funcionando igual.
+ * Speech recognition for the kitchen, with the engine chosen on this device
+ * (ADR 0015): the browser's (Web Speech API) or offline Vosk. It knows
+ * nothing about orders or commands — it only delivers transcripts. If the
+ * engine is not available (e.g. Firefox with the browser engine),
+ * `supported` is false and start()/stop() do nothing; the rest of the KDS
+ * works the same.
  *
- * continuous+interimResults: la sesión NO se corta en la primera pausa
- * natural del habla — sigue escuchando y entrega el transcript acumulado
- * completo (parcial + final) en cada actualización vía onTranscriptChange.
- * Decidir CUÁNDO ese transcript ya está "completo" (ventana de silencio)
- * es responsabilidad de quien use este hook, no de este wrapper.
+ * The session does not end at the first natural pause: it keeps listening
+ * and delivers the full accumulated transcript (final + partial) on every
+ * update through onTranscriptChange. Deciding WHEN that transcript is
+ * "complete" (silence window) belongs to the caller.
  */
 export function useSpeechRecognition({
   onTranscriptChange,
   onError,
   lang = 'es-CO',
+  grammar,
   maxDurationMs = 20_000,
 }: {
   onTranscriptChange: (transcript: string) => void
   onError?: (code: string) => void
   lang?: string
-  /** Corta la sesión sola si nunca hay silencio — evita quedar escuchando indefinidamente. */
+  /** Allowed vocabulary for engines that support it (Vosk). */
+  grammar?: string
+  /** Stops the session if there is never silence, so it never listens forever. */
   maxDurationMs?: number
 }) {
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const [engineId] = useRecognizerPreference()
+  const engine = engineFor(engineId)
+  const sessionRef = useRef<RecognitionSession | null>(null)
+  const startingRef = useRef(false)
   const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [listening, setListening] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,50 +46,56 @@ export function useSpeechRecognition({
     onErrorRef.current = onError
   })
 
+  // Offline engine: load the model in the background so the microphone answers at once.
+  useEffect(() => {
+    if (engineId === 'vosk' && engine.supported()) void loadVoskModel().catch(() => undefined)
+  }, [engineId, engine])
+
   useEffect(() => {
     return () => {
-      recognitionRef.current?.stop()
+      sessionRef.current?.stop()
       if (maxDurationTimerRef.current) clearTimeout(maxDurationTimerRef.current)
     }
   }, [])
 
-  function start() {
-    if (!SPEECH_RECOGNITION_CTOR || recognitionRef.current) return
+  function fail(code: string) {
+    setError(code)
+    setListening(false)
+    onErrorRef.current?.(code)
+  }
+
+  async function start() {
+    if (!engine.supported() || sessionRef.current || startingRef.current) return
+    startingRef.current = true
     setError(null)
-    const recognition = new SPEECH_RECOGNITION_CTOR()
-    recognition.lang = lang
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.maxAlternatives = 1
-    recognition.onstart = () => setListening(true)
-    recognition.onresult = (e) => {
-      let fullTranscript = ''
-      for (let i = 0; i < e.results.length; i++) {
-        fullTranscript += e.results[i]?.[0]?.transcript ?? ''
-      }
-      onTranscriptChangeRef.current(fullTranscript.trim())
+    try {
+      const session = await engine.start({
+        lang,
+        grammar,
+        onTranscript: (text) => onTranscriptChangeRef.current(text),
+        onStart: () => setListening(true),
+        onEnd: () => {
+          setListening(false)
+          sessionRef.current = null
+          if (maxDurationTimerRef.current) {
+            clearTimeout(maxDurationTimerRef.current)
+            maxDurationTimerRef.current = null
+          }
+        },
+        onError: fail,
+      })
+      sessionRef.current = session
+      maxDurationTimerRef.current = setTimeout(() => session.stop(), maxDurationMs)
+    } catch (err) {
+      fail(err instanceof Error && err.message === 'not-allowed' ? 'not-allowed' : 'engine-error')
+    } finally {
+      startingRef.current = false
     }
-    recognition.onerror = (e) => {
-      setError(e.error)
-      setListening(false)
-      onErrorRef.current?.(e.error)
-    }
-    recognition.onend = () => {
-      setListening(false)
-      recognitionRef.current = null
-      if (maxDurationTimerRef.current) {
-        clearTimeout(maxDurationTimerRef.current)
-        maxDurationTimerRef.current = null
-      }
-    }
-    recognition.start()
-    recognitionRef.current = recognition
-    maxDurationTimerRef.current = setTimeout(() => recognition.stop(), maxDurationMs)
   }
 
   function stop() {
-    recognitionRef.current?.stop()
+    sessionRef.current?.stop()
   }
 
-  return { supported: isSpeechRecognitionSupported, listening, error, start, stop }
+  return { supported: engine.supported(), engine: engine.id, listening, error, start, stop }
 }

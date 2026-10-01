@@ -4,6 +4,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
+import { ProductThumb } from '@/modules/products/components/ProductImage'
 import { Combobox } from '@/shared/ui/Combobox'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -76,7 +77,12 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
     () =>
       products
         ?.filter((p) => p.active)
-        .map((p) => ({ value: p.id, label: p.name, sublabel: formatMoney(p.price) })) ?? [],
+        .map((p) => ({
+          value: p.id,
+          label: p.name,
+          sublabel: formatMoney(p.price),
+          leading: <ProductThumb name={p.name} path={p.imagePath} toneSeed={p.categoryName} size="sm" />,
+        })) ?? [],
     [products],
   )
 

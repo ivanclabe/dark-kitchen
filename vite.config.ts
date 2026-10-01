@@ -21,6 +21,8 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, './src'),
+        // Global Admin portal (ADR 0019): only so its tests run with the rest.
+        '@admin': path.resolve(import.meta.dirname, './admin/src'),
       },
     },
     server: {

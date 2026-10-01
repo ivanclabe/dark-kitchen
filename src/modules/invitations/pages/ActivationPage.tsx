@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { appUrl } from '@/shared/lib/appUrl'
 import { kitchenPath, MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
 import { supabase } from '@/shared/lib/supabase'
 import { Button } from '@/shared/ui/Button'
@@ -6,10 +7,10 @@ import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Flame, LogIn, LogOut, UserCheck } from 'lucide-react'
+import { AlertTriangle, Flame, LogIn, LogOut, Mail, UserCheck } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { acceptActivation, previewActivation, type ActivationStatus } from '../api'
+import { acceptActivation, loginNeedsPassword, previewActivation, type ActivationStatus } from '../api'
 
 const STATUS_MESSAGE: Record<Exclude<ActivationStatus, 'valid'>, string> = {
   expired: 'Este enlace venció. Pide a tu administrador uno nuevo.',
@@ -38,6 +39,8 @@ function Shell({ children }: { children: ReactNode }) {
  * ADR 0008 sección 10). Sin sesión: la persona define su contraseña (o, si
  * ya tiene usuario en la plataforma, inicia sesión). Con sesión: activa con
  * un clic. La base valida que el correo de la sesión sea el del usuario.
+ * Si la sesión viene de una invitación por correo (portal Global Admin,
+ * ADR 0019) y aún no tiene contraseña, primero la crea.
  */
 export function ActivationPage() {
   const { token = '' } = useParams<{ token: string }>()
@@ -49,6 +52,13 @@ export function ActivationPage() {
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const sessionMatches = Boolean(session && preview && session.user.email?.toLowerCase() === preview.email)
+  const { data: needsPassword, isLoading: checkingPassword } = useQuery({
+    queryKey: ['activation', token, 'needs-password', session?.user.id],
+    queryFn: loginNeedsPassword,
+    enabled: sessionMatches && preview?.status === 'valid',
+    retry: false,
+  })
 
   async function activate() {
     setBusy(true)
@@ -72,7 +82,7 @@ export function ActivationPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: preview.email,
       password,
-      options: { data: { full_name: preview.fullName }, emailRedirectTo: window.location.href },
+      options: { data: { full_name: preview.fullName }, emailRedirectTo: appUrl(`/activar/${token}`) },
     })
     if (signUpError) {
       setError(signUpError.message)
@@ -86,6 +96,35 @@ export function ActivationPage() {
     }
     await activate()
   }
+
+  async function setPasswordAndActivate(e: FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    const { error: updateError } = await supabase.auth.updateUser({ password })
+    if (updateError) {
+      setError(updateError.message)
+      setBusy(false)
+      return
+    }
+    await activate()
+  }
+
+  async function sendAccessLink() {
+    if (!preview) return
+    setBusy(true)
+    setError(null)
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: preview.email, options: { emailRedirectTo: appUrl(`/activar/${token}`), shouldCreateUser: false } })
+    setBusy(false)
+    if (otpError) setError(otpError.message)
+    else setInfo(`Te enviamos un enlace a ${preview.email}. Ábrelo para crear tu contraseña y terminar.`)
+  }
+
+  const passwordField = (
+    <FormField label="Crea tu contraseña" required hint="Mínimo 8 caracteres." error={error}>
+      {(a11y) => <Input {...a11y} type="password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />}
+    </FormField>
+  )
 
   if (isLoading) return <Shell><p className={typography.small}>Cargando…</p></Shell>
 
@@ -130,7 +169,17 @@ export function ActivationPage() {
     return (
       <Shell>
         {header}
-        {sessionEmail === preview.email ? (
+        {sessionMatches && checkingPassword ? (
+          <p className={typography.small}>Cargando…</p>
+        ) : sessionMatches && needsPassword ? (
+          <form onSubmit={(e) => void setPasswordAndActivate(e)} className="space-y-4" noValidate>
+            <p className={typography.small}>Crea tu contraseña para entrar a Quanela de ahora en adelante.</p>
+            {passwordField}
+            <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={password.length < 8}>
+              Crear contraseña y entrar
+            </Button>
+          </form>
+        ) : sessionEmail === preview.email ? (
           <Button variant="primary" size="lg" icon={UserCheck} className="w-full" loading={busy} onClick={() => void activate()}>
             Activar y entrar a {preview.organizationName}
           </Button>
@@ -144,7 +193,7 @@ export function ActivationPage() {
             </Button>
           </>
         )}
-        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+        {error && !needsPassword && <p role="alert" className="text-sm text-red-400">{error}</p>}
       </Shell>
     )
   }
@@ -157,6 +206,14 @@ export function ActivationPage() {
         <Button variant="primary" size="lg" icon={LogIn} className="w-full" onClick={() => navigate(`/login?next=${encodeURIComponent(`/activar/${token}`)}`)}>
           Iniciar sesión
         </Button>
+        {info ? (
+          <p role="status" className="text-sm text-emerald-400">{info}</p>
+        ) : (
+          <Button variant="ghost" icon={Mail} className="w-full" loading={busy} onClick={() => void sendAccessLink()}>
+            Aún no tengo contraseña: envíame un enlace
+          </Button>
+        )}
+        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
       </Shell>
     )
   }
@@ -171,9 +228,7 @@ export function ActivationPage() {
           <FormField label="Correo">
             {(a11y) => <Input {...a11y} value={preview.email} readOnly disabled />}
           </FormField>
-          <FormField label="Crea tu contraseña" required hint="Mínimo 8 caracteres." error={error}>
-            {(a11y) => <Input {...a11y} type="password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />}
-          </FormField>
+          {passwordField}
           <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={password.length < 8}>
             Activar mi usuario
           </Button>

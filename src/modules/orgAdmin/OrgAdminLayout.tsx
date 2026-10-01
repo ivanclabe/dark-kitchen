@@ -5,7 +5,7 @@ import { useOrgAdmin } from '@/shared/org/orgContext'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Popover, PopoverItem, PopoverSeparator } from '@/shared/ui/Popover'
 import clsx from 'clsx'
-import { ArrowRight, ChevronDown, Flame, LayoutList, LogOut, Menu, ShieldCheck } from 'lucide-react'
+import { ArrowRight, ChevronDown, Flame, LayoutList, LogOut, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { isOrgNavItemActive, isOrgSectionAllowed, ORG_ADMIN_ICON, orgHomeSection, visibleOrgNav, type OrgNavItem } from './orgNavigation'
@@ -56,7 +56,6 @@ function GoToAccount() {
 
 function OrgUserMenu() {
   const { profile, user, signOut } = useAuth()
-  const { isPlatformAdmin } = useOrgAdmin()
   const navigate = useNavigate()
   return (
     <Popover
@@ -80,11 +79,6 @@ function OrgUserMenu() {
           <PopoverItem icon={LayoutList} onSelect={() => { close(); navigate('/cuentas') }}>
             Tus cuentas
           </PopoverItem>
-          {isPlatformAdmin && (
-            <PopoverItem icon={ShieldCheck} onSelect={() => { close(); navigate('/admin') }}>
-              Plataforma
-            </PopoverItem>
-          )}
           <PopoverSeparator />
           <PopoverItem icon={LogOut} tone="danger" onSelect={() => { close(); void signOut() }}>
             Cerrar sesión

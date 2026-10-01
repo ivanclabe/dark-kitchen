@@ -10,7 +10,7 @@ grant all on _t, _ctx to authenticated;
 grant usage on sequence _t_n_seq to authenticated;
 
 create or replace function pg_temp.act_as(p_auth uuid, p_kitchen uuid default null) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated')::text, true);
+  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   select set_config('request.headers', (case when p_kitchen is null then '{}'::jsonb else jsonb_build_object('x-dk-kitchen-id', p_kitchen) end)::text, true);
 $$;
 create or replace function pg_temp.as_owner() returns void language sql as $$

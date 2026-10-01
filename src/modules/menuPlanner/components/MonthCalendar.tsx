@@ -3,6 +3,7 @@ import { toDateInput } from '@/shared/utils/format'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatMonthLabel, isSameMonth, monthGridDates, todayStr } from '../lib/week'
 import type { MenuPlanItem } from '../types'
+import { isDayBlocked, type PlanDragInfo } from '../lib/dragRules'
 import { DayCell } from './DayCell'
 
 /** Vista de resumen/navegación — para editar en detalle, un click en un día abre la semana correspondiente (arrastrar sigue funcionando también acá). */
@@ -12,12 +13,16 @@ export function MonthCalendar({
   itemsByDate,
   onOpenWeek,
   onOpenItem,
+  onRemoveItem,
+  drag,
 }: {
   monthAnchor: string
   onMonthAnchorChange: (date: string) => void
   itemsByDate: Record<string, MenuPlanItem[]>
   onOpenWeek: (date: string) => void
   onOpenItem: (item: MenuPlanItem) => void
+  onRemoveItem?: (item: MenuPlanItem) => void
+  drag?: PlanDragInfo
 }) {
   const dates = monthGridDates(monthAnchor)
 
@@ -49,6 +54,9 @@ export function MonthCalendar({
             selected={false}
             onSelect={() => onOpenWeek(date)}
             onOpenItem={onOpenItem}
+            onRemoveItem={onRemoveItem}
+            dragging={Boolean(drag?.productId)}
+            blocked={isDayBlocked(date, itemsByDate[date] ?? [], drag)}
             compact
             muted={!isSameMonth(date, monthAnchor)}
           />

@@ -27,3 +27,10 @@ export async function acceptActivation(token: string): Promise<string | null> {
   if (error) throw error
   return data
 }
+
+/** La sesión vino de una invitación y todavía no tiene contraseña (ADR 0019). */
+export async function loginNeedsPassword(): Promise<boolean> {
+  const { data, error } = await supabase.rpc('dk_my_login_needs_password')
+  if (error) throw error
+  return Boolean(data)
+}

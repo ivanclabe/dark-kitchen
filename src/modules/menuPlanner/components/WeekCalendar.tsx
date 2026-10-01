@@ -2,6 +2,7 @@ import { Button, IconButton } from '@/shared/ui/Button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addDays, formatWeekRangeLabel, startOfWeek, todayStr } from '../lib/week'
 import type { MenuPlanItem } from '../types'
+import { isDayBlocked, type PlanDragInfo } from '../lib/dragRules'
 import { DayCell } from './DayCell'
 
 export function WeekCalendar({
@@ -11,6 +12,8 @@ export function WeekCalendar({
   selectedDate,
   onSelectDate,
   onOpenItem,
+  onRemoveItem,
+  drag,
 }: {
   weekStart: string
   onWeekStartChange: (weekStart: string) => void
@@ -18,8 +21,11 @@ export function WeekCalendar({
   selectedDate: string
   onSelectDate: (date: string) => void
   onOpenItem: (item: MenuPlanItem) => void
+  onRemoveItem?: (item: MenuPlanItem) => void
+  drag?: PlanDragInfo
 }) {
   const dates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const distinct = new Set(dates.flatMap((d) => (itemsByDate[d] ?? []).map((i) => i.productId))).size
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -28,6 +34,9 @@ export function WeekCalendar({
           <IconButton icon={ChevronLeft} variant="ghost" aria-label="Semana anterior" onClick={() => onWeekStartChange(addDays(weekStart, -7))} />
           <IconButton icon={ChevronRight} variant="ghost" aria-label="Semana siguiente" onClick={() => onWeekStartChange(addDays(weekStart, 7))} />
           <span className="ml-1 text-sm font-medium text-neutral-200">{formatWeekRangeLabel(weekStart)}</span>
+          <span className="ml-2 hidden text-xs text-neutral-500 sm:inline">
+            {distinct === 0 ? 'Semana sin platos' : `${distinct} ${distinct === 1 ? 'plato' : 'platos'} esta semana`}
+          </span>
         </div>
         <Button variant="secondary" size="sm" onClick={() => onWeekStartChange(startOfWeek(todayStr()))}>
           Hoy
@@ -43,6 +52,9 @@ export function WeekCalendar({
             selected={date === selectedDate}
             onSelect={() => onSelectDate(date)}
             onOpenItem={onOpenItem}
+            onRemoveItem={onRemoveItem}
+            dragging={Boolean(drag?.productId)}
+            blocked={isDayBlocked(date, itemsByDate[date] ?? [], drag)}
           />
         ))}
       </div>

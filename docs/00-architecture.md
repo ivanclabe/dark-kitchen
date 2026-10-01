@@ -78,9 +78,17 @@ src/
     reports/
     organization/            # equipos, roles, cuentas, funciones y plan (componentes que reutiliza el centro)
     orgAdmin/                # centro de administración /o/:org (ADR 0012): layout, Resumen, Observabilidad, Bitácora, Facturación, IA y voz…
-    platform/                # plataforma /admin: cuentas de todas las organizaciones y ai/ (control central de IA y voz, ADR 0014)
+    platform/                # paneles de plataforma (ai/: control central de IA y voz, ADR 0014; planes; cuentas) que usa el portal Global Admin
   types/
     database.ts             # tipos generados por Supabase CLI (supabase gen types)
+
+admin/                     # portal Quanela Global Admin (ADR 0019): app aparte, admin.quanela.com
+  index.html               # noindex; public/robots.txt bloquea todo
+  src/
+    auth/                  # sesión propia (storageKey 'quanela-global-admin') y login con TOTP
+    layout/                # barra lateral y marca del portal
+    lib/                   # cliente Supabase propio y api.ts (solo funciones dk_ga_*)
+    pages/                 # Dashboard, Organizations, Users, AI Monitoring, Activity, Administration
 ```
 
 Cada módulo de dominio sigue la misma subestructura interna:
@@ -96,7 +104,13 @@ modules/inventory/
   schemas/         # validación (zod) de formularios
 ```
 
-**Dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md)).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector y `/admin`, la plataforma.
+**Dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md)).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector. La plataforma ya no vive en Quanela: `/admin` redirige a inicio.
+
+**Portal Global Admin ([ADR 0019](./adr/0019-portal-global-admin.md)).**
+- **App y build propios:** `vite.admin.config.ts`, raíz `admin/`, `npm run dev:admin` / `npm run build:admin`. En Vercel es un segundo proyecto con `QUANELA_APP=admin`.
+- **Su propio cliente de Supabase,** con su propia sesión (otro origen y otro `storageKey`). El alias `@/shared/lib/supabase` apunta a ese cliente, así que los paneles reutilizados de `src/modules/platform` usan la sesión del portal. Ambas apps cierran sesión solo en local.
+- **Autorización en la base:** toda consulta pasa por funciones `dk_ga_*` y `dk_platform_*` que exigen `dk_require_global_admin()`: rol `SUPERADMIN` **y** sesión `aal2` (TOTP).
+- **Altas:** la Edge Function `dk-global-admin` crea la organización con la misma `dk_provision_organization` del registro público e invita al Organization Admin por correo. La persona crea su contraseña en `/activar/:token`.
 
 **Regla dura:** ningún componente React hace `supabase.from(...)` directamente. Todo pasa por `services/` → `repositories/`. Esto es lo que permite mover la lógica de negocio a un RPC sin tocar la UI, y probar `services/` sin renderizar componentes.
 
@@ -207,6 +221,17 @@ Detalle de matriz completa (tabla × acción × rol) en [../docs/adr/0005-rls-st
   - **Edge Function de IA:** usa el modelo que devuelve `dk_ai_run_allowed` y guarda tokens y latencia. La clave vive solo como secreto.
   - **Voz:** texto a voz del dispositivo, detrás de un adaptador (`SpeechEngine`) y una única cola con prioridades (`src/shared/voice/speechQueue.ts`). Las frases salen de plantillas, sin modelo de lenguaje.
   - **Auxiliares SQL internas:** se revocan explícitamente a `anon`/`authenticated`, porque Supabase les concede EXECUTE por defecto.
+- **Comandos de voz sin internet ([ADR 0015](./adr/0015-comandos-de-voz-con-vosk.md), beta).**
+  - El reconocimiento pasa por un adaptador (`src/shared/voice/recognition/engines.ts`) con dos motores: el del navegador (predeterminado) y Vosk en WebAssembly (opcional por equipo).
+  - Vosk usa una gramática limitada a los comandos y el modelo `vosk-model-small-es-0.42` desde el bucket público de solo lectura `dk-voice-models`, y se carga en diferido.
+  - Los números hablados se convierten a cifras antes del intérprete (`spokenNumbers.ts`).
+  - Con Vosk, cancelar por voz está desactivado por seguridad.
+- **Manos libres «Oye Quanela» ([ADR 0016](./adr/0016-oye-quanela-palabra-de-activacion.md), beta).**
+  - Función `voice_wake_word` (depende de `voice_commands`; mismos planes). La plataforma ajusta el umbral y los tramos de confirmación. Además, cada equipo tiene un interruptor propio, apagado por defecto.
+  - Detector en el navegador (`src/shared/voice/wakeWord/`): un AudioWorklet pasa el micrófono a 16 kHz en tramos de 80 ms; luego vienen espectrograma mel, red de características y clasificador, en `onnxruntime-web` (WASM, un hilo, carga diferida).
+  - Los tres modelos (~3,3 MB) están en `dk-voice-models/wake/oye-quanela-v1/`. Se entrenan con el código de `ml/wake-word/`, solo con fuentes de licencia comercial.
+  - Al detectar la frase: tono y 5 s de escucha con el motor de comandos del equipo. La detección suelta el micrófono mientras se escucha un comando y descarta el audio mientras habla Quanela (`SpeechQueue.isSpeaking`).
+  - El audio se procesa en el equipo y se descarta.
 - *Histórico:* el rol global (`dk_users.role`, `dk_current_role()`) se retiró en la Fase 6 de la ADR 0007; la columna se conserva sin uso.
 - Las tablas puramente transaccionales críticas (`dk_inventory_movements`, `dk_inventory_reservations`) **no reciben `INSERT` directo del cliente** salvo por rol `ADMIN`/`INVENTORY` en casos manuales (compra manual, merma, ajuste); los movimientos derivados de pedidos se generan exclusivamente dentro de los RPC `SECURITY DEFINER`, que se ejecutan con privilegios elevados pero validan el rol del `auth.uid()` que invoca internamente.
 - Storage: buckets privados (`invoices`, `product-images`), políticas por rol igual que las tablas.
@@ -282,7 +307,8 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0007 — Multi-cocina](./adr/0007-multi-cocina.md) · [ADR 0008 — Organizaciones y cuentas](./adr/0008-organizaciones-y-cuentas.md)
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
-- [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md)
+- [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md)
 
 ---
 

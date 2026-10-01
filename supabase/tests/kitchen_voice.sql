@@ -10,7 +10,7 @@ grant all on _t, _ctx to authenticated, anon;
 grant usage on sequence _t_n_seq to authenticated, anon;
 
 create or replace function pg_temp.act_as(p_auth uuid, p_kitchen uuid) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated')::text, true);
+  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   select set_config('request.headers', case when p_kitchen is null then '{}' else jsonb_build_object('x-dk-kitchen-id', p_kitchen)::text end, true);
 $$;
 create or replace function pg_temp.as_owner() returns void language sql as $$
@@ -94,37 +94,37 @@ select pg_temp.act_as('00000000-0000-0000-0000-00000000b0b1', (select id from _c
 set local role authenticated;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Layers', 'Organization default reaches the account', 'daniel · 1.1', pg_temp.voice('profile') || ' · ' || pg_temp.voice('rate'));
-  -- 4. Account override (ADMIN)
+  -- 4. ADR 0018: the account admin no longer changes the voice
+  insert into _t (area, test, expected, got) values ('Override', 'The account admin cannot configure', 'false', pg_temp.feat('voice_speech', 'canConfigure'));
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "belen", "style": "friendly"}');
+    insert into _t (area, test, expected, got) values ('Override', 'The account admin changes the voice', 'blocked', 'ALLOWED');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Override', 'The account admin changes the voice', 'blocked', 'blocked', sqlerrm); end;
+end $$;
+reset role;
+
+-- 5. The organization sets an exception for the account
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
   perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "belen", "style": "friendly"}');
-  insert into _t (area, test, expected, got) values ('Layers', 'Account override on top of the organization', 'belen · friendly · 1.1',
-    pg_temp.voice('profile') || ' · ' || pg_temp.voice('style') || ' · ' || pg_temp.voice('rate'));
-  insert into _t (area, test, expected, got) values ('Layers', 'Inherited voice stays visible', 'daniel',
-    pg_temp.feat('voice_speech', 'inheritedSettings')::jsonb ->> 'profile');
   begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"lang": "en-US"}');
     insert into _t (area, test, expected, got) values ('Validation', 'Language not offered', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Validation', 'Language not offered', 'blocked', 'blocked', sqlerrm); end;
 end $$;
 reset role;
 
--- 5. Organization forbids customization: account uses the organization voice; its choice is kept
-select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
-set local role authenticated;
-do $$ begin perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'voice_speech', '{"profile": "daniel", "rate": 1.1, "allow_account_override": false}'); end $$;
-reset role;
-
 select pg_temp.act_as('00000000-0000-0000-0000-00000000b0b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Override', 'Not allowed: organization voice, cannot configure', 'daniel · false',
-    pg_temp.voice('profile') || ' · ' || pg_temp.feat('voice_speech', 'canConfigure'));
-  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'voice_speech', '{"profile": "ivan"}');
-    insert into _t (area, test, expected, got) values ('Override', 'Account changes the voice when not allowed', 'blocked', 'ALLOWED');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Override', 'Account changes the voice when not allowed', 'blocked', 'blocked', sqlerrm); end;
+  insert into _t (area, test, expected, got) values ('Layers', 'Account exception on top of the organization', 'belen · friendly · 1.1',
+    pg_temp.voice('profile') || ' · ' || pg_temp.voice('style') || ' · ' || pg_temp.voice('rate'));
+  insert into _t (area, test, expected, got) values ('Layers', 'Inherited voice stays visible', 'daniel',
+    pg_temp.feat('voice_speech', 'inheritedSettings')::jsonb ->> 'profile');
 end $$;
 reset role;
 
 select pg_temp.as_owner();
-insert into _t (area, test, expected, got) values ('Override', 'The account choice is kept', 'belen',
+insert into _t (area, test, expected, got) values ('Override', 'The exception is stored for the account', 'belen',
   (select settings ->> 'profile' from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'voice_speech'));
 
 -- 6. Platform switches the voice off: nobody speaks, settings kept

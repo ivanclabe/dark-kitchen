@@ -12,12 +12,12 @@ interface MenuPlanItemRow {
   special_price: number | null
   unit_limit: number | null
   while_supplies_last: boolean
-  dk_products: { name: string; price: number; active: boolean; dk_product_categories: { name: string } | null } | null
+  dk_products: { name: string; price: number; active: boolean; image_path: string | null; dk_product_categories: { name: string } | null } | null
 }
 
 const SELECT = `
   id, plan_date, product_id, display_order, is_active, start_time, end_time, special_price, unit_limit, while_supplies_last,
-  dk_products ( name, price, active, dk_product_categories ( name ) )
+  dk_products ( name, price, active, image_path, dk_product_categories ( name ) )
 `
 
 function mapRow(row: MenuPlanItemRow): MenuPlanItem {
@@ -29,6 +29,7 @@ function mapRow(row: MenuPlanItemRow): MenuPlanItem {
     productPrice: Number(row.dk_products?.price ?? 0),
     productCategory: row.dk_products?.dk_product_categories?.name ?? null,
     productActive: row.dk_products?.active ?? true,
+    productImagePath: row.dk_products?.image_path ?? null,
     displayOrder: row.display_order,
     isActive: row.is_active,
     startTime: row.start_time,

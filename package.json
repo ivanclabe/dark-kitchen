@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:admin": "vite --config vite.admin.config.ts",
     "build": "tsc -b && vite build",
+    "build:admin": "tsc -b && vite build --config vite.admin.config.ts",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run"
@@ -19,11 +21,13 @@
     "@tanstack/react-query": "^5.102.8",
     "clsx": "^2.1.1",
     "lucide-react": "^1.45.0",
+    "onnxruntime-web": "1.30.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.88.0",
     "react-router-dom": "^7.18.3",
     "recharts": "^3.10.1",
+    "vosk-browser": "0.0.8",
     "zod": "^4.6.2"
   },
   "devDependencies": {

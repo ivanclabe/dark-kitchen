@@ -11,6 +11,8 @@ export interface MenuPlanItem {
   productPrice: number
   productCategory: string | null
   productActive: boolean
+  /** Main photo of the dish (ADR 0018), in the public bucket dk-product-images. */
+  productImagePath: string | null
   displayOrder: number
   isActive: boolean
   startTime: string | null

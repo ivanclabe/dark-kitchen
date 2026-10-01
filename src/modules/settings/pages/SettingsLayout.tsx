@@ -1,16 +1,16 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { RouteTabs, type RouteTabItem } from '@/shared/ui/RouteTabs'
-import { Settings, Sparkles, Store } from 'lucide-react'
+import { Mic, Settings, Store } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-/** Configuración de la Cuenta activa: datos generales y funciones (IA, voz). Cada pestaña según el permiso del rol. */
+/** Configuración de la Cuenta activa: datos generales y la voz en este equipo. La IA la configura la organización (ADR 0018). */
 export function SettingsLayout() {
   const { can, path, kitchen } = useActiveKitchen()
   const { pathname } = useLocation()
   const tabs: RouteTabItem[] = [
     ...(can('settings.manage') ? [{ to: path('/settings/general'), label: 'General', icon: Store }] : []),
-    ...(can('ai.manage') || can('settings.manage') ? [{ to: path('/settings/features'), label: 'IA y voz', icon: Sparkles }] : []),
+    ...(can('settings.manage') ? [{ to: path('/settings/features'), label: 'Voz en este equipo', icon: Mic }] : []),
   ]
 
   if (tabs.length === 0) return <Navigate to={path('/')} replace />

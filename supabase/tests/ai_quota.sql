@@ -48,7 +48,8 @@ begin
     end if;
   end loop;
 end $$;
-select pg_temp.act_as('00000000-0000-0000-0000-0000000a1a01', (select id from _ctx where key = 'A'));
+-- ADR 0018: settings are written by the organization (its owner here).
+select pg_temp.act_as((select id from auth.users where email = 'ivanclabe@gmail.com'), (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
   begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"frequency_min": 0}');

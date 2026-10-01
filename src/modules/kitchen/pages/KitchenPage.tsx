@@ -5,6 +5,9 @@ import { Button, IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
 import { kitchenSpeech } from '@/shared/voice/speechQueue'
+import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
+import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
+import { useWakeWord } from '@/shared/voice/wakeWord/useWakeWord'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { typography } from '@/shared/ui/typography'
 import { formatDateLong, formatMoney, toDateInput } from '@/shared/utils/format'
@@ -33,6 +36,7 @@ import { KanbanView } from '../views/KanbanView'
 import { SlaView } from '../views/SlaView'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 import { useVoiceCommandEngine } from '../voice/useVoiceCommandEngine'
+import { WakeWordIndicator } from '../voice/WakeWordIndicator'
 
 type KitchenView = 'tablero' | 'sla'
 type Density = 'normal' | 'grande'
@@ -85,7 +89,7 @@ function Kpi({ label, value }: { label: string; value: number }) {
  */
 export function KitchenPage() {
   // Permisos del rol en la Cocina activa (ADR 0007): vienen de la base.
-  const { can, canUseFeature } = useActiveKitchen()
+  const { can, canUseFeature, feature } = useActiveKitchen()
   const canConfigure = can('settings.manage')
   const canCreate = canPerform(can, 'create')
   const showSales = can('dashboard.view')
@@ -195,6 +199,16 @@ export function KitchenPage() {
   // Comandos de voz: función de la Cuenta (organización ∧ Cuenta ∧ permiso) + soporte del navegador.
   const voiceCommands = canUseFeature('voice_commands')
   const voiceAvailable = voiceCommands && voice.supported && isToday
+  // Hands-free (ADR 0016): feature of the account + switched on in this device; one tap pauses it.
+  const [handsFree] = useWakeWordPreference()
+  const [wakePaused, setWakePaused] = useState(false)
+  const wakeWordOn = voiceAvailable && canUseFeature('voice_wake_word') && handsFree
+  const wakeWord = useWakeWord({
+    active: wakeWordOn && !wakePaused,
+    suspended: voiceBusy,
+    tuning: wakeWordTuning(feature('voice_wake_word')),
+    onDetect: () => void voice.startHandsFree(),
+  })
   const menuItems: MenuItem[] = [
     view === 'tablero'
       ? { label: 'Ver tiempos (SLA)', icon: Gauge, onSelect: () => changeView('sla') }
@@ -262,6 +276,8 @@ export function KitchenPage() {
               ) : (
                 <IconButton icon={Search} aria-label="Buscar pedido" onClick={() => setSearchOpen(true)} />
               )}
+
+              {wakeWordOn && <WakeWordIndicator state={wakeWord.state} error={wakeWord.error} paused={wakePaused} onToggle={() => setWakePaused((p) => !p)} />}
 
               {voiceCommands && <VoiceCommandBar engine={voice} enabled={isToday} testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
 

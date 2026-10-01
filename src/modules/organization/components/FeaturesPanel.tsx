@@ -21,6 +21,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Lock, Mic, Sparkles, Store, Workflow } from 'lucide-react'
 import { orgKey } from '../hooks/useOrganization'
+import { FeatureSettingsSection } from './FeatureSettings'
 
 const CATEGORY_ICON: Record<FeatureCategory, typeof Sparkles> = { ai: Sparkles, voice: Mic, general: Store }
 
@@ -61,8 +62,8 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
   return (
     <div className="space-y-8">
       <p className={typography.small}>
-        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''} y en qué cuentas están activadas: solo tú las activas. Cada cuenta ajusta sus
-        umbrales en Configuración → IA y voz.
+        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''}, en qué cuentas están activadas y cómo se comportan. Toda la IA se configura aquí;
+        si una cuenta necesita otros valores, agrégale una excepción en «Ajustes».
       </p>
       {data.accounts.length === 0 && <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea una cuenta para activar funciones en ella." compact />}
       {categories.map((category) => {
@@ -80,6 +81,8 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
                     key={f.key}
                     feature={f}
                     accounts={data.accounts}
+                    organizationId={organizationId}
+                    onChanged={refresh}
                     disabled={pending}
                     onAvailable={(available) => setAvailable.mutate({ key: f.key, available })}
                     onEnabled={(accountId, enabled) => setEnabled.mutate({ accountId, key: f.key, enabled })}
@@ -96,12 +99,16 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
 function FeatureCard({
   feature,
   accounts,
+  organizationId,
+  onChanged,
   disabled,
   onAvailable,
   onEnabled,
 }: {
   feature: FeatureMatrix['features'][number]
   accounts: FeatureMatrix['accounts']
+  organizationId: string
+  onChanged: () => Promise<unknown>
   disabled: boolean
   onAvailable: (available: boolean) => void
   onEnabled: (accountId: string, enabled: boolean) => void
@@ -127,8 +134,11 @@ function FeatureCard({
           </div>
           <p className={clsx('mt-1', typography.caption)}>{feature.description}</p>
           {feature.dependsOn.length > 0 && (
-            <p className="mt-1 text-[11px] text-neutral-500">Para hablar usa «Voz de la aplicación».</p>
+            <p className="mt-1 text-[11px] text-neutral-500">
+              {feature.key === 'voice_wake_word' ? 'Necesita «Comandos de voz».' : 'Para hablar usa «Voz de la aplicación».'}
+            </p>
           )}
+          {feature.key === 'voice_speech' && <p className="mt-1 text-[11px] text-neutral-500">La voz, el estilo y la velocidad se ajustan en la pestaña «Voz de cocina».</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {platformOff ? (
@@ -179,6 +189,10 @@ function FeatureCard({
             })}
           </ul>
         </div>
+      )}
+
+      {feature.platformActive && feature.includedInPlan && (
+        <FeatureSettingsSection organizationId={organizationId} feature={feature} accounts={accounts} canEdit onChanged={onChanged} />
       )}
     </article>
   )

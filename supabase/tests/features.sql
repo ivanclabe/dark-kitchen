@@ -59,12 +59,12 @@ delete from dk_organization_features where organization_id = (select id from _ct
 select pg_temp.act_as('00000000-0000-0000-0000-0000000fe0b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo', '7', jsonb_array_length(dk_my_features())::text);
+  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo', '8', jsonb_array_length(dk_my_features())::text);
   insert into _t (area, test, expected, got) values ('Por defecto', 'IA apagada sin fila', 'false · false', pg_temp.feat('supply_reorder', 'enabled') || ' · ' || pg_temp.feat('supply_reorder', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Voz encendida sin fila', 'true', pg_temp.feat('voice_commands', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Parámetros por defecto del catálogo', '7', pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
   -- ADR 0014: el ADMIN de la Cuenta ya no activa; solo ajusta parámetros.
-  insert into _t (area, test, expected, got) values ('Por defecto', 'ADMIN: no activa, sí configura', 'false · true',
+  insert into _t (area, test, expected, got) values ('Por defecto', 'ADMIN: no activa ni configura (ADR 0018)', 'false · false',
     pg_temp.feat('supply_reorder', 'canManage') || ' · ' || pg_temp.feat('supply_reorder', 'canConfigure'));
   begin perform dk_set_kitchen_feature((select id from _ctx where key = 'A'), 'supply_reorder', true);
     insert into _t (area, test, expected, got) values ('Permisos', 'ADMIN activa una función en su Cuenta', 'bloqueado', 'PERMITIDO');
@@ -88,8 +88,11 @@ do $$ begin
     (select settings::text from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'supply_reorder'));
   insert into _t (area, test, expected, got) values ('Cuenta', 'Estado: parámetros = catálogo + Cuenta', '10 · 360',
     (dk_feature_state('supply_reorder') -> 'settings' ->> 'coverage_days') || ' · ' || (dk_feature_state('supply_reorder') -> 'settings' ->> 'frequency_min'));
-  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 11}');
-  insert into _t (area, test, expected, got) values ('Cuenta', 'ADMIN ajusta los parámetros', '11', pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
+  -- ADR 0018: the account no longer configures AI; the organization does.
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 11}');
+    insert into _t (area, test, expected, got) values ('Cuenta', 'ADMIN de la Cuenta ajusta la IA', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Cuenta', 'ADMIN de la Cuenta ajusta la IA', 'bloqueado', 'bloqueado', sqlerrm); end;
+  insert into _t (area, test, expected, got) values ('Cuenta', 'ADMIN de la Cuenta no configura', 'false', pg_temp.feat('supply_reorder', 'canConfigure'));
 
   -- 3. ADMIN no toca la organización
   begin perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'supply_reorder', false);
@@ -132,7 +135,7 @@ set local role authenticated;
 do $$ begin
   perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'supply_reorder', false);
   perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'voice_commands', false);
-  insert into _t (area, test, expected, got) values ('Organización', 'La matriz lista funciones y Cuentas', '7 · sí',
+  insert into _t (area, test, expected, got) values ('Organización', 'La matriz lista funciones y Cuentas', '8 · sí',
     jsonb_array_length(dk_org_feature_matrix((select id from _ctx where key = 'orgA')) -> 'features')::text || ' · ' ||
     case when jsonb_array_length(dk_org_feature_matrix((select id from _ctx where key = 'orgA')) -> 'accounts') >= 1 then 'sí' else 'no' end);
 end $$;

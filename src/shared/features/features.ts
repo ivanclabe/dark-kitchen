@@ -21,6 +21,7 @@ export const FEATURE_KEYS = [
   'kitchen_insights',
   'voice_commands',
   'voice_speech',
+  'voice_wake_word',
 ] as const
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number]
@@ -127,6 +128,8 @@ export interface FeatureMatrix {
     enabled: Record<FeatureKey, boolean>
     /** Features whose settings this account customized. */
     customized: FeatureKey[]
+    /** ADR 0018: the account exceptions set by the organization, by feature. */
+    overrides?: Partial<Record<FeatureKey, FeatureSettings>>
   }[]
 }
 

@@ -89,7 +89,7 @@ begin
     (v -> 'orders' -> 'today' ->> 'created') || ' · ' || (v -> 'orders' -> 'today' ->> 'delivered') || ' · ' || (v -> 'orders' -> 'today' ->> 'sales')::numeric);
   insert into _t (area, test, expected, got) values ('Cuenta', '7 días por día (7 filas) · atrasados · canal', '7 · 1 · 3',
     jsonb_array_length(v -> 'orders' -> 'byDay') || ' · ' || (v ->> 'late') || ' · ' || (v -> 'orders' -> 'byChannel' ->> 'MANUAL'));
-  insert into _t (area, test, expected, got) values ('Cuenta', 'Módulos, equipo y funciones', 'true · 2 · 7',
+  insert into _t (area, test, expected, got) values ('Cuenta', 'Módulos, equipo y funciones', 'true · 2 · 8',
     (v -> 'modules' ->> 'slaConfigured') || ' · ' || (v -> 'team' ->> 'members') || ' · ' || jsonb_array_length(v -> 'features'));
 end $$;
 reset role;

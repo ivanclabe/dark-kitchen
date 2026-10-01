@@ -4,7 +4,7 @@ import { useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenC
 import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
 import { canAccessModule } from '@/shared/rbac/roles'
 import { Popover, PopoverItem, PopoverSeparator } from '@/shared/ui/Popover'
-import { ArrowLeftRight, BadgeCheck, Building2, ChevronLeft, ChevronRight, LogOut, Settings, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { ArrowLeftRight, BadgeCheck, Building2, ChevronLeft, ChevronRight, LogOut, Settings, UserRound, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AccountList, RoleList, useShowOrganization } from './AccountSwitcher'
@@ -118,11 +118,6 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
             {canAdminOrg && organization && (
               <PopoverItem icon={Building2} onSelect={() => go(orgPath(organization.slug), close)}>
                 Administración de la organización
-              </PopoverItem>
-            )}
-            {profile?.isSuperadmin && (
-              <PopoverItem icon={ShieldCheck} onSelect={() => go('/admin', close)}>
-                Plataforma
               </PopoverItem>
             )}
 

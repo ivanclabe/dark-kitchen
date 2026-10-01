@@ -10,7 +10,7 @@ grant all on _t, _ctx to authenticated, anon;
 grant usage on sequence _t_n_seq to authenticated, anon;
 
 create or replace function pg_temp.act_as(p_auth uuid, p_kitchen uuid) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated')::text, true);
+  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   select set_config('request.headers', case when p_kitchen is null then '{}' else jsonb_build_object('x-dk-kitchen-id', p_kitchen)::text end, true);
 $$;
 create or replace function pg_temp.as_owner() returns void language sql as $$
@@ -46,7 +46,7 @@ delete from dk_ai_insights where kitchen_id = (select id from _ctx where key = '
 select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '7', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
+  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '8', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
   insert into _t (area, test, expected, got) values ('Overview', 'Models come from the catalog (H3)', 'claude-sonnet-5-5 · claude-haiku-4-5-20251001',
     (select string_agg(f ->> 'modelKey', ' · ' order by f ->> 'key' desc) from jsonb_array_elements(dk_platform_ai_overview() -> 'features') f
      where f ->> 'key' in ('supply_reorder', 'kitchen_insights')));
@@ -178,47 +178,51 @@ do $$ begin
 end $$;
 reset role;
 
--- 4. Organization settings and account override
-select pg_temp.act_as('00000000-0000-0000-0000-00000000a1b1', (select id from _ctx where key = 'A'));
-set local role authenticated;
-do $$ begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 20}'); end $$;
-reset role;
-
-select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
-set local role authenticated;
-do $$ begin perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'supply_reorder', '{"coverage_days": 15, "allow_account_override": false}'); end $$;
-reset role;
-
+-- 4. Organization settings and account exceptions (ADR 0018: only the organization writes)
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a1b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Layers', 'Override off: organization value wins', '15 · false',
-    (pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days') || ' · ' || pg_temp.feat('supply_reorder', 'canConfigure'));
-  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 21}');
-    insert into _t (area, test, expected, got) values ('Layers', 'Account customizes when not allowed', 'blocked', 'ALLOWED');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Layers', 'Account customizes when not allowed', 'blocked', 'blocked', sqlerrm); end;
+  begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 20}');
+    insert into _t (area, test, expected, got) values ('Layers', 'The account admin configures its AI', 'blocked', 'ALLOWED');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Layers', 'The account admin configures its AI', 'blocked', 'blocked', sqlerrm); end;
+  insert into _t (area, test, expected, got) values ('Layers', 'The account cannot configure', 'false', pg_temp.feat('supply_reorder', 'canConfigure'));
 end $$;
 reset role;
 
-select pg_temp.as_owner();
-insert into _t (area, test, expected, got) values ('Layers', 'The account value is kept while not allowed', '20',
-  (select settings ->> 'coverage_days' from dk_kitchen_features where kitchen_id = (select id from _ctx where key = 'A') and feature_key = 'supply_reorder'));
-
 select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  begin perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'supply_reorder', '{"allow_account_override": "yes"}');
-    insert into _t (area, test, expected, got) values ('Layers', 'Override flag must be boolean', 'blocked', 'ALLOWED');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Layers', 'Override flag must be boolean', 'blocked', 'blocked', sqlerrm); end;
-  perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'supply_reorder', '{"coverage_days": 15, "allow_account_override": true}');
+  -- The old override flag is ignored: exceptions set by the organization always apply.
+  perform dk_set_org_feature_settings((select id from _ctx where key = 'orgA'), 'supply_reorder', '{"coverage_days": 15, "allow_account_override": false}');
+  perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{"coverage_days": 20}');
+  insert into _t (area, test, expected, got) values ('Layers', 'The organization sees the account exception', '20',
+    (select a -> 'overrides' -> 'supply_reorder' ->> 'coverage_days'
+     from jsonb_array_elements(dk_org_feature_matrix((select id from _ctx where key = 'orgA')) -> 'accounts') a
+     where a ->> 'id' = (select id from _ctx where key = 'A')::text));
+  insert into _t (area, test, expected, got) values ('Layers', 'The override flag is not stored', 'false',
+    (select (settings ? 'allow_account_override')::text from dk_organization_features
+     where organization_id = (select id from _ctx where key = 'orgA') and feature_key = 'supply_reorder'));
 end $$;
 reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a1b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Layers', 'Override on: account value wins, inherited kept', '20 · 15',
+  insert into _t (area, test, expected, got) values ('Layers', 'Account exception wins, inherited kept', '20 · 15',
     (pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days') || ' · ' || (pg_temp.feat('supply_reorder', 'inheritedSettings')::jsonb ->> 'coverage_days'));
+end $$;
+reset role;
+
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin perform dk_set_kitchen_feature_settings((select id from _ctx where key = 'A'), 'supply_reorder', '{}'); end $$;
+reset role;
+
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a1b1', (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
+  insert into _t (area, test, expected, got) values ('Layers', 'Exception removed: the organization value applies', '15',
+    pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
 end $$;
 reset role;
 

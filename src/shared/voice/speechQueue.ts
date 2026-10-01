@@ -43,6 +43,7 @@ export class SpeechQueue {
   private nextId = 1
   private watchdog: ReturnType<typeof setTimeout> | null = null
   private readonly samples: number[] = []
+  private lastActiveAt = Number.NEGATIVE_INFINITY
   private readonly maxPending: number
   private readonly staleMs: number
   private readonly now: () => number
@@ -81,8 +82,17 @@ export class SpeechQueue {
     this.watchdog = null
     if (this.current) {
       this.current = null
+      this.lastActiveAt = this.now()
       this.engine.cancel()
     }
+  }
+
+  /**
+   * True while something is being said and for `tailMs` after it ends (the
+   * room still echoes it). The wake word stops listening meanwhile (ADR 0016).
+   */
+  isSpeaking(tailMs = 0): boolean {
+    return this.current !== null || this.now() - this.lastActiveAt < tailMs
   }
 
   get size(): number {
@@ -107,6 +117,7 @@ export class SpeechQueue {
       if (this.watchdog) clearTimeout(this.watchdog)
       this.watchdog = null
       this.current = null
+      this.lastActiveAt = this.now()
       this.pump()
     }
     this.watchdog = setTimeout(() => {

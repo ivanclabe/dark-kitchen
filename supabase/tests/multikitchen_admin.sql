@@ -25,7 +25,7 @@ insert into dk_users (id, auth_user_id, full_name, role, active) values
   ('11000000-0000-0000-0000-00000000ca01', '00000000-0000-0000-0000-00000000ca01', 'Cajero A', 'CASHIER', true),
   ('11000000-0000-0000-0000-00000000ad02', '00000000-0000-0000-0000-00000000ad02', 'Admin B', 'ADMIN', true);
 
-select set_config('request.jwt.claims', json_build_object('sub', (select id from _ctx where key = 'ivan'), 'role', 'authenticated')::text, true);
+select set_config('request.jwt.claims', json_build_object('sub', (select id from _ctx where key = 'ivan'), 'role', 'authenticated', 'aal', 'aal2')::text, true);
 set local role authenticated;
 insert into _ctx (key, id) select 'B', dk_create_kitchen('Cocina Prueba B', 'cocina-prueba-b');
 reset role;
@@ -39,7 +39,7 @@ select k.id, u.id, r.id from (values
 join _ctx k on k.key = m.kitchen join dk_users u on u.id = m.user_id join dk_roles r on r.is_system and r.key = m.role_key;
 
 create or replace function pg_temp.act_as(p_auth uuid, p_kitchen uuid) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated',
+  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated', 'aal', 'aal2',
     'email', (select email from auth.users where id = p_auth),
     'user_metadata', (select raw_user_meta_data from auth.users where id = p_auth))::text, true);
   select set_config('request.headers', case when p_kitchen is null then '{}' else json_build_object('x-dk-kitchen-id', p_kitchen)::text end, true);

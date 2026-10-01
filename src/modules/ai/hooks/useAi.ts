@@ -1,9 +1,9 @@
-import { setKitchenFeatureSettings } from '@/shared/features/features'
-import { FEATURES_KEY, useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAiConnectionStatus, getKitchenSignals, getLatestInsight, listInventorySignals, requestInsight } from '../api/ai'
 import { numberSetting, withDefaults } from '../lib/catalog'
 import type { AiFeatureKey, AiInsightFeatureKey, AiSettings, InsightResult } from '../types'
+
 const INSIGHT_KEY = ['ai-insight'] as const
 // Bajo el prefijo de las sugerencias de Abastecimiento: toda mutación que ya las
 // invalida (compras, mermas, ajustes, consumo en cocina, edición de insumos) refresca también las señales.
@@ -21,19 +21,6 @@ export function useAiFeature(key: AiFeatureKey): { enabled: boolean; settings: A
 }
 
 /** Operational settings of a feature in the active account (ADR 0014: no activation here; the database checks organization and permission). */
-export function useUpdateAiFeature() {
-  const queryClient = useQueryClient()
-  const { kitchen } = useActiveKitchen()
-  return useMutation({
-    mutationFn: ({ key, settings }: { key: AiFeatureKey; settings: AiSettings }) => setKitchenFeatureSettings(kitchen.id, key, settings),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
-      void queryClient.invalidateQueries({ queryKey: INSIGHT_KEY })
-      void queryClient.invalidateQueries({ queryKey: INVENTORY_SIGNALS_KEY })
-    },
-  })
-}
-
 export function useAiConnectionStatus() {
   return useQuery({ queryKey: ['ai-connection'], queryFn: getAiConnectionStatus, staleTime: 5 * 60_000, retry: false })
 }

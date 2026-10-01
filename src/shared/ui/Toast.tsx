@@ -4,14 +4,26 @@ import { createPortal } from 'react-dom'
 
 type ToastTone = 'success' | 'error' | 'info'
 
+interface ToastAction {
+  label: string
+  onClick: () => void
+}
+
 interface ToastItem {
   id: number
   tone: ToastTone
   message: string
+  action?: ToastAction
+}
+
+export interface ToastOptions {
+  /** One button next to the message (e.g. "Deshacer"); clicking it also closes the toast. */
+  action?: ToastAction
+  durationMs?: number
 }
 
 interface ToastContextValue {
-  show: (message: string, tone?: ToastTone) => void
+  show: (message: string, tone?: ToastTone, options?: ToastOptions) => void
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null)
@@ -32,10 +44,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const show = useCallback(
-    (message: string, tone: ToastTone = 'success') => {
+    (message: string, tone: ToastTone = 'success', options?: ToastOptions) => {
       const id = nextId++
-      setToasts((t) => [...t, { id, tone, message }])
-      setTimeout(() => dismiss(id), 4000)
+      setToasts((t) => [...t, { id, tone, message, action: options?.action }])
+      setTimeout(() => dismiss(id), options?.durationMs ?? (options?.action ? 6000 : 4000))
     },
     [dismiss],
   )
@@ -52,6 +64,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               {TONE_STYLES[toast.tone].icon}
               <p className="flex-1">{toast.message}</p>
+              {toast.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.action?.onClick()
+                    dismiss(toast.id)
+                  }}
+                  className="shrink-0 rounded-md px-1.5 text-sm font-semibold text-brasa-300 transition-colors hover:bg-white/5 hover:text-brasa-200"
+                >
+                  {toast.action.label}
+                </button>
+              )}
               <button
                 onClick={() => dismiss(toast.id)}
                 className="text-neutral-500 transition-colors hover:text-neutral-200"

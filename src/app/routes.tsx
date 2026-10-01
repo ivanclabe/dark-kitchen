@@ -20,7 +20,6 @@ import { OrgTeamPage } from '@/modules/orgAdmin/pages/OrgTeamPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
 import { SignUpConfirmedPage } from '@/modules/signup/pages/SignUpConfirmedPage'
-import { PlatformAdminPage } from '@/modules/platform/pages/PlatformAdminPage'
 import { ProfilePage } from '@/modules/profile/pages/ProfilePage'
 import { KitchenSelectorPage } from '@/modules/kitchens/pages/KitchenSelectorPage'
 import { FeaturesSettingsPage } from '@/modules/settings/pages/FeaturesSettingsPage'
@@ -102,15 +101,8 @@ export const router = createBrowserRouter([
   // Dirección anterior del selector.
   { path: '/cocinas', element: <Navigate to="/cuentas" replace /> },
 
-  // Administración de la plataforma (superusuario): todas las Cocinas.
-  {
-    path: '/admin',
-    element: (
-      <ProtectedRoute>
-        <PlatformAdminPage />
-      </ProtectedRoute>
-    ),
-  },
+  // La plataforma se administra en el portal Global Admin (admin.quanela.com, ADR 0019).
+  { path: '/admin/*', element: <Navigate to="/" replace /> },
 
   // Centro de administración de la organización (ADR 0012): /o/{organización}/…
   // Sin Cuenta activa; cada sección exige su permiso de organización.

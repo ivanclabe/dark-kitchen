@@ -1,12 +1,15 @@
 import { useKitchenVoice, type SpokenText } from '@/shared/voice/hooks'
 import { kitchenPhrases } from '@/shared/voice/kitchenPhrases'
 import { kitchenSpeech } from '@/shared/voice/speechQueue'
+import { playWakeTone } from '@/shared/voice/wakeWord/tone'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useEffect, useRef, useState } from 'react'
 import { useAdvanceTicketItems, useCancelKitchenOrder, useSetTicketPriority } from '../hooks/useKitchen'
 import type { KitchenTicket } from '../types'
 import { parseVoiceCommand, type VoiceAction } from './commandParser'
+import { commandGrammar } from './commandGrammar'
+import { spokenNumbersToDigits } from './spokenNumbers'
 import { useSpeechRecognition } from './speechRecognition'
 
 export type VoicePhase = 'idle' | 'listening' | 'processing' | 'success' | 'error'
@@ -22,6 +25,11 @@ const RESULT_DISPLAY_MS = 4000
  * la intención completa del usuario y se procesa.
  */
 export const VOICE_COMMAND_DELAY_MS = 1800
+
+const COMMAND_GRAMMAR = commandGrammar()
+
+/** After "Oye Quanela": how long to wait for the command to start (ADR 0016, D6). */
+export const HANDS_FREE_WINDOW_MS = 5000
 
 const ACTION_FEEDBACK: Record<VoiceAction, string> = {
   CONFIRM: 'confirmado',
@@ -68,6 +76,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
 
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const noSpeechTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Se pone en true apenas el debounce dispara (antes incluso de validar) y
   // se usa para: (a) ignorar cualquier transcript tardío que el navegador
   // siga entregando mientras recognition.stop() termina de aplicarse, (b)
@@ -94,10 +103,20 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     setPhase('processing')
     setLastTranscript(transcript)
 
-    const parsed = parseVoiceCommand(transcript)
+    // Offline engines return numbers as words ("dos mil cuarenta"); digits pass through unchanged.
+    const parsed = parseVoiceCommand(spokenNumbersToDigits(transcript))
 
     if (parsed.confidence !== 'high' || !parsed.orderCode || !parsed.action) {
       announce('error', 'No entendí el comando.', (v) => kitchenPhrases.notUnderstood(v))
+      isProcessingRef.current = false
+      return
+    }
+
+    // Offline recognition (beta, ADR 0015) can mishear a digit and name another
+    // order with full confidence; cancelling is the one action that is hard to
+    // undo, so with that engine it is done from the screen.
+    if (parsed.action === 'CANCEL' && speech.engine === 'vosk') {
+      announce('error', 'Con el reconocimiento sin internet, los pedidos se cancelan desde la pantalla.', 'Cancela desde la pantalla.')
       isProcessingRef.current = false
       return
     }
@@ -167,6 +186,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
 
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
     if (transcript.length === 0) return
+    clearNoSpeechTimer()
 
     debounceTimer.current = setTimeout(() => {
       void processTranscript(transcript)
@@ -177,20 +197,47 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     onTranscriptChange: handleTranscriptChange,
     onError: (code) => announce('error', speechErrorMessage(code)),
     lang: 'es-CO',
+    grammar: COMMAND_GRAMMAR,
   })
 
   useEffect(() => {
     return () => {
       if (resetTimer.current) clearTimeout(resetTimer.current)
       if (debounceTimer.current) clearTimeout(debounceTimer.current)
+      if (noSpeechTimer.current) clearTimeout(noSpeechTimer.current)
     }
   }, [])
 
+  function clearNoSpeechTimer() {
+    if (noSpeechTimer.current) clearTimeout(noSpeechTimer.current)
+    noSpeechTimer.current = null
+  }
+
   function start() {
     isProcessingRef.current = false
+    clearNoSpeechTimer()
     setLiveTranscript('')
     setPhase('listening')
-    speech.start()
+    void speech.start()
+  }
+
+  /**
+   * "Oye Quanela" was heard (ADR 0016): a short tone, then the same command
+   * flow as the microphone button. If nobody speaks within
+   * HANDS_FREE_WINDOW_MS it quietly goes back to waiting for the phrase.
+   */
+  async function startHandsFree() {
+    isProcessingRef.current = false
+    clearNoSpeechTimer()
+    setLiveTranscript('')
+    setPhase('listening')
+    await playWakeTone()
+    void speech.start()
+    noSpeechTimer.current = setTimeout(() => {
+      noSpeechTimer.current = null
+      speech.stop()
+      setPhase('idle')
+    }, HANDS_FREE_WINDOW_MS)
   }
 
   function toggleTts() {
@@ -218,6 +265,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
     speechAllowed: voiceOutput.allowed,
     toggleTts,
     start,
+    startHandsFree,
     stop: speech.stop,
     /**
      * Alimenta el pipeline con un transcript sin pasar por el micrófono
@@ -241,6 +289,8 @@ function speechErrorMessage(code: string): string {
       return 'No hay micrófono disponible.'
     case 'not-allowed':
       return 'Permiso de micrófono denegado.'
+    case 'engine-error':
+      return 'No se pudo iniciar el reconocimiento sin internet.'
     default:
       return 'Error de reconocimiento de voz.'
   }

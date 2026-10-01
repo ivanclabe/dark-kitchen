@@ -127,4 +127,17 @@ describe('SpeechQueue (ADR 0014, 9.5)', () => {
     const q = queue({ available: () => false, speak: vi.fn(), cancel: vi.fn() })
     expect(q.enqueue('Hola.', 'command', params)).toBe(false)
   })
+
+  it('reports speaking while a message plays and for a tail after it (ADR 0016)', () => {
+    const f = fakeEngine()
+    const q = queue(f.engine)
+    expect(q.isSpeaking(700)).toBe(false)
+    q.enqueue('Pedido 1042 listo.', 'command', params)
+    expect(q.isSpeaking()).toBe(true)
+    f.end()
+    expect(q.isSpeaking()).toBe(false)
+    expect(q.isSpeaking(700)).toBe(true)
+    now += 701
+    expect(q.isSpeaking(700)).toBe(false)
+  })
 })

@@ -7,16 +7,29 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Plus, Search, UtensilsCrossed } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { shortDateLabel } from '../hooks/useMenuPlannerDrag'
 import { DishCatalogCard } from './DishCatalogCard'
 
-/** Catálogo lateral: buscar/filtrar platos, arrastrarlos al calendario, crear/editar. */
+const NO_DATES: ReadonlySet<string> = new Set()
+
+/**
+ * Side catalog: search/filter dishes, drag them onto the calendar (they stay
+ * here, marked with the days they are on), quick-add to the selected day,
+ * create/edit.
+ */
 export function CatalogSidebar({
-  selectedDateProductIds,
+  weekDates,
+  datesByProduct,
+  selectedDate,
+  justAddedProductId,
   onQuickAdd,
   onEditDish,
   onCreateDish,
 }: {
-  selectedDateProductIds: Set<string>
+  weekDates: string[]
+  datesByProduct: ReadonlyMap<string, ReadonlySet<string>>
+  selectedDate: string
+  justAddedProductId: string | null
   onQuickAdd: (product: Product) => void
   onEditDish: (product: Product) => void
   onCreateDish: () => void
@@ -59,6 +72,12 @@ export function CatalogSidebar({
         />
       </div>
 
+      {can('menus.edit') && (
+        <p className="-mt-1 text-[11px] text-neutral-500">
+          Arrastra a cualquier día, o usa <span className="font-semibold text-neutral-300">+</span> para agregar a <span className="text-neutral-300">{shortDateLabel(selectedDate)}</span>.
+        </p>
+      )}
+
       {categories && categories.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           <Chip label="Todas" active={categoryId === 'all'} onClick={() => setCategoryId('all')} />
@@ -78,7 +97,10 @@ export function CatalogSidebar({
             <DishCatalogCard
               key={product.id}
               product={product}
-              alreadyOnSelectedDate={selectedDateProductIds.has(product.id)}
+              weekDates={weekDates}
+              datesWithDish={datesByProduct.get(product.id) ?? NO_DATES}
+              selectedDate={selectedDate}
+              justAdded={justAddedProductId === product.id}
               onQuickAdd={() => onQuickAdd(product)}
               onEdit={() => onEditDish(product)}
               canEdit={can('products.edit')}

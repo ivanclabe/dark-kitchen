@@ -1,3 +1,4 @@
+import { appUrl } from '@/shared/lib/appUrl'
 import { supabase } from '@/shared/lib/supabase'
 
 /** ¿Está abierto el registro público? (ADR 0008 D8: se activa con SMTP y CAPTCHA configurados). */
@@ -39,7 +40,7 @@ export async function signUpBusiness(input: {
     password: input.password,
     options: {
       data: { full_name: input.fullName.trim(), pending_organization: input.organization, plan: input.plan },
-      emailRedirectTo: `${window.location.origin}${CONFIRMED_PATH}`,
+      emailRedirectTo: appUrl(CONFIRMED_PATH),
       captchaToken: input.captchaToken,
     },
   })
@@ -49,7 +50,7 @@ export async function signUpBusiness(input: {
 }
 
 export async function resendConfirmation(email: string): Promise<void> {
-  const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${window.location.origin}${CONFIRMED_PATH}` } })
+  const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: appUrl(CONFIRMED_PATH) } })
   if (error) throw error
 }
 

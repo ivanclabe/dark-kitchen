@@ -2350,6 +2350,71 @@ export type Database = {
           },
         ]
       }
+      dk_product_images: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          height: number | null
+          id: string
+          kitchen_id: string
+          path: string
+          position: number
+          product_id: string
+          width: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          kitchen_id?: string
+          path: string
+          position: number
+          product_id: string
+          width?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          kitchen_id?: string
+          path?: string
+          position?: number
+          product_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_product_images_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_images_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       dk_products: {
         Row: {
           active: boolean
@@ -3409,6 +3474,79 @@ export type Database = {
         Args: { p_full_name?: string; p_phone: string }
         Returns: string
       }
+      dk_ga_activity: {
+        Args: {
+          p_category?: string
+          p_from?: string
+          p_limit?: number
+          p_offset?: number
+          p_organization_id?: string
+          p_search?: string
+          p_to?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      dk_ga_ai_monitoring: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_ga_check_new_organization: {
+        Args: { p_email: string; p_name: string; p_tax_id?: string }
+        Returns: Json
+      }
+      dk_ga_create_organization: {
+        Args: {
+          p_admin_email: string
+          p_admin_name: string
+          p_category: string
+          p_city?: string
+          p_confirm_similar?: boolean
+          p_country?: string
+          p_name: string
+          p_phone?: string
+          p_plan: string
+          p_sector: string
+          p_tax_id?: string
+        }
+        Returns: Json
+      }
+      dk_ga_last_sign_in: { Args: { p_user: string }; Returns: string }
+      dk_ga_log_invitation: {
+        Args: {
+          p_detail?: string
+          p_email: string
+          p_organization_id: string
+          p_sent: boolean
+        }
+        Returns: undefined
+      }
+      dk_ga_me: { Args: never; Returns: Json }
+      dk_ga_normalize: { Args: { p: string }; Returns: string }
+      dk_ga_organization_detail: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
+      dk_ga_organizations: { Args: never; Returns: Json }
+      dk_ga_overview: { Args: { p_from: string; p_to: string }; Returns: Json }
+      dk_ga_resend_invitation: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
+      dk_ga_set_global_admin: {
+        Args: { p_email: string; p_on: boolean }
+        Returns: undefined
+      }
+      dk_ga_set_organization_active: {
+        Args: {
+          p_active: boolean
+          p_confirm_name: string
+          p_organization_id: string
+        }
+        Returns: undefined
+      }
+      dk_ga_user_detail: { Args: { p_user_id: string }; Returns: Json }
+      dk_ga_users: { Args: never; Returns: Json }
       dk_has_any_profile: { Args: never; Returns: boolean }
       dk_has_kitchen_permission: {
         Args: { p_kitchen_id: string; p_permission: string }
@@ -3461,6 +3599,7 @@ export type Database = {
           wasted_30d: number
         }[]
       }
+      dk_is_global_admin: { Args: never; Returns: boolean }
       dk_is_kitchen_member: { Args: { p_kitchen_id: string }; Returns: boolean }
       dk_is_org_super_admin: {
         Args: { p_organization_id: string }
@@ -3522,6 +3661,7 @@ export type Database = {
           slug: string
         }[]
       }
+      dk_my_login_needs_password: { Args: never; Returns: boolean }
       dk_my_subscription: { Args: { p_organization_id: string }; Returns: Json }
       dk_new_activation: {
         Args: { p_organization_id: string; p_user_id: string }
@@ -3608,6 +3748,29 @@ export type Database = {
           p_pitch?: number
         }
         Returns: undefined
+      }
+      dk_provision_organization: {
+        Args: {
+          p_account_icon?: string
+          p_account_name?: string
+          p_address?: string
+          p_category: string
+          p_city?: string
+          p_country?: string
+          p_created_by: string
+          p_legal_name?: string
+          p_name: string
+          p_owner: string
+          p_phone?: string
+          p_plan: Database["public"]["Tables"]["dk_plans"]["Row"]
+          p_sector: string
+          p_tax_id?: string
+        }
+        Returns: {
+          new_kitchen_id: string
+          new_kitchen_slug: string
+          new_organization_id: string
+        }[]
       }
       dk_purge_audit_log: { Args: { p_days?: number }; Returns: number }
       dk_register_adjustment: {
@@ -3696,6 +3859,7 @@ export type Database = {
       }
       dk_request_header: { Args: { p_name: string }; Returns: string }
       dk_require: { Args: { p_permission: string }; Returns: undefined }
+      dk_require_global_admin: { Args: never; Returns: undefined }
       dk_require_master_menu_manager: {
         Args: { p_menu_id: string }
         Returns: undefined
@@ -3752,6 +3916,10 @@ export type Database = {
       }
       dk_set_last_account: {
         Args: { p_kitchen_id: string }
+        Returns: undefined
+      }
+      dk_set_main_product_image: {
+        Args: { p_image_id: string }
         Returns: undefined
       }
       dk_set_member_roles: {

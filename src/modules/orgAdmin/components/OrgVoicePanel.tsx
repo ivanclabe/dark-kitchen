@@ -1,13 +1,12 @@
 import { orgKey } from '@/modules/organization/hooks/useOrganization'
 import { AccountIcon } from '@/shared/avatars/Avatar'
-import { fetchFeatureMatrix, setOrganizationFeatureSettings } from '@/shared/features/features'
+import { fetchFeatureMatrix, setKitchenFeatureSettings, setOrganizationFeatureSettings } from '@/shared/features/features'
 import { FEATURES_KEY } from '@/shared/kitchen/activeKitchenContext'
 import { useOrgAdmin } from '@/shared/org/orgContext'
-import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
+import { Select } from '@/shared/ui/FormField'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
@@ -15,13 +14,13 @@ import { toVoiceSettings, type KitchenVoiceSettings } from '@/shared/voice/catal
 import { useVoiceProfiles } from '@/shared/voice/hooks'
 import { VoiceSettingsForm } from '@/shared/voice/VoiceSettingsForm'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
 /**
- * Kitchen voice of the organization (ADR 0014, 7): the default for all its
- * accounts and whether each account may customize it. Starts from the
- * platform default.
+ * Kitchen voice of the organization (ADR 0014, ADR 0018): the voice of all
+ * its accounts and, only where needed, a different voice for one account.
+ * Accounts no longer change it themselves. Starts from the platform default.
  */
 export function OrgVoicePanel() {
   const { organization } = useOrgAdmin()
@@ -30,16 +29,29 @@ export function OrgVoicePanel() {
   const matrixKey = [...orgKey(organization.id), 'features'] as const
   const { data, isLoading, isError, error, refetch } = useQuery({ queryKey: matrixKey, queryFn: () => fetchFeatureMatrix(organization.id) })
   const { data: profiles } = useVoiceProfiles()
-  const [edited, setEdited] = useState<{ settings: KitchenVoiceSettings; allowOverride: boolean } | null>(null)
+  const [edited, setEdited] = useState<KitchenVoiceSettings | null>(null)
+  const [exception, setException] = useState<{ accountId: string; settings: KitchenVoiceSettings } | null>(null)
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: matrixKey })
+    await queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
+  }
 
   const save = useMutation({
-    mutationFn: ({ settings, allowOverride }: { settings: Partial<KitchenVoiceSettings>; allowOverride: boolean }) =>
-      setOrganizationFeatureSettings(organization.id, 'voice_speech', { ...settings, allow_account_override: allowOverride }),
+    mutationFn: (settings: Partial<KitchenVoiceSettings>) => setOrganizationFeatureSettings(organization.id, 'voice_speech', { ...settings }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: matrixKey })
-      await queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
+      await refresh()
       setEdited(null)
       show('Voz de cocina de la organización guardada.')
+    },
+    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar la voz'), 'error'),
+  })
+  const saveAccount = useMutation({
+    mutationFn: ({ accountId, settings }: { accountId: string; settings: Partial<KitchenVoiceSettings> }) => setKitchenFeatureSettings(accountId, 'voice_speech', { ...settings }),
+    onSuccess: async (_, { settings }) => {
+      await refresh()
+      setException(null)
+      show(Object.keys(settings).length === 0 ? 'La cuenta vuelve a usar la voz de la organización.' : 'Voz de la cuenta guardada.')
     },
     onError: (err) => show(getErrorMessage(err, 'No se pudo guardar la voz'), 'error'),
   })
@@ -57,10 +69,15 @@ export function OrgVoicePanel() {
     )
   }
 
-  const saved = { settings: toVoiceSettings(feature.settings), allowOverride: feature.accountOverride }
+  const saved = toVoiceSettings(feature.settings)
   const form = edited ?? saved
   const platformDefault = toVoiceSettings(feature.platformSettings)
-  const customized = data.accounts.filter((a) => a.customized.includes('voice_speech'))
+  const profileName = (key: string) => profiles?.find((p) => p.key === key)?.name ?? key
+  const withVoice = data.accounts.filter((a) => Object.keys(a.overrides?.voice_speech ?? {}).length > 0)
+  const withoutVoice = data.accounts.filter((a) => !withVoice.includes(a))
+  /** Only what differs from the organization voice is stored for the account. */
+  const diff = (settings: KitchenVoiceSettings) =>
+    Object.fromEntries(Object.entries(settings).filter(([k, v]) => saved[k as keyof KitchenVoiceSettings] !== v)) as Partial<KitchenVoiceSettings>
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -74,18 +91,11 @@ export function OrgVoicePanel() {
       )}
 
       <section className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-5">
-        <VoiceSettingsForm value={form.settings} onChange={(settings) => setEdited({ ...form, settings })} profiles={profiles} disabled={save.isPending} />
-        <label className="flex items-start justify-between gap-4 border-t border-neutral-800/60 pt-4">
-          <span className="min-w-0">
-            <span className="block text-sm font-medium text-neutral-100">Permitir que cada cuenta personalice su voz</span>
-            <span className={typography.caption}>Si lo apagas, todas las cuentas usan esta voz. Lo que cada una había elegido se conserva.</span>
-          </span>
-          <Switch checked={form.allowOverride} onChange={(allowOverride) => setEdited({ ...form, allowOverride })} label="Permitir que cada cuenta personalice su voz" disabled={save.isPending} />
-        </label>
+        <VoiceSettingsForm value={form} onChange={setEdited} profiles={profiles} disabled={save.isPending} />
         <div className="flex flex-wrap justify-end gap-2">
           {!edited && (
-            <Button variant="ghost" size="sm" onClick={() => save.mutate({ settings: {}, allowOverride: form.allowOverride })} loading={save.isPending}>
-              Usar la voz de la plataforma ({profiles?.find((p) => p.key === platformDefault.profile)?.name ?? platformDefault.profile})
+            <Button variant="ghost" size="sm" onClick={() => save.mutate({})} loading={save.isPending}>
+              Usar la voz de la plataforma ({profileName(platformDefault.profile)})
             </Button>
           )}
           {edited && (
@@ -93,7 +103,7 @@ export function OrgVoicePanel() {
               <Button variant="ghost" size="sm" onClick={() => setEdited(null)} disabled={save.isPending}>
                 Descartar
               </Button>
-              <Button variant="primary" size="sm" loading={save.isPending} onClick={() => save.mutate({ settings: { ...edited.settings }, allowOverride: edited.allowOverride })}>
+              <Button variant="primary" size="sm" loading={save.isPending} onClick={() => save.mutate({ ...edited })}>
                 Guardar
               </Button>
             </>
@@ -102,23 +112,86 @@ export function OrgVoicePanel() {
       </section>
 
       <section className="space-y-2">
-        <h3 className={typography.h3}>Cuentas con voz propia</h3>
-        {customized.length === 0 ? (
-          <p className={typography.caption}>Todas las cuentas usan la voz de la organización.</p>
-        ) : (
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {customized.map((a) => (
-              <li key={a.id} className={clsx('flex items-center gap-2.5 rounded-xl border border-neutral-800/60 px-3 py-2', !form.allowOverride && 'opacity-60')}>
-                <AccountIcon iconKey={a.iconKey} seed={a.id} size="xs" />
-                <span className="min-w-0 flex-1 truncate text-sm text-neutral-200">{a.name}</span>
-                <Badge tone={form.allowOverride ? 'brand' : 'neutral'} size="sm">
-                  {form.allowOverride ? 'Personalizada' : 'En pausa'}
-                </Badge>
+        <h3 className={typography.h3}>Voz distinta por cuenta</h3>
+        {withVoice.length === 0 && !exception && <p className={typography.caption}>Todas las cuentas usan la voz de la organización.</p>}
+        <ul className="space-y-2">
+          {withVoice.map((a) => {
+            const own = toVoiceSettings({ ...feature.settings, ...a.overrides?.voice_speech })
+            const editing = exception?.accountId === a.id
+            return (
+              <li key={a.id} className="rounded-xl border border-neutral-800/60 px-3 py-2">
+                <div className="flex items-center gap-2.5">
+                  <AccountIcon iconKey={a.iconKey} seed={a.id} size="xs" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm text-neutral-100">{a.name}</span>
+                    <span className="block truncate text-[11px] text-brasa-300">{profileName(own.profile)} · {own.style}</span>
+                  </span>
+                  {!editing && (
+                    <>
+                      <Button variant="ghost" size="sm" onClick={() => setException({ accountId: a.id, settings: own })} disabled={saveAccount.isPending}>
+                        Editar
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => saveAccount.mutate({ accountId: a.id, settings: {} })} disabled={saveAccount.isPending}>
+                        Quitar
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {editing && exception && <AccountVoiceForm value={exception.settings} profiles={profiles} saving={saveAccount.isPending} onChange={(settings) => setException({ ...exception, settings })} onCancel={() => setException(null)} onSave={() => saveAccount.mutate({ accountId: a.id, settings: diff(exception.settings) })} />}
               </li>
-            ))}
-          </ul>
+            )
+          })}
+          {exception && !withVoice.some((a) => a.id === exception.accountId) && (
+            <li className="rounded-xl border border-brasa-500/30 px-3 py-2">
+              <p className="text-sm text-neutral-100">{data.accounts.find((a) => a.id === exception.accountId)?.name}</p>
+              <AccountVoiceForm value={exception.settings} profiles={profiles} saving={saveAccount.isPending} onChange={(settings) => setException({ ...exception, settings })} onCancel={() => setException(null)} onSave={() => saveAccount.mutate({ accountId: exception.accountId, settings: diff(exception.settings) })} />
+            </li>
+          )}
+        </ul>
+        {!exception && withoutVoice.length > 0 && data.accounts.length > 1 && (
+          <div className="flex items-center gap-2">
+            <Plus size={13} className="text-neutral-500" aria-hidden />
+            <Select aria-label="Elegir una voz distinta para una cuenta" value="" onChange={(e) => e.target.value && setException({ accountId: e.target.value, settings: saved })} className="!mt-0 max-w-xs">
+              <option value="">Voz distinta para una cuenta…</option>
+              {withoutVoice.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </Select>
+          </div>
         )}
       </section>
+    </div>
+  )
+}
+
+function AccountVoiceForm({
+  value,
+  profiles,
+  saving,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  value: KitchenVoiceSettings
+  profiles: Parameters<typeof VoiceSettingsForm>[0]['profiles']
+  saving: boolean
+  onChange: (settings: KitchenVoiceSettings) => void
+  onCancel: () => void
+  onSave: () => void
+}) {
+  return (
+    <div className="mt-3 space-y-3 border-t border-neutral-800/60 pt-3">
+      <VoiceSettingsForm value={value} onChange={onChange} profiles={profiles} disabled={saving} />
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}>
+          Cancelar
+        </Button>
+        <Button variant="primary" size="sm" onClick={onSave} loading={saving}>
+          Guardar voz de la cuenta
+        </Button>
+      </div>
     </div>
   )
 }

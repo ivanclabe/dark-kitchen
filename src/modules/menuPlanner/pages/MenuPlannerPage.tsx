@@ -6,18 +6,19 @@ import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tabs } from '@/shared/ui/Tabs'
 import { useToast } from '@/shared/ui/Toast'
-import { planItemErrorMessage } from '../lib/errors'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { CalendarDays, CalendarRange, Copy, Soup } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CatalogSidebar } from '../components/CatalogSidebar'
 import { CopyMenuDialog } from '../components/CopyMenuDialog'
 import { DishFormDrawer } from '../components/DishFormDrawer'
 import { MonthCalendar } from '../components/MonthCalendar'
 import { PlanItemRulesDrawer } from '../components/PlanItemRulesDrawer'
 import { WeekCalendar } from '../components/WeekCalendar'
-import { useAddMenuPlanItem, useMenuPlanRange } from '../hooks/useMenuPlan'
-import { useMenuPlannerDrag } from '../hooks/useMenuPlannerDrag'
+import { ProductThumb } from '@/modules/products/components/ProductImage'
+import { useAddMenuPlanItem, useMenuPlanRange, useRemoveMenuPlanItem } from '../hooks/useMenuPlan'
+import { shortDateLabel, useMenuPlannerDrag } from '../hooks/useMenuPlannerDrag'
+import type { PlanDragInfo } from '../lib/dragRules'
 import { addDays, startOfWeek, todayStr } from '../lib/week'
 import type { MenuPlanItem } from '../types'
 
@@ -41,7 +42,20 @@ export function MenuPlannerPage() {
 
   const { data: items, isLoading, isError, error, refetch } = useMenuPlanRange(rangeStart, rangeEnd)
   const addItem = useAddMenuPlanItem()
+  const removeItem = useRemoveMenuPlanItem()
   const { show } = useToast()
+  const [justAddedProductId, setJustAddedProductId] = useState<string | null>(null)
+  const justAddedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => {
+    if (justAddedTimer.current) clearTimeout(justAddedTimer.current)
+  }, [])
+
+  /** Brief "Agregado" on the catalog card, so it is clear the dish landed while the card stays in place. */
+  function flashAdded(productId: string) {
+    setJustAddedProductId(productId)
+    if (justAddedTimer.current) clearTimeout(justAddedTimer.current)
+    justAddedTimer.current = setTimeout(() => setJustAddedProductId(null), 1400)
+  }
 
   const itemsByDate = useMemo(() => {
     const map: Record<string, MenuPlanItem[]> = {}
@@ -51,23 +65,54 @@ export function MenuPlannerPage() {
     return map
   }, [items])
 
-  const { sensors, activeDrag, handleDragStart, handleDragEnd } = useMenuPlannerDrag(itemsByDate)
+  const { sensors, activeDrag, draggedProductId, handleDragStart, handleDragEnd, addToDay } = useMenuPlannerDrag(itemsByDate, (productId) => flashAdded(productId))
+  const drag: PlanDragInfo = { productId: draggedProductId, sourceDate: activeDrag?.kind === 'planItem' ? activeDrag.item.planDate : null }
 
-  const selectedDateProductIds = useMemo(() => new Set((itemsByDate[selectedDate] ?? []).map((i) => i.productId)), [itemsByDate, selectedDate])
+  /** Where each dish already is (in the loaded range), for the catalog cards. */
+  const datesByProduct = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+    for (const item of items ?? []) {
+      if (!map.has(item.productId)) map.set(item.productId, new Set())
+      map.get(item.productId)!.add(item.planDate)
+    }
+    return map
+  }, [items])
+  const visibleWeekStart = view === 'week' ? weekStart : startOfWeek(selectedDate)
+  const weekDates = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(visibleWeekStart, i)), [visibleWeekStart])
 
-  async function handleQuickAdd(product: Product) {
-    const dayItems = itemsByDate[selectedDate] ?? []
-    if (dayItems.some((i) => i.productId === product.id)) {
-      show(`${product.name} ya está en ese día.`, 'error')
-      return
-    }
-    const nextOrder = dayItems.length ? Math.max(...dayItems.map((i) => i.displayOrder)) + 1 : 0
-    try {
-      await addItem.mutateAsync({ planDate: selectedDate, input: { productId: product.id, displayOrder: nextOrder } })
-      show(`${product.name} agregado.`)
-    } catch (err) {
-      show(planItemErrorMessage(err, 'No se pudo agregar el plato.', `${product.name} ya está en ese día.`), 'error')
-    }
+  function handleQuickAdd(product: Product) {
+    void addToDay(
+      product.id,
+      { productName: product.name, productPrice: product.price, productCategory: product.categoryName, productActive: product.active, productImagePath: product.imagePath },
+      selectedDate,
+    )
+  }
+
+  /** Off the day at once, with a few seconds to undo (same rules come back). */
+  function handleRemove(item: MenuPlanItem) {
+    removeItem.mutate(item.id, {
+      onError: () => show(`No se pudo quitar ${item.productName}.`, 'error'),
+    })
+    show(`${item.productName} quitado de ${shortDateLabel(item.planDate)}.`, 'info', {
+      action: {
+        label: 'Deshacer',
+        onClick: () =>
+          addItem.mutate({
+            planDate: item.planDate,
+            input: {
+              productId: item.productId,
+              displayOrder: item.displayOrder,
+              isActive: item.isActive,
+              startTime: item.startTime,
+              endTime: item.endTime,
+              specialPrice: item.specialPrice,
+              unitLimit: item.unitLimit,
+              whileSuppliesLast: item.whileSuppliesLast,
+            },
+            product: item,
+          }),
+      },
+    })
   }
 
   function handleOpenWeekFromMonth(date: string) {
@@ -90,6 +135,8 @@ export function MenuPlannerPage() {
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         onOpenItem={can('menus.edit') ? setRulesItem : () => {}}
+        onRemoveItem={can('menus.edit') ? handleRemove : undefined}
+        drag={drag}
       />
     )
   } else {
@@ -100,11 +147,18 @@ export function MenuPlannerPage() {
         itemsByDate={itemsByDate}
         onOpenWeek={handleOpenWeekFromMonth}
         onOpenItem={can('menus.edit') ? setRulesItem : () => {}}
+        onRemoveItem={can('menus.edit') ? handleRemove : undefined}
+        drag={drag}
       />
     )
   }
 
-  const activeDishName = activeDrag?.kind === 'catalog' ? activeDrag.productName : activeDrag?.kind === 'planItem' ? activeDrag.item.productName : null
+  const activeDish =
+    activeDrag?.kind === 'catalog'
+      ? { name: activeDrag.productName, path: activeDrag.product.productImagePath, category: activeDrag.product.productCategory }
+      : activeDrag?.kind === 'planItem'
+        ? { name: activeDrag.item.productName, path: activeDrag.item.productImagePath, category: activeDrag.item.productCategory }
+        : null
 
   return (
     <DndContext sensors={can('menus.edit') ? sensors : []} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
@@ -135,8 +189,11 @@ export function MenuPlannerPage() {
         <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
           <div className="shrink-0 md:w-72 lg:w-80">
             <CatalogSidebar
-              selectedDateProductIds={selectedDateProductIds}
-              onQuickAdd={(product) => void handleQuickAdd(product)}
+              weekDates={weekDates}
+              datesByProduct={datesByProduct}
+              selectedDate={selectedDate}
+              justAddedProductId={justAddedProductId}
+              onQuickAdd={handleQuickAdd}
               onEditDish={(product) => {
                 setEditingProduct(product)
                 setDishDrawerOpen(true)
@@ -152,9 +209,13 @@ export function MenuPlannerPage() {
         </div>
       </div>
 
-      <DragOverlay>
-        {activeDishName && (
-          <div className="shadow-float rounded-lg border border-brasa-500/60 bg-neutral-900 px-2.5 py-1.5 text-xs font-medium text-neutral-100">{activeDishName}</div>
+      {/* No animation back to the origin: the dish lands where it is dropped (ADR 0018). */}
+      <DragOverlay dropAnimation={null}>
+        {activeDish && (
+          <div className="shadow-float flex items-center gap-2 rounded-lg border border-brasa-500/60 bg-neutral-900 py-1 pr-2.5 pl-1 text-xs font-medium text-neutral-100">
+            <ProductThumb name={activeDish.name} path={activeDish.path} toneSeed={activeDish.category} size="xs" />
+            {activeDish.name}
+          </div>
         )}
       </DragOverlay>
 

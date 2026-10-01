@@ -1,5 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
-import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
+import { PRODUCT_IMAGES_BUCKET, prepareImage, type ProductImagePosition } from '../lib/productImages'
 import type { Product, ProductCategory, ProductInput } from '../types'
 
 interface ProductRow {
@@ -114,17 +114,72 @@ export async function createProductCategory(name: string): Promise<ProductCatego
   return data
 }
 
-export async function uploadProductImage(productId: string, file: File): Promise<void> {
-  const path = await kitchenFilePath('products', productId, file.name)
-  const { error: uploadError } = await supabase.storage.from('dk-attachments').upload(path, file)
-  if (uploadError) throw uploadError
-
-  const { error: updateError } = await supabase.from('dk_products').update({ image_path: path }).eq('id', productId)
-  if (updateError) throw updateError
+export interface ProductImage {
+  id: string
+  productId: string
+  path: string
+  position: ProductImagePosition
+  width: number | null
+  height: number | null
 }
 
-export async function getProductImageUrl(imagePath: string): Promise<string> {
-  const { data, error } = await supabase.storage.from('dk-attachments').createSignedUrl(imagePath, 60 * 5)
+/** Photos of a dish (ADR 0018), main one first. */
+export async function listProductImages(productId: string): Promise<ProductImage[]> {
+  const { data, error } = await supabase
+    .from('dk_product_images')
+    .select('id, product_id, path, position, width, height')
+    .eq('product_id', productId)
+    .order('position')
   if (error) throw error
-  return data.signedUrl
+  return (data ?? []).map((r) => ({ id: r.id, productId: r.product_id, path: r.path, position: r.position as ProductImagePosition, width: r.width, height: r.height }))
+}
+
+/**
+ * Puts a photo in a place of the dish (1 = main, 2 = second), replacing what
+ * was there. The file is shrunk in the browser, uploaded under a new name
+ * (so caches never show the old one) and only then recorded; the old file
+ * is deleted afterwards. If recording fails, the new file is removed.
+ */
+export async function saveProductImage(productId: string, position: ProductImagePosition, file: File): Promise<void> {
+  const prepared = await prepareImage(file)
+  const { data: kitchenId, error: kitchenError } = await supabase.rpc('dk_current_kitchen_id')
+  if (kitchenError) throw kitchenError
+  if (!kitchenId) throw new Error('No hay una cuenta activa para guardar la foto.')
+  const path = `kitchens/${kitchenId}/products/${productId}/${crypto.randomUUID()}.${prepared.extension}`
+
+  const bucket = supabase.storage.from(PRODUCT_IMAGES_BUCKET)
+  const { error: uploadError } = await bucket.upload(path, prepared.blob, { contentType: prepared.blob.type, cacheControl: '31536000', upsert: false })
+  if (uploadError) throw uploadError
+
+  try {
+    const { data: current, error: currentError } = await supabase
+      .from('dk_product_images')
+      .select('id, path')
+      .eq('product_id', productId)
+      .eq('position', position)
+      .maybeSingle()
+    if (currentError) throw currentError
+    const values = { path, width: prepared.width, height: prepared.height }
+    const { error } = current
+      ? await supabase.from('dk_product_images').update(values).eq('id', current.id)
+      : await supabase.from('dk_product_images').insert({ product_id: productId, position, ...values })
+    if (error) throw error
+    if (current) await bucket.remove([current.path])
+  } catch (err) {
+    await bucket.remove([path])
+    throw err
+  }
+}
+
+/** Removes a photo; if it was the main one, the other becomes main (database trigger). */
+export async function deleteProductImage(image: ProductImage): Promise<void> {
+  const { error } = await supabase.from('dk_product_images').delete().eq('id', image.id)
+  if (error) throw error
+  // A leftover file is harmless (nothing points to it); the record is what matters.
+  await supabase.storage.from(PRODUCT_IMAGES_BUCKET).remove([image.path])
+}
+
+export async function setMainProductImage(imageId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_set_main_product_image', { p_image_id: imageId })
+  if (error) throw error
 }

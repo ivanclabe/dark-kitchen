@@ -11,7 +11,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
-import { ArrowRight, Building2, ChefHat, Flame, LogOut, Plus, ShieldCheck, Store } from 'lucide-react'
+import { ArrowRight, Building2, ChefHat, Flame, LogOut, Plus, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
@@ -53,11 +53,6 @@ export function KitchenSelectorPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {profile?.isSuperadmin && (
-              <Link to="/admin" className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-neutral-100">
-                <ShieldCheck size={16} aria-hidden /> Plataforma
-              </Link>
-            )}
             <Button variant="ghost" icon={LogOut} onClick={() => void signOut()}>
               Cerrar sesión
             </Button>

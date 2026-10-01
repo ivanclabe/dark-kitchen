@@ -11,7 +11,7 @@ grant all on _t, _ctx to authenticated, anon;
 grant usage on sequence _t_n_seq to authenticated, anon;
 
 create or replace function pg_temp.act_as(p_auth uuid, p_kitchen uuid default null) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated')::text, true);
+  select set_config('request.jwt.claims', json_build_object('sub', p_auth, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   select set_config('request.headers',
     (case when p_kitchen is null then '{}'::jsonb else jsonb_build_object('x-dk-kitchen-id', p_kitchen) end)::text, true);
 $$;
@@ -33,9 +33,9 @@ set local role anon;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Público', 'Planes visibles sin sesión (en orden)', 'standard, business, enterprise',
     (select string_agg(key, ', ' order by sort_order) from dk_plans));
-  insert into _t (area, test, expected, got) values ('Público', 'Funciones por plan visibles', '3 · 7 · 7',
+  insert into _t (area, test, expected, got) values ('Público', 'Funciones por plan visibles', '4 · 8 · 8',
     (select count(*) filter (where plan_key = 'standard') || ' · ' || count(*) filter (where plan_key = 'business') || ' · ' || count(*) filter (where plan_key = 'enterprise') from dk_plan_features));
-  insert into _t (area, test, expected, got) values ('Público', 'Catálogo de funciones visible', '7', (select count(*)::text from dk_features));
+  insert into _t (area, test, expected, got) values ('Público', 'Catálogo de funciones visible', '8', (select count(*)::text from dk_features));
   begin
     insert into _t (area, test, expected, got) values ('Público', 'Organizaciones cerradas', '0', (select count(*)::text from dk_organizations));
   exception when others then insert into _t (area, test, expected, got, detail) values ('Público', 'Organizaciones cerradas', '0', '0', sqlerrm); end;

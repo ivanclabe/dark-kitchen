@@ -1,15 +1,17 @@
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
+import { MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
 import { useState } from 'react'
 import { planItemErrorMessage } from '../lib/errors'
 import { formatDayHeader } from '../lib/week'
 import type { MenuPlanItem } from '../types'
-import { useAddMenuPlanItem, useMoveMenuPlanItem, useReorderMenuPlanDay } from './useMenuPlan'
+import { useAddMenuPlanItem, useMoveMenuPlanItem, useReorderMenuPlanDay, type PlanProductSnapshot } from './useMenuPlan'
 
-export type MenuPlanDragData = { kind: 'catalog'; productId: string; productName: string } | { kind: 'planItem'; item: MenuPlanItem }
+export type MenuPlanDragData =
+  | { kind: 'catalog'; productId: string; productName: string; product: PlanProductSnapshot }
+  | { kind: 'planItem'; item: MenuPlanItem }
 
-function shortDateLabel(date: string) {
+export function shortDateLabel(date: string) {
   const { weekday, day, month } = formatDayHeader(date)
   return `${weekday} ${day} ${month}`
 }
@@ -21,23 +23,29 @@ function arrayMoveSimple<T>(arr: T[], from: number, to: number): T[] {
   return copy
 }
 
+const nextOrder = (dayItems: MenuPlanItem[]) => (dayItems.length ? Math.max(...dayItems.map((i) => i.displayOrder)) + 1 : 0)
+
 /**
- * Encapsula el drag & drop del planificador — mismo patrón que
- * useKanbanDragDrop de Cocina: solo actúa en dragEnd (sin preview optimista
- * propia), y siempre llama a las mismas mutaciones que ya usan los botones
- * "+"/quitar/reglas, nunca lógica duplicada. Tres gestos:
- *   catalog -> day        agrega el plato a esa fecha
- *   planItem -> otro día  mueve la fecha (falla si el plato ya está ese día)
- *   planItem -> otro item del MISMO día   reordena
+ * Drag & drop of the planner (ADR 0018): same mutations as the "+" button
+ * and the rules drawer, now optimistic — a dish dropped on a day is there at
+ * once, the catalog card stays where it was, and a failure undoes itself.
+ *   catalog -> day        adds the dish to that date
+ *   planItem -> other day moves it (not onto a day that already has it)
+ *   planItem -> item of the same day  reorders
+ * Days that already have the dragged dish do not accept it (see DayCell).
  */
-export function useMenuPlannerDrag(itemsByDate: Record<string, MenuPlanItem[]>) {
+export function useMenuPlannerDrag(itemsByDate: Record<string, MenuPlanItem[]>, onAdded?: (productId: string, date: string) => void) {
   const [activeDrag, setActiveDrag] = useState<MenuPlanDragData | null>(null)
   const addItem = useAddMenuPlanItem()
   const moveItem = useMoveMenuPlanItem()
   const reorderDay = useReorderMenuPlanDay()
   const { show } = useToast()
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+  // Mouse: a small movement starts the drag. Touch: a short press, so scrolling the catalog never drags.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+  )
 
   function handleDragStart(event: DragStartEvent) {
     setActiveDrag((event.active.data.current as MenuPlanDragData | undefined) ?? null)
@@ -50,6 +58,22 @@ export function useMenuPlannerDrag(itemsByDate: Record<string, MenuPlanItem[]>) 
     return null
   }
 
+  /** The unique (plan_date, product_id) of the table is the real rule; this keeps the message human. */
+  const alreadyThere = (date: string, productId: string) => (itemsByDate[date] ?? []).some((i) => i.productId === productId)
+
+  async function addToDay(productId: string, product: PlanProductSnapshot, date: string) {
+    if (alreadyThere(date, productId)) {
+      show(`${product.productName} ya está en ${shortDateLabel(date)}.`, 'info')
+      return
+    }
+    onAdded?.(productId, date)
+    try {
+      await addItem.mutateAsync({ planDate: date, input: { productId, displayOrder: nextOrder(itemsByDate[date] ?? []) }, product })
+    } catch (err) {
+      show(planItemErrorMessage(err, 'No se pudo agregar el plato.', `${product.productName} ya está en ${shortDateLabel(date)}.`), 'error')
+    }
+  }
+
   async function handleDragEnd(event: DragEndEvent) {
     const data = activeDrag
     setActiveDrag(null)
@@ -60,24 +84,8 @@ export function useMenuPlannerDrag(itemsByDate: Record<string, MenuPlanItem[]>) 
     const targetDate = overId.startsWith('day:') ? overId.slice(4) : findItemDate(overId)
     if (!targetDate) return
 
-    // El unique (plan_date, product_id) de la tabla es la regla real; acá se
-    // valida antes para no llegar a la base con algo que sabemos que falla y
-    // devolver un mensaje humano en vez de "duplicate key value violates…".
-    const alreadyThere = (productId: string) => (itemsByDate[targetDate] ?? []).some((i) => i.productId === productId)
-
     if (data.kind === 'catalog') {
-      if (alreadyThere(data.productId)) {
-        show(`${data.productName} ya está en ${shortDateLabel(targetDate)}.`, 'error')
-        return
-      }
-      const dayItems = itemsByDate[targetDate] ?? []
-      const nextOrder = dayItems.length ? Math.max(...dayItems.map((i) => i.displayOrder)) + 1 : 0
-      try {
-        await addItem.mutateAsync({ planDate: targetDate, input: { productId: data.productId, displayOrder: nextOrder } })
-        show(`${data.productName} agregado a ${shortDateLabel(targetDate)}.`)
-      } catch (err) {
-        show(planItemErrorMessage(err, 'No se pudo agregar el plato.', `${data.productName} ya está en ${shortDateLabel(targetDate)}.`), 'error')
-      }
+      await addToDay(data.productId, data.product, targetDate)
       return
     }
 
@@ -97,19 +105,19 @@ export function useMenuPlannerDrag(itemsByDate: Record<string, MenuPlanItem[]>) 
       return
     }
 
-    if (alreadyThere(item.productId)) {
-      show(`${item.productName} ya está en ${shortDateLabel(targetDate)}.`, 'error')
+    if (alreadyThere(targetDate, item.productId)) {
+      show(`${item.productName} ya está en ${shortDateLabel(targetDate)}.`, 'info')
       return
     }
-    const dayItems = itemsByDate[targetDate] ?? []
-    const nextOrder = dayItems.length ? Math.max(...dayItems.map((i) => i.displayOrder)) + 1 : 0
     try {
-      await moveItem.mutateAsync({ id: item.id, planDate: targetDate, displayOrder: nextOrder })
-      show(`${item.productName} movido a ${shortDateLabel(targetDate)}.`)
+      await moveItem.mutateAsync({ id: item.id, planDate: targetDate, displayOrder: nextOrder(itemsByDate[targetDate] ?? []) })
     } catch (err) {
       show(planItemErrorMessage(err, 'No se pudo mover el plato.', `${item.productName} ya está en ${shortDateLabel(targetDate)}.`), 'error')
     }
   }
 
-  return { sensors, activeDrag, handleDragStart, handleDragEnd }
+  /** The dish being dragged (for days to say whether they accept it). */
+  const draggedProductId = activeDrag?.kind === 'catalog' ? activeDrag.productId : activeDrag?.kind === 'planItem' ? activeDrag.item.productId : null
+
+  return { sensors, activeDrag, draggedProductId, handleDragStart, handleDragEnd, addToDay }
 }

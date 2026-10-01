@@ -1,0 +1,17 @@
+/* Quanela Global Admin (ADR 0019): Quanela's tokens and base components, on a
+   cooler "console" canvas so it never looks like an organization's app. */
+@import '../../src/index.css';
+@source '../../src';
+@source '.';
+
+@theme {
+  --color-console-950: #0b0d10;
+  --color-console-900: #111419;
+  --color-console-850: #161a20;
+  --color-console-800: #1d222a;
+  --color-console-700: #2a2f37;
+}
+
+body {
+  background: var(--color-console-950);
+}

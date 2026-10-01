@@ -93,7 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
-    await supabase.auth.signOut()
+    // Only this app on this device: the Global Admin portal keeps its own session (ADR 0019).
+    await supabase.auth.signOut({ scope: 'local' })
   }
 
   async function refreshProfile() {

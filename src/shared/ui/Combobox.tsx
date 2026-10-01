@@ -1,10 +1,12 @@
 import { Check, ChevronDown, Plus, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 
 export interface ComboboxOption {
   value: string
   label: string
   sublabel?: string
+  /** Small visual before the label (e.g. a dish photo). */
+  leading?: ReactNode
 }
 
 interface ComboboxProps {
@@ -188,9 +190,12 @@ export function Combobox({
                 i === highlighted ? 'bg-neutral-800 text-neutral-50' : 'text-neutral-200'
               }`}
             >
-              <span className="min-w-0">
-                <span className="block truncate">{option.label}</span>
-                {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
+              <span className="flex min-w-0 items-center gap-2.5">
+                {option.leading}
+                <span className="min-w-0">
+                  <span className="block truncate">{option.label}</span>
+                  {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
+                </span>
               </span>
               {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" />}
             </button>

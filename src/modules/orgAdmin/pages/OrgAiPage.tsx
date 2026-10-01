@@ -10,12 +10,13 @@ import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { typography } from '@/shared/ui/typography'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { Activity, AlertTriangle, BarChart3, Mic, Sparkles } from 'lucide-react'
+import { Activity, AlertTriangle, BarChart3, Gauge, Mic, Sparkles } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchOrgAiUsage, type OrgAiUsage } from '../api'
+import { OrgAiStatusPanel } from '../components/OrgAiStatusPanel'
 import { OrgVoicePanel } from '../components/OrgVoicePanel'
 
-type Tab = 'features' | 'voice' | 'usage'
+type Tab = 'features' | 'voice' | 'usage' | 'status'
 
 function UsagePanel() {
   const { organization } = useOrgAdmin()
@@ -91,9 +92,11 @@ function UsagePanel() {
 }
 
 /**
- * AI and voice of the organization (ADR 0014, 7): which features it offers
- * and where they are active (only the SUPER_ADMIN activates), the kitchen
- * voice of the business, and AI usage by account.
+ * The one place to configure AI and voice (ADR 0014, ADR 0018): which
+ * features the organization offers, where they are active and how they behave
+ * (settings, with exceptions per account), the kitchen voice, usage and the
+ * state of AI. Accounts no longer configure AI; the platform keeps models,
+ * costs and plan limits.
  */
 export function OrgAiPage() {
   const { organization } = useOrgAdmin()
@@ -102,15 +105,24 @@ export function OrgAiPage() {
     { value: 'features', label: 'Funciones', icon: Sparkles },
     { value: 'voice', label: 'Voz de cocina', icon: Mic },
     { value: 'usage', label: 'Uso', icon: BarChart3 },
+    { value: 'status', label: 'Estado', icon: Gauge },
   ]
   const requested = params.get('tab') as Tab | null
   const tab: Tab = tabs.some((t) => t.value === requested) ? (requested as Tab) : 'features'
 
   return (
     <div className="space-y-6">
-      <PageHeader title="IA y voz" icon={Sparkles} description="Qué funciones de IA y voz usa cada cuenta, la voz de cocina y el uso." />
+      <PageHeader title="IA y voz" icon={Sparkles} description="Toda la configuración de IA y voz de la organización: funciones, ajustes, voz de cocina y uso." />
       <Tabs value={tab} onChange={(t) => setParams(t === 'features' ? {} : { tab: t }, { replace: true })} items={tabs} />
-      {tab === 'features' ? <FeaturesPanel organizationId={organization.id} /> : tab === 'voice' ? <OrgVoicePanel /> : <UsagePanel />}
+      {tab === 'features' ? (
+        <FeaturesPanel organizationId={organization.id} />
+      ) : tab === 'voice' ? (
+        <OrgVoicePanel />
+      ) : tab === 'usage' ? (
+        <UsagePanel />
+      ) : (
+        <OrgAiStatusPanel />
+      )}
     </div>
   )
 }
