@@ -356,7 +356,7 @@ function Result({ result, planName, onAnother, onOpen }: { result: CreatedOrgani
           <p className="flex items-center gap-2 font-semibold">
             <MailWarning size={14} aria-hidden /> No se pudo enviar el correo{inv.detail ? `: ${inv.detail}` : ''}
           </p>
-          <p className="mt-1">Comparte este enlace de activación con el administrador por un canal seguro. Vence en 7 días.</p>
+          <p className="mt-1">Compártelo con el administrador por un canal privado (WhatsApp, por ejemplo). Es de un solo uso, lo deja entrar directo para crear su contraseña y vence en poco tiempo (1 hora, por defecto); si vence, usa «Reenviar invitación».</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="min-w-0 flex-1 break-all font-mono text-amber-200">{inv.activationUrl}</span>
             <Button size="sm" variant="secondary" icon={Copy} onClick={() => void navigator.clipboard.writeText(inv.activationUrl ?? '').then(() => show('Enlace copiado.'))}>

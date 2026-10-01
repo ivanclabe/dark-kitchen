@@ -19,6 +19,14 @@ const STATUS_MESSAGE: Record<Exclude<ActivationStatus, 'valid'>, string> = {
   organization_inactive: 'Este negocio está desactivado.',
 }
 
+/** Supabase's e-mail errors, in plain words (the usual one: its hourly limit without an own SMTP). */
+function emailErrorMessage(message: string): string {
+  if (/rate limit|too many|security purposes/i.test(message)) {
+    return 'Se enviaron demasiados correos en poco tiempo. Intenta de nuevo en una hora o pide a tu administrador un enlace de acceso.'
+  }
+  return 'No se pudo enviar el correo. Intenta de nuevo o pide a tu administrador un enlace de acceso.'
+}
+
 function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
@@ -85,7 +93,7 @@ export function ActivationPage() {
       options: { data: { full_name: preview.fullName }, emailRedirectTo: appUrl(`/activar/${token}`) },
     })
     if (signUpError) {
-      setError(signUpError.message)
+      setError(/rate limit|too many/i.test(signUpError.message) ? emailErrorMessage(signUpError.message) : signUpError.message)
       setBusy(false)
       return
     }
@@ -116,7 +124,7 @@ export function ActivationPage() {
     setError(null)
     const { error: otpError } = await supabase.auth.signInWithOtp({ email: preview.email, options: { emailRedirectTo: appUrl(`/activar/${token}`), shouldCreateUser: false } })
     setBusy(false)
-    if (otpError) setError(otpError.message)
+    if (otpError) setError(emailErrorMessage(otpError.message))
     else setInfo(`Te enviamos un enlace a ${preview.email}. Ábrelo para crear tu contraseña y terminar.`)
   }
 

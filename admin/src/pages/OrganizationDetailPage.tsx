@@ -51,7 +51,7 @@ export function OrganizationDetailPage() {
       if (r.invitation.sent) show(`Invitación enviada a ${r.adminEmail}.`)
       else {
         setManualLink(r.invitation.activationUrl)
-        show('No se pudo enviar el correo: copia el enlace de activación.', 'error')
+        show('No se pudo enviar el correo: copia el enlace de acceso.', 'error')
       }
     },
     onError: (err) => show(getErrorMessage(err, 'No se pudo reenviar la invitación'), 'error'),
@@ -99,6 +99,7 @@ export function OrganizationDetailPage() {
 
       {manualLink && (
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
+          <p className="w-full">No se pudo enviar el correo. Compártelo con el administrador por un canal privado (WhatsApp, por ejemplo). Es de un solo uso, lo deja entrar directo para crear su contraseña y vence en poco tiempo (1 hora, por defecto); si vence, usa «Reenviar invitación».</p>
           <span className="min-w-0 flex-1 break-all font-mono">{manualLink}</span>
           <Button size="sm" variant="secondary" icon={Copy} onClick={() => void navigator.clipboard.writeText(manualLink).then(() => show('Enlace copiado.'))}>
             Copiar enlace

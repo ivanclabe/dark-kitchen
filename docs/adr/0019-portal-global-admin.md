@@ -205,6 +205,7 @@ El registro público sigue igual para quien lo usa.
 | Global Admins **en solo lectura** | D6: el rol se otorga desde la base por ahora |
 | Botón «Aún no tengo contraseña: envíame un enlace» en la activación | Si el enlace de invitación de Supabase vence (24 h) antes que el de activación (7 días), la persona no queda bloqueada |
 | `dist-admin` en `.gitignore` | Salida del build local del portal |
+| Si el correo falla, el enlace para copiar es un **enlace de acceso de un solo uso** (`generateLink`, no envía correo) que lleva a «Crea tu contraseña», en vez de `/activar/…` | Sin sesión, `/activar/…` pedía otro correo y chocaba con el límite de Supabase. Solo lo ve el Global Admin (rol + MFA) y el fallo queda auditado |
 
 ### 11.3 Validación de los 20 puntos
 | # | Punto | Estado | Cómo se comprobó |

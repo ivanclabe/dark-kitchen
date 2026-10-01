@@ -9,8 +9,12 @@
 //     invitation and create their own password when activating; people who
 //     already have a login receive a sign-in link. Both land on
 //     {APP_URL}/activar/{token}.
-//   * If the e-mail cannot be sent, the activation link is returned so the
-//     portal can show it to copy (and the failure is recorded).
+//   * If the e-mail cannot be sent (no SMTP yet, rate limit…), Supabase
+//     generates a one-time access link WITHOUT sending anything; the portal
+//     shows it to share by hand. It signs the person in and lands on
+//     /activar/{token}, where they create their password. A bare /activar link
+//     would not work: without a session it needs yet another e-mail. Only the
+//     Global Admin (role + MFA) gets it, and the failure is recorded.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -135,12 +139,27 @@ Deno.serve(async (req: Request) => {
     detail = err instanceof Error ? err.message : String(err);
   }
 
+  let manualLink: string | null = null;
+  if (!sent) {
+    manualLink = await accessLink(admin, email, name, activationUrl);
+  }
+
   await asCaller.rpc("dk_ga_log_invitation", { p_organization_id: organizationId, p_email: email, p_sent: sent, p_detail: detail });
 
   return json({
     ...summary,
     organizationId,
     adminEmail: email,
-    invitation: { sent, detail, method: hasLogin ? "sign_in_link" : "invite", activationUrl: sent ? null : activationUrl },
+    invitation: { sent, detail, method: hasLogin ? "sign_in_link" : "invite", activationUrl: sent ? null : (manualLink ?? activationUrl) },
   });
 });
+
+/** One-time access link that lands on the activation page; nothing is e-mailed. */
+// deno-lint-ignore no-explicit-any
+async function accessLink(admin: any, email: string, name: string, redirectTo: string): Promise<string | null> {
+  const invite = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo, data: { full_name: name } } });
+  if (!invite.error) return invite.data?.properties?.action_link ?? null;
+  // They already have a login (invited before, or signed up): a sign-in link instead.
+  const magic = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo } });
+  return magic.error ? null : magic.data?.properties?.action_link ?? null;
+}
