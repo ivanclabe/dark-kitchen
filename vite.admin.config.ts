@@ -12,6 +12,9 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   root: path.resolve(import.meta.dirname, 'admin'),
   envDir: import.meta.dirname,
+  // Own dependency cache: sharing node_modules/.vite with Quanela's dev server made
+  // each one overwrite the other's optimized deps (e.g. onnxruntime-web for «Oye Quanela»).
+  cacheDir: path.resolve(import.meta.dirname, 'node_modules/.vite-admin'),
   publicDir: path.resolve(import.meta.dirname, 'admin/public'),
   plugins: [react(), tailwindcss()],
   resolve: {
