@@ -154,12 +154,17 @@ Deno.serve(async (req: Request) => {
   });
 });
 
-/** One-time access link that lands on the activation page; nothing is e-mailed. */
+/**
+ * One-time access link that lands on the activation page; nothing is e-mailed.
+ * It points straight at Quanela (/activar/{token}?token_hash=…) and the page
+ * opens the session itself, so it does not depend on Supabase's redirect list.
+ */
 // deno-lint-ignore no-explicit-any
-async function accessLink(admin: any, email: string, name: string, redirectTo: string): Promise<string | null> {
-  const invite = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo, data: { full_name: name } } });
-  if (!invite.error) return invite.data?.properties?.action_link ?? null;
+async function accessLink(admin: any, email: string, name: string, activationUrl: string): Promise<string | null> {
+  const withHash = (hash: string | undefined, type: string) => (hash ? `${activationUrl}?token_hash=${encodeURIComponent(hash)}&type=${type}` : null);
+  const invite = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo: activationUrl, data: { full_name: name } } });
+  if (!invite.error) return withHash(invite.data?.properties?.hashed_token, "invite");
   // They already have a login (invited before, or signed up): a sign-in link instead.
-  const magic = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo } });
-  return magic.error ? null : magic.data?.properties?.action_link ?? null;
+  const magic = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: activationUrl } });
+  return magic.error ? null : withHash(magic.data?.properties?.hashed_token, "magiclink");
 }

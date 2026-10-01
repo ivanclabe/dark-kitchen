@@ -8,8 +8,8 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, Flame, LogIn, LogOut, Mail, UserCheck } from 'lucide-react'
-import { useState, type FormEvent, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { acceptActivation, loginNeedsPassword, previewActivation, type ActivationStatus } from '../api'
 
 const STATUS_MESSAGE: Record<Exclude<ActivationStatus, 'valid'>, string> = {
@@ -25,6 +25,23 @@ function emailErrorMessage(message: string): string {
     return 'Se enviaron demasiados correos en poco tiempo. Intenta de nuevo en una hora o pide a tu administrador un enlace de acceso.'
   }
   return 'No se pudo enviar el correo. Intenta de nuevo o pide a tu administrador un enlace de acceso.'
+}
+
+/**
+ * Access link shared by hand from the Global Admin portal (ADR 0019):
+ * /activar/{token}?token_hash=…&type=invite|magiclink. The page itself opens the
+ * session, so it does not depend on Supabase's redirect list, and an e-mail
+ * scanner that only opens the link does not use it up. One verification per
+ * link, even if the page mounts twice.
+ */
+const linkVerifications = new Map<string, Promise<boolean>>()
+function verifyAccessLink(tokenHash: string, type: string | null): Promise<boolean> {
+  let pending = linkVerifications.get(tokenHash)
+  if (!pending) {
+    pending = supabase.auth.verifyOtp({ token_hash: tokenHash, type: type === 'invite' ? 'invite' : 'email' }).then(({ error }) => !error)
+    linkVerifications.set(tokenHash, pending)
+  }
+  return pending
 }
 
 function Shell({ children }: { children: ReactNode }) {
@@ -60,6 +77,22 @@ export function ActivationPage() {
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [params] = useSearchParams()
+  const tokenHash = params.get('token_hash')
+  const linkType = params.get('type')
+  const [linkFailed, setLinkFailed] = useState(false)
+  useEffect(() => {
+    if (!tokenHash) return
+    let active = true
+    void verifyAccessLink(tokenHash, linkType).then((ok) => {
+      if (!active) return
+      setLinkFailed(!ok)
+      navigate(`/activar/${token}`, { replace: true })
+    })
+    return () => {
+      active = false
+    }
+  }, [tokenHash, linkType, token, navigate])
   const sessionMatches = Boolean(session && preview && session.user.email?.toLowerCase() === preview.email)
   const { data: needsPassword, isLoading: checkingPassword } = useQuery({
     queryKey: ['activation', token, 'needs-password', session?.user.id],
@@ -134,7 +167,7 @@ export function ActivationPage() {
     </FormField>
   )
 
-  if (isLoading) return <Shell><p className={typography.small}>Cargando…</p></Shell>
+  if (isLoading || tokenHash) return <Shell><p className={typography.small}>Cargando…</p></Shell>
 
   if (isError || !preview) {
     return (
@@ -153,6 +186,11 @@ export function ActivationPage() {
       <p className={`mt-1 ${typography.small}`}>
         Hola, <span className="text-neutral-100">{preview.fullName}</span> · {preview.email}
       </p>
+      {linkFailed && (
+        <p role="alert" className="mt-3 text-sm text-amber-300">
+          El enlace de acceso ya se usó o venció. Pide uno nuevo a tu administrador.
+        </p>
+      )}
     </div>
   )
 
