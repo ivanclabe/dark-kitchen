@@ -52,7 +52,7 @@ export function FeatureDrawer({
   })
 
   const intervalNumber = intervalText.trim() === '' ? null : Number(intervalText)
-  const intervalError = intervalNumber !== null && (!Number.isInteger(intervalNumber) || intervalNumber < 30 || intervalNumber > 86_400) ? 'Entre 30 y 86.400 segundos' : null
+  const intervalError = intervalNumber !== null && (!Number.isInteger(intervalNumber) || intervalNumber < 2 || intervalNumber > 86_400) ? 'Entre 2 y 86.400 segundos' : null
 
   return (
     <Drawer open onClose={onClose} title={feature.label} subtitle={feature.description}>

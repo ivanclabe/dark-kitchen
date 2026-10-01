@@ -33,9 +33,9 @@ set local role anon;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Público', 'Planes visibles sin sesión (en orden)', 'standard, business, enterprise',
     (select string_agg(key, ', ' order by sort_order) from dk_plans));
-  insert into _t (area, test, expected, got) values ('Público', 'Funciones por plan visibles', '4 · 8 · 8',
+  insert into _t (area, test, expected, got) values ('Público', 'Funciones por plan visibles', '4 · 9 · 9',
     (select count(*) filter (where plan_key = 'standard') || ' · ' || count(*) filter (where plan_key = 'business') || ' · ' || count(*) filter (where plan_key = 'enterprise') from dk_plan_features));
-  insert into _t (area, test, expected, got) values ('Público', 'Catálogo de funciones visible', '8', (select count(*)::text from dk_features));
+  insert into _t (area, test, expected, got) values ('Público', 'Catálogo de funciones visible', '9', (select count(*)::text from dk_features));
   begin
     insert into _t (area, test, expected, got) values ('Público', 'Organizaciones cerradas', '0', (select count(*)::text from dk_organizations));
   exception when others then insert into _t (area, test, expected, got, detail) values ('Público', 'Organizaciones cerradas', '0', '0', sqlerrm); end;

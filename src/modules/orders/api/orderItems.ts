@@ -1,39 +1,7 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { OrderItem, OrderItemInput } from '../types'
+import type { OrderItemInput } from '../types'
 
-interface OrderItemRow {
-  id: string
-  order_id: string
-  product_id: string
-  quantity: number
-  unit_price: number
-  line_total: number
-  observation: string | null
-  kitchen_status: OrderItem['kitchenStatus']
-  dk_products: { name: string } | null
-}
-
-const SELECT = 'id, order_id, product_id, quantity, unit_price, line_total, observation, kitchen_status, dk_products ( name )'
-
-function mapRow(row: OrderItemRow): OrderItem {
-  return {
-    id: row.id,
-    orderId: row.order_id,
-    productId: row.product_id,
-    productName: row.dk_products?.name ?? '—',
-    quantity: row.quantity,
-    unitPrice: Number(row.unit_price),
-    lineTotal: Number(row.line_total),
-    observation: row.observation,
-    kitchenStatus: row.kitchen_status,
-  }
-}
-
-export async function listOrderItems(orderId: string): Promise<OrderItem[]> {
-  const { data, error } = await supabase.from('dk_order_items').select(SELECT).eq('order_id', orderId).order('created_at')
-  if (error) throw error
-  return (data as unknown as OrderItemRow[]).map(mapRow)
-}
+// The items are read with their order (orders/api/orders.ts); here only what changes them.
 
 export async function addOrderItem(orderId: string, input: OrderItemInput): Promise<void> {
   const { error } = await supabase.from('dk_order_items').insert({
@@ -48,5 +16,17 @@ export async function addOrderItem(orderId: string, input: OrderItemInput): Prom
 
 export async function removeOrderItem(id: string): Promise<void> {
   const { error } = await supabase.from('dk_order_items').delete().eq('id', id)
+  if (error) throw error
+}
+
+/** PENDIENTE → EN_PREPARACION → LISTO; the order's status follows its items (in the database). */
+export async function advanceKitchenItem(orderItemId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_advance_kitchen_item', { p_order_item_id: orderItemId })
+  if (error) throw error
+}
+
+/** The mirror of advanceKitchenItem, one step back. */
+export async function revertKitchenItem(orderItemId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_revert_kitchen_item', { p_order_item_id: orderItemId })
   if (error) throw error
 }

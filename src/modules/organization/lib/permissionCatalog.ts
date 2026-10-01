@@ -3,7 +3,7 @@ import type { PermissionDef } from '../api/organization'
 /** Nombre de cada módulo del catálogo (dk_permissions.module). */
 export const MODULE_LABEL: Record<string, string> = {
   dashboard: 'Dashboard',
-  kitchen: 'Cocina (tablero)',
+  kitchen: 'Cocina',
   orders: 'Pedidos',
   dispatch: 'Despacho',
   customers: 'Clientes',
@@ -19,6 +19,8 @@ export const MODULE_LABEL: Record<string, string> = {
   ai: 'IA',
   settings: 'Configuración',
   team: 'Equipo de la cuenta',
+  staff: 'Personal y turnos',
+  copilot: 'Quanela Copilot',
   audit: 'Auditoría',
 }
 
@@ -40,6 +42,7 @@ export const ACTION_LABEL: Record<string, string> = {
   adjust: 'Mermas y ajustes',
   upload: 'Subir',
   profitability: 'Rentabilidad',
+  use: 'Usar',
 }
 
 export interface ModuleGroup {

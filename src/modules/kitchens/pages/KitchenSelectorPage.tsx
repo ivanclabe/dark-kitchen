@@ -4,6 +4,8 @@ import { kitchenPath, useMyContext, useMyKitchens } from '@/shared/kitchen/activ
 import type { MyKitchen, MyOrganization } from '@/shared/kitchen/kitchensApi'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
+import { tenantHostLabel, tenantUrl } from '@/shared/tenant/host'
+import { useTenant } from '@/shared/tenant/tenantContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -11,7 +13,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
-import { ArrowRight, Building2, ChefHat, Flame, LogOut, Plus, Store } from 'lucide-react'
+import { ArrowRight, Building2, ChefHat, ExternalLink, Flame, LogOut, Plus, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
@@ -32,7 +34,12 @@ export function KitchenSelectorPage() {
   const { data: kitchens, isLoading, isError, error, refetch } = useMyKitchens()
   const [creatingIn, setCreatingIn] = useState<MyOrganization | null>(null)
 
-  const organizations = ctx?.organizations ?? []
+  const tenant = useTenant()
+  const onTenant = tenant.mode === 'tenant'
+  // On an organization's subdomain, only its accounts; the others are links to their subdomains (ADR 0021).
+  const allOrganizations = ctx?.organizations ?? []
+  const organizations = onTenant ? allOrganizations.filter((o) => o.slug === tenant.slug) : allOrganizations
+  const otherOrganizations = onTenant ? allOrganizations.filter((o) => o.slug !== tenant.slug && o.status === 'active' && o.active) : []
   const groups = organizations
     .map((org) => ({ org, kitchens: (kitchens ?? []).filter((k) => k.organizationId === org.id) }))
     .filter((g) => g.kitchens.length > 0 || g.org.permissions.includes('accounts.create'))
@@ -86,6 +93,7 @@ export function KitchenSelectorPage() {
                       {showGroupTitles || canCreateSomewhere ? (
                         <h2 className={clsx(typography.h3, 'flex items-center gap-2')}>
                           {org.name}
+                          {tenant.mode !== 'path' && <span className="font-mono text-xs font-normal text-neutral-500">{tenantHostLabel(org.slug)}</span>}
                           {org.isSuperAdmin && (
                             <Badge tone="brand" size="sm">
                               SUPER_ADMIN
@@ -127,6 +135,26 @@ export function KitchenSelectorPage() {
           </div>
         )}
       </div>
+
+      {otherOrganizations.length > 0 && (
+        <section aria-label="Tus otras organizaciones" className="mx-auto mt-10 max-w-4xl space-y-3">
+          <h2 className={typography.h3}>Tus otras organizaciones</h2>
+          <ul className="flex flex-wrap gap-2">
+            {otherOrganizations.map((o) => (
+              <li key={o.id}>
+                <a
+                  href={tenantUrl(o.slug, '/') ?? '/'}
+                  className="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-500 hover:text-neutral-50"
+                >
+                  <Building2 size={14} aria-hidden /> {o.name}
+                  <span className="font-mono text-xs text-neutral-500">{tenantHostLabel(o.slug)}</span>
+                  <ExternalLink size={12} className="text-neutral-500" aria-hidden />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {creatingIn && (
         <CreateKitchenDialog

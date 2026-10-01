@@ -10,10 +10,12 @@ export type ModuleKey =
   | 'users'
   | 'supply'
   | 'menuPlanner'
+  | 'orders'
   | 'kitchen'
   | 'customers'
   | 'reports'
   | 'settings'
+  | 'staff'
 
 /** ¿Tiene el usuario este permiso (clave del catálogo, p. ej. 'orders.confirm') en la Cuenta activa? */
 export type Can = (permission: AccountPermission) => boolean
@@ -32,12 +34,16 @@ const MODULE_PERMISSIONS: Record<ModuleKey, readonly AccountPermission[]> = {
   supply: ['inventory.view', 'purchasing.view', 'suppliers.view'],
   // Platos, calendario y recetas.
   menuPlanner: ['menus.view'],
-  // Tablero: pedidos, preparación y despacho.
+  // Pedidos (ADR 0020): Tablero y Lista con orders.view; Despacho también con dispatch.view.
+  orders: ['orders.view', 'dispatch.view', 'dispatch.assign'],
+  // Cocina: la pantalla de preparación (una vista de los pedidos).
   kitchen: ['kitchen.view'],
   customers: ['customers.view'],
   reports: ['reports.view'],
   // Configuración de la Cuenta (datos generales, IA).
   settings: ['settings.manage', 'ai.manage'],
+  // Personal y Turnos (ADR 0020). Los turnos propios no exigen permiso: viven en el menú de usuario.
+  staff: ['staff.view', 'staff.manage'],
 }
 
 export function canAccessModule(can: Can, module: ModuleKey): boolean {

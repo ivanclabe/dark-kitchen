@@ -2,7 +2,7 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { RegisterPaymentModal } from '@/modules/cartera/components/RegisterPaymentModal'
 import { usePaymentsByCustomer, useReceivables } from '@/modules/cartera/hooks/useReceivables'
 import type { CustomerPayment } from '@/modules/cartera/types'
-import { useOrdersByCustomer } from '@/modules/orders/hooks/useOrders'
+import { useOrderSearch } from '@/modules/orders/hooks/useOrders'
 import { OrderStatusBadge } from '@/modules/orders/lib/orderStatus'
 import type { Order } from '@/modules/orders/types'
 import { Button } from '@/shared/ui/Button'
@@ -30,7 +30,7 @@ export function CustomerDetailPage() {
   const { id = '' } = useParams<{ id: string }>()
   const { data: customers, isLoading: loadingCustomers } = useCustomers()
   const { data: receivables } = useReceivables()
-  const { data: orders, isLoading: loadingOrders, isError: ordersError, error: ordersErrorObj, refetch: refetchOrders } = useOrdersByCustomer(id)
+  const { data: orders, isLoading: loadingOrders, isError: ordersError, error: ordersErrorObj, refetch: refetchOrders } = useOrderSearch({ customerId: id, limit: 100 }, !!id)
   const { data: payments } = usePaymentsByCustomer(id)
   const [editOpen, setEditOpen] = useState(false)
   const [payOpen, setPayOpen] = useState(false)
@@ -40,7 +40,7 @@ export function CustomerDetailPage() {
   const balance = computeCustomerBalance(customerReceivables)
 
   const timeline = useMemo<TimelineEntry[]>(() => {
-    const orderEntries: TimelineEntry[] = (orders ?? []).map((order) => ({ kind: 'order', date: order.createdAt, order }))
+    const orderEntries: TimelineEntry[] = (orders?.orders ?? []).map((order) => ({ kind: 'order', date: order.createdAt, order }))
     const paymentEntries: TimelineEntry[] = (payments ?? []).map((payment) => ({ kind: 'payment', date: payment.createdAt, payment }))
     return [...orderEntries, ...paymentEntries].sort((a, b) => (a.date < b.date ? 1 : -1))
   }, [orders, payments])
@@ -131,7 +131,7 @@ export function CustomerDetailPage() {
               {timeline.map((entry) =>
                 entry.kind === 'order' ? (
                   <li key={`order-${entry.order.id}`}>
-                    <Link to={`/kitchen?pedido=${entry.order.id}`} className="flex items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-neutral-900/50">
+                    <Link to={`/orders/${entry.order.id}`} className="flex items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-neutral-900/50">
                       <div className="min-w-0">
                         <p className="flex items-center gap-2 text-sm font-medium text-neutral-100">
                           Pedido #{entry.order.orderNumber} <OrderStatusBadge status={entry.order.status} size="sm" />

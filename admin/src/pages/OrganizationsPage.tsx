@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { PageTitle, StatusPill } from '../components/ui'
 import { fetchOrganizations, type OrganizationRow } from '../lib/api'
 import { formatShortDate, timeAgo } from '../lib/format'
+import { tenantHost, tenantUrl } from '../lib/tenant'
 
 type Sort = 'recent' | 'name' | 'users' | 'activity'
 
@@ -62,6 +63,21 @@ export function OrganizationsPage() {
           <span className="block truncate text-[11px] text-neutral-500">{[o.city, o.country].filter(Boolean).join(', ') || o.slug}</span>
         </span>
       ),
+    },
+    {
+      key: 'subdomain',
+      header: 'Subdominio',
+      hideBelow: 'md',
+      cell: (o) => {
+        const url = tenantUrl(o.slug)
+        return url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono text-[11px] text-brasa-300 hover:underline">
+            {tenantHost(o.slug)}
+          </a>
+        ) : (
+          <span className="font-mono text-[11px] text-neutral-400">{o.slug}</span>
+        )
+      },
     },
     { key: 'status', header: 'Estado', cell: (o) => <StatusPill tone={o.active ? 'good' : 'neutral'}>{o.active ? 'Activa' : 'Inactiva'}</StatusPill> },
     {

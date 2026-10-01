@@ -5,7 +5,8 @@ import { setLastAccount, toKitchenView } from '@/shared/kitchen/kitchensApi'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useQuery } from '@tanstack/react-query'
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
-import { Navigate, Outlet, useParams } from 'react-router-dom'
+import { hostRedirectFor } from '@/shared/tenant/navigation'
+import { Navigate, Outlet, useLocation, useParams } from 'react-router-dom'
 import { FullScreenLoading } from './FullScreenLoading'
 import { KitchenInactivePage } from './KitchenInactivePage'
 
@@ -28,6 +29,10 @@ export function KitchenScope() {
   const storedRole = account ? readStoredRole(account.id) : null
   const kitchen = useMemo(() => (ctx && account ? toKitchenView(ctx, account, storedRole) : null), [ctx, account, storedRole])
   const organization = ctx?.organizations.find((o) => o.id === account?.organizationId) ?? null
+  // ADR 0021: an account lives on its organization's subdomain. Opened from
+  // another one (or from the root domain), the same path goes there.
+  const { pathname, search } = useLocation()
+  const crossHost = account ? hostRedirectFor(organization?.slug, `${pathname}${search}`) : null
 
   const setActiveRole = useCallback(
     (roleId: string) => {
@@ -39,21 +44,25 @@ export function KitchenScope() {
   )
   // Durante el render (no en un efecto): los efectos de los hijos corren
   // antes que los del padre y sus consultas saldrían sin Cuenta o sin rol.
-  if (kitchen) {
+  if (kitchen && !crossHost) {
     setActiveKitchenId(kitchen.id)
     setActiveRoleId(kitchen.activeRoleId || null)
   }
 
   // Funciones de la Cuenta activa (después de fijar Cuenta y rol: la clave de
   // caché y los encabezados ya son los de este contexto).
-  const { data: features } = useQuery({ queryKey: FEATURES_KEY, queryFn: fetchMyFeatures, enabled: Boolean(kitchen), staleTime: 60_000 })
+  const { data: features } = useQuery({ queryKey: FEATURES_KEY, queryFn: fetchMyFeatures, enabled: Boolean(kitchen) && !crossHost, staleTime: 60_000 })
 
   const value = useMemo(
     () => (kitchen ? buildActiveKitchen(kitchen, { organization, setActiveRole, features }) : null),
     [kitchen, organization, setActiveRole, features],
   )
 
-  const kitchenId = kitchen?.id
+  useEffect(() => {
+    if (crossHost) window.location.replace(crossHost)
+  }, [crossHost])
+
+  const kitchenId = crossHost ? undefined : kitchen?.id
   useEffect(() => {
     if (!kitchenId) return
     // Para volver a esta Cuenta al iniciar sesión, también desde otro equipo. No crítico.
@@ -69,7 +78,7 @@ export function KitchenScope() {
     }
   }, [kitchen])
 
-  if (isLoading) return <FullScreenLoading />
+  if (isLoading || crossHost) return <FullScreenLoading />
   if (isError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950 p-6">

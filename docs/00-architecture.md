@@ -71,9 +71,10 @@ src/
     recipes/
     products/               # platos
     menus/                  # menú, menú del día
-    orders/                  # pedidos
-    kitchen/                 # comanda / cocina
-    delivery/                # despacho / domiciliarios
+    orders/                  # PEDIDOS, el centro operativo (ADR 0020): una sola capa de datos del pedido, tablero (board/), Lista, Despacho y detalle
+    kitchen/                 # Cocina: vista de preparación de esos mismos pedidos (KDS), tiempos (SLA), voz, horario
+    staff/                   # Personal y Turnos (ADR 0020): turnos flexibles, entrada/salida, horas
+    copilot/                 # Quanela Copilot (ADR 0020): panel y renderizado seguro de respuestas
     customers/
     reports/
     organization/            # equipos, roles, cuentas, funciones y plan (componentes que reutiliza el centro)
@@ -105,6 +106,31 @@ modules/inventory/
 ```
 
 **Dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md)).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector. La plataforma ya no vive en Quanela: `/admin` redirige a inicio.
+
+**Pedidos como centro ([ADR 0020](./adr/0020-pedidos-como-centro-personal-y-copilot.md)).**
+- **Una sola fuente del pedido en la interfaz.** El pedido se lee con una única consulta y un único tipo (`orders/api/orders.ts` → `Order`), bajo una sola raíz de caché `['orders']`. Pedidos (Tablero, Lista, Despacho), Cocina, el Dashboard y Clientes la comparten: un cambio en una vista se ve en todas. Ninguna tiene su propia copia.
+- **Cocina reutiliza el tablero de Pedidos.** Usa el mismo componente (`orders/board`) con otras columnas y un **alcance** (`KITCHEN_SCOPE`): prepara, prioriza y cancela; no confirma ni despacha.
+- **Abastecimiento no cambia.** Pedidos solo refresca sus cachés de stock después de cambiar un pedido.
+- **`/` de la cuenta es «tu inicio».** Caja → Pedidos, cocina → Cocina, domiciliario → Despacho, administración → `/dashboard`.
+
+**Un subdominio por organización ([ADR 0021](./adr/0021-subdominios-por-organizacion.md)).**
+- **Dominios.** `{slug}.quanela.com` es la organización; `quanela.com` es la landing, el registro y el login general. Un solo despliegue con el dominio comodín `*.quanela.com`; el dominio raíz sale de `VITE_TENANT_ROOT_DOMAIN`.
+- **Resolución del tenant.** `src/shared/tenant` lee el host, y `dk_tenant_public` dice si la organización existe y está activa. `TenantProvider`/`useTenant()` es el único contexto de organización; `TenantGate` exige la membresía antes de montar cualquier ruta.
+- **Cuenta en la URL y redirección.** La cuenta sigue en la ruta (`/k/{cuenta}`). Una cuenta u organización de otro tenant lleva a su subdominio.
+- **Sesión compartida.** La sesión es una cookie de `.quanela.com`, compartida por todas tus organizaciones. En `*.localhost` es por subdominio.
+- **`slug` inmutable.** Solo el Global Admin lo cambia, y el anterior queda como alias que redirige.
+- **Autoridad de los datos.** Sigue siendo la RLS por cuenta y membresía.
+
+**Personal y Turnos.**
+- **`dk_shifts`** apunta a la persona y a su rol en la cuenta: no copia usuarios ni roles. La base impide los solapes por persona en toda la organización.
+- **Permisos:** `staff.view` y `staff.manage`. Cualquier persona ve sus propios turnos y marca su entrada y salida.
+
+**Quanela Copilot.**
+- **Edge Function `dk-copilot`.** Corre con la sesión de la persona y la cuenta activa.
+- **Herramientas `dk_copilot_*`.** El modelo solo usa estas funciones de la base, de solo lectura, que se ejecutan con los permisos de la persona; cada una exige su permiso y respeta la RLS.
+- **Solo las herramientas permitidas.** El modelo solo ve las que esa persona puede usar.
+- **Cifras y enlaces.** Las cifras salen únicamente de las herramientas, y los enlaces a entidades que no devolvió una herramienta se eliminan.
+- **Registro y cuota.** Cada pregunta queda en `dk_ai_insights` (función `copilot`) y consume la cuota de IA del plan.
 
 **Portal Global Admin ([ADR 0019](./adr/0019-portal-global-admin.md)).**
 - **App y build propios:** `vite.admin.config.ts`, raíz `admin/`, `npm run dev:admin` / `npm run build:admin`. En Vercel es un segundo proyecto con `QUANELA_APP=admin`.
@@ -308,7 +334,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 - [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
-- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md)
 
 ---
 

@@ -5,6 +5,7 @@ export const FEATURE_LABEL: Record<string, string> = {
   supply_slow_movers: 'Poco movimiento',
   kitchen_stall_alerts: 'Pedidos detenidos',
   kitchen_insights: 'Sugerencias de Cocina',
+  copilot: 'Quanela Copilot',
   voice_commands: 'Comandos de voz',
   voice_speech: 'Voz de la aplicación',
   voice_wake_word: 'Manos libres',

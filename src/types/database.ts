@@ -26,6 +26,7 @@ export type Database = {
           kitchen_id: string
           latency_ms: number | null
           model: string | null
+          organization_id: string | null
           output: Json | null
           output_tokens: number | null
           status: string
@@ -41,6 +42,7 @@ export type Database = {
           kitchen_id?: string
           latency_ms?: number | null
           model?: string | null
+          organization_id?: string | null
           output?: Json | null
           output_tokens?: number | null
           status: string
@@ -56,6 +58,7 @@ export type Database = {
           kitchen_id?: string
           latency_ms?: number | null
           model?: string | null
+          organization_id?: string | null
           output?: Json | null
           output_tokens?: number | null
           status?: string
@@ -80,6 +83,13 @@ export type Database = {
             columns: ["kitchen_id"]
             isOneToOne: false
             referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ai_insights_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -2117,6 +2127,42 @@ export type Database = {
           },
         ]
       }
+      dk_organization_slug_aliases: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          organization_id: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          organization_id: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          organization_id?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_organization_slug_aliases_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_organization_slug_aliases_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_organizations: {
         Row: {
           active: boolean
@@ -2802,6 +2848,99 @@ export type Database = {
           },
         ]
       }
+      dk_shifts: {
+        Row: {
+          break_minutes: number
+          clock_in_at: string | null
+          clock_out_at: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          kitchen_id: string
+          notes: string | null
+          organization_id: string
+          role_id: string
+          starts_at: string
+          status: Database["public"]["Enums"]["dk_shift_status"]
+          unplanned: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          break_minutes?: number
+          clock_in_at?: string | null
+          clock_out_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          kitchen_id?: string
+          notes?: string | null
+          organization_id: string
+          role_id: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["dk_shift_status"]
+          unplanned?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          break_minutes?: number
+          clock_in_at?: string | null
+          clock_out_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          kitchen_id?: string
+          notes?: string | null
+          organization_id?: string
+          role_id?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["dk_shift_status"]
+          unplanned?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_shifts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_shifts_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_shifts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_shifts_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "dk_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_shifts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_subscriptions: {
         Row: {
           billing_period: string
@@ -3273,6 +3412,7 @@ export type Database = {
         Args: { p_kitchen_id: string; p_organization_id: string }
         Returns: Json
       }
+      dk_account_tz: { Args: never; Returns: string }
       dk_activation_preview: {
         Args: { p_token: string }
         Returns: {
@@ -3356,14 +3496,77 @@ export type Database = {
         Args: { p_order_id: string; p_reason?: string }
         Returns: undefined
       }
+      dk_clock_in: { Args: never; Returns: string }
+      dk_clock_out: { Args: never; Returns: string }
       dk_confirm_order: { Args: { p_order_id: string }; Returns: undefined }
       dk_confirm_purchase: {
         Args: { p_purchase_id: string }
         Returns: undefined
       }
+      dk_copilot_context: { Args: never; Returns: Json }
+      dk_copilot_customers: {
+        Args: {
+          p_from?: string
+          p_limit?: number
+          p_order_by?: string
+          p_search?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
+      dk_copilot_deliveries: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_copilot_ingredients: {
+        Args: { p_limit?: number; p_only_low?: boolean; p_search?: string }
+        Returns: Json
+      }
+      dk_copilot_kitchen: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_copilot_order: { Args: { p_number: number }; Returns: Json }
+      dk_copilot_orders: {
+        Args: {
+          p_from?: string
+          p_limit?: number
+          p_min_minutes?: number
+          p_search?: string
+          p_statuses?: string[]
+          p_to?: string
+        }
+        Returns: Json
+      }
+      dk_copilot_products: {
+        Args: { p_ingredient?: string; p_limit?: number; p_search?: string }
+        Returns: Json
+      }
+      dk_copilot_purchases: {
+        Args: { p_from: string; p_supplier?: string; p_to: string }
+        Returns: Json
+      }
+      dk_copilot_range: {
+        Args: { p_from: string; p_to: string }
+        Returns: undefined
+      }
+      dk_copilot_sales: {
+        Args: {
+          p_compare?: boolean
+          p_from: string
+          p_group_by?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      dk_copilot_staff: { Args: { p_day?: string }; Returns: Json }
       dk_copy_menu_plan_range: {
         Args: { p_days?: number; p_from_date: string; p_to_date: string }
         Returns: undefined
+      }
+      dk_copy_shifts: {
+        Args: { p_from_week: string; p_to_week: string }
+        Returns: Json
       }
       dk_copy_weekly_menu_day: {
         Args: {
@@ -3546,6 +3749,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_ga_set_organization_slug: {
+        Args: { p_organization_id: string; p_slug: string }
+        Returns: Json
+      }
       dk_ga_user_detail: { Args: { p_user_id: string }; Returns: Json }
       dk_ga_users: { Args: never; Returns: Json }
       dk_has_any_profile: { Args: never; Returns: boolean }
@@ -3606,6 +3813,7 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: boolean
       }
+      dk_is_reserved_slug: { Args: { p_slug: string }; Returns: boolean }
       dk_is_staff: { Args: never; Returns: boolean }
       dk_is_superadmin: { Args: never; Returns: boolean }
       dk_is_syncing_master: { Args: never; Returns: boolean }
@@ -3670,6 +3878,19 @@ export type Database = {
       }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
+      dk_order_search: {
+        Args: {
+          p_channel?: Database["public"]["Enums"]["dk_order_channel"]
+          p_customer_id?: string
+          p_from?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_statuses?: Database["public"]["Enums"]["dk_order_status"][]
+          p_to?: string
+        }
+        Returns: string[]
+      }
       dk_org_ai_usage: {
         Args: { p_days?: number; p_organization_id: string }
         Returns: Json
@@ -3961,9 +4182,35 @@ export type Database = {
         Args: { p_order_id: string; p_priority: number }
         Returns: undefined
       }
+      dk_shifts_now: {
+        Args: never
+        Returns: {
+          clocked_in: boolean
+          ends_at: string
+          full_name: string
+          rider_id: string
+          role_id: string
+          role_name: string
+          shift_id: string
+          starts_at: string
+          user_id: string
+        }[]
+      }
       dk_slugify: {
         Args: { p_fallback?: string; p_text: string }
         Returns: string
+      }
+      dk_staff_members: {
+        Args: never
+        Returns: {
+          active: boolean
+          avatar_key: string
+          default_role_id: string
+          full_name: string
+          rider_id: string
+          roles: Json
+          user_id: string
+        }[]
       }
       dk_subscription_is_current: {
         Args: { p_organization_id: string }
@@ -3973,6 +4220,7 @@ export type Database = {
         Args: { p_kitchen_id: string; p_menu_id: string }
         Returns: undefined
       }
+      dk_tenant_public: { Args: { p_slug: string }; Returns: Json }
       dk_today_day_of_week: {
         Args: never
         Returns: Database["public"]["Enums"]["dk_day_of_week"]
@@ -4029,6 +4277,7 @@ export type Database = {
         | "INVENTORY"
         | "CASHIER"
         | "DELIVERY"
+      dk_shift_status: "scheduled" | "cancelled"
       dk_unit_type: "WEIGHT" | "VOLUME" | "UNIT"
       dk_waste_reason: "VENCIMIENTO" | "DANO" | "ERROR_PREPARACION" | "OTRO"
     }
@@ -4190,6 +4439,7 @@ export const Constants = {
         "CASHIER",
         "DELIVERY",
       ],
+      dk_shift_status: ["scheduled", "cancelled"],
       dk_unit_type: ["WEIGHT", "VOLUME", "UNIT"],
       dk_waste_reason: ["VENCIMIENTO", "DANO", "ERROR_PREPARACION", "OTRO"],
     },

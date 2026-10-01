@@ -1,4 +1,6 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { rootUrl, tenantHostLabel } from '@/shared/tenant/host'
+import { useTenant } from '@/shared/tenant/tenantContext'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
@@ -8,6 +10,9 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom'
 
 export function LoginPage() {
   const { session, signIn } = useAuth()
+  // On an organization's subdomain, its own login (ADR 0021): same identity, its name.
+  const tenant = useTenant()
+  const orgName = tenant.mode === 'tenant' && tenant.status !== 'not_found' ? tenant.organization?.name : null
   const [searchParams] = useSearchParams()
   // Solo rutas internas (p. ej. volver al enlace de invitación): nunca redirigir fuera de la app.
   const next = searchParams.get('next')
@@ -36,8 +41,16 @@ export function LoginPage() {
             <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
           </span>
           <div>
-            <h1 className={typography.h1}>Quanela</h1>
-            <p className={`mt-1 ${typography.small}`}>Inicia sesión para continuar</p>
+            <h1 className={typography.h1}>{orgName ?? 'Quanela'}</h1>
+            <p className={`mt-1 ${typography.small}`}>
+              {orgName && tenant.slug ? (
+                <>
+                  Inicia sesión en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.slug)}</span>
+                </>
+              ) : (
+                'Inicia sesión para continuar'
+              )}
+            </p>
           </div>
         </div>
 
@@ -56,9 +69,16 @@ export function LoginPage() {
         <p className="mt-6 text-center text-sm text-neutral-500">
           ¿Eres nuevo en el equipo? Pide a tu administrador una <span className="text-neutral-300">invitación</span>.
         </p>
-        <Link to="/" className="mt-3 flex items-center justify-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-300">
-          <ArrowLeft size={14} aria-hidden /> Volver al inicio
-        </Link>
+        {/* On a subdomain "/" is this same login: the start is quanela.com (ADR 0021). */}
+        {orgName && rootUrl('/') ? (
+          <a href={rootUrl('/')!} className="mt-3 flex items-center justify-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-300">
+            <ArrowLeft size={14} aria-hidden /> Ir a Quanela
+          </a>
+        ) : (
+          <Link to="/" className="mt-3 flex items-center justify-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-300">
+            <ArrowLeft size={14} aria-hidden /> Volver al inicio
+          </Link>
+        )}
       </div>
     </div>
   )

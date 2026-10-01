@@ -1,5 +1,5 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { BarChart3, ChefHat, LayoutDashboard, Soup, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarClock, ChefHat, ClipboardList, LayoutDashboard, Soup, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
@@ -18,14 +18,21 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Dashboard', description: 'Resumen del negocio', modules: ['dashboard'], icon: LayoutDashboard },
+  { to: '/dashboard', label: 'Dashboard', description: 'Resumen del negocio', modules: ['dashboard'], icon: LayoutDashboard },
+  {
+    to: '/orders',
+    label: 'Pedidos',
+    description: 'El centro operativo: tablero, lista y despacho',
+    modules: ['orders'],
+    icon: ClipboardList,
+    matchPrefixes: ['/orders', '/delivery'],
+  },
   {
     to: '/kitchen',
     label: 'Cocina',
-    description: 'Del pedido a la entrega, en un tablero',
+    description: 'La pantalla de preparación de los pedidos',
     modules: ['kitchen'],
     icon: ChefHat,
-    matchPrefixes: ['/kitchen', '/orders', '/delivery'],
   },
   {
     to: '/menu-planner',
@@ -51,6 +58,13 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Users,
     matchPrefixes: ['/customers'],
   },
+  {
+    to: '/staff',
+    label: 'Personal',
+    description: 'Turnos del equipo, asistencia y horas',
+    modules: ['staff'],
+    icon: CalendarClock,
+  },
   { to: '/reports', label: 'Reportes', description: 'Ventas, compras y rentabilidad', modules: ['reports'], icon: BarChart3 },
 ]
 
@@ -64,7 +78,6 @@ const matches = (section: string, prefix: string) => section === prefix || secti
 
 /** `section` = la ruta dentro de la Cuenta activa ('/', '/kitchen', '/supply/compras'…). */
 export function isNavItemActive(section: string, item: NavItem): boolean {
-  if (item.to === '/') return section === '/'
   return (item.matchPrefixes ?? [item.to]).some((p) => matches(section, p))
 }
 
@@ -75,13 +88,31 @@ export function isNavItemActive(section: string, item: NavItem): boolean {
  * ningún módulo (p. ej. /perfil) siempre se permite.
  */
 export function isSectionAllowed(section: string, can: Can): boolean {
+  // "/" is "your start": it sends each role to its own screen (homeSection).
+  if (section === '/') return true
   const item = NAV_ITEMS.find((i) => isNavItemActive(section, i))
   if (item) return canAccessAnyModule(can, item.modules)
   const extra = EXTRA_SECTIONS.find((e) => matches(section, e.prefix))
   return extra ? canAccessAnyModule(can, extra.modules) : true
 }
 
-/** Inicio de la Cuenta para este rol: el Dashboard o, si no lo tiene, su primer módulo (Cocina → el tablero). */
+/**
+ * Where each role starts (ADR 0020, D3), decided by permissions so custom
+ * roles follow the same rule:
+ *   - rider (delivers, does not see all orders)  → Pedidos (Despacho)
+ *   - kitchen (prepares, does not create orders) → Cocina
+ *   - cashier (creates orders, does not manage)  → Pedidos
+ *   - everyone else → their first module (Dashboard for administration)
+ */
 export function homeSection(can: Can): string {
+  const preferred =
+    can('dispatch.deliver') && !can('orders.view')
+      ? '/orders'
+      : can('kitchen.prepare') && !can('orders.create')
+        ? '/kitchen'
+        : can('orders.create') && !can('settings.manage')
+          ? '/orders'
+          : null
+  if (preferred && isSectionAllowed(preferred, can)) return preferred
   return NAV_ITEMS.find((i) => canAccessAnyModule(can, i.modules))?.to ?? '/perfil'
 }

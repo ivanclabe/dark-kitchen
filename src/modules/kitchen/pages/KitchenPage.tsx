@@ -1,41 +1,34 @@
-import { useDashboardSummary } from '@/modules/dashboard/hooks/useDashboard'
+import { allows, BoardActionsContext, KITCHEN_SCOPE, type BoardActions } from '@/modules/orders/board/boardActions'
+import { CancelOrderDialog } from '@/modules/orders/board/BoardDialogs'
+import { OrderBoard } from '@/modules/orders/board/OrderBoard'
+import { OrderDetailDrawer } from '@/modules/orders/components/OrderDetailDrawer'
+import { useNewOrderAlert } from '@/modules/orders/hooks/useNewOrderAlert'
+import { useLiveOrders } from '@/modules/orders/hooks/useOrders'
+import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
+import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/orders/lib/orderVisuals'
+import type { Order, PrepStatus } from '@/modules/orders/types'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { useNow } from '@/shared/hooks/useNow'
-import { Button, IconButton } from '@/shared/ui/Button'
+import { IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
+import { typography } from '@/shared/ui/typography'
 import { kitchenSpeech } from '@/shared/voice/speechQueue'
 import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
 import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
 import { useWakeWord } from '@/shared/voice/wakeWord/useWakeWord'
-import { Tooltip } from '@/shared/ui/Tooltip'
-import { typography } from '@/shared/ui/typography'
-import { formatDateLong, formatMoney, toDateInput } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { Bell, Bike, CalendarClock, Gauge, History, Kanban, Keyboard, MoreHorizontal, Plus, Search, Settings, Volume2, X, ZoomIn } from 'lucide-react'
+import { Bell, ChefHat, ClipboardList, Gauge, Kanban, Keyboard, MoreHorizontal, Search, Settings, Volume2, X, ZoomIn } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HistoryDrawer } from '../components/HistoryDrawer'
 import { KitchenConfigDrawer, type KitchenConfigTab } from '../components/KitchenConfigDrawer'
-import { KitchenDateNav, todayStr } from '../components/KitchenDateNav'
 import { KitchenInsightLine } from '../components/KitchenInsightLine'
 import { KitchenStatusLine } from '../components/KitchenStatusLine'
-import { NewOrderDrawer } from '../components/NewOrderDrawer'
-import { OrderDetailDrawer } from '../components/OrderDetailDrawer'
-import { RidersDrawer } from '../components/RidersDrawer'
-import { useDeliveredTodayCount, useKitchenFlow } from '../hooks/useKitchen'
-import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
-import { useNewTicketAlert } from '../hooks/useNewTicketAlert'
 import { useStallAlerts } from '../hooks/useStallAlerts'
-import { BoardActionsContext, type BoardActions } from '../kanban/boardActions'
-import { CancelOrderDialog, ConfirmOrderDialog, DispatchDialog } from '../kanban/BoardDialogs'
-import { ACTION_DENIED_REASON, canPerform } from '../lib/permissions'
-import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '../lib/ticketVisuals'
-import type { KitchenOrderStatus, KitchenTicket } from '../types'
-import { KanbanView } from '../views/KanbanView'
 import { SlaView } from '../views/SlaView'
-import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 import { useVoiceCommandEngine } from '../voice/useVoiceCommandEngine'
+import { VoiceCommandBar } from '../voice/VoiceCommandBar'
 import { WakeWordIndicator } from '../voice/WakeWordIndicator'
 
 type KitchenView = 'tablero' | 'sla'
@@ -44,15 +37,16 @@ type Density = 'normal' | 'grande'
 const VIEW_PREF_KEY = 'dk-kitchen-view'
 const DENSITY_PREF_KEY = 'dk-kitchen-density'
 
-/** Estados de la cocina propiamente dicha: lo único que ven la voz, la alerta de "pedido nuevo" y la vista SLA. */
-const KITCHEN_STATUSES = new Set<KitchenOrderStatus>(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
+/** Cocina's stretch of the order: what the line prepares. */
+const PREP_COLUMNS: PrepStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
+const PREP = new Set<string>(PREP_COLUMNS)
 
 function readPref<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
   try {
     const stored = localStorage.getItem(key)
     if (stored && (allowed as readonly string[]).includes(stored)) return stored as T
   } catch {
-    // localStorage puede no estar disponible (modo privado) — se usa el default.
+    // localStorage may be unavailable (private mode): default.
   }
   return fallback
 }
@@ -61,49 +55,35 @@ function writePref(key: string, value: string) {
   try {
     localStorage.setItem(key, value)
   } catch {
-    // No crítico.
+    // Not critical.
   }
 }
 
-function yesterday(): string {
-  const d = new Date()
-  d.setDate(d.getDate() - 1)
-  return toDateInput(d)
-}
-
-function Kpi({ label, value }: { label: string; value: number }) {
+function Kpi({ label, value, tone }: { label: string; value: number; tone?: 'warn' }) {
   return (
     <div className="min-w-0 rounded-xl border border-neutral-800/60 bg-neutral-900/60 px-3.5 py-2.5">
-      <p className="text-xl leading-none font-semibold tabular-nums text-neutral-50">{value}</p>
+      <p className={clsx('text-xl leading-none font-semibold tabular-nums', tone === 'warn' && value > 0 ? 'text-red-400' : 'text-neutral-50')}>{value}</p>
       <p className="mt-1.5 truncate text-xs text-neutral-500">{label}</p>
     </div>
   )
 }
 
 /**
- * Cocina: el centro operativo, reducido a lo esencial — título con el estado
- * de la cocina en vivo, cinco cifras y el tablero del flujo completo. Lo
- * secundario (vista SLA, tamaño, sonido, día anterior, historial,
- * domiciliarios, configuración) vive en el menú ⋯, y las acciones de cada
- * pedido en su detalle.
+ * Cocina — a specialised view of the orders (ADR 0020): the line's screen.
+ * The same live orders as Pedidos, only the kitchen stretch (En cola →
+ * Preparando → Listo), with the line's tools: time targets (SLA), voice and
+ * "Oye Quanela", stalled-dish alerts, a large size for the tablet. Creating,
+ * confirming, dispatching and the order history belong to Pedidos.
  */
 export function KitchenPage() {
-  // Permisos del rol en la Cocina activa (ADR 0007): vienen de la base.
   const { can, canUseFeature, feature } = useActiveKitchen()
   const canConfigure = can('settings.manage')
-  const canCreate = canPerform(can, 'create')
-  const showSales = can('dashboard.view')
-
   const [searchParams, setSearchParams] = useSearchParams()
-  const detailOrderId = searchParams.get('pedido')
+  // ?order=id opens the detail (the old ?pedido=id links too).
+  const detailOrderId = searchParams.get('order') ?? searchParams.get('pedido')
 
-  const [selectedDate, setSelectedDate] = useState(todayStr)
-  const isToday = selectedDate >= todayStr()
-
-  const { data: flowTickets, isLoading } = useKitchenFlow(isToday ? null : selectedDate)
-  const { data: deliveredToday } = useDeliveredTodayCount(isToday)
-  const { data: summary } = useDashboardSummary(showSales)
-  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
+  const { data: live, isLoading } = useLiveOrders()
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
   const now = useNow()
 
   const [view, setView] = useState<KitchenView>(() => readPref(VIEW_PREF_KEY, ['tablero', 'sla'] as const, 'tablero'))
@@ -111,58 +91,41 @@ export function KitchenPage() {
   const [search, setSearch] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [voiceTestOpen, setVoiceTestOpen] = useState(false)
-
   const [configTab, setConfigTab] = useState<KitchenConfigTab | null>(null)
-  const [newOrderOpen, setNewOrderOpen] = useState(false)
-  const [historyOpen, setHistoryOpen] = useState(false)
-  const [ridersOpen, setRidersOpen] = useState(false)
-  const [confirmTicket, setConfirmTicket] = useState<KitchenTicket | null>(null)
-  const [dispatchTicket, setDispatchTicket] = useState<KitchenTicket | null>(null)
-  const [cancelTicket, setCancelTicket] = useState<KitchenTicket | null>(null)
+  const [cancelOrder, setCancelOrder] = useState<Order | null>(null)
 
-  const sortedTickets = useMemo(
+  const prepOrders = useMemo(
     () =>
-      flowTickets
-        ? [...flowTickets].sort((a, b) => {
-            if (a.priority !== b.priority) return b.priority - a.priority
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          })
-        : undefined,
-    [flowTickets],
+      live
+        ?.filter((o) => PREP.has(o.status))
+        .sort((a, b) => b.priority - a.priority || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+    [live],
   )
 
-  // La voz, la alerta de "pedido nuevo" y la vista SLA siguen viendo SOLO la
-  // cocina (Confirmado → Listo), sin filtros de búsqueda. Si recibieran el
-  // flujo completo, un borrador de caja sonaría en cocina y, al confirmarse,
-  // ya no sonaría (mismo id).
-  const kitchenTickets = useMemo(() => sortedTickets?.filter((t) => KITCHEN_STATUSES.has(t.orderStatus)), [sortedTickets])
-  const { newIds, acknowledge, soundEnabled, toggleSound } = useNewTicketAlert(isToday ? kitchenTickets : undefined)
-  const voice = useVoiceCommandEngine(isToday ? kitchenTickets : undefined)
-  // Mientras el micrófono escucha, los avisos hablados esperan (si no, se transcribirían).
+  const { newIds, acknowledge, soundEnabled, toggleSound } = useNewOrderAlert(prepOrders)
+  const voice = useVoiceCommandEngine(prepOrders)
+  // While the microphone listens, spoken alerts wait (otherwise they would be transcribed).
   const voiceBusy = voice.phase === 'listening' || voice.phase === 'processing'
-  const { stalledByOrder } = useStallAlerts({ active: isToday, paused: voiceBusy, muted: !soundEnabled })
+  const { stalledByOrder } = useStallAlerts({ active: true, paused: voiceBusy, muted: !soundEnabled })
   // Muting sounds and spoken alerts also empties the speech queue at once (ADR 0014).
   useEffect(() => {
     if (!soundEnabled) kitchenSpeech.clear()
   }, [soundEnabled])
 
   const kpis = useMemo(() => {
-    const count = (status: KitchenOrderStatus) => (flowTickets ?? []).filter((t) => t.orderStatus === status).length
-    const late = (kitchenTickets ?? []).filter(
-      (t) => timeTier(minutesAgoSince(t.createdAt, now), alertMinutesFor(t.orderStatus, thresholds), thresholds.nearThresholdPct) === 'retrasado',
-    ).length
-    return { nuevo: count('NUEVO'), cola: count('CONFIRMADO'), preparando: count('EN_PREPARACION'), listo: count('LISTO'), late }
-  }, [flowTickets, kitchenTickets, now, thresholds])
+    const orders = prepOrders ?? []
+    const count = (status: PrepStatus) => orders.filter((o) => o.status === status).length
+    const late = orders.filter((o) => timeTier(minutesAgoSince(o.createdAt, now), alertMinutesFor(o.status, thresholds), thresholds.nearThresholdPct) === 'retrasado').length
+    return { cola: count('CONFIRMADO'), preparando: count('EN_PREPARACION'), listo: count('LISTO'), late }
+  }, [prepOrders, now, thresholds])
 
-  // El pedido abierto vive en la URL (?pedido=id): el detalle se puede
-  // compartir, sobrevive a un refresh, y los enlaces viejos /orders/:id
-  // (Dashboard, ficha de Cliente) redirigen acá con el drawer ya abierto.
   const setDetailOrder = useCallback(
     (orderId: string | null) =>
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev)
-        if (orderId) next.set('pedido', orderId)
-        else next.delete('pedido')
+        next.delete('pedido')
+        if (orderId) next.set('order', orderId)
+        else next.delete('order')
         return next
       }),
     [setSearchParams],
@@ -172,10 +135,12 @@ export function KitchenPage() {
     () => ({
       can,
       density,
-      openDetail: (ticket) => setDetailOrder(ticket.orderId),
-      requestConfirm: setConfirmTicket,
-      requestDispatch: setDispatchTicket,
-      requestCancel: setCancelTicket,
+      scope: KITCHEN_SCOPE,
+      openDetail: (order) => setDetailOrder(order.id),
+      // Not offered in Cocina (KITCHEN_SCOPE): confirming and dispatching are done in Pedidos.
+      requestConfirm: () => {},
+      requestDispatch: () => {},
+      requestCancel: setCancelOrder,
     }),
     [can, density, setDetailOrder],
   )
@@ -196,9 +161,9 @@ export function KitchenPage() {
     setSearchOpen(false)
   }
 
-  // Comandos de voz: función de la Cuenta (organización ∧ Cuenta ∧ permiso) + soporte del navegador.
+  // Voice commands: feature of the account (organization ∧ account ∧ permission) + browser support.
   const voiceCommands = canUseFeature('voice_commands')
-  const voiceAvailable = voiceCommands && voice.supported && isToday
+  const voiceAvailable = voiceCommands && voice.supported
   // Hands-free (ADR 0016): feature of the account + switched on in this device; one tap pauses it.
   const [handsFree] = useWakeWordPreference()
   const [wakePaused, setWakePaused] = useState(false)
@@ -209,10 +174,11 @@ export function KitchenPage() {
     tuning: wakeWordTuning(feature('voice_wake_word')),
     onDetect: () => void voice.startHandsFree(),
   })
+
   const menuItems: MenuItem[] = [
     view === 'tablero'
       ? { label: 'Ver tiempos (SLA)', icon: Gauge, onSelect: () => changeView('sla') }
-      : { label: 'Ver tablero', icon: Kanban, onSelect: () => changeView('tablero') },
+      : { label: 'Ver pantalla de cocina', icon: Kanban, onSelect: () => changeView('tablero') },
     { label: 'Tamaño grande', icon: ZoomIn, checked: density === 'grande', onSelect: toggleDensity },
     { label: 'Sonidos y avisos de voz', icon: Bell, checked: soundEnabled, onSelect: toggleSound },
     ...(voiceAvailable
@@ -221,15 +187,8 @@ export function KitchenPage() {
           { label: 'Probar comando de texto', icon: Keyboard, onSelect: () => setVoiceTestOpen(true) },
         ]
       : []),
-    isToday
-      ? { label: 'Ver un día anterior', icon: CalendarClock, onSelect: () => setSelectedDate(yesterday()), separated: true }
-      : { label: 'Volver a hoy', icon: CalendarClock, onSelect: () => setSelectedDate(todayStr()), separated: true },
-    { label: 'Historial de pedidos', icon: History, onSelect: () => setHistoryOpen(true) },
-    { label: 'Domiciliarios', icon: Bike, onSelect: () => setRidersOpen(true) },
     { label: 'Configuración', icon: Settings, onSelect: () => setConfigTab('semanal'), separated: true },
   ]
-
-  const liveDetailTicket = detailOrderId ? flowTickets?.find((t) => t.orderId === detailOrderId) : undefined
 
   return (
     <BoardActionsContext.Provider value={boardActions}>
@@ -238,24 +197,10 @@ export function KitchenPage() {
           <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
               <h1 className={typography.h1}>Cocina</h1>
-              {isToday ? (
-                <KitchenStatusLine lateCount={kpis.late} canConfigure={canConfigure} onConfigure={() => setConfigTab('semanal')} />
-              ) : (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <KitchenDateNav date={selectedDate} onChange={setSelectedDate} />
-                  <span className={typography.small}>{formatDateLong(selectedDate)}</span>
-                </div>
-              )}
+              <KitchenStatusLine lateCount={kpis.late} canConfigure={canConfigure} onConfigure={() => setConfigTab('semanal')} />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {showSales && (
-                <div className="mr-2 text-right">
-                  <p className={typography.caption}>Ventas de hoy</p>
-                  <p className="text-lg leading-tight font-semibold tabular-nums text-neutral-50">{summary ? formatMoney(summary.salesToday) : '—'}</p>
-                </div>
-              )}
-
               {searchOpen ? (
                 <div className="relative">
                   <Search size={14} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500" aria-hidden />
@@ -279,7 +224,17 @@ export function KitchenPage() {
 
               {wakeWordOn && <WakeWordIndicator state={wakeWord.state} error={wakeWord.error} paused={wakePaused} onToggle={() => setWakePaused((p) => !p)} />}
 
-              {voiceCommands && <VoiceCommandBar engine={voice} enabled={isToday} testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
+              {voiceCommands && <VoiceCommandBar engine={voice} enabled testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
+
+              {can('orders.view') && (
+                <KitchenLink
+                  to="/orders"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900 px-3.5 text-sm text-neutral-300 transition-colors hover:border-neutral-700 hover:bg-neutral-800"
+                  title="Crear, confirmar y despachar pedidos"
+                >
+                  <ClipboardList size={15} aria-hidden /> Pedidos
+                </KitchenLink>
+              )}
 
               <Menu
                 items={menuItems}
@@ -295,40 +250,29 @@ export function KitchenPage() {
                   </button>
                 )}
               />
-
-              <Tooltip label={canCreate ? 'Crear un pedido nuevo' : ACTION_DENIED_REASON.create} side="bottom">
-                <Button variant="primary" icon={Plus} onClick={() => setNewOrderOpen(true)} disabled={!canCreate}>
-                  Nuevo pedido
-                </Button>
-              </Tooltip>
             </div>
           </header>
 
-          {isToday && (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-              <Kpi label="Por confirmar" value={kpis.nuevo} />
-              <Kpi label="En cola" value={kpis.cola} />
-              <Kpi label="Preparando" value={kpis.preparando} />
-              <Kpi label="Listos" value={kpis.listo} />
-              <Kpi label="Entregados" value={deliveredToday ?? 0} />
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Kpi label="En cola" value={kpis.cola} />
+            <Kpi label="Preparando" value={kpis.preparando} />
+            <Kpi label="Listos" value={kpis.listo} />
+            <Kpi label="Atrasados" value={kpis.late} tone="warn" />
+          </div>
 
-          {isToday && (
-            <KitchenInsightLine
-              active={isToday}
-              paused={voiceBusy}
-              muted={!soundEnabled}
-              orderNumberOf={(orderId) => flowTickets?.find((t) => t.orderId === orderId)?.orderNumber}
-              onOpenOrder={setDetailOrder}
-            />
-          )}
+          <KitchenInsightLine
+            active
+            paused={voiceBusy}
+            muted={!soundEnabled}
+            orderNumberOf={(orderId) => live?.find((o) => o.id === orderId)?.orderNumber}
+            onOpenOrder={setDetailOrder}
+          />
 
           {view === 'sla' && (
             <p className={clsx('flex items-center gap-2', typography.small)}>
               <Gauge size={14} className="text-brasa-400" aria-hidden /> Tiempos por pedido (SLA)
-              <button type="button" onClick={() => changeView('tablero')} className="text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4">
-                Volver al tablero
+              <button type="button" onClick={() => changeView('tablero')} className="text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline">
+                Volver a la pantalla de cocina
               </button>
             </p>
           )}
@@ -336,28 +280,28 @@ export function KitchenPage() {
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {view === 'tablero' ? (
-            <KanbanView tickets={sortedTickets} isLoading={isLoading} now={now} newIds={newIds} onAcknowledge={acknowledge} search={search} stalledByOrder={stalledByOrder} />
+            <OrderBoard
+              columns={PREP_COLUMNS}
+              tickets={prepOrders}
+              isLoading={isLoading}
+              now={now}
+              newIds={newIds}
+              onAcknowledge={acknowledge}
+              search={search}
+              stalledByOrder={stalledByOrder}
+              emptyIcon={ChefHat}
+              emptyTitle="Cocina al día"
+              emptyDescription="No hay nada por preparar. Los pedidos confirmados aparecen aquí solos."
+            />
           ) : (
-            <SlaView tickets={kitchenTickets} now={now} />
+            <SlaView tickets={prepOrders} now={now} />
           )}
         </div>
       </div>
 
       {configTab && <KitchenConfigDrawer initialTab={configTab} canEdit={canConfigure} onClose={() => setConfigTab(null)} />}
-      {newOrderOpen && <NewOrderDrawer open onClose={() => setNewOrderOpen(false)} />}
-      <HistoryDrawer
-        open={historyOpen}
-        onClose={() => setHistoryOpen(false)}
-        onOpenOrder={(orderId) => {
-          setHistoryOpen(false)
-          setDetailOrder(orderId)
-        }}
-      />
-      <RidersDrawer open={ridersOpen} onClose={() => setRidersOpen(false)} canManage={can('dispatch.riders')} />
-      <OrderDetailDrawer orderId={detailOrderId} ticket={liveDetailTicket} can={can} onClose={() => setDetailOrder(null)} />
-      {confirmTicket && <ConfirmOrderDialog ticket={confirmTicket} onClose={() => setConfirmTicket(null)} />}
-      {dispatchTicket && <DispatchDialog ticket={dispatchTicket} onClose={() => setDispatchTicket(null)} />}
-      {cancelTicket && <CancelOrderDialog ticket={cancelTicket} onClose={() => setCancelTicket(null)} />}
+      <OrderDetailDrawer orderId={detailOrderId} onClose={() => setDetailOrder(null)} />
+      {cancelOrder && allows(boardActions, 'cancel') && <CancelOrderDialog ticket={cancelOrder} onClose={() => setCancelOrder(null)} />}
     </BoardActionsContext.Provider>
   )
 }

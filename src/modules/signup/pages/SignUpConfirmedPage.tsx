@@ -1,13 +1,15 @@
 import { FullScreenLoading } from '@/app/FullScreenLoading'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { kitchenPath, MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
+import { fetchMyContext } from '@/shared/kitchen/kitchensApi'
+import { tenantHostLabel, tenantUrl } from '@/shared/tenant/host'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { clearSelectedPlan, usePublicPricing } from '@/shared/plans/usePlans'
 import { Button } from '@/shared/ui/Button'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Loader2, RotateCw } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle2, Copy, Loader2, RotateCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { createOrganization, PLAN_NOT_AVAILABLE, pendingOrganizationOf, pendingPlanOf, updatePendingPlan } from '../api'
@@ -28,6 +30,9 @@ export function SignUpConfirmedPage() {
   const [planRejected, setPlanRejected] = useState(false)
   const [planOverride, setPlanOverride] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
+  // Created: the organization's own address (ADR 0021), shown before entering.
+  const [created, setCreated] = useState<{ orgName: string; orgSlug: string; accountSlug: string } | null>(null)
+  const [copied, setCopied] = useState(false)
   const started = useRef(-1)
   const pending = pendingOrganizationOf(session?.user.user_metadata)
   const plan = planOverride ?? pendingPlanOf(session?.user.user_metadata)
@@ -42,7 +47,12 @@ export function SignUpConfirmedPage() {
         clearSelectedPlan()
         await refreshProfile()
         await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
-        navigate(`${kitchenPath(slug, '/')}?bienvenida=1`, { replace: true })
+        const ctx = await fetchMyContext().catch(() => null)
+        const account = ctx?.accounts.find((a) => a.slug === slug)
+        const org = ctx?.organizations.find((o) => o.id === account?.organizationId)
+        // With subdomains, show "your Quanela space" first; otherwise straight in, as before.
+        if (org && tenantUrl(org.slug)) setCreated({ orgName: org.name, orgSlug: org.slug, accountSlug: slug })
+        else navigate(`${kitchenPath(slug, '/')}?bienvenida=1`, { replace: true })
       })
       .catch((err) => {
         const message = getErrorMessage(err, 'No se pudo preparar tu negocio')
@@ -66,6 +76,35 @@ export function SignUpConfirmedPage() {
   if (loading) return <FullScreenLoading />
   // Sin sesión (enlace vencido o abierto en otro navegador): iniciar sesión termina el proceso.
   if (!session) return <Navigate to={`/login?next=${encodeURIComponent('/registro/confirmado')}`} replace />
+  if (created) {
+    const url = tenantUrl(created.orgSlug, `${kitchenPath(created.accountSlug, '/')}?bienvenida=1`)!
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-neutral-100">
+        <div className="w-full max-w-md space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
+          <CheckCircle2 size={28} className="mx-auto text-emerald-400" aria-hidden />
+          <div>
+            <h1 className={typography.h2}>{created.orgName} está lista</h1>
+            <p className={`mt-1 ${typography.small}`}>Tu espacio Quanela tiene su propia dirección. Guárdala: tu equipo entra por ahí.</p>
+          </div>
+          <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2.5">
+            <span className="truncate font-mono text-sm text-brasa-300">{tenantHostLabel(created.orgSlug)}</span>
+            <button
+              type="button"
+              onClick={() => void navigator.clipboard.writeText(`https://${tenantHostLabel(created.orgSlug)}`).then(() => setCopied(true))}
+              aria-label="Copiar la dirección"
+              className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
+            >
+              <Copy size={14} aria-hidden />
+            </button>
+          </div>
+          {copied && <p className="text-xs text-emerald-400">Dirección copiada.</p>}
+          <Button variant="primary" size="lg" icon={ArrowRight} className="w-full" onClick={() => window.location.assign(url)}>
+            Entrar a mi espacio
+          </Button>
+        </div>
+      </div>
+    )
+  }
   if (!pending) return <Navigate to="/" replace />
 
   if (planRejected) {

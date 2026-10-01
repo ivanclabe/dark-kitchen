@@ -8,6 +8,9 @@ import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
 import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
+import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
+import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
+import { StaffPage } from '@/modules/staff/pages/StaffPage'
 import { UsersAndPermissionsPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
 import { OrgAdminLayout } from '@/modules/orgAdmin/OrgAdminLayout'
 import { OrgAccountsPage } from '@/modules/orgAdmin/pages/OrgAccountsPage'
@@ -27,9 +30,11 @@ import { FeaturesSettingsPage } from '@/modules/settings/pages/FeaturesSettingsP
 import { KitchenGeneralPage } from '@/modules/settings/pages/KitchenGeneralPage'
 import { SettingsLayout } from '@/modules/settings/pages/SettingsLayout'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { TenantGate } from '@/shared/tenant/TenantProvider'
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
+import { createBrowserRouter, Navigate, useParams, type RouteObject } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
+import { homeSection } from './navigation'
 import { KitchenEntryRedirect, LegacyKitchenRedirect } from './kitchenEntry'
 import { KitchenScope } from './KitchenScope'
 import { OrgScope } from './OrgScope'
@@ -42,10 +47,10 @@ function KitchenRedirect({ to }: { to: string }) {
   return <Navigate to={path(to)} replace />
 }
 
-/** /orders/:id (ruta vieja) → el tablero de Cocina con ese pedido abierto en el detalle. */
-function LegacyOrderRedirect() {
-  const { id } = useParams<{ id: string }>()
-  return <KitchenRedirect to={id ? `/kitchen?pedido=${id}` : '/kitchen'} />
+/** The account's start: Pedidos for a cashier, Cocina for the line, Despacho for a rider, Dashboard for administration. */
+function RoleHome() {
+  const { can, path } = useActiveKitchen()
+  return <Navigate to={path(homeSection(can))} replace />
 }
 
 /** /purchases/:id (ruta vieja) → el detalle de esa misma compra dentro de Abastecimiento. */
@@ -64,7 +69,7 @@ const ReportsPage = lazy(() => import('@/modules/reports/pages/ReportsPage').the
 
 const loading = <p className="text-neutral-400">Cargando…</p>
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
   // Pública: presentación del producto, antes de iniciar sesión.
   { path: '/landing', element: <LandingPage /> },
   // Precios (ADR 0010): enlace para compartir; la landing se ve con o sin sesión en /landing.
@@ -146,13 +151,16 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <Suspense fallback={loading}><DashboardPage /></Suspense> },
-          // Cocina — el centro operativo: un solo tablero con el flujo completo
-          // del pedido (por confirmar → en cola → preparando → listo → en ruta).
+          // "/" = your start: each role lands on its own screen (ADR 0020, D3).
+          { index: true, element: <RoleHome /> },
+          { path: 'dashboard', element: <Suspense fallback={loading}><DashboardPage /></Suspense> },
+          // Pedidos — el centro operativo (ADR 0020): Tablero, Lista y Despacho
+          // del mismo pedido; /orders/:orderId abre su detalle.
+          { path: 'orders', element: <OrdersPage /> },
+          { path: 'orders/:orderId', element: <OrdersPage /> },
+          { path: 'delivery', element: <KitchenRedirect to="/orders?view=dispatch" /> },
+          // Cocina — una vista especializada de esos pedidos: la pantalla de preparación.
           { path: 'kitchen', element: <KitchenPage /> },
-          { path: 'orders', element: <KitchenRedirect to="/kitchen" /> },
-          { path: 'orders/:id', element: <LegacyOrderRedirect /> },
-          { path: 'delivery', element: <KitchenRedirect to="/kitchen" /> },
           // Catálogo — Planificador de Menús: platos, calendario y recetas.
           { path: 'menu-planner', element: <MenuPlannerPage /> },
           { path: 'recipes/:productId', element: <RecipeEditorPage /> },
@@ -165,6 +173,9 @@ export const router = createBrowserRouter([
           { path: 'purchases', element: <KitchenRedirect to="/supply/compras" /> },
           { path: 'purchases/:id', element: <LegacyPurchaseRedirect /> },
           { path: 'suppliers', element: <KitchenRedirect to="/supply/proveedores" /> },
+          // Personal y Turnos (ADR 0020); "Mis turnos" es de cada persona, sin permiso.
+          { path: 'staff', element: <StaffPage /> },
+          { path: 'my-shifts', element: <MyShiftsPage /> },
           // Clientes — saldos, pagos e historial.
           { path: 'customers', element: <CustomersPage /> },
           { path: 'customers/:id', element: <CustomerDetailPage /> },
@@ -202,4 +213,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-])
+]
+
+// Every route goes through the gate of the subdomain's organization (ADR 0021).
+export const router = createBrowserRouter([{ element: <TenantGate />, children: routes }])

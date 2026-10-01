@@ -23,7 +23,6 @@ import {
   useCancelOrder,
   useConfirmOrder,
   useOrder,
-  useOrderItems,
   useOrderStatusHistory,
   useRemoveOrderItem,
 } from '../hooks/useOrders'
@@ -50,14 +49,15 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
   const { show } = useToast()
 
   const { data: order, isLoading } = useOrder(orderId)
-  const { data: items, isLoading: itemsLoading } = useOrderItems(orderId)
+  const items = order?.items
+  const itemsLoading = isLoading
   const { data: history } = useOrderStatusHistory(orderId)
   const { data: products } = useProducts()
 
   const addItem = useAddOrderItem(orderId)
-  const removeItem = useRemoveOrderItem(orderId)
-  const confirmOrder = useConfirmOrder(orderId)
-  const cancelOrder = useCancelOrder(orderId)
+  const removeItem = useRemoveOrderItem()
+  const confirmOrder = useConfirmOrder()
+  const cancelOrder = useCancelOrder()
 
   const [productId, setProductId] = useState('')
   const [quantity, setQuantity] = useState(1)
@@ -114,7 +114,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
   async function handleConfirm() {
     setError(null)
     try {
-      await confirmOrder.mutateAsync()
+      await confirmOrder.mutateAsync(orderId)
       setConfirmOpen(false)
       show('Pedido confirmado — inventario reservado y comanda enviada a cocina.')
     } catch (err) {
@@ -126,7 +126,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
   async function handleCancel() {
     setError(null)
     try {
-      await cancelOrder.mutateAsync(undefined)
+      await cancelOrder.mutateAsync({ orderId })
       setCancelOpen(false)
       show('Pedido cancelado.', 'info')
     } catch (err) {
@@ -259,7 +259,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
       )}
 
       {history && history.length > 0 && (
-        <Card title="Historial de estados" icon={History}>
+        <Card title="Línea de tiempo" icon={History}>
           <ul className="divide-y divide-neutral-800/60 text-sm">
             {history.map((h) => (
               <li key={h.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2 first:pt-0 last:pb-0">
@@ -269,6 +269,7 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
                   {orderStatusLabel(h.toStatus)}
                 </span>
                 {h.note && <span className="text-neutral-500">({h.note})</span>}
+                {h.changedBy && <span className="text-neutral-500">· {h.changedBy}</span>}
               </li>
             ))}
           </ul>

@@ -9,6 +9,7 @@ import { Activity, Building2, Copy, Mail, Power, Settings2, Sparkles, Users } fr
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { PasswordLinkButton } from '../components/PasswordLinkButton'
+import { SubdomainBar } from '../components/SubdomainBar'
 import { ActivityFeed, ConfirmByName, Metric, PageTitle, Panel, StatusPill } from '../components/ui'
 import { fetchOrganization, resendInvitation, setOrganizationActive, type OrganizationDetail } from '../lib/api'
 import { featureLabel } from '../lib/features'
@@ -98,6 +99,8 @@ export function OrganizationDetailPage() {
           </>
         }
       />
+
+      <SubdomainBar organizationId={org.id} slug={org.slug} />
 
       {manualLink && (
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">

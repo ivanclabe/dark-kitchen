@@ -28,7 +28,8 @@ const state = (over: Partial<FeatureState>): FeatureState => ({
 
 describe('funciones', () => {
   it('la app conoce las mismas claves que siembra la migración del catálogo', () => {
-    const seeded = [...catalogSql.matchAll(/^\s+\(?'([a-z_]+)', '(?:ai|voice|general)'/gm)].map((m) => m[1])
+    // Rows of the catalog inserts: "  ('key', 'ai', …" or "values ('key', 'ai', …" (Copilot, ADR 0020).
+    const seeded = [...catalogSql.matchAll(/^\s*(?:values\s*)?\(?'([a-z_]+)', '(?:ai|voice|general)'/gm)].map((m) => m[1])
     expect(seeded.sort()).toEqual([...FEATURE_KEYS].sort())
   })
 

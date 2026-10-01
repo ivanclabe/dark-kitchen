@@ -1,11 +1,10 @@
 import { useReceivables } from '@/modules/cartera/hooks/useReceivables'
-import { useDispatchedOrders, useReadyOrders } from '@/modules/delivery/hooks/useDelivery'
-import { useKitchenQueue } from '@/modules/kitchen/hooks/useKitchen'
-import { useKitchenSlaSettings } from '@/modules/kitchen/hooks/useKitchenSettings'
-import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/kitchen/lib/ticketVisuals'
-import { useOrders } from '@/modules/orders/hooks/useOrders'
+import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
+import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/orders/lib/orderVisuals'
+import { useLiveOrders, useOrderSearch } from '@/modules/orders/hooks/useOrders'
 import { OrderStatusBadge } from '@/modules/orders/lib/orderStatus'
 import { useSalesByDay } from '@/modules/reports/hooks/useReports'
+import { useOnShiftNow } from '@/modules/staff/hooks/useStaff'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useNow } from '@/shared/hooks/useNow'
 import { buttonClass } from '@/shared/ui/Button'
@@ -21,6 +20,7 @@ import clsx from 'clsx'
 import {
   ArrowRight,
   BarChart3,
+  CalendarClock,
   ChefHat,
   ChevronDown,
   ClipboardList,
@@ -516,13 +516,13 @@ function CardLink({ to, label }: { to: string; label: string }) {
   )
 }
 
-/** Últimos pedidos — mismo useOrders de la página Pedidos, solo se muestran los 4 más recientes. */
+/** Últimos pedidos — la misma búsqueda de Pedidos → Lista, solo los 4 más recientes. */
 function RecentOrdersCard() {
-  const { data: orders, isLoading } = useOrders()
-  const recent = orders?.slice(0, 4) ?? []
+  const { data, isLoading } = useOrderSearch({ limit: 4 })
+  const recent = data?.orders ?? []
 
   return (
-    <Card title="Pedidos recientes" icon={ClipboardList} action={<CardLink to="/kitchen" label="Ver todos los pedidos" />}>
+    <Card title="Pedidos recientes" icon={ClipboardList} action={<CardLink to="/orders?view=list" label="Ver todos los pedidos" />}>
       {isLoading ? (
         <LoadingState variant="block" className="!border-0 !bg-transparent !p-0" />
       ) : recent.length === 0 ? (
@@ -531,7 +531,7 @@ function RecentOrdersCard() {
         <ul className="divide-y divide-neutral-800/60">
           {recent.map((o) => (
             <li key={o.id}>
-              <Link to={`/kitchen?pedido=${o.id}`} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-neutral-800/50">
+              <Link to={`/orders/${o.id}`} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-neutral-800/50">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-neutral-100">{o.customerName}</p>
                   <p className="text-xs text-neutral-500">
@@ -549,28 +549,30 @@ function RecentOrdersCard() {
   )
 }
 
-/** Atrasados fuera de SLA — misma regla (timeTier) que usa Cocina. Solo se monta para roles con acceso a la cola. */
+/**
+ * Atrasados fuera de SLA, listos y en ruta — de la misma lista en vivo que
+ * usan Pedidos y Cocina (una sola consulta). Solo se monta para roles con acceso a la cola.
+ */
 function LateKitchenRow() {
   const now = useNow()
-  const { data: kitchenTickets } = useKitchenQueue(true)
-  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
-  const { data: readyOrders } = useReadyOrders(true)
-  const { data: dispatchedOrders } = useDispatchedOrders(true)
+  const { data: live } = useLiveOrders()
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
 
-  const late = useMemo(() => {
-    if (!kitchenTickets) return 0
-    return kitchenTickets.filter((t) => {
-      if (t.orderStatus === 'CANCELADO') return false
-      return timeTier(minutesAgoSince(t.createdAt, now), alertMinutesFor(t.orderStatus, thresholds), thresholds.nearThresholdPct) === 'retrasado'
-    }).length
-  }, [kitchenTickets, now, thresholds])
+  const { late, ready, onRoute } = useMemo(() => {
+    const orders = live ?? []
+    return {
+      late: orders.filter((t) => timeTier(minutesAgoSince(t.createdAt, now), alertMinutesFor(t.status, thresholds), thresholds.nearThresholdPct) === 'retrasado').length,
+      ready: orders.filter((t) => t.status === 'LISTO').length,
+      onRoute: orders.filter((t) => t.status === 'DESPACHADO').length,
+    }
+  }, [live, now, thresholds])
 
   return (
     <StatList
       items={[
         { label: 'Atrasados (fuera de SLA)', value: late, tone: late > 0 ? 'warn' : 'good', to: '/kitchen' },
-        { label: 'Listos para despachar', value: readyOrders?.length ?? 0, tone: (readyOrders?.length ?? 0) > 0 ? 'good' : undefined, to: '/kitchen' },
-        { label: 'En ruta', value: dispatchedOrders?.length ?? 0, to: '/kitchen' },
+        { label: 'Listos para despachar', value: ready, tone: ready > 0 ? 'good' : undefined, to: '/orders?view=dispatch' },
+        { label: 'En ruta', value: onRoute, to: '/orders?view=dispatch' },
       ]}
     />
   )
@@ -582,11 +584,39 @@ function KitchenNowCard({ summary, liveOps }: { summary: DashboardSummary | unde
       {liveOps && <LateKitchenRow />}
       <StatList
         items={[
-          { label: 'Nuevos', value: summary?.ordersNuevo ?? '—', to: '/kitchen' },
+          { label: 'Nuevos', value: summary?.ordersNuevo ?? '—', to: '/orders' },
           { label: 'Confirmados', value: summary?.ordersConfirmado ?? '—', to: '/kitchen' },
           { label: 'En preparación', value: summary?.ordersEnPreparacion ?? '—', to: '/kitchen' },
         ]}
       />
+    </Card>
+  )
+}
+
+/** En turno ahora (Personal y Turnos, ADR 0020): who is working, by role. */
+function OnShiftCard() {
+  const { data, isLoading } = useOnShiftNow()
+  const byRole = useMemo(() => {
+    const map = new Map<string, string[]>()
+    for (const s of data ?? []) map.set(s.roleName, [...(map.get(s.roleName) ?? []), s.fullName.split(' ')[0]])
+    return [...map]
+  }, [data])
+  return (
+    <Card title="En turno ahora" icon={CalendarClock} action={<CardLink to="/staff" label="Ver turnos" />}>
+      {isLoading ? (
+        <LoadingState variant="block" className="!border-0 !bg-transparent !p-0" />
+      ) : byRole.length === 0 ? (
+        <p className="text-sm text-neutral-500">Nadie tiene turno en este momento.</p>
+      ) : (
+        <ul className="space-y-1.5 text-sm">
+          {byRole.map(([role, names]) => (
+            <li key={role} className="flex justify-between gap-3">
+              <span className="text-neutral-400">{role}</span>
+              <span className="truncate text-right text-neutral-100">{names.join(', ')}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   )
 }
@@ -656,6 +686,7 @@ export function DashboardPage() {
         {canSeeLiveOps && <RecentOrdersCard />}
         <KitchenNowCard summary={data} liveOps={canSeeLiveOps} />
         <CarteraCard summary={data} liveOps={canSeeLiveOps} />
+        {can('staff.view') && <OnShiftCard />}
       </div>
     </div>
   )

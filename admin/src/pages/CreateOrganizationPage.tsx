@@ -12,6 +12,7 @@ import { PageTitle, Panel, StatusPill } from '../components/ui'
 import { checkNewOrganization, createOrganization, fetchPlans, type CreatedOrganization, type NewOrganizationCheck, type NewOrganizationInput } from '../lib/api'
 import { EMPTY_ORGANIZATION as EMPTY, validateStep } from '../lib/createOrganization'
 import { formatDateTimeShort } from '../lib/format'
+import { tenantHost } from '../lib/tenant'
 
 type Step = 'business' | 'admin' | 'review' | 'done'
 
@@ -334,6 +335,7 @@ function Result({ result, planName, onAnother, onOpen }: { result: CreatedOrgani
         </div>
       </div>
       <dl className="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        <Row label="Subdominio" value={tenantHost(result.organizationSlug)} />
         <Row label="Plan" value={planName} />
         <Row label="Creada" value={formatDateTimeShort(result.createdAt)} />
         <Row label="Administrador" value={result.adminName} />

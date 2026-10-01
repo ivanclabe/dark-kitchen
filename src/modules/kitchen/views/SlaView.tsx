@@ -7,7 +7,7 @@ import { StatCard } from '@/shared/ui/StatCard'
 import { AlertTriangle, CheckCircle2, ChefHat, Clock, Flag, Gauge, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSlaSummary } from '../hooks/useSla'
-import { useKitchenSlaSettings } from '../hooks/useKitchenSettings'
+import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
 import {
   alertMinutesFor,
   DEFAULT_SLA_THRESHOLDS,
@@ -16,8 +16,8 @@ import {
   TIME_TIER_STYLE,
   timeTier,
   type TimeTier,
-} from '../lib/ticketVisuals'
-import type { KitchenTicket } from '../types'
+} from '@/modules/orders/lib/orderVisuals'
+import type { Order } from '@/modules/orders/types'
 
 type SlaRange = 'hoy' | 'ultima_hora' | '4h'
 
@@ -55,15 +55,15 @@ const TIER_ICON: Record<TimeTier, typeof Clock> = {
  * vamos con los tiempos?" y "¿qué pedidos están causando el problema
  * ahora?" en un vistazo. Los pedidos activos reutilizan exactamente el
  * mismo timeTier ya usado en Grid/Kanban/Lista, parametrizado con los
- * umbrales configurables (useKitchenSlaSettings) — ningún umbral nuevo.
+ * umbrales configurables (useSlaSettings) — ningún umbral nuevo.
  */
-export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined; now: number }) {
+export function SlaView({ tickets, now }: { tickets: Order[] | undefined; now: number }) {
   const [range, setRange] = useState<SlaRange>('hoy')
   // rangeStart(range) crea un Date nuevo en cada llamada — memoizado para
   // que su ISO string (parte de la queryKey) no cambie en cada render y la
   // consulta no se reinicie infinitamente.
   const start = useMemo(() => rangeStart(range), [range])
-  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useKitchenSlaSettings()
+  const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
   // Tiempo total de preparación (CONFIRMADO -> LISTO) dentro de SLA = suma
   // de los umbrales de las dos etapas que ese tramo cubre.
   const lateThresholdMin = thresholds.confirmadoAlertMin + thresholds.enPreparacionAlertMin
@@ -77,8 +77,8 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
     [tickets, now],
   )
 
-  function tierFor(ticket: KitchenTicket, minutesAgo: number): TimeTier {
-    return timeTier(minutesAgo, alertMinutesFor(ticket.orderStatus, thresholds), thresholds.nearThresholdPct)
+  function tierFor(ticket: Order, minutesAgo: number): TimeTier {
+    return timeTier(minutesAgo, alertMinutesFor(ticket.status, thresholds), thresholds.nearThresholdPct)
   }
 
   const lateNowCount = activeWithTime.filter(({ ticket, minutesAgo }) => tierFor(ticket, minutesAgo) === 'retrasado').length
@@ -127,7 +127,7 @@ export function SlaView({ tickets, now }: { tickets: KitchenTicket[] | undefined
               const tier = tierFor(ticket, minutesAgo)
               const TierIcon = TIER_ICON[tier]
               return (
-                <li key={ticket.orderId} className="flex items-center justify-between gap-3 py-2.5">
+                <li key={ticket.id} className="flex items-center justify-between gap-3 py-2.5">
                   <span className="inline-flex items-center gap-2 text-sm text-neutral-200">
                     {ticket.priority > 0 && <Flag size={12} className="shrink-0 text-violet-400" aria-label="Prioritario" />}
                     <span className="tabular-nums">#{ticket.orderNumber}</span> · {ticket.customerName}

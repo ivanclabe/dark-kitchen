@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
@@ -29,5 +30,7 @@ export default defineConfig(({ mode }) => {
       port: process.env.PORT ? Number(process.env.PORT) : 5173,
       strictPort: false,
     },
+    // Tests run in path mode (no subdomains) unless a test sets the root domain itself (ADR 0021).
+    test: { env: { VITE_TENANT_ROOT_DOMAIN: '' } },
   }
 })

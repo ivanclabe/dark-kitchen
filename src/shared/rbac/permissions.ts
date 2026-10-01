@@ -53,6 +53,9 @@ export const ACCOUNT_PERMISSION_KEYS = [
   'settings.manage',
   'team.view',
   'team.manage',
+  'staff.view',
+  'staff.manage',
+  'copilot.use',
   'audit.view',
 ] as const
 

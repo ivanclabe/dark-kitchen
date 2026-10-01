@@ -3,7 +3,8 @@ import { kitchensOf, useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import { canOpenAdminCenter, OrgAdminCtx, orgPath, type OrgAdminContext } from '@/shared/org/orgContext'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useEffect, useMemo } from 'react'
-import { Navigate, Outlet, useParams } from 'react-router-dom'
+import { hostRedirectFor } from '@/shared/tenant/navigation'
+import { Navigate, Outlet, useLocation, useParams } from 'react-router-dom'
 import { FullScreenLoading } from './FullScreenLoading'
 
 /**
@@ -19,6 +20,12 @@ export function OrgScope() {
   const { data: ctx, isLoading, isError, error, refetch } = useMyContext()
   const organization = ctx?.organizations.find((o) => o.slug === orgSlug) ?? null
   const allowed = canOpenAdminCenter(organization)
+  // ADR 0021: the administration center of an organization lives on its subdomain.
+  const { pathname, search } = useLocation()
+  const crossHost = organization ? hostRedirectFor(organization.slug, `${pathname}${search}`) : null
+  useEffect(() => {
+    if (crossHost) window.location.replace(crossHost)
+  }, [crossHost])
 
   // Durante el render (como KitchenScope): los hijos piden datos antes que los efectos del padre.
   setActiveKitchenId(null)
@@ -44,7 +51,7 @@ export function OrgScope() {
     }
   }, [organization])
 
-  if (isLoading) return <FullScreenLoading />
+  if (isLoading || crossHost) return <FullScreenLoading />
   if (isError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950 p-6">

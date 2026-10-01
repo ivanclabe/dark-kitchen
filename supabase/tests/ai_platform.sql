@@ -46,7 +46,7 @@ delete from dk_ai_insights where kitchen_id = (select id from _ctx where key = '
 select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '8', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
+  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '9', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
   insert into _t (area, test, expected, got) values ('Overview', 'Models come from the catalog (H3)', 'claude-sonnet-5-5 · claude-haiku-4-5-20251001',
     (select string_agg(f ->> 'modelKey', ' · ' order by f ->> 'key' desc) from jsonb_array_elements(dk_platform_ai_overview() -> 'features') f
      where f ->> 'key' in ('supply_reorder', 'kitchen_insights')));
@@ -144,9 +144,9 @@ do $$ begin
     insert into _t (area, test, expected, got) values ('Model', 'Deactivate a model in use', 'blocked', 'ALLOWED');
   exception when others then insert into _t (area, test, expected, got, detail) values ('Model', 'Deactivate a model in use', 'blocked', 'blocked', sqlerrm); end;
 
-  begin perform dk_platform_set_feature('kitchen_insights', p_min_interval_seconds => 10);
-    insert into _t (area, test, expected, got) values ('Policies', 'Interval under 30 s', 'blocked', 'ALLOWED');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Policies', 'Interval under 30 s', 'blocked', 'blocked', sqlerrm); end;
+  begin perform dk_platform_set_feature('kitchen_insights', p_min_interval_seconds => 1);
+    insert into _t (area, test, expected, got) values ('Policies', 'Interval under 2 s', 'blocked', 'ALLOWED');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Policies', 'Interval under 2 s', 'blocked', 'blocked', sqlerrm); end;
   perform dk_platform_set_feature('kitchen_insights', p_min_interval_seconds => 600);
 
   begin perform dk_platform_set_feature('supply_reorder', p_default_settings => '{"coverage_days": 500}');

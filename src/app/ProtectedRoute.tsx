@@ -2,12 +2,14 @@ import { AccountDisabledPage } from '@/modules/auth/pages/AccountDisabledPage'
 import { NoProfilePage } from '@/modules/auth/pages/NoProfilePage'
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { useTenant } from '@/shared/tenant/tenantContext'
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, profile, loading, profileLoading } = useAuth()
   const { pathname } = useLocation()
+  const tenant = useTenant()
 
   // Solo bloquea toda la pantalla en la carga inicial. Supabase dispara
   // onAuthStateChange (p.ej. TOKEN_REFRESHED) periódicamente en segundo
@@ -26,7 +28,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     // Sin sesión, la página de inicio es la landing (en la misma URL "/", sin
     // redirigir). Cualquier otra ruta protegida sigue llevando al login:
     // quien entra por un enlace directo viene a usar la app, no a conocerla.
-    if (pathname === '/') return <LandingPage />
+    // On an organization's subdomain there is no landing: its login (ADR 0021).
+    if (pathname === '/' && tenant.mode !== 'tenant') return <LandingPage />
     return <Navigate to="/login" replace />
   }
 

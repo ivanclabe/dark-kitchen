@@ -1,6 +1,10 @@
 import { readLastKitchenSlug, setActiveKitchenId, setActiveRoleId } from '@/shared/kitchen/activeKitchen'
 import { kitchenPath, kitchensOf, useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import type { MyContext, MyKitchen } from '@/shared/kitchen/kitchensApi'
+import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
+import { hostRedirectFor } from '@/shared/tenant/navigation'
+import { useTenant } from '@/shared/tenant/tenantContext'
+import { useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { FullScreenLoading } from './FullScreenLoading'
 
@@ -10,8 +14,9 @@ import { FullScreenLoading } from './FullScreenLoading'
  * la de este equipo) mientras siga teniendo acceso, o su única Cuenta
  * activa. Con varias y ninguna recordada, null → "Tus cuentas".
  */
-export function defaultKitchen(ctx: MyContext): MyKitchen | null {
-  const usable = kitchensOf(ctx).filter((k) => k.active || k.isPlatformAdmin)
+export function defaultKitchen(ctx: MyContext, organizationId?: string | null): MyKitchen | null {
+  // On an organization's subdomain, only its accounts (ADR 0021).
+  const usable = kitchensOf(ctx).filter((k) => (k.active || k.isPlatformAdmin) && (!organizationId || k.organizationId === organizationId))
   const lastSlug = readLastKitchenSlug()
   return (
     usable.find((k) => k.id === ctx.profile.lastAccountId) ??
@@ -20,12 +25,27 @@ export function defaultKitchen(ctx: MyContext): MyKitchen | null {
   )
 }
 
-/** "/" con sesión: directo a la Cuenta por defecto o al selector. */
+/**
+ * "/" con sesión: directo a la Cuenta por defecto o al selector.
+ *   - En el subdominio de una organización: su Cuenta de esa organización
+ *     (o su centro de administración si no tiene Cuentas).
+ *   - En la raíz (quanela.com): al subdominio de la organización de su
+ *     Cuenta por defecto (ADR 0021); sin una clara, "Tus cuentas".
+ */
 export function KitchenEntryRedirect() {
   const { data: ctx, isLoading } = useMyContext()
-  if (isLoading || !ctx) return <FullScreenLoading />
-  const kitchen = defaultKitchen(ctx)
-  return <Navigate to={kitchen ? kitchenPath(kitchen.slug, '/') : '/cuentas'} replace />
+  const tenant = useTenant()
+  const kitchen = ctx ? defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null) : null
+  const orgSlug = kitchen ? ctx?.organizations.find((o) => o.id === kitchen.organizationId)?.slug : null
+  const crossHost = kitchen ? hostRedirectFor(orgSlug, kitchenPath(kitchen.slug, '/')) : null
+  useEffect(() => {
+    if (crossHost) window.location.replace(crossHost)
+  }, [crossHost])
+
+  if (isLoading || !ctx || crossHost) return <FullScreenLoading />
+  if (kitchen) return <Navigate to={kitchenPath(kitchen.slug, '/')} replace />
+  if (tenant.mode === 'tenant' && tenant.membership && canOpenAdminCenter(tenant.membership)) return <Navigate to={orgPath(tenant.membership.slug)} replace />
+  return <Navigate to="/cuentas" replace />
 }
 
 /**
@@ -37,8 +57,10 @@ export function KitchenEntryRedirect() {
 export function LegacyKitchenRedirect() {
   const { pathname, search } = useLocation()
   const { data: ctx, isLoading } = useMyContext()
+  const tenant = useTenant()
   if (isLoading || !ctx) return <FullScreenLoading />
-  const kitchen = defaultKitchen(ctx)
+  // Short paths on a subdomain (/orders, /kitchen…) open in YOUR account of that organization.
+  const kitchen = defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null)
   if (!kitchen) return <Navigate to="/cuentas" replace />
   return <Navigate to={`${kitchenPath(kitchen.slug, pathname)}${search}`} replace />
 }

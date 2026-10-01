@@ -144,7 +144,7 @@ El registro público sigue igual para quien lo usa.
 ## 8. Decisiones (con recomendación)
 | # | Decisión | Recomendación |
 |---|---|---|
-| **D1** | Nombre | **«Quanela Global Admin»**, para ser coherente con la marca, que ya es Quanela. El texto decía «Cuanela». |
+| **D1** | Nombre | **«Quanela Global Admin»**, para ser coherente con la marca, Quanela. |
 | **D2** | Correo autorizado (`[CORREO_DEL_ADMIN]` vino vacío) | **`ivanclabe@gmail.com`**, el único Super Admin actual |
 | **D3** | Dónde vive | **`admin.quanela.com`**, un proyecto de Vercel aparte del mismo repositorio. El dominio propio separa las sesiones de verdad. |
 | **D4** | Segundo factor | **TOTP obligatorio** para entrar al portal y para toda función de plataforma |

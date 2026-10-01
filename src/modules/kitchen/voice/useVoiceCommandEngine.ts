@@ -5,8 +5,8 @@ import { playWakeTone } from '@/shared/voice/wakeWord/tone'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useEffect, useRef, useState } from 'react'
-import { useAdvanceTicketItems, useCancelKitchenOrder, useSetTicketPriority } from '../hooks/useKitchen'
-import type { KitchenTicket } from '../types'
+import { useAdvanceOrderItems, useCancelOrder, useSetOrderPriority } from '@/modules/orders/hooks/useOrders'
+import type { Order } from '@/modules/orders/types'
 import { parseVoiceCommand, type VoiceAction } from './commandParser'
 import { commandGrammar } from './commandGrammar'
 import { spokenNumbersToDigits } from './spokenNumbers'
@@ -52,19 +52,19 @@ function readTtsPref(): boolean {
  * Orquesta: transcript acumulado de voz (buffer + debounce) →
  * parseVoiceCommand (puro) → busca el ticket por orderNumber en la cola ya
  * cargada → valida contra su estado actual → ejecuta las MISMAS mutaciones
- * que usan los botones (useAdvanceTicketItems, useSetTicketPriority) →
+ * que usan los botones (useAdvanceOrderItems, useSetOrderPriority) →
  * feedback visual (toast) + auditivo opcional (TTS). No llama Supabase
  * directamente en ningún punto.
  */
-export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
+export function useVoiceCommandEngine(tickets: Order[] | undefined) {
   const ticketsRef = useRef(tickets)
   useEffect(() => {
     ticketsRef.current = tickets
   })
 
-  const { advanceTicketItems } = useAdvanceTicketItems()
-  const setPriority = useSetTicketPriority()
-  const cancelOrder = useCancelKitchenOrder()
+  const { advanceOrderItems } = useAdvanceOrderItems()
+  const setPriority = useSetOrderPriority()
+  const cancelOrder = useCancelOrder()
   const { show } = useToast()
   const voiceOutput = useKitchenVoice()
 
@@ -146,7 +146,7 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
             already('en preparación')
             return
           }
-          await advanceTicketItems(ticket.items, 'EN_PREPARACION')
+          await advanceOrderItems(ticket.items, 'EN_PREPARACION')
           break
         }
         case 'MARK_READY': {
@@ -155,17 +155,17 @@ export function useVoiceCommandEngine(tickets: KitchenTicket[] | undefined) {
             already('listo')
             return
           }
-          await advanceTicketItems(ticket.items, 'LISTO')
+          await advanceOrderItems(ticket.items, 'LISTO')
           break
         }
         case 'CANCEL':
-          await cancelOrder.mutateAsync({ orderId: ticket.orderId })
+          await cancelOrder.mutateAsync({ orderId: ticket.id })
           break
         case 'SET_PRIORITY':
-          await setPriority.mutateAsync({ orderId: ticket.orderId, priority: 1 })
+          await setPriority.mutateAsync({ orderId: ticket.id, priority: 1 })
           break
         case 'UNSET_PRIORITY':
-          await setPriority.mutateAsync({ orderId: ticket.orderId, priority: 0 })
+          await setPriority.mutateAsync({ orderId: ticket.id, priority: 0 })
           break
       }
       announce('success', `Pedido ${code} ${ACTION_FEEDBACK[action]}.`, (v) => kitchenPhrases.commandDone(code, action, v))

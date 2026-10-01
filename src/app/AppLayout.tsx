@@ -7,6 +7,7 @@ import { Flame, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ContextIndicator } from './AccountSwitcher'
+import { CopilotButton, CopilotProvider } from '@/modules/copilot/CopilotProvider'
 import { homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS } from './navigation'
 import { UserMenu } from './UserMenu'
 import { WelcomeCard } from './WelcomeCard'
@@ -35,6 +36,8 @@ export function AppLayout() {
     // fuera de vista, y para que <main> tenga una altura acotada real — sin
     // eso, ninguna vista puede "llenar la pantalla" de forma confiable (solo
     // puede crecer con su contenido y dejar que la página entera scrollee).
+    // Copilot (ADR 0020): one conversation per account — a new account starts a new one.
+    <CopilotProvider key={kitchen.id}>
     <div className="flex h-screen overflow-hidden bg-neutral-950 text-neutral-100">
       {/* Rail de escritorio compacto: solo íconos. El nombre de cada módulo
           aparece en un tooltip (hover y foco por teclado) y es su aria-label. */}
@@ -83,6 +86,9 @@ export function AppLayout() {
         {/* Contexto actual (escritorio): Cuenta · rol, con cambio de Cuenta. */}
         <header className="hidden h-12 shrink-0 items-center border-b border-neutral-800/60 px-4 md:flex lg:px-6">
           <ContextIndicator />
+          <div className="ml-auto">
+            <CopilotButton />
+          </div>
         </header>
 
         {/* Barra superior móvil: módulos + contexto + menú de usuario. */}
@@ -98,6 +104,7 @@ export function AppLayout() {
           <div className="min-w-0 flex-1">
             <ContextIndicator compact />
           </div>
+          <CopilotButton compact />
           <UserMenu placement="bottom-end" />
         </header>
 
@@ -139,5 +146,6 @@ export function AppLayout() {
         </nav>
       </Drawer>
     </div>
+    </CopilotProvider>
   )
 }

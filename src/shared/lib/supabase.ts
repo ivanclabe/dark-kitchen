@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import { sharedCookieDomain } from '@/shared/tenant/host'
+import { createSharedSessionStorage } from './sharedSessionStorage'
 import { getActiveKitchenId, getActiveRoleId, KITCHEN_HEADER, ROLE_HEADER } from '@/shared/kitchen/activeKitchen'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -35,4 +37,14 @@ export const kitchenAwareFetch: typeof fetch = (input, init) => {
   return fetch(input, { ...init, headers, cache: 'no-store' })
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseKey, { global: { fetch: kitchenAwareFetch } })
+/**
+ * One session for every organization subdomain (ADR 0021): on a real root
+ * domain the session lives in a cookie of ".quanela.com"; in development
+ * (*.localhost) and Vercel previews it stays in this origin's localStorage.
+ */
+const cookieDomain = sharedCookieDomain()
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+  global: { fetch: kitchenAwareFetch },
+  auth: cookieDomain ? { storage: createSharedSessionStorage(cookieDomain) } : undefined,
+})

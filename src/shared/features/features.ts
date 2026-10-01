@@ -19,6 +19,7 @@ export const FEATURE_KEYS = [
   'supply_slow_movers',
   'kitchen_stall_alerts',
   'kitchen_insights',
+  'copilot',
   'voice_commands',
   'voice_speech',
   'voice_wake_word',

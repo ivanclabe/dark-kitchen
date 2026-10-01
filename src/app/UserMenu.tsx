@@ -1,13 +1,14 @@
 import { Avatar } from '@/shared/avatars/Avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
+import { useActiveKitchen, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
 import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
 import { canAccessModule } from '@/shared/rbac/roles'
 import { Popover, PopoverItem, PopoverSeparator } from '@/shared/ui/Popover'
-import { ArrowLeftRight, BadgeCheck, Building2, ChevronLeft, ChevronRight, LogOut, Settings, UserRound, Users } from 'lucide-react'
+import { ArrowLeftRight, BadgeCheck, Building2, CalendarClock, ChevronLeft, ChevronRight, LogOut, Settings, UserRound, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AccountList, RoleList, useShowOrganization } from './AccountSwitcher'
+import { OrganizationList } from './OrganizationSwitcher'
 
 /**
  * Menú de usuario (ADR 0008, sección 13.1): quién soy, dónde estoy (Cuenta
@@ -25,7 +26,9 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
   const canAccountTeam = canAccessModule(can, 'users') && !orgUsers
   const { data: kitchens } = useMyKitchens()
   const navigate = useNavigate()
-  const [view, setView] = useState<'main' | 'accounts' | 'roles'>('main')
+  const [view, setView] = useState<'main' | 'accounts' | 'roles' | 'organizations'>('main')
+  const { data: ctx } = useMyContext()
+  const canSwitchOrganization = (ctx?.organizations.filter((o) => o.status === 'active').length ?? 0) > 1
   const showOrg = useShowOrganization()
   const canSwitchRole = kitchen.roleOptions.length > 1
 
@@ -64,9 +67,9 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
               onClick={() => setView('main')}
               className="mb-1 flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-sm font-medium text-neutral-300 hover:bg-neutral-800 focus-visible:bg-neutral-800 focus-visible:outline-none"
             >
-              <ChevronLeft size={16} aria-hidden /> {view === 'accounts' ? 'Cambiar de cuenta' : 'Trabajar como'}
+              <ChevronLeft size={16} aria-hidden /> {view === 'accounts' ? 'Cambiar de cuenta' : view === 'organizations' ? 'Cambiar de organización' : 'Trabajar como'}
             </button>
-            {view === 'accounts' ? <AccountList onDone={close} /> : <RoleList onDone={close} />}
+            {view === 'accounts' ? <AccountList onDone={close} /> : view === 'organizations' ? <OrganizationList currentId={kitchen.organizationId} onDone={close} /> : <RoleList onDone={close} />}
           </>
         ) : (
           <>
@@ -89,6 +92,11 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
               <dt className="text-neutral-500">{canSwitchRole ? 'Rol activo' : 'Rol'}</dt>
               <dd className="truncate text-right font-medium text-neutral-200">{kitchen.roleName}</dd>
             </dl>
+            {canSwitchOrganization && (
+              <PopoverItem icon={Building2} onSelect={() => setView('organizations')} trailing={<ChevronRight size={15} className="text-neutral-500" aria-hidden />}>
+                Cambiar de organización
+              </PopoverItem>
+            )}
             {canSwitchRole && (
               <PopoverItem icon={BadgeCheck} onSelect={() => setView('roles')} trailing={<ChevronRight size={15} className="text-neutral-500" aria-hidden />}>
                 Cambiar de rol
@@ -97,6 +105,9 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
 
             <PopoverItem icon={UserRound} onSelect={() => go(path('/perfil'), close)}>
               Mi perfil
+            </PopoverItem>
+            <PopoverItem icon={CalendarClock} onSelect={() => go(path('/my-shifts'), close)}>
+              Mis turnos
             </PopoverItem>
             {canAccessModule(can, 'settings') && (
               <PopoverItem icon={Settings} onSelect={() => go(path('/settings'), close)}>

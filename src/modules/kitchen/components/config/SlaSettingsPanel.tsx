@@ -4,13 +4,13 @@ import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useState, type FormEvent } from 'react'
-import { useKitchenSlaSettings, useUpdateKitchenSlaSettings } from '../../hooks/useKitchenSettings'
-import { DEFAULT_SLA_THRESHOLDS, type SlaThresholds } from '../../lib/ticketVisuals'
+import { useSlaSettings, useUpdateSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
+import { DEFAULT_SLA_THRESHOLDS, type SlaThresholds } from '@/modules/orders/lib/orderVisuals'
 
 /** Umbrales de alerta (SLA) por estado — el formulario que antes vivía en su propio modal. */
 export function SlaSettingsPanel({ canEdit }: { canEdit: boolean }) {
-  const { data: saved } = useKitchenSlaSettings()
-  const update = useUpdateKitchenSlaSettings()
+  const { data: saved } = useSlaSettings()
+  const update = useUpdateSlaSettings()
   const { show } = useToast()
 
   // Derivado de `saved` mientras no haya edición local, sin efecto de sincronización.
