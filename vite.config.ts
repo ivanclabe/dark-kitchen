@@ -19,6 +19,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   return {
     plugins: [react(), tailwindcss(), siteUrl(env.VITE_SITE_URL)],
+    // Version shown in "Detalles de la sesión" (ADR 0023): the deploy's commit on Vercel.
+    define: { 'import.meta.env.VITE_APP_VERSION': JSON.stringify((process.env.VERCEL_GIT_COMMIT_SHA ?? env.VITE_APP_VERSION ?? '').slice(0, 7)) },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, './src'),

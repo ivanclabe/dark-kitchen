@@ -9,6 +9,17 @@
       content="Pedidos, cocina, despacho, menús, inventario y cobros en una sola plataforma para dark kitchens. Empieza gratis 14 días, sin tarjeta."
     />
     <meta name="theme-color" content="#0a0a0a" />
+    <!-- Apariencia de este equipo (ADR 0023), antes del primer pintado: sin destello al cargar. -->
+    <script>
+      try {
+        // Cookie of the parent domain first (shared by every organization subdomain), then this origin.
+        var c = document.cookie.split('; ').filter(function (x) { return x.indexOf('dk-appearance=') === 0 })[0]
+        var a = JSON.parse((c && decodeURIComponent(c.slice(14))) || localStorage.getItem('dk-appearance') || '{}')
+        var t = a.theme === 'light' || (a.theme === 'system' && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark'
+        document.documentElement.dataset.theme = t
+        document.documentElement.dataset.textSize = a.textSize === 'large' ? 'large' : 'normal'
+      } catch (e) {}
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 

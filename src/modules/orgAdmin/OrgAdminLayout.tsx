@@ -1,11 +1,11 @@
-import { AccountIcon, Avatar } from '@/shared/avatars/Avatar'
-import { useAuth } from '@/shared/hooks/useAuth'
+import { OrgUserMenu } from '@/app/UserMenu'
+import { AccountIcon } from '@/shared/avatars/Avatar'
 import { kitchenPath } from '@/shared/kitchen/activeKitchenContext'
 import { useOrgAdmin } from '@/shared/org/orgContext'
 import { Drawer } from '@/shared/ui/Drawer'
-import { Popover, PopoverItem, PopoverSeparator } from '@/shared/ui/Popover'
+import { Popover, PopoverItem } from '@/shared/ui/Popover'
 import clsx from 'clsx'
-import { ArrowRight, ChevronDown, Flame, LayoutList, LogOut, Menu } from 'lucide-react'
+import { ArrowRight, ChevronDown, Flame, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { isOrgNavItemActive, isOrgSectionAllowed, ORG_ADMIN_ICON, orgHomeSection, visibleOrgNav, type OrgNavItem } from './orgNavigation'
@@ -48,41 +48,6 @@ function GoToAccount() {
               </span>
             </PopoverItem>
           ))}
-        </>
-      )}
-    </Popover>
-  )
-}
-
-function OrgUserMenu() {
-  const { profile, user, signOut } = useAuth()
-  const navigate = useNavigate()
-  return (
-    <Popover
-      label="Menú de usuario"
-      placement="bottom-end"
-      trigger={(props) => (
-        <button type="button" {...props} aria-label={`Menú de usuario: ${profile?.fullName ?? ''}`} className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500">
-          <Avatar avatarKey={profile?.avatarKey} seed={profile?.id} size="sm" />
-        </button>
-      )}
-    >
-      {(close) => (
-        <>
-          <div className="flex items-center gap-3 px-2 pt-1 pb-3">
-            <Avatar avatarKey={profile?.avatarKey} seed={profile?.id} size="md" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-neutral-50">{profile?.fullName}</p>
-              <p className="truncate text-xs text-neutral-500">{user?.email}</p>
-            </div>
-          </div>
-          <PopoverItem icon={LayoutList} onSelect={() => { close(); navigate('/cuentas') }}>
-            Tus cuentas
-          </PopoverItem>
-          <PopoverSeparator />
-          <PopoverItem icon={LogOut} tone="danger" onSelect={() => { close(); void signOut() }}>
-            Cerrar sesión
-          </PopoverItem>
         </>
       )}
     </Popover>

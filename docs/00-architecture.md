@@ -121,6 +121,11 @@ modules/inventory/
 - **Código inmutable.** El código lo genera la base al crear la organización y nadie lo cambia. El `slug` queda como dato interno (`/o/{slug}`).
 - **Autoridad de los datos.** Sigue siendo la RLS por cuenta y membresía.
 
+**Menú de usuario y Apariencia ([ADR 0023](./adr/0023-menu-de-usuario.md)).**
+- **Menú con submenús.** `MenuPanel` (`src/shared/ui`) arma menús descritos como datos, con submenús laterales en escritorio y dentro del mismo panel en el celular. El menú de usuario es el mismo en la cuenta y en el centro de administración.
+- **Tema.** El tema claro (beta) invierte la escala `neutral` en un solo lugar (`[data-theme='light']` en `index.css`).
+- **Preferencias del equipo.** Apariencia se guarda por equipo, en una cookie del dominio raíz para que se vea igual en todos los subdominios.
+
 **Personal y Turnos.**
 - **`dk_shifts`** apunta a la persona y a su rol en la cuenta: no copia usuarios ni roles. La base impide los solapes por persona en toda la organización.
 - **Permisos:** `staff.view` y `staff.manage`. Cualquier persona ve sus propios turnos y marca su entrada y salida.
@@ -334,7 +339,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 - [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
-- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md) · [ADR 0023 — Menú de usuario, Apariencia y Ayuda](./adr/0023-menu-de-usuario.md)
 
 ---
 
