@@ -3,6 +3,8 @@
 ## Estado
 **Aceptada e implementada (2026-09-28).** Aprobada una sola vez con las recomendaciones D1–D8 y ejecutada completa (fases 1–9). La sección 24 resume la implementación, las diferencias con el plan y lo pendiente.
 
+> **Interfaz reemplazada por el [ADR 0024](./0024-cuenta-como-unico-nivel.md) (2026-10-02).** El centro `/o/{organización}/…` ya no existe: sus secciones viven dentro de la cuenta (Usuarios y Configuración) y las direcciones viejas redirigen. La base de este ADR (permisos de organización, bitácora de solo agregar, observabilidad, facturación) sigue vigente.
+
 Continúa los ADR 0008 (organizaciones y RBAC), 0009 (funciones), 0010 (planes) y 0011 (endurecimiento). Se mantiene Organización → Cuentas → Usuarios → Roles → Permisos, con aislamiento por `organization_id`/`kitchen_id` (Cuenta), RBAC y RLS.
 
 > **Nota:** los cambios de los ADR 0011 y 0012 están aplicados en la base y en el código, pero **sin commit**. No se hacen commits salvo que se pidan.

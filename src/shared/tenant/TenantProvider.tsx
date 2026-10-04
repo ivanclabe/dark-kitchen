@@ -89,7 +89,7 @@ export function TenantGate() {
       return <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-400">Cargando…</div>
     case 'error':
       return (
-        <Screen icon={AlertTriangle} title="No pudimos abrir esta organización">
+        <Screen icon={AlertTriangle} title="No pudimos abrir este espacio">
           <p>Revisa tu conexión e inténtalo de nuevo.</p>
           <button type="button" onClick={tenant.retry} className={linkClass}>
             Reintentar
@@ -100,7 +100,7 @@ export function TenantGate() {
       return (
         <Screen icon={SearchX} title="Esta dirección no existe">
           <p>
-            No hay ninguna organización en <span className="font-mono text-neutral-200">{label}</span>. Revisa que la dirección esté bien escrita.
+            No hay ningún espacio de Quanela en <span className="font-mono text-neutral-200">{label}</span>. Revisa que la dirección esté bien escrita.
           </p>
           <a href={home} className={linkClass}>
             Ir a Quanela
@@ -109,7 +109,7 @@ export function TenantGate() {
       )
     case 'inactive':
       return (
-        <Screen icon={Building2} title={`${tenant.organization?.name ?? 'Esta organización'} está desactivada`}>
+        <Screen icon={Building2} title={`${tenant.organization?.name ?? 'Este espacio'} está desactivado`}>
           <p>Por ahora nadie puede entrar. Si crees que es un error, contacta a quien administra tu negocio.</p>
           <a href={home} className={linkClass}>
             Ir a Quanela
@@ -120,10 +120,10 @@ export function TenantGate() {
       const others = (ctx?.organizations ?? []).filter((o) => o.status === 'active' && o.active && o.tenantCode !== tenant.code)
       return (
         <Screen icon={AlertTriangle} title={`No tienes acceso a ${tenant.organization?.name ?? label}`}>
-          <p>Tu usuario no pertenece a esta organización, o tu acceso todavía no está activo. Pide a su administrador que te agregue al equipo.</p>
+          <p>Tu usuario no pertenece a este espacio, o tu acceso todavía no está activo. Pide a su administrador que te agregue al equipo.</p>
           {others.length > 0 && (
             <div className="space-y-2">
-              <p className="text-neutral-300">Tus organizaciones:</p>
+              <p className="text-neutral-300">Tus espacios:</p>
               <div className="flex flex-col items-center gap-2">
                 {others.map((o) => (
                   <a key={o.id} href={tenantUrl(o.tenantCode, '/') ?? '/'} className={linkClass}>

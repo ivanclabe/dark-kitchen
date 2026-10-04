@@ -1,3 +1,5 @@
+import { OrgGeneralForm } from '@/modules/organization/components/OrgGeneralForm'
+import { useOrganizationDetails } from '@/modules/organization/hooks/useOrganization'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { resolveAccountIconKey } from '@/shared/avatars/catalog'
 import { AccountIconPicker } from '@/shared/avatars/GalleryPicker'
@@ -13,9 +15,10 @@ import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Building2, Copy, Link2, Plug } from 'lucide-react'
+import { Building2, Link2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AccountStatusCard } from '../components/AccountStatusCard'
 
 const TIMEZONES: { value: string; label: string }[] = [
   { value: 'America/Bogota', label: 'Colombia (Bogotá)' },
@@ -31,11 +34,49 @@ const TIMEZONES: { value: string; label: string }[] = [
 ]
 
 /**
- * Datos generales de la Cocina activa. El Administrador (settings:manage)
- * edita nombre, identificador y datos del negocio; activar o desactivar la
- * Cocina es solo del superusuario (lo impide la base).
+ * General settings (ADR 0024): the data of this account and, for whoever
+ * manages the business, the data that applies to all your accounts.
  */
 export function KitchenGeneralPage() {
+  const { can, canShared, organization } = useActiveKitchen()
+  return (
+    <div className="space-y-10">
+      {can('settings.manage') && <AccountDetailsForm />}
+      {organization && canShared('organization.manage') && <BusinessSection organizationId={organization.id} />}
+      {canShared('accounts.manage') && (
+        <div className="max-w-3xl">
+          <AccountStatusCard />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function BusinessSection({ organizationId }: { organizationId: string }) {
+  const details = useOrganizationDetails(organizationId)
+  return (
+    <section className="space-y-3">
+      <div>
+        <h2 className={typography.h3}>Tu negocio</h2>
+        <p className={typography.caption}>Aplica a todas tus cuentas.</p>
+      </div>
+      {details.isLoading ? (
+        <LoadingState variant="block" />
+      ) : details.isError || !details.data ? (
+        <ErrorState error={details.error} onRetry={() => void details.refetch()} />
+      ) : (
+        <OrgGeneralForm key={details.data.id} org={details.data} />
+      )}
+    </section>
+  )
+}
+
+/**
+ * Datos generales de la cuenta activa. El Administrador (settings:manage)
+ * edita nombre, identificador y datos del negocio; activar o desactivar la
+ * cuenta es solo del superusuario (lo impide la base).
+ */
+function AccountDetailsForm() {
   const { kitchen, can } = useActiveKitchen()
   const canEdit = can('settings.manage')
   const queryClient = useQueryClient()
@@ -91,7 +132,7 @@ export function KitchenGeneralPage() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
-      <Card title="Identidad" description="Cómo se ve esta cuenta en la app y en su dirección" icon={Building2}>
+      <Card title="Esta cuenta" description="Cómo se ve esta cuenta en la app y en su dirección" icon={Building2}>
         <FormGrid>
           <FormField label="Nombre" required error={edited ? nameError : null}>
             {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} disabled={!canEdit} />}
@@ -102,7 +143,7 @@ export function KitchenGeneralPage() {
             error={edited ? slugProblem : null}
             hint={
               <span className="inline-flex items-center gap-1">
-                <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cocina.
+                <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta.
               </span>
             }
           >
@@ -116,14 +157,14 @@ export function KitchenGeneralPage() {
             <AccountIcon iconKey={form.iconKey} seed={kitchen.id} size="lg" />
             <div className="min-w-0">
               <p className="text-sm font-medium text-neutral-200">Icono de la cuenta</p>
-              <p className={typography.caption}>Representa al establecimiento en el selector de cuentas y en la organización.</p>
+              <p className={typography.caption}>Representa al establecimiento en el selector de cuentas.</p>
             </div>
           </div>
           {canEdit && <AccountIconPicker value={resolveAccountIconKey(form.iconKey, kitchen.id)} onChange={(iconKey) => set({ iconKey })} />}
         </div>
       </Card>
 
-      <Card title="Datos del negocio" description="Opcionales: aparecen en documentos y soporte" icon={Building2}>
+      <Card title="Datos de esta cuenta" description="Opcionales: aparecen en documentos y soporte" icon={Building2}>
         <FormGrid>
           <FormField label="Razón social">
             {(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} disabled={!canEdit} />}
@@ -150,39 +191,6 @@ export function KitchenGeneralPage() {
             )}
           </FormField>
         </FormGrid>
-      </Card>
-
-      <Card
-        title="Integraciones"
-        description="Para conectar sistemas externos (p. ej. pedidos por WhatsApp con n8n) a esta cuenta"
-        icon={Plug}
-      >
-        <FormField
-          label="ID de la cuenta"
-          hint={
-            <>
-              Cada integración envía este valor en el encabezado <code className="text-neutral-300">x-dk-kitchen-id</code>. Sin él no ve ni registra nada.
-            </>
-          }
-        >
-          {(a11y) => (
-            <div className="flex gap-2">
-              <Input {...a11y} value={kitchen.id} readOnly className="font-mono text-xs" onFocus={(e) => e.target.select()} />
-              <Button
-                variant="secondary"
-                icon={Copy}
-                onClick={() =>
-                  navigator.clipboard.writeText(kitchen.id).then(
-                    () => show('ID de la cuenta copiado.'),
-                    () => show('No se pudo copiar; selecciónalo y cópialo a mano.', 'error'),
-                  )
-                }
-              >
-                Copiar
-              </Button>
-            </div>
-          )}
-        </FormField>
       </Card>
 
       {canEdit ? (

@@ -32,7 +32,7 @@ function Usage({ label, used, limit, singular, plural }: { label: string; used: 
 }
 
 /**
- * Plan de la organización (ADR 0010): qué plan tiene, su estado, límites y
+ * Plan del negocio, compartido por todas tus cuentas (ADR 0010, ADR 0024): qué plan tiene, su estado, límites y
  * uso, y qué incluye. Sin pagos todavía: el cambio de plan es con ventas.
  */
 export function PlanPanel({ organizationId }: { organizationId: string }) {
@@ -116,7 +116,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
         </div>
         <div>
           <h3 className={typography.h3}>Funciones del plan</h3>
-          <p className={clsx('mt-1', typography.caption)}>Las ofreces a tus cuentas en la pestaña Funciones.</p>
+          <p className={clsx('mt-1', typography.caption)}>Se activan en Configuración → IA y voz.</p>
           <ul className="mt-3 space-y-2 text-sm text-neutral-300">
             {sub.features.map((key) => (
               <li key={key} className="flex gap-2">

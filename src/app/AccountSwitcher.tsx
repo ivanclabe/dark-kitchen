@@ -1,10 +1,10 @@
-import { kitchenPath, useActiveKitchen, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
+import { kitchenPath, useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
 import type { MyKitchen } from '@/shared/kitchen/kitchensApi'
 import { Popover } from '@/shared/ui/Popover'
 import { useToast } from '@/shared/ui/Toast'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import clsx from 'clsx'
-import { Check, ChevronDown, ChevronRight, LayoutGrid, Search } from 'lucide-react'
+import { Check, ChevronDown, LayoutGrid, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { roleSummary } from './roleSummary'
@@ -29,17 +29,7 @@ export function useSwitchAccount() {
   }
 }
 
-/**
- * ¿Se muestra la organización? Solo cuando aporta: con una organización y
- * una sola Cuenta, la palabra "organización" no aparece (ADR 0008, 0.1).
- */
-export function useShowOrganization(): boolean {
-  const { kitchen } = useActiveKitchen()
-  const { data: ctx } = useMyContext()
-  return (ctx?.organizations.length ?? 0) > 1 || (ctx?.accounts.length ?? 0) > 1 || kitchen.superAdmin
-}
-
-/** Lista de Cuentas para elegir (agrupada por organización si hay varias; con buscador si son muchas). */
+/** Lista de cuentas para elegir (una sola lista, ADR 0024; con buscador si son muchas). Las de otro negocio abren su subdominio. */
 export function AccountList({ onDone }: { onDone: () => void }) {
   const { kitchen } = useActiveKitchen()
   const { data: kitchens } = useMyKitchens()
@@ -48,8 +38,7 @@ export function AccountList({ onDone }: { onDone: () => void }) {
   const [query, setQuery] = useState('')
   const all = kitchens ?? []
   const q = query.trim().toLowerCase()
-  const shown = q ? all.filter((k) => k.name.toLowerCase().includes(q) || k.slug.includes(q) || k.organizationName.toLowerCase().includes(q)) : all
-  const orgCount = new Set(all.map((k) => k.organizationId)).size
+  const shown = q ? all.filter((k) => k.name.toLowerCase().includes(q) || k.slug.includes(q)) : all
 
   return (
     <div className="space-y-1">
@@ -66,12 +55,10 @@ export function AccountList({ onDone }: { onDone: () => void }) {
         </label>
       )}
       <ul className="max-h-80 space-y-0.5 overflow-y-auto">
-        {shown.map((k, i) => {
+        {shown.map((k) => {
           const current = k.id === kitchen.id
-          const newGroup = orgCount > 1 && (i === 0 || shown[i - 1].organizationId !== k.organizationId)
           return (
             <li key={k.id}>
-              {newGroup && <p className="px-3 pt-2 pb-1 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">{k.organizationName}</p>}
               <button
                 type="button"
                 role="menuitem"
@@ -162,26 +149,19 @@ export function RoleList({ onDone }: { onDone: () => void }) {
 }
 
 /**
- * Contexto actual, siempre visible arriba del contenido (ADR 0008, 13.1):
- * Organización › Cuenta · rol activo. Si hay más de un rol o más de una
- * Cuenta, al pulsarlo se cambia de rol o de Cuenta.
+ * Contexto actual, siempre visible arriba del contenido (ADR 0008, 13.1;
+ * ADR 0024): Cuenta · rol activo. Si hay más de un rol o más de una cuenta,
+ * al pulsarlo se cambia de rol o de cuenta.
  */
 export function ContextIndicator({ compact = false }: { compact?: boolean }) {
   const { kitchen } = useActiveKitchen()
   const { data: kitchens } = useMyKitchens()
-  const showOrg = useShowOrganization()
   const canSwitchAccount = (kitchens?.length ?? 0) > 1
   const canSwitchRole = kitchen.roleOptions.length > 1
 
   const content = (
     <>
       <AccountIcon iconKey={kitchen.iconKey} seed={kitchen.id} size="sm" />
-      {showOrg && (
-        <span className={clsx('flex min-w-0 shrink items-center gap-1 text-sm text-neutral-500', compact && 'hidden sm:flex')}>
-          <span className="truncate">{kitchen.organizationName}</span>
-          <ChevronRight size={13} className="shrink-0" aria-hidden />
-        </span>
-      )}
       <span className="min-w-0 truncate text-sm font-semibold text-neutral-100">{kitchen.name}</span>
       <span className={clsx('shrink-0 text-sm text-neutral-500', compact && 'hidden sm:inline')}>· {kitchen.roleName}</span>
     </>
@@ -199,7 +179,7 @@ export function ContextIndicator({ compact = false }: { compact?: boolean }) {
         <button
           type="button"
           {...props}
-          aria-label={`${showOrg ? `Organización ${kitchen.organizationName}, ` : ''}cuenta ${kitchen.name}, rol ${kitchen.roleName}. Cambiar`}
+          aria-label={`Cuenta ${kitchen.name}, rol ${kitchen.roleName}. Cambiar`}
           className="flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
         >
           {content}

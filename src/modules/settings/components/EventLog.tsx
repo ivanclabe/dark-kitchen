@@ -1,5 +1,5 @@
-import { AccountIcon, Avatar } from '@/shared/avatars/Avatar'
-import { useOrgAdmin } from '@/shared/org/orgContext'
+import { Avatar } from '@/shared/avatars/Avatar'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -12,7 +12,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { ChevronDown, ScrollText } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
-import { categoryLabel, EVENT_CATEGORIES, fetchOrgEvents, type AuditEvent, type EventFilters } from '../api'
+import { categoryLabel, EVENT_CATEGORIES, fetchAccountEvents, type AuditEvent, type EventFilters } from '../api'
 
 const SOURCE_LABEL: Record<AuditEvent['source'], string> = { db: 'Base de datos', edge: 'Servicio de IA', app: 'Aplicación' }
 
@@ -39,11 +39,6 @@ function EventRow({ event }: { event: AuditEvent }) {
           <Badge size="sm" tone="neutral">
             {categoryLabel(event.category)}
           </Badge>
-          {event.account && (
-            <span className="inline-flex items-center gap-1">
-              <AccountIcon iconKey={event.account.iconKey} seed={event.account.id} size="xs" /> {event.account.name}
-            </span>
-          )}
           {event.result === 'failure' && (
             <Badge size="sm" tone="danger" dot>
               Falló
@@ -74,19 +69,19 @@ function EventRow({ event }: { event: AuditEvent }) {
 }
 
 /**
- * Bitácora (ADR 0012, sección 5): ¿quién hizo qué, cuándo, dónde y sobre
- * qué? No es observabilidad (¿cómo funciona?). La base la escribe (no la
- * app), es de solo agregar y se lee por páginas (cursor), con filtros.
+ * Bitácora (ADR 0012, sección 5; ADR 0024): ¿quién hizo qué, cuándo y sobre
+ * qué en ESTA cuenta? No es observabilidad (¿cómo funciona?). La base la
+ * escribe (no la app), es de solo agregar y se lee por páginas (cursor).
  */
-export function EventLog({ initialAccountId }: { initialAccountId?: string }) {
-  const { organization, accounts } = useOrgAdmin()
-  const [filters, setFilters] = useState<EventFilters>({ accountId: initialAccountId })
+export function EventLog() {
+  const { kitchen } = useActiveKitchen()
+  const [filters, setFilters] = useState<EventFilters>({})
   const search = useDeferredValue(filters.search ?? '')
   const effective = { ...filters, search }
 
   const query = useInfiniteQuery({
-    queryKey: ['org', organization.id, 'events', effective],
-    queryFn: ({ pageParam }) => fetchOrgEvents(organization.id, effective, pageParam),
+    queryKey: ['account', kitchen.id, 'events', effective],
+    queryFn: ({ pageParam }) => fetchAccountEvents(effective, pageParam),
     initialPageParam: undefined as { at: string; id: string } | undefined,
     getNextPageParam: (last) => {
       const tail = last.events.at(-1)
@@ -98,7 +93,7 @@ export function EventLog({ initialAccountId }: { initialAccountId?: string }) {
 
   return (
     <div className="space-y-4">
-      <p className={typography.small}>Quién hizo qué, cuándo y dónde. La registra la base de datos y nadie puede modificarla ni borrarla; se conserva 400 días.</p>
+      <p className={typography.small}>Quién hizo qué y cuándo en esta cuenta. La registra la base de datos y nadie puede modificarla ni borrarla; se conserva 400 días.</p>
       <div className="flex flex-wrap items-center gap-2">
         <Input value={filters.search ?? ''} onChange={(e) => set({ search: e.target.value })} placeholder="Buscar en la bitácora" aria-label="Buscar en la bitácora" className="!mt-0 max-w-xs" />
         <Select value={filters.category ?? ''} onChange={(e) => set({ category: e.target.value || undefined })} aria-label="Filtrar por categoría" className="!mt-0 max-w-[12rem]">
@@ -106,14 +101,6 @@ export function EventLog({ initialAccountId }: { initialAccountId?: string }) {
           {EVENT_CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>
               {c.label}
-            </option>
-          ))}
-        </Select>
-        <Select value={filters.accountId ?? ''} onChange={(e) => set({ accountId: e.target.value || undefined })} aria-label="Filtrar por cuenta" className="!mt-0 max-w-[14rem]">
-          <option value="">Toda la organización</option>
-          {accounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
             </option>
           ))}
         </Select>

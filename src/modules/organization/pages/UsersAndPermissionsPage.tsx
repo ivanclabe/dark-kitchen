@@ -11,53 +11,42 @@ import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { typography } from '@/shared/ui/typography'
 import { ShieldCheck, UserPlus, Users } from 'lucide-react'
-import { orgPath } from '@/shared/org/orgContext'
 import { formatDate, formatDateTime } from '@/shared/utils/format'
 import { useMemo, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import type { OrgAccount, OrgRole, OrgUser } from '../api/organization'
 import { RolesPanel } from '../components/RolesPanel'
 import { UserDrawer } from '../components/UserDrawer'
-import { useOrgRoles, useOrgUsers, usePermissionCatalog } from '../hooks/useOrganization'
+import { useAccountUsers, useOrgRoles, usePermissionCatalog, useRoleUsage } from '../hooks/useOrganization'
 
 type Tab = 'users' | 'roles'
 
 /**
- * Equipo (ADR 0008 §10–11 y ADR 0012 §6), en dos alcances con el mismo
- * componente:
- * - Organización (centro de administración, /o/:org/equipos): todas las
- *   personas, sus roles por Cuenta, incorporación y última actividad.
- * - Cuenta (/k/:cuenta/users, "Equipo de la cuenta"): el ADMIN de una Cuenta
- *   ve y administra solo a la gente de su Cuenta.
- * Las RPC y reglas de siempre validan todo en la base (sin atajos a RBAC).
+ * Usuarios of the active account (ADR 0008 §10–11, ADR 0024): two tabs,
+ * Usuarios and Roles y permisos. Only the people of THIS account, with their
+ * roles in it, also for whoever manages several accounts or the SUPER_ADMIN.
+ * The database checks everything again (no shortcuts to RBAC).
  */
-export function TeamView({
-  organizationId,
-  scopeName,
-  manageOrg,
-  manageTeam,
-  canManageRoles,
-  myPermissions,
-  assignable,
-  showActivity,
-}: {
-  organizationId: string
-  scopeName: string
-  manageOrg: boolean
-  manageTeam: boolean
-  canManageRoles: boolean
-  myPermissions: ReadonlySet<string>
-  assignable: OrgAccount[]
-  showActivity: boolean
-}) {
-  const [tab, setTab] = useState<Tab>('users')
-  const users = useOrgUsers(organizationId)
+export function UsersAndPermissionsPage() {
+  const { kitchen, organization, can, canShared } = useActiveKitchen()
+  const [params, setParams] = useSearchParams()
+  const organizationId = organization?.id ?? kitchen.organizationId
+  const users = useAccountUsers(organizationId, kitchen.id)
   const roles = useOrgRoles(organizationId)
   const catalog = usePermissionCatalog()
+  const usage = useRoleUsage(organizationId, kitchen.id)
+  const assignable: OrgAccount[] = useMemo(
+    () => [{ id: kitchen.id, slug: kitchen.slug, name: kitchen.name, iconKey: kitchen.iconKey, active: kitchen.active, createdAt: '' }],
+    [kitchen],
+  )
+  const manageOrg = canShared('users.manage')
+  const manageTeam = can('team.manage') || manageOrg
+  const showActivity = canShared('users.view') || can('team.manage')
 
+  const tab: Tab = params.get('tab') === 'roles' ? 'roles' : 'users'
   const tabs: TabItem<Tab>[] = [
     { value: 'users', label: users.data ? `Usuarios (${users.data.length})` : 'Usuarios', icon: Users },
-    { value: 'roles', label: 'Roles', icon: ShieldCheck },
+    { value: 'roles', label: 'Roles y permisos', icon: ShieldCheck },
   ]
 
   const loading = users.isLoading || roles.isLoading || catalog.isLoading
@@ -65,12 +54,8 @@ export function TeamView({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={manageOrg ? 'Equipos' : 'Equipo de la cuenta'}
-        icon={Users}
-        description={manageOrg ? `Quién trabaja en ${scopeName}, con qué roles y en qué cuentas.` : `Quién trabaja en ${scopeName} y con qué roles.`}
-      />
-      <Tabs value={tab} onChange={setTab} items={tabs} />
+      <PageHeader title="Usuarios" icon={Users} description={`Quién trabaja en ${kitchen.name} y con qué roles.`} />
+      <Tabs value={tab} onChange={(t) => setParams(t === 'roles' ? { tab: 'roles' } : {}, { replace: true })} items={tabs} />
 
       {error ? (
         <ErrorState error={error} onRetry={() => void Promise.all([users.refetch(), roles.refetch(), catalog.refetch()])} />
@@ -85,38 +70,15 @@ export function TeamView({
           assignable={assignable}
           manageOrg={manageOrg}
           manageTeam={manageTeam}
-          myPermissions={myPermissions}
+          myPermissions={kitchen.permissions}
           showActivity={showActivity}
         />
       ) : (
-        <RolesPanel organizationId={organizationId} roles={roles.data} users={users.data} catalog={catalog.data} canManage={canManageRoles} />
+        <RolesPanel organizationId={organizationId} roles={roles.data} users={users.data} catalog={catalog.data} canManage={canShared('roles.manage')} usage={usage.data} />
       )}
 
       <p className={typography.caption}>El equipo de soporte de la plataforma Quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.</p>
     </div>
-  )
-}
-
-/** "Equipo de la cuenta": dentro de una Cuenta. Quien administra toda la organización va al centro. */
-export function UsersAndPermissionsPage() {
-  const { kitchen, organization, can } = useActiveKitchen()
-  const orgPermissions = new Set(organization?.permissions ?? [])
-  const assignable: OrgAccount[] = useMemo(
-    () => [{ id: kitchen.id, slug: kitchen.slug, name: kitchen.name, iconKey: kitchen.iconKey, active: kitchen.active, createdAt: '' }],
-    [kitchen],
-  )
-  if (organization && orgPermissions.has('users.view')) return <Navigate to={orgPath(organization.slug, '/equipos')} replace />
-  return (
-    <TeamView
-      organizationId={kitchen.organizationId}
-      scopeName={kitchen.name}
-      manageOrg={false}
-      manageTeam={can('team.manage')}
-      canManageRoles={false}
-      myPermissions={kitchen.permissions}
-      assignable={assignable}
-      showActivity={false}
-    />
   )
 }
 
@@ -142,23 +104,15 @@ function UsersPanel({
   showActivity: boolean
 }) {
   const [query, setQuery] = useState('')
-  const [accountFilter, setAccountFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
   const [editing, setEditing] = useState<{ user: OrgUser | null } | null>(null)
   const roleName = (id: string) => roles.find((r) => r.id === id)?.name ?? '—'
 
-  const accountOptions = useMemo(() => {
-    const byId = new Map<string, string>()
-    for (const u of users) for (const a of u.accounts) byId.set(a.kitchenId, a.kitchenName)
-    return [...byId.entries()].sort((a, b) => a[1].localeCompare(b[1]))
-  }, [users])
-
   const q = query.trim().toLowerCase()
   const shown = users.filter(
     (u) =>
       (!q || u.fullName.toLowerCase().includes(q) || (u.email ?? '').includes(q)) &&
-      (!accountFilter || u.isSuperAdmin || u.accounts.some((a) => a.kitchenId === accountFilter)) &&
       (!statusFilter || u.status === statusFilter) &&
       (!roleFilter || (roleFilter === 'SUPER_ADMIN' ? u.isSuperAdmin : u.accounts.some((a) => a.roleIds.includes(roleFilter)))),
   )
@@ -190,18 +144,11 @@ function UsersPanel({
               <Badge tone="brand" size="sm" icon={ShieldCheck}>
                 SUPER_ADMIN
               </Badge>
-              <span className="text-xs text-neutral-500">creador · acceso global</span>
+              <span className="text-xs text-neutral-500">acceso a todas tus cuentas</span>
             </span>
           )}
-          {/* Roles de Cuenta: también los del SUPER_ADMIN (p. ej. ADMIN en las Cuentas que creó). */}
-          <ul className="space-y-0.5 text-xs">
-            {u.accounts.map((a) => (
-              <li key={a.kitchenId} className={a.active ? 'text-neutral-300' : 'text-neutral-600 line-through'}>
-                <span className="text-neutral-500">{a.kitchenName}:</span> {a.roleIds.map(roleName).join(', ')}
-              </li>
-            ))}
-            {u.accounts.length === 0 && !u.isSuperAdmin && <li className="text-neutral-500">Sin cuentas asignadas</li>}
-          </ul>
+          {/* Roles in this account (also the SUPER_ADMIN's, e.g. ADMIN to "work as"). */}
+          <p className="text-xs text-neutral-300">{u.accounts.flatMap((a) => a.roleIds.map(roleName)).join(', ') || (u.isSuperAdmin ? '' : 'Sin rol')}</p>
         </div>
       ),
     },
@@ -263,16 +210,6 @@ function UsersPanel({
             </option>
           ))}
         </Select>
-        {accountOptions.length > 1 && (
-          <Select value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)} aria-label="Filtrar por cuenta" className="!mt-0 max-w-[14rem]">
-            <option value="">Todas las cuentas</option>
-            {accountOptions.map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </Select>
-        )}
         {manageTeam && (
           <Button variant="primary" icon={UserPlus} className="ml-auto" onClick={() => setEditing({ user: null })}>
             Crear usuario
@@ -289,7 +226,7 @@ function UsersPanel({
           <EmptyState
             icon={Users}
             title={users.length === 0 ? 'Todavía no hay usuarios' : 'Nadie coincide'}
-            description={users.length === 0 ? 'Crea los usuarios de tu equipo y asígnales sus cuentas y roles.' : 'Prueba con otro nombre o cuenta.'}
+            description={users.length === 0 ? 'Crea los usuarios de tu equipo y asígnales sus roles.' : 'Prueba con otro nombre.'}
             compact
           />
         }

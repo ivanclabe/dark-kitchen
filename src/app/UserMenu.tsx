@@ -2,17 +2,14 @@ import { useCopilot } from '@/modules/copilot/copilotContext'
 import { useAppearance } from '@/shared/appearance/appearance'
 import { Avatar } from '@/shared/avatars/Avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { useActiveKitchen, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
-import type { MyOrganization } from '@/shared/kitchen/kitchensApi'
-import { canOpenAdminCenter, orgPath, useOrgAdmin } from '@/shared/org/orgContext'
+import { useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
+import { settingsSections } from '@/modules/settings/sections'
 import { canAccessModule } from '@/shared/rbac/roles'
 import { tenantHostLabel } from '@/shared/tenant/host'
-import { goToOrganization } from '@/shared/tenant/navigation'
 import { MenuPanel, type MenuNode } from '@/shared/ui/MenuPanel'
 import { useToast } from '@/shared/ui/Toast'
 import {
   BadgeCheck,
-  Building2,
   CalendarClock,
   CircleHelp,
   Clock3,
@@ -26,6 +23,7 @@ import {
   Mail,
   MessageCircle,
   Settings,
+  ShieldCheck,
   Sparkles,
   Store,
   UserRound,
@@ -60,25 +58,10 @@ function Header() {
   )
 }
 
-/** "Cambiar de organización": the subdomain changes for real (ADR 0021/0022). */
-function organizationNodes(organizations: MyOrganization[], currentId: string | null, fallback: () => void): MenuNode[] {
-  return organizations.map((o) => ({
-    kind: 'item',
-    id: `org-${o.id}`,
-    label: o.name,
-    hint: `${o.tenantCode} · ${tenantHostLabel(o.tenantCode)}`,
-    icon: Building2,
-    checked: o.id === currentId,
-    onSelect: () => {
-      if (o.id !== currentId && !goToOrganization(o.tenantCode, '/')) fallback()
-    },
-  }))
-}
-
 /**
- * What both menus share (account and administration center): Apariencia,
- * Ayuda y soporte, Detalles de la sesión and Cerrar sesión — plus the
- * windows they open, which live outside the menu (it closes on select).
+ * The end of the menu: Apariencia, Ayuda y soporte, Detalles de la sesión and
+ * Cerrar sesión — plus the windows they open, which live outside the menu
+ * (it closes on select).
  */
 function useCommonMenu(session: SessionInfo) {
   const { profile, user, session: authSession, signOut } = useAuth()
@@ -170,25 +153,23 @@ function Trigger(props: { onClick: () => void; 'aria-haspopup': 'menu'; 'aria-ex
 }
 
 /**
- * Menú de usuario dentro de una cuenta (ADR 0023): quién soy; rol y cuenta,
- * cada uno con su submenú; mis cosas; administración según permisos;
+ * Menú de usuario (ADR 0023, ADR 0024): quién soy; rol y cuenta, cada uno con
+ * su submenú (todas tus cuentas en una lista: las de otro negocio abren su
+ * espacio); mis cosas; la administración de ESTA cuenta según permisos;
  * Apariencia; Ayuda y soporte; Detalles de la sesión; Cerrar sesión.
  */
 export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' }) {
-  const { kitchen, organization, can, path, setActiveRole } = useActiveKitchen()
+  const active = useActiveKitchen()
+  const { kitchen, organization, can, path, setActiveRole } = active
   const { data: kitchens } = useMyKitchens()
-  const { data: ctx } = useMyContext()
   const switchAccount = useSwitchAccount()
   const navigate = useNavigate()
   const { show } = useToast()
 
-  const canAdminOrg = canOpenAdminCenter(organization)
-  const orgUsers = organization?.permissions.includes('users.view') ?? false
-  // "Equipo de la cuenta": who manages THIS account's team without managing the organization.
-  const canAccountTeam = canAccessModule(can, 'users') && !orgUsers
-  const orgAccounts = (kitchens ?? []).filter((k) => k.organizationId === kitchen.organizationId)
-  const organizations = (ctx?.organizations ?? []).filter((o) => o.status === 'active' && (o.active || ctx?.profile.isPlatformAdmin))
   const activeRole = kitchen.roleOptions.find((r) => r.id === kitchen.activeRoleId)
+  const sections = settingsSections(active)
+  const canUsers = canAccessModule(can, 'users')
+  const go = (to: string) => () => navigate(path(to))
 
   const common = useCommonMenu({
     organization: organization ? { name: organization.name, code: organization.tenantCode } : null,
@@ -233,20 +214,11 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
       kind: 'submenu',
       id: 'account',
       label: kitchen.name,
-      hint: organization ? `${organization.name} · ${organization.tenantCode}` : kitchen.organizationName,
+      hint: organization ? tenantHostLabel(organization.tenantCode) : undefined,
       icon: Store,
       children: [
-        {
-          kind: 'custom',
-          id: 'org-title',
-          render: () => (
-            <p className="px-3 pt-2 pb-1 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-              {organization?.name ?? kitchen.organizationName}
-              {organization && <span className="font-mono"> · {organization.tenantCode}</span>}
-            </p>
-          ),
-        },
-        ...orgAccounts.map((k) => ({
+        { kind: 'section', id: 'accounts-title', label: 'Tus cuentas' },
+        ...(kitchens ?? []).map((k) => ({
           kind: 'item' as const,
           id: `account-${k.id}`,
           label: k.name,
@@ -263,27 +235,29 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
           icon: Info,
           onSelect: () => (can('settings.manage') ? navigate(path('/settings/general')) : common.openSessionDetails()),
         },
-        ...(organizations.length > 1
-          ? [
-              {
-                kind: 'submenu' as const,
-                id: 'organizations',
-                label: 'Cambiar de organización',
-                icon: Building2,
-                children: organizationNodes(organizations, kitchen.organizationId, () => navigate('/cuentas')),
-              },
-            ]
-          : []),
-        { kind: 'item', id: 'all-accounts', label: 'Tus cuentas', icon: LayoutList, onSelect: () => navigate('/cuentas') },
+        { kind: 'item', id: 'all-accounts', label: 'Todas tus cuentas', icon: LayoutList, onSelect: () => navigate('/cuentas') },
       ],
     },
     { kind: 'separator', id: 'sep-account' },
-    { kind: 'item', id: 'profile', label: 'Mi perfil', icon: UserRound, onSelect: () => navigate(path('/perfil')) },
-    { kind: 'item', id: 'shifts', label: 'Mis turnos', icon: CalendarClock, onSelect: () => navigate(path('/my-shifts')) },
-    ...(canAccessModule(can, 'settings') ? [{ kind: 'item' as const, id: 'settings', label: 'Configuración', icon: Settings, onSelect: () => navigate(path('/settings')) }] : []),
-    ...(canAccountTeam ? [{ kind: 'item' as const, id: 'team', label: 'Equipo de la cuenta', icon: Users, onSelect: () => navigate(path('/users')) }] : []),
-    ...(canAdminOrg && organization
-      ? [{ kind: 'item' as const, id: 'org-admin', label: 'Administración de la organización', icon: Building2, onSelect: () => navigate(orgPath(organization.slug)) }]
+    { kind: 'item', id: 'profile', label: 'Mi perfil', icon: UserRound, onSelect: go('/perfil') },
+    { kind: 'item', id: 'shifts', label: 'Mis turnos', icon: CalendarClock, onSelect: go('/my-shifts') },
+    ...(sections.length > 0 || canUsers ? [{ kind: 'separator' as const, id: 'sep-admin' }] : []),
+    ...(sections.length > 0
+      ? [
+          {
+            kind: 'submenu' as const,
+            id: 'settings',
+            label: 'Configuración de la cuenta',
+            icon: Settings,
+            children: sections.map((section) => ({ kind: 'item' as const, id: `settings-${section.to}`, label: section.label, icon: section.icon, onSelect: go(section.to) })),
+          },
+        ]
+      : []),
+    ...(canUsers
+      ? [
+          { kind: 'item' as const, id: 'users', label: 'Usuarios', icon: Users, onSelect: go('/users') },
+          { kind: 'item' as const, id: 'roles', label: 'Roles y permisos', icon: ShieldCheck, onSelect: go('/users?tab=roles') },
+        ]
       : []),
     ...common.nodes,
   ]
@@ -291,49 +265,6 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
   return (
     <>
       <MenuPanel label="Menú de usuario" placement={placement} header={<Header />} items={items} trigger={(props) => <Trigger {...props} />} />
-      {common.dialogs}
-    </>
-  )
-}
-
-/**
- * The same menu in the organization's administration center (ADR 0023,
- * D6): there is no active account, so "Organización" takes its place.
- */
-export function OrgUserMenu() {
-  const { organization } = useOrgAdmin()
-  const { data: ctx } = useMyContext()
-  const navigate = useNavigate()
-  const organizations = (ctx?.organizations ?? []).filter((o) => o.status === 'active' && (o.active || ctx?.profile.isPlatformAdmin))
-  const common = useCommonMenu({
-    organization: { name: organization.name, code: organization.tenantCode },
-    account: null,
-    role: organization.isSuperAdmin ? 'Organization Admin' : 'Administración',
-    permissionCount: organization.permissions.length,
-  })
-
-  const items: MenuNode[] = [
-    { kind: 'section', id: 'org-title', label: 'Organización' },
-    {
-      kind: 'submenu',
-      id: 'organization',
-      label: organization.name,
-      hint: `${organization.tenantCode} · ${tenantHostLabel(organization.tenantCode)}`,
-      icon: Building2,
-      children: [
-        ...(organizations.length > 1
-          ? [{ kind: 'section' as const, id: 'switch-title', label: 'Cambiar de organización' }, ...organizationNodes(organizations, organization.id, () => navigate('/cuentas')), { kind: 'separator' as const, id: 'org-sep' }]
-          : []),
-        { kind: 'item', id: 'all-accounts', label: 'Tus cuentas', icon: LayoutList, onSelect: () => navigate('/cuentas') },
-      ],
-    },
-    { kind: 'separator', id: 'sep-org' },
-    ...common.nodes,
-  ]
-
-  return (
-    <>
-      <MenuPanel label="Menú de usuario" placement="bottom-end" header={<Header />} items={items} trigger={(props) => <Trigger {...props} />} />
       {common.dialogs}
     </>
   )

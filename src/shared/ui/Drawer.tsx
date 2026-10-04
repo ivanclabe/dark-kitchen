@@ -13,6 +13,7 @@ export function Drawer({
   children,
   side = 'right',
   size = 'lg',
+  footer,
 }: {
   open: boolean
   onClose: () => void
@@ -21,6 +22,8 @@ export function Drawer({
   children: ReactNode
   side?: 'left' | 'right'
   size?: 'sm' | 'md' | 'lg'
+  /** Fixed at the bottom, outside the scroll (e.g. a chat composer). */
+  footer?: ReactNode
 }) {
   const panelRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
@@ -61,6 +64,7 @@ export function Drawer({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+        {footer && <div className="shrink-0 border-t border-neutral-800 px-5 pt-3 pb-4 sm:px-6">{footer}</div>}
       </div>
     </div>,
     document.body,

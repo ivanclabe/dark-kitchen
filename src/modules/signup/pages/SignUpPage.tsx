@@ -214,7 +214,7 @@ export function SignUpPage() {
   const titles = {
     user: ['Crea tu usuario', 'Con él entrarás a Quanela.'],
     plan: ['Elige el plan para tu negocio', 'Empieza gratis; puedes cambiar de plan más adelante.'],
-    business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu organización y su primera cuenta.'],
+    business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu espacio y tu primera cuenta.'],
   }[step]
   const planSummary = selectedPlan && step !== 'plan' ? <PlanSummary plan={selectedPlan} onChange={() => setStep('plan')} /> : null
 
@@ -282,7 +282,7 @@ export function SignUpPage() {
 
       {step === 'business' && (
         <form onSubmit={(e) => void submit(e)} className="space-y-4" noValidate>
-          <FormField label="Nombre del negocio" required hint="Así se llamará tu organización. Puedes cambiarlo después.">
+          <FormField label="Nombre del negocio" required hint="Así se llamará tu negocio. Puedes cambiarlo después.">
             {(a11y) => <Input {...a11y} value={org.name} onChange={(e) => set({ name: e.target.value })} placeholder="Grupo XYZ" maxLength={80} autoFocus />}
           </FormField>
           <FormGrid>

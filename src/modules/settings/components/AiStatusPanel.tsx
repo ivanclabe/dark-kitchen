@@ -1,25 +1,25 @@
 import { useAiConnectionStatus } from '@/modules/ai/hooks/useAi'
-import { orgKey } from '@/modules/organization/hooks/useOrganization'
-import { fetchFeatureMatrix } from '@/shared/features/features'
-import { useOrgAdmin } from '@/shared/org/orgContext'
+import { useAccountFeatureMatrix } from '@/modules/organization/hooks/useAccountFeatures'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { typography } from '@/shared/ui/typography'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { CheckCircle2, Gauge, KeyRound, ShieldCheck } from 'lucide-react'
-import { fetchOrgAiUsage } from '../api'
+import { fetchAccountAiUsage } from '../api'
 
 /**
- * Read-only state of AI for the organization (ADR 0018): whether the platform
- * connected it, the principle the features follow, and the plan limits.
- * Models, providers and costs are managed by the platform.
+ * Read-only state of AI in the active account (ADR 0018, ADR 0024): whether
+ * the platform connected it, the principle the features follow, and the plan
+ * limits. Models, providers and costs are managed by the platform.
  */
-export function OrgAiStatusPanel() {
-  const { organization } = useOrgAdmin()
+export function AiStatusPanel() {
+  const { kitchen } = useActiveKitchen()
   const connection = useAiConnectionStatus()
-  const matrix = useQuery({ queryKey: [...orgKey(organization.id), 'features'], queryFn: () => fetchFeatureMatrix(organization.id) })
-  const usage = useQuery({ queryKey: ['org', organization.id, 'ai-usage'], queryFn: () => fetchOrgAiUsage(organization.id) })
+  const matrix = useAccountFeatureMatrix(kitchen.id)
+  const usage = useQuery({ queryKey: ['account', kitchen.id, 'ai-usage'], queryFn: () => fetchAccountAiUsage() })
   const configured = connection.data?.configured === true
-  const offered = matrix.data?.features.filter((f) => f.category === 'ai' && f.available).length ?? 0
+  const account = matrix.data?.accounts.find((a) => a.id === kitchen.id)
+  const active = matrix.data?.features.filter((f) => f.category === 'ai' && f.available && account?.enabled[f.key]).length ?? 0
   const included = matrix.data?.features.filter((f) => f.category === 'ai' && f.includedInPlan).length ?? 0
 
   return (
@@ -44,7 +44,7 @@ export function OrgAiStatusPanel() {
         title={matrix.data?.plan ? `Plan ${matrix.data.plan.name}` : 'Plan'}
         body={
           usage.data
-            ? `Hasta ${usage.data.dailyLimit} análisis de IA al día por cuenta. Ofreces ${offered} de ${included} funciones de IA que incluye tu plan.`
+            ? `Hasta ${usage.data.dailyLimit} análisis de IA al día en esta cuenta. Tiene activas ${active} de ${included} funciones de IA que incluye tu plan.`
             : 'Límites del plan para los análisis de IA.'
         }
       />

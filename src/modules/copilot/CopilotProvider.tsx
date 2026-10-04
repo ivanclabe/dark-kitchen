@@ -160,64 +160,20 @@ function CopilotPanel({
   }
 
   return (
-    <Drawer open onClose={onClose} title="Quanela Copilot" subtitle={`Responde con los datos de ${accountName} y lo que tu rol puede ver.`} size="md">
-      <div className="flex min-h-[60vh] flex-col gap-4">
-        <div className="flex-1 space-y-4">
-          {messages.length === 0 && (
-            <div className="space-y-3">
-              <p className="flex items-center gap-2 text-sm text-neutral-300">
-                <Sparkles size={15} className="text-brasa-400" aria-hidden /> Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, entregas o turnos.
-              </p>
-              <div className="flex flex-col gap-2">
-                {suggestions.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => onSend(s)}
-                    className="rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-left text-sm text-neutral-200 transition-colors hover:border-brasa-500/50 hover:bg-neutral-900"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {messages.map((m, i) =>
-            m.role === 'user' ? (
-              <div key={i} className="ml-8 rounded-2xl rounded-br-md bg-brasa-500/15 px-3.5 py-2 text-sm text-neutral-100">
-                {m.content}
-              </div>
-            ) : (
-              <div key={i} className={clsx('space-y-2', m.error && 'rounded-xl border border-red-500/30 bg-red-500/5 p-3')}>
-                {m.error ? <p className="text-sm text-red-300">{m.content}</p> : <CopilotMarkdown text={m.content} onLink={onClose} />}
-                <div className="flex flex-wrap items-center gap-2">
-                  {m.steps?.map((s, j) => (
-                    <span key={j} className={clsx('rounded-full px-2 py-0.5 text-[10px]', s.ok ? 'bg-neutral-800 text-neutral-400' : 'bg-red-500/10 text-red-300')}>
-                      {s.label}
-                    </span>
-                  ))}
-                  {!m.error && <CopyButton text={m.content} />}
-                </div>
-              </div>
-            ),
-          )}
-
-          {pending && (
-            <p role="status" className="flex items-center gap-2 text-sm text-neutral-400">
-              <Loader2 size={14} className="animate-spin" aria-hidden /> Consultando los datos…
-            </p>
-          )}
-          <div ref={endRef} />
-        </div>
-
-        <div className="sticky bottom-0 space-y-2 bg-neutral-950 pt-2">
+    <Drawer
+      open
+      onClose={onClose}
+      title="Quanela Copilot"
+      subtitle={`Responde con los datos de ${accountName} y lo que tu rol puede ver.`}
+      size="md"
+      footer={
+        <>
           <form
             onSubmit={(e) => {
               e.preventDefault()
               onSend(draft)
             }}
-            className="flex items-end gap-2 rounded-2xl border border-neutral-800 bg-neutral-900 p-2 focus-within:border-brasa-500/60"
+            className="flex items-end gap-2 rounded-2xl border border-neutral-700/70 bg-neutral-950 p-2 transition-colors focus-within:border-brasa-500/60"
           >
             <textarea
               value={draft}
@@ -228,18 +184,18 @@ function CopilotPanel({
               autoFocus
               placeholder="Escribe tu pregunta…"
               aria-label="Pregunta para Copilot"
-              className="min-h-10 flex-1 resize-none bg-transparent px-1.5 py-1 text-sm text-neutral-100 placeholder:text-neutral-600 focus:outline-none"
+              className="min-h-10 flex-1 resize-none bg-transparent px-1.5 py-1 text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
             />
             <button
               type="submit"
               disabled={!draft.trim() || pending}
               aria-label="Enviar"
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-brasa-500 text-white transition-colors hover:bg-brasa-400 disabled:opacity-40"
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-brasa-500 text-white transition-colors hover:bg-brasa-400 disabled:bg-neutral-800 disabled:text-neutral-500"
             >
               <ArrowUp size={16} aria-hidden />
             </button>
           </form>
-          <div className="flex items-center justify-between text-[11px] text-neutral-600">
+          <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-500">
             <span>Solo lectura · Ctrl/⌘ + J{remaining != null ? ` · ${remaining} consultas de IA hoy` : ''}</span>
             {messages.length > 0 && (
               <button type="button" onClick={onReset} className="inline-flex items-center gap-1 hover:text-neutral-300">
@@ -247,7 +203,56 @@ function CopilotPanel({
               </button>
             )}
           </div>
-        </div>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        {messages.length === 0 && (
+          <div className="space-y-3">
+            <p className="flex items-start gap-2 text-sm text-neutral-300">
+              <Sparkles size={15} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden /> Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, entregas o turnos.
+            </p>
+            <div className="flex flex-col gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => onSend(s)}
+                  className="rounded-xl border border-neutral-800 bg-neutral-950/40 px-3 py-2 text-left text-sm text-neutral-200 transition-colors hover:border-brasa-500/50 hover:bg-neutral-800/60"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {messages.map((m, i) =>
+          m.role === 'user' ? (
+            <div key={i} className="ml-8 rounded-2xl rounded-br-md bg-brasa-500/15 px-3.5 py-2 text-sm text-neutral-100">
+              {m.content}
+            </div>
+          ) : (
+            <div key={i} className={clsx('space-y-2', m.error && 'rounded-xl border border-red-500/30 bg-red-500/5 p-3')}>
+              {m.error ? <p className="text-sm text-red-300">{m.content}</p> : <CopilotMarkdown text={m.content} onLink={onClose} />}
+              <div className="flex flex-wrap items-center gap-2">
+                {m.steps?.map((s, j) => (
+                  <span key={j} className={clsx('rounded-full px-2 py-0.5 text-[10px]', s.ok ? 'bg-neutral-800 text-neutral-400' : 'bg-red-500/10 text-red-300')}>
+                    {s.label}
+                  </span>
+                ))}
+                {!m.error && <CopyButton text={m.content} />}
+              </div>
+            </div>
+          ),
+        )}
+
+        {pending && (
+          <p role="status" className="flex items-center gap-2 text-sm text-neutral-400">
+            <Loader2 size={14} className="animate-spin" aria-hidden /> Consultando los datos…
+          </p>
+        )}
+        <div ref={endRef} />
       </div>
     </Drawer>
   )

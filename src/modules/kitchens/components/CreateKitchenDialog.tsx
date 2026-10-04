@@ -55,7 +55,7 @@ export function CreateKitchenDialog({
   const effectiveIcon = icon ?? suggestAccountIcon(name)
   const effectiveSlug = slugTouched ? slug : slugify(name)
   const nameError = name.trim().length >= 2 ? null : 'Mínimo 2 caracteres'
-  const error = nameError ?? slugError(effectiveSlug) ?? (targetOrg ? null : 'Elige la organización')
+  const error = nameError ?? slugError(effectiveSlug) ?? (targetOrg ? null : 'Elige el negocio')
 
   const create = useMutation({
     mutationFn: () => createKitchen(name.trim(), effectiveSlug, targetOrg, effectiveIcon),
@@ -94,7 +94,7 @@ export function CreateKitchenDialog({
     >
       <form id="create-kitchen-form" onSubmit={handleSubmit} className="space-y-4">
         {!organizationId && (
-          <FormField label="Organización" required hint="La cuenta usa el plan y los límites de esa organización.">
+          <FormField label="Negocio" required hint="La cuenta usa el plan y los límites de ese negocio.">
             {(a11y) => (
               <Select {...a11y} value={chosenOrg} onChange={(e) => setChosenOrg(e.target.value)} disabled={organizations.isLoading}>
                 <option value="">Elegir…</option>

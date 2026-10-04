@@ -1,12 +1,12 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { BarChart3, CalendarClock, ChefHat, ClipboardList, LayoutDashboard, Soup, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarClock, ChefHat, ClipboardList, LayoutDashboard, Settings, Soup, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
  * navegación): cada entrada apunta a su ruta "principal" pero se resalta en
  * cualquiera de `matchPrefixes`. Es visible si el rol activo tiene acceso a
- * AL MENOS UNO de `modules`. Usuarios y permisos, Configuración y Mi perfil
- * viven en el menú de usuario (ADR 0008).
+ * AL MENOS UNO de `modules`. Usuarios y Configuración van aparte, debajo
+ * (ADMIN_NAV_ITEMS); Mi perfil vive en el menú de usuario (ADR 0008).
  */
 export interface NavItem {
   to: string
@@ -68,10 +68,20 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/reports', label: 'Reportes', description: 'Ventas, compras y rentabilidad', modules: ['reports'], icon: BarChart3 },
 ]
 
-/** Secciones fuera del rail que también exigen un módulo. */
-const EXTRA_SECTIONS: { prefix: string; modules: ModuleKey[] }[] = [
-  { prefix: '/settings', modules: ['settings'] },
-  { prefix: '/users', modules: ['users'] },
+/**
+ * Administration of the account (ADR 0024), below a divider in the rail:
+ * Usuarios (Usuarios · Roles y permisos) and Configuración (General ·
+ * Facturación · IA y voz · Integraciones · Actividad). Always this account.
+ */
+export const ADMIN_NAV_ITEMS: NavItem[] = [
+  { to: '/users', label: 'Usuarios', description: 'Usuarios, roles y permisos de esta cuenta', modules: ['users'], icon: UserCog },
+  {
+    to: '/settings',
+    label: 'Configuración',
+    description: 'General, facturación, IA y voz, integraciones y actividad',
+    modules: ['settings'],
+    icon: Settings,
+  },
 ]
 
 const matches = (section: string, prefix: string) => section === prefix || section.startsWith(`${prefix}/`)
@@ -92,8 +102,8 @@ export function isSectionAllowed(section: string, can: Can): boolean {
   if (section === '/') return true
   const item = NAV_ITEMS.find((i) => isNavItemActive(section, i))
   if (item) return canAccessAnyModule(can, item.modules)
-  const extra = EXTRA_SECTIONS.find((e) => matches(section, e.prefix))
-  return extra ? canAccessAnyModule(can, extra.modules) : true
+  const admin = ADMIN_NAV_ITEMS.find((i) => isNavItemActive(section, i))
+  return admin ? canAccessAnyModule(can, admin.modules) : true
 }
 
 /**

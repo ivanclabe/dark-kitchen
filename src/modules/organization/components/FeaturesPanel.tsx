@@ -1,71 +1,60 @@
-import { AccountIcon } from '@/shared/avatars/Avatar'
 import {
   FEATURE_CATEGORY_LABEL,
-  fetchFeatureMatrix,
-  setKitchenFeature,
-  setOrganizationFeature,
+  setAccountFeature,
+  type AccountFeatureMatrix,
   type FeatureCategory,
   type FeatureKey,
-  type FeatureMatrix,
 } from '@/shared/features/features'
 import { FEATURES_KEY } from '@/shared/kitchen/activeKitchenContext'
 import { Badge } from '@/shared/ui/Badge'
-import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Lock, Mic, Sparkles, Store, Workflow } from 'lucide-react'
-import { orgKey } from '../hooks/useOrganization'
+import { accountFeaturesKey, useAccountFeatureMatrix } from '../hooks/useAccountFeatures'
 import { FeatureSettingsSection } from './FeatureSettings'
 
 const CATEGORY_ICON: Record<FeatureCategory, typeof Sparkles> = { ai: Sparkles, voice: Mic, general: Store }
 
 /**
- * Funciones de la organización (ADR 0009, 3.2). Arriba de cada función, si la
- * organización la ofrece; debajo, en qué Cuentas está activada. La
- * organización es el techo: lo que no ofrece queda apagado en todas sus
- * Cuentas (la base lo exige), y lo que cada Cuenta había elegido se conserva.
+ * Functions of the active account (ADR 0009, ADR 0018, ADR 0024): one switch
+ * per feature for THIS account and its settings. Switching it on here never
+ * switches it on in another account (the database guarantees it). Settings
+ * can apply to all your accounts or only to this one.
  */
-export function FeaturesPanel({ organizationId }: { organizationId: string }) {
+export function FeaturesPanel({ organizationId, accountId }: { organizationId: string; accountId: string }) {
   const queryClient = useQueryClient()
   const { show } = useToast()
-  const matrixKey = [...orgKey(organizationId), 'features'] as const
-  const { data, isLoading, isError, error, refetch } = useQuery({ queryKey: matrixKey, queryFn: () => fetchFeatureMatrix(organizationId) })
+  const { data, isLoading, isError, error, refetch } = useAccountFeatureMatrix(accountId)
 
   async function refresh() {
-    await queryClient.invalidateQueries({ queryKey: matrixKey })
+    await queryClient.invalidateQueries({ queryKey: accountFeaturesKey(accountId) })
     await queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
   }
 
-  const setAvailable = useMutation({
-    mutationFn: ({ key, available }: { key: FeatureKey; available: boolean }) => setOrganizationFeature(organizationId, key, available),
-    onSuccess: refresh,
-    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
-  })
   const setEnabled = useMutation({
-    mutationFn: ({ accountId, key, enabled }: { accountId: string; key: FeatureKey; enabled: boolean }) => setKitchenFeature(accountId, key, enabled),
+    mutationFn: ({ key, enabled }: { key: FeatureKey; enabled: boolean }) => setAccountFeature(key, enabled),
     onSuccess: refresh,
     onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
   })
 
   if (isLoading) return <LoadingState variant="block" />
   if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />
+  const account = data.accounts.find((a) => a.id === accountId)
+  if (!account) return <ErrorState error={new Error('No se encontró esta cuenta')} onRetry={() => void refetch()} />
 
   const categories = (['ai', 'voice', 'general'] as const).filter((c) => data.features.some((f) => f.category === c))
-  const pending = setAvailable.isPending || setEnabled.isPending
 
   return (
     <div className="space-y-8">
       <p className={typography.small}>
-        Decide qué funciones ofrece tu organización{data.plan ? ` (plan ${data.plan.name})` : ''}, en qué cuentas están activadas y cómo se comportan. Toda la IA se configura aquí;
-        si una cuenta necesita otros valores, agrégale una excepción en «Ajustes».
+        Decide qué funciones usa esta cuenta{data.plan ? ` (plan ${data.plan.name})` : ''} y cómo se comportan. Activar una función aquí no la activa en tus otras cuentas.
       </p>
-      {data.accounts.length === 0 && <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea una cuenta para activar funciones en ella." compact />}
       {categories.map((category) => {
         const Icon = CATEGORY_ICON[category]
         return (
@@ -80,12 +69,12 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
                   <FeatureCard
                     key={f.key}
                     feature={f}
-                    accounts={data.accounts}
+                    account={account}
+                    accountCount={data.accountCount}
                     organizationId={organizationId}
                     onChanged={refresh}
-                    disabled={pending}
-                    onAvailable={(available) => setAvailable.mutate({ key: f.key, available })}
-                    onEnabled={(accountId, enabled) => setEnabled.mutate({ accountId, key: f.key, enabled })}
+                    disabled={setEnabled.isPending}
+                    onEnabled={(enabled) => setEnabled.mutate({ key: f.key, enabled })}
                   />
                 ))}
             </div>
@@ -98,25 +87,25 @@ export function FeaturesPanel({ organizationId }: { organizationId: string }) {
 
 function FeatureCard({
   feature,
-  accounts,
+  account,
+  accountCount,
   organizationId,
   onChanged,
   disabled,
-  onAvailable,
   onEnabled,
 }: {
-  feature: FeatureMatrix['features'][number]
-  accounts: FeatureMatrix['accounts']
+  feature: AccountFeatureMatrix['features'][number]
+  account: AccountFeatureMatrix['accounts'][number]
+  accountCount: number
   organizationId: string
   onChanged: () => Promise<unknown>
   disabled: boolean
-  onAvailable: (available: boolean) => void
-  onEnabled: (accountId: string, enabled: boolean) => void
+  onEnabled: (enabled: boolean) => void
 }) {
-  const activeIn = accounts.filter((a) => a.enabled[feature.key]).length
+  const on = feature.available && account.enabled[feature.key] === true
   const platformOff = !feature.platformActive
   return (
-    <article className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', feature.available ? 'border-brasa-500/30' : 'border-neutral-800/60', platformOff && 'opacity-70')}>
+    <article className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', on ? 'border-brasa-500/30' : 'border-neutral-800/60', platformOff && 'opacity-70')}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -148,11 +137,11 @@ function FeatureCard({
             </Badge>
           ) : feature.includedInPlan ? (
             <>
-              <Switch checked={feature.available} onChange={onAvailable} label={`Ofrecer ${feature.label} en la organización`} disabled={disabled} />
-              <span className="text-[11px] text-neutral-500">{feature.available ? 'Disponible' : 'No disponible'}</span>
+              <Switch checked={on} onChange={onEnabled} label={`${feature.label} en esta cuenta`} disabled={disabled} />
+              <span className="text-[11px] text-neutral-500">{on ? 'Activa' : 'Apagada'}</span>
             </>
           ) : (
-            // El plan no la incluye: no se puede ofrecer (la base lo exige igual).
+            // The plan does not include it: it cannot be switched on (the database refuses it too).
             <Badge tone="neutral" size="sm" icon={Lock}>
               {feature.minPlan ? `Incluida en ${feature.minPlan}` : 'No incluida en tu plan'}
             </Badge>
@@ -160,39 +149,8 @@ function FeatureCard({
         </div>
       </div>
 
-      {accounts.length > 0 && (
-        <div className="space-y-2 border-t border-neutral-800/60 pt-3">
-          <p className="text-xs text-neutral-500">
-            {platformOff
-              ? 'La plataforma la apagó para todos. Lo que cada cuenta tenía se conserva y vuelve cuando la reactive.'
-              : feature.available
-              ? `Activada en ${activeIn} de ${accounts.length} ${accounts.length === 1 ? 'cuenta' : 'cuentas'}`
-              : feature.includedInPlan
-                ? 'Apagada en todas las cuentas mientras no esté disponible.'
-                : 'Tu plan no la incluye: apagada en todas las cuentas.'}
-          </p>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {accounts.map((a) => {
-              const enabled = a.enabled[feature.key]
-              return (
-                <li key={a.id} className={clsx('flex items-center gap-2.5 rounded-xl border border-neutral-800/60 px-3 py-2', !feature.available && 'opacity-60')}>
-                  <AccountIcon iconKey={a.iconKey} seed={a.id} size="xs" className={a.active ? undefined : 'opacity-50'} />
-                  <span className={clsx('min-w-0 flex-1 truncate text-sm', feature.available && enabled ? 'text-neutral-100' : 'text-neutral-500')}>{a.name}</span>
-                  <Switch
-                    checked={enabled}
-                    onChange={(value) => onEnabled(a.id, value)}
-                    label={`${feature.label} en ${a.name}`}
-                    disabled={disabled || platformOff || (!feature.available && !enabled)}
-                  />
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
-
       {feature.platformActive && feature.includedInPlan && (
-        <FeatureSettingsSection organizationId={organizationId} feature={feature} accounts={accounts} canEdit onChanged={onChanged} />
+        <FeatureSettingsSection organizationId={organizationId} feature={feature} account={account} accountCount={accountCount} canEdit onChanged={onChanged} />
       )}
     </article>
   )

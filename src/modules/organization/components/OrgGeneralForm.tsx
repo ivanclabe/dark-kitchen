@@ -11,7 +11,7 @@ import { updateOrganization, type OrganizationDetails, type OrganizationInput } 
 import { orgKey } from '../hooks/useOrganization'
 import { CATEGORIES, COUNTRIES, SECTORS } from '../lib/business'
 
-/** Datos del negocio (nivel organización, ADR 0012): nombre, sector, legales, moneda por defecto. */
+/** Datos del negocio (ADR 0012, ADR 0024): nombre, sector, legales y moneda por defecto. Aplican a todas tus cuentas. */
 export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
   const queryClient = useQueryClient()
   const { show } = useToast()
@@ -39,7 +39,7 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
       await queryClient.invalidateQueries({ queryKey: orgKey(org.id) })
       await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
       setEdited(null)
-      show('Datos de la organización guardados.')
+      show('Datos del negocio guardados.')
     },
     onError: (err) => show(getErrorMessage(err, 'No se pudieron guardar los datos'), 'error'),
   })
@@ -51,7 +51,7 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
 
   return (
     <form onSubmit={onSubmit} className="max-w-3xl space-y-5">
-      <Card title="Tu negocio" description="Así se identifica tu organización en Quanela" icon={Building2}>
+      <Card title="Identidad del negocio" description="Así se identifica tu negocio en Quanela" icon={Building2}>
         <FormGrid>
           <FormField label="Nombre" required error={edited ? nameError : null}>
             {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} />}

@@ -3,7 +3,7 @@ import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
 import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
-import { MenuPlannerPage } from '@/modules/menuPlanner/pages/MenuPlannerPage'
+import { CatalogPage } from '@/modules/menuPlanner/pages/CatalogPage'
 import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
@@ -12,21 +12,15 @@ import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
 import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
 import { StaffPage } from '@/modules/staff/pages/StaffPage'
 import { UsersAndPermissionsPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
-import { OrgAdminLayout } from '@/modules/orgAdmin/OrgAdminLayout'
-import { OrgAccountsPage } from '@/modules/orgAdmin/pages/OrgAccountsPage'
-import { OrgBillingPage } from '@/modules/orgAdmin/pages/OrgBillingPage'
-import { OrgMasterMenusPage } from '@/modules/orgAdmin/pages/OrgMasterMenusPage'
-import { OrgObservabilityPage } from '@/modules/orgAdmin/pages/OrgObservabilityPage'
-import { OrgOverviewPage } from '@/modules/orgAdmin/pages/OrgOverviewPage'
-import { OrgAiPage } from '@/modules/orgAdmin/pages/OrgAiPage'
-import { OrgSettingsPage } from '@/modules/orgAdmin/pages/OrgSettingsPage'
-import { OrgTeamPage } from '@/modules/orgAdmin/pages/OrgTeamPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
 import { SignUpConfirmedPage } from '@/modules/signup/pages/SignUpConfirmedPage'
 import { ProfilePage } from '@/modules/profile/pages/ProfilePage'
 import { KitchenSelectorPage } from '@/modules/kitchens/pages/KitchenSelectorPage'
-import { FeaturesSettingsPage } from '@/modules/settings/pages/FeaturesSettingsPage'
+import { ActivitySettingsPage } from '@/modules/settings/pages/ActivitySettingsPage'
+import { AiSettingsPage } from '@/modules/settings/pages/AiSettingsPage'
+import { BillingSettingsPage } from '@/modules/settings/pages/BillingSettingsPage'
+import { IntegrationsSettingsPage } from '@/modules/settings/pages/IntegrationsSettingsPage'
 import { KitchenGeneralPage } from '@/modules/settings/pages/KitchenGeneralPage'
 import { SettingsLayout } from '@/modules/settings/pages/SettingsLayout'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -35,10 +29,8 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, useParams, type RouteObject } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { homeSection } from './navigation'
-import { KitchenEntryRedirect, LegacyKitchenRedirect } from './kitchenEntry'
+import { KitchenEntryRedirect, LegacyKitchenRedirect, LegacyOrgRedirect } from './kitchenEntry'
 import { KitchenScope } from './KitchenScope'
-import { OrgScope } from './OrgScope'
-import { OrgSettingsRedirect } from './orgRedirects'
 import { ProtectedRoute } from './ProtectedRoute'
 
 /** Redirección a una sección de la Cocina activa (las rutas viejas de dentro de la app). */
@@ -112,31 +104,15 @@ const routes: RouteObject[] = [
   // La plataforma se administra en el portal Global Admin (admin.quanela.com, ADR 0019).
   { path: '/admin/*', element: <Navigate to="/" replace /> },
 
-  // Centro de administración de la organización (ADR 0012): /o/{organización}/…
-  // Sin Cuenta activa; cada sección exige su permiso de organización.
+  // The organization's administration center (ADR 0012) no longer exists (ADR 0024):
+  // its old addresses go to their equivalent inside an account.
   {
-    path: '/o/:orgSlug',
+    path: '/o/:orgSlug/*',
     element: (
       <ProtectedRoute>
-        <OrgScope />
+        <LegacyOrgRedirect />
       </ProtectedRoute>
     ),
-    children: [
-      {
-        element: <OrgAdminLayout />,
-        children: [
-          { index: true, element: <OrgOverviewPage /> },
-          { path: 'cuentas', element: <OrgAccountsPage /> },
-          { path: 'observabilidad', element: <OrgObservabilityPage /> },
-          { path: 'equipos', element: <OrgTeamPage /> },
-          { path: 'facturacion', element: <OrgBillingPage /> },
-          { path: 'ai', element: <OrgAiPage /> },
-          { path: 'configuracion', element: <OrgSettingsPage /> },
-          { path: 'menus-maestros', element: <OrgMasterMenusPage /> },
-          { path: '*', element: <Navigate to=".." replace /> },
-        ],
-      },
-    ],
   },
 
   // Toda la app vive dentro de una Cocina (ADR 0007): /k/{slug}/…
@@ -161,8 +137,8 @@ const routes: RouteObject[] = [
           { path: 'delivery', element: <KitchenRedirect to="/orders?view=dispatch" /> },
           // Cocina — una vista especializada de esos pedidos: la pantalla de preparación.
           { path: 'kitchen', element: <KitchenPage /> },
-          // Catálogo — Planificador de Menús: platos, calendario y recetas.
-          { path: 'menu-planner', element: <MenuPlannerPage /> },
+          // Catálogo — Planificador de Menús: platos, calendario y recetas; ?view=shared, los platos compartidos (ADR 0024).
+          { path: 'menu-planner', element: <CatalogPage /> },
           { path: 'recipes/:productId', element: <RecipeEditorPage /> },
           // Abastecimiento — Stock, Compras y Proveedores. La vista y el elemento seleccionado viven en la URL.
           { path: 'supply', element: <SupplyPage /> },
@@ -182,19 +158,20 @@ const routes: RouteObject[] = [
           { path: 'reports', element: <Suspense fallback={loading}><ReportsPage /></Suspense> },
           // Mi perfil: nombre, avatar y contraseña de la persona (ADR 0008, Fase A).
           { path: 'perfil', element: <ProfilePage /> },
-          // Usuarios y permisos (toda la organización para el SUPER_ADMIN; su Cuenta para el Administrador).
+          // Usuarios: Usuarios · Roles y permisos, always of this account (ADR 0024).
           { path: 'users', element: <UsersAndPermissionsPage /> },
-          // Configuración de la organización (SUPER_ADMIN).
-          { path: 'organizacion', element: <OrgSettingsRedirect /> },
-          // Configuración de la Cuenta: datos generales y funciones (IA, voz; ADR 0009).
+          // Old address of the organization settings.
+          { path: 'organizacion', element: <KitchenRedirect to="/settings/general" /> },
+          // Configuración of the account (ADR 0024): General, Facturación, IA y voz, Integraciones, Actividad.
           {
             path: 'settings',
             element: <SettingsLayout />,
             children: [
               { path: 'general', element: <KitchenGeneralPage /> },
-              { path: 'features', element: <FeaturesSettingsPage /> },
-              // Dirección anterior de la pestaña de IA.
-              { path: 'ai', element: <Navigate to="../features" replace /> },
+              { path: 'billing', element: <BillingSettingsPage /> },
+              { path: 'ai', element: <AiSettingsPage /> },
+              { path: 'integrations', element: <IntegrationsSettingsPage /> },
+              { path: 'activity', element: <ActivitySettingsPage /> },
             ],
           },
           { path: '*', element: <KitchenRedirect to="/" /> },

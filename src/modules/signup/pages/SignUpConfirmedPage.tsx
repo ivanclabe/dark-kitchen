@@ -83,7 +83,7 @@ export function SignUpConfirmedPage() {
         <div className="w-full max-w-md space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
           <CheckCircle2 size={28} className="mx-auto text-emerald-400" aria-hidden />
           <div>
-            <h1 className={typography.h2}>Tu organización ha sido creada</h1>
+            <h1 className={typography.h2}>Tu cuenta ha sido creada</h1>
             <p className={`mt-1 ${typography.small}`}>{created.orgName} tiene su propia dirección. Guárdala: tu equipo entra por ahí.</p>
           </div>
           <p className="text-sm text-neutral-400">
@@ -167,7 +167,7 @@ export function SignUpConfirmedPage() {
           <>
             <Loader2 size={24} className="mx-auto animate-spin text-brasa-400" aria-hidden />
             <p className="font-medium">Preparando {pending.accountName ?? pending.name}…</p>
-            <p className={typography.small}>Estamos creando tu organización, tu plan y tu primera cuenta.</p>
+            <p className={typography.small}>Estamos creando tu espacio, tu plan y tu primera cuenta.</p>
           </>
         )}
       </div>

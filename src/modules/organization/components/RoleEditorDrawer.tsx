@@ -13,10 +13,10 @@ import { orgKey } from '../hooks/useOrganization'
 import { actionLabel, groupCatalog } from '../lib/permissionCatalog'
 
 /**
- * Crear, editar o duplicar un rol propio de la organización con su matriz de
+ * Crear, editar o duplicar un rol propio con su matriz de
  * permisos (catálogo central, ADR 0008). Las plantillas del sistema se ven en
  * solo lectura. Guardar reemplaza la matriz completa en una transacción. Un
- * rol propio sirve en todas las Cuentas de la organización.
+ * rol propio sirve en todas tus cuentas (ADR 0024).
  */
 export function RoleEditorDrawer({
   role,
@@ -90,7 +90,7 @@ export function RoleEditorDrawer({
   }
 
   return (
-    <Drawer open onClose={onClose} title={readOnly && role ? role.name : role ? `Editar ${role.name}` : 'Nuevo rol'} subtitle={role?.isSystem ? 'Plantilla del sistema: igual en toda la plataforma, no se edita (puedes duplicarla)' : readOnly ? 'Rol propio de la organización' : 'Rol propio de la organización: sirve en todas sus cuentas'}>
+    <Drawer open onClose={onClose} title={readOnly && role ? role.name : role ? `Editar ${role.name}` : 'Nuevo rol'} subtitle={role?.isSystem ? 'Plantilla del sistema: igual en toda la plataforma, no se edita (puedes duplicarla)' : readOnly ? 'Rol propio · Aplica a todas tus cuentas' : 'Rol propio: aplica a todas tus cuentas que lo usan'}>
       <form onSubmit={handleSubmit} className="space-y-5">
         {!readOnly && (
           <div className="grid gap-4 sm:grid-cols-2">

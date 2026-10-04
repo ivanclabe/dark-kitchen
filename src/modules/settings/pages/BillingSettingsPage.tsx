@@ -1,15 +1,14 @@
 import { PlanPanel } from '@/modules/organization/components/PlanPanel'
-import { useOrgAdmin } from '@/shared/org/orgContext'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { typography } from '@/shared/ui/typography'
 import { formatDate, formatMoney } from '@/shared/utils/format'
 import { useQuery } from '@tanstack/react-query'
-import { CreditCard, FileText, Wallet } from 'lucide-react'
+import { FileText, Wallet } from 'lucide-react'
 import { fetchInvoices, type Invoice } from '../api'
 
 const INVOICE_STATUS: Record<Invoice['status'], { label: string; tone: 'success' | 'warning' | 'neutral' | 'danger' }> = {
@@ -21,18 +20,23 @@ const INVOICE_STATUS: Record<Invoice['status'], { label: string; tone: 'success'
 }
 
 /**
- * Facturación (ADR 0012, sección 7): el plan es de la organización. Muestra
- * solo datos reales; facturas y métodos de pago quedan listos para cuando se
- * conecte un proveedor de pagos (hoy no se inventa nada).
+ * Facturación (ADR 0012, sección 7; ADR 0024): one plan covers all your
+ * accounts. Only real data; invoices and payment methods are ready for when a
+ * payment provider is connected (nothing is made up today).
  */
-export function OrgBillingPage() {
-  const { organization } = useOrgAdmin()
-  const invoices = useQuery({ queryKey: ['org', organization.id, 'invoices'], queryFn: () => fetchInvoices(organization.id) })
+export function BillingSettingsPage() {
+  const { organization } = useActiveKitchen()
+  if (!organization) return null
+  return <Billing organizationId={organization.id} />
+}
+
+function Billing({ organizationId }: { organizationId: string }) {
+  const invoices = useQuery({ queryKey: ['org', organizationId, 'invoices'], queryFn: () => fetchInvoices(organizationId) })
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Facturación" icon={CreditCard} description={`Plan, límites y uso de ${organization.name}.`} />
-      <PlanPanel organizationId={organization.id} />
+      <p className={typography.small}>Tu plan aplica a todas tus cuentas.</p>
+      <PlanPanel organizationId={organizationId} />
 
       <div className="grid max-w-4xl gap-4 lg:grid-cols-2">
         <Card title="Facturas" icon={FileText}>

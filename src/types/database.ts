@@ -3375,11 +3375,37 @@ export type Database = {
     }
     Functions: {
       dk_accept_activation: { Args: { p_token: string }; Returns: string }
+      dk_account_ai_usage: { Args: { p_days?: number }; Returns: Json }
+      dk_account_alerts: { Args: never; Returns: Json }
+      dk_account_events: {
+        Args: {
+          p_actor?: string
+          p_before_at?: string
+          p_before_id?: string
+          p_category?: string
+          p_from?: string
+          p_limit?: number
+          p_search?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
+      dk_account_feature_matrix: { Args: never; Returns: Json }
       dk_account_observability: {
         Args: { p_kitchen_id: string; p_organization_id: string }
         Returns: Json
       }
+      dk_account_remove_member: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      dk_account_role_usage: { Args: never; Returns: Json }
+      dk_account_set_feature: {
+        Args: { p_enabled: boolean; p_key: string }
+        Returns: undefined
+      }
       dk_account_tz: { Args: never; Returns: string }
+      dk_account_users: { Args: never; Returns: Json }
       dk_activation_preview: {
         Args: { p_token: string }
         Returns: {

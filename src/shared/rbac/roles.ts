@@ -40,8 +40,8 @@ const MODULE_PERMISSIONS: Record<ModuleKey, readonly AccountPermission[]> = {
   kitchen: ['kitchen.view'],
   customers: ['customers.view'],
   reports: ['reports.view'],
-  // Configuración de la Cuenta (datos generales, IA).
-  settings: ['settings.manage', 'ai.manage'],
+  // Configuración de la Cuenta (datos generales, IA y voz, integraciones; Actividad con audit.view, ADR 0024).
+  settings: ['settings.manage', 'ai.manage', 'audit.view'],
   // Personal y Turnos (ADR 0020). Los turnos propios no exigen permiso: viven en el menú de usuario.
   staff: ['staff.view', 'staff.manage'],
 }

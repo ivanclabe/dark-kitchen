@@ -18,9 +18,9 @@ const input = {
 }
 
 describe('support diagnostics (ADR 0023)', () => {
-  it('locates the person: organization with code, account, role, screen, device, version', () => {
+  it('locates the person: business code, account, role, screen, device, version', () => {
     const text = diagnosticsText(diagnostics(input))
-    expect(text).toContain('Organización: Dark Kitchen · FR3RK6')
+    expect(text).toContain('Código: FR3RK6 · Dark Kitchen')
     expect(text).toContain('Cuenta: Brasa Centro (brasa-centro)')
     expect(text).toContain('Rol activo: Administrador')
     expect(text).toContain('Dispositivo: Chrome 128 · macOS')

@@ -1,4 +1,4 @@
-import { ActiveBadge, Badge } from '@/shared/ui/Badge'
+import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -12,7 +12,7 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { BookOpen, Layers, Link2, Link2Off, Pencil, Plus, Trash2 } from 'lucide-react'
+import { BookOpen, Layers, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import {
   assignMasterMenu,
@@ -51,8 +51,8 @@ function NewMenuDialog({ organizationId, onClose, onCreated }: { organizationId:
     <Modal
       open
       onClose={onClose}
-      title="Nuevo menú maestro"
-      description="Agrega sus platos y luego compártelo con las cuentas que quieras."
+      title="Nuevo menú compartido"
+      description="Agrega sus platos con receta y actívalo en esta cuenta. Luego puedes usarlo también en tus otras cuentas."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
@@ -76,7 +76,7 @@ function NewMenuDialog({ organizationId, onClose, onCreated }: { organizationId:
   )
 }
 
-function MenuDetail({ menu, kitchens }: { menu: MasterMenu; kitchens: MenuAccount[] }) {
+function MenuDetail({ menu, account }: { menu: MasterMenu; account: MenuAccount }) {
   const queryClient = useQueryClient()
   const { show } = useToast()
   const { data: products, isLoading } = useQuery({ queryKey: [...MASTER_KEY, 'products', menu.id], queryFn: () => listMasterProducts(menu.id) })
@@ -84,7 +84,6 @@ function MenuDetail({ menu, kitchens }: { menu: MasterMenu; kitchens: MenuAccoun
   const [editing, setEditing] = useState<{ product: MasterProduct | null } | null>(null)
   const [deletingProduct, setDeletingProduct] = useState<MasterProduct | null>(null)
   const [deletingMenu, setDeletingMenu] = useState(false)
-  const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const refresh = () => void queryClient.invalidateQueries({ queryKey: MASTER_KEY })
   const run = useMutation({
@@ -93,10 +92,8 @@ function MenuDetail({ menu, kitchens }: { menu: MasterMenu; kitchens: MenuAccoun
     onError: (err) => show(getErrorMessage(err, 'No se pudo completar la acción'), 'error'),
   })
 
-  const assigned = new Set(menu.kitchenIds)
-  const selectedIds = [...selected]
-  const toAssign = selectedIds.filter((id) => !assigned.has(id))
-  const toUnassign = selectedIds.filter((id) => assigned.has(id))
+  const here = menu.kitchenIds.includes(account.id)
+  const elsewhere = menu.kitchenIds.length - (here ? 1 : 0)
 
   return (
     <div className="space-y-5">
@@ -154,36 +151,32 @@ function MenuDetail({ menu, kitchens }: { menu: MasterMenu; kitchens: MenuAccoun
         )}
       </section>
 
-      <section className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className={typography.h3}>Cuentas que lo usan</p>
-          <div className="flex gap-2">
-            <Button size="sm" variant="primary" icon={Link2} disabled={!toAssign.length} loading={run.isPending} onClick={() => run.mutate(async () => { const n = await assignMasterMenu(menu.id, toAssign); show(`Menú compartido con ${n} ${n === 1 ? 'cuenta' : 'cuentas'}.`); setSelected(new Set()) })}>
-              Compartir ({toAssign.length})
-            </Button>
-            <Button size="sm" variant="danger" icon={Link2Off} disabled={!toUnassign.length} loading={run.isPending} onClick={() => run.mutate(async () => { const n = await unassignMasterMenu(menu.id, toUnassign); show(`Se dejó de compartir con ${n} ${n === 1 ? 'cuenta' : 'cuentas'}; sus platos quedan como locales desactivados.`); setSelected(new Set()) })}>
-              Dejar de compartir ({toUnassign.length})
-            </Button>
+      <section className="space-y-2 rounded-xl border border-neutral-800/60 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-neutral-100">Usar en {account.name}</p>
+            <p className={typography.caption}>
+              {here ? 'Sus platos están en el catálogo de esta cuenta.' : 'Al activarlo, sus platos se agregan al catálogo de esta cuenta.'}
+              {elsewhere > 0 && ` También lo ${elsewhere === 1 ? 'usa otra de tus cuentas' : `usan ${elsewhere} de tus otras cuentas`}: los cambios en sus platos aplican allí también.`}
+            </p>
           </div>
+          <Switch
+            checked={here}
+            disabled={run.isPending}
+            label={`Usar ${menu.name} en ${account.name}`}
+            onChange={(on) =>
+              run.mutate(async () => {
+                if (on) {
+                  await assignMasterMenu(menu.id, [account.id])
+                  show('Menú activado en esta cuenta.')
+                } else {
+                  await unassignMasterMenu(menu.id, [account.id])
+                  show('Menú quitado de esta cuenta; sus platos quedan como locales desactivados.')
+                }
+              })
+            }
+          />
         </div>
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {kitchens.map((k) => (
-            <li key={k.id}>
-              <label className={clsx('flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm', selected.has(k.id) ? 'border-brasa-500/50 bg-brasa-500/5' : 'border-neutral-800/60')}>
-                <span className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(k.id)}
-                    onChange={() => setSelected((prev) => { const next = new Set(prev); if (next.has(k.id)) next.delete(k.id); else next.add(k.id); return next })}
-                    className="size-4 accent-[var(--color-brasa-500)]"
-                  />
-                  <span className="text-neutral-100">{k.name}</span>
-                </span>
-                {assigned.has(k.id) ? <Badge tone="brand" size="sm" icon={Layers}>Lo usa</Badge> : <span className="text-xs text-neutral-600">No lo usa</span>}
-              </label>
-            </li>
-          ))}
-        </ul>
       </section>
 
       {editing && units && (
@@ -213,16 +206,21 @@ function MenuDetail({ menu, kitchens }: { menu: MasterMenu; kitchens: MenuAccoun
         onConfirm={() => run.mutate(async () => { await deleteMasterMenu(menu.id); setDeletingMenu(false) })}
         pending={run.isPending}
         danger
-        title="Eliminar menú maestro"
+        title="Eliminar menú compartido"
         confirmLabel="Sí, eliminar"
-        description={<p>Se elimina {menu.name}. En cada cuenta sus platos quedan como locales desactivados.</p>}
+        description={<p>Se elimina {menu.name}. Aplica a todas tus cuentas: en las que lo usan, sus platos quedan como locales desactivados.</p>}
       />
     </div>
   )
 }
 
-/** Menús maestros de la organización (SUPER_ADMIN): crear, editar platos y receta, y compartir con varias Cuentas a la vez. */
-export function MasterMenusPanel({ organizationId, kitchens }: { organizationId: string; kitchens: MenuAccount[] }) {
+/**
+ * Platos compartidos (ADR 0024, D4; master_menus.manage): menus with recipe
+ * kept in one place. From an account you create and edit them and decide
+ * whether THIS account uses them; nothing about the other accounts is shown
+ * beyond how many use each menu.
+ */
+export function MasterMenusPanel({ organizationId, account }: { organizationId: string; account: MenuAccount }) {
   const queryClient = useQueryClient()
   const { data: menus, isLoading, isError, error, refetch } = useQuery({ queryKey: [...MASTER_KEY, 'menus', organizationId], queryFn: () => listMasterMenus(organizationId) })
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -247,7 +245,7 @@ export function MasterMenusPanel({ organizationId, kitchens }: { organizationId:
           >
             <p className="font-medium text-neutral-100">{m.name}</p>
             <p className="text-xs text-neutral-500">
-              {m.productCount} platos · {m.kitchenIds.length} {m.kitchenIds.length === 1 ? 'cuenta' : 'cuentas'}
+              {m.productCount} platos · {m.kitchenIds.includes(account.id) ? 'en esta cuenta' : 'no está en esta cuenta'}
               {!m.active && ' · inactivo'}
             </p>
           </button>
@@ -255,9 +253,9 @@ export function MasterMenusPanel({ organizationId, kitchens }: { organizationId:
       </aside>
       <div className="min-w-0 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5">
         {selected ? (
-          <MenuDetail key={selected.id} menu={selected} kitchens={kitchens} />
+          <MenuDetail key={selected.id} menu={selected} account={account} />
         ) : (
-          <EmptyState icon={Layers} title="Todavía no hay menús maestros" description="Crea un menú, agrega sus platos con receta y compártelo con las cuentas que quieras." compact />
+          <EmptyState icon={Layers} title="Todavía no hay platos compartidos" description="Crea un menú, agrega sus platos con receta y actívalo en esta cuenta." compact />
         )}
       </div>
       {creating && (

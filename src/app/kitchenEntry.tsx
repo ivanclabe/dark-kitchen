@@ -1,12 +1,12 @@
 import { readLastKitchenSlug, setActiveKitchenId, setActiveRoleId } from '@/shared/kitchen/activeKitchen'
 import { kitchenPath, kitchensOf, useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import type { MyContext, MyKitchen } from '@/shared/kitchen/kitchensApi'
-import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
 import { hostRedirectFor } from '@/shared/tenant/navigation'
 import { useTenant } from '@/shared/tenant/tenantContext'
 import { useEffect } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, useLocation, useParams } from 'react-router-dom'
 import { FullScreenLoading } from './FullScreenLoading'
+import { accountPathForOrgSection } from './legacyOrgRoutes'
 
 /**
  * A qué Cuenta entrar sin que el usuario elija (ADR 0008, sección 8): la
@@ -28,7 +28,7 @@ export function defaultKitchen(ctx: MyContext, organizationId?: string | null): 
 /**
  * "/" con sesión: directo a la Cuenta por defecto o al selector.
  *   - En el subdominio de una organización: su Cuenta de esa organización
- *     (o su centro de administración si no tiene Cuentas).
+ *     (sin Cuentas, "Tus cuentas", donde puede crear la primera).
  *   - En la raíz (quanela.com): al subdominio de la organización de su
  *     Cuenta por defecto (ADR 0021); sin una clara, "Tus cuentas".
  */
@@ -44,7 +44,6 @@ export function KitchenEntryRedirect() {
 
   if (isLoading || !ctx || crossHost) return <FullScreenLoading />
   if (kitchen) return <Navigate to={kitchenPath(kitchen.slug, '/')} replace />
-  if (tenant.mode === 'tenant' && tenant.membership && canOpenAdminCenter(tenant.membership)) return <Navigate to={orgPath(tenant.membership.slug)} replace />
   return <Navigate to="/cuentas" replace />
 }
 
@@ -63,6 +62,23 @@ export function LegacyKitchenRedirect() {
   const kitchen = defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null)
   if (!kitchen) return <Navigate to="/cuentas" replace />
   return <Navigate to={`${kitchenPath(kitchen.slug, pathname)}${search}`} replace />
+}
+
+/**
+ * /o/{slug}/… (ADR 0012) ya no existe (ADR 0024): cada dirección va a su
+ * equivalente dentro de tu cuenta por defecto de ese negocio; sin una clara,
+ * a "Tus cuentas". El slug nunca autoriza: se busca entre las tuyas.
+ */
+export function LegacyOrgRedirect() {
+  const { orgSlug, '*': rest = '' } = useParams<{ orgSlug: string; '*': string }>()
+  const { search } = useLocation()
+  const { data: ctx, isLoading } = useMyContext()
+  if (isLoading || !ctx) return <FullScreenLoading />
+  const organization = ctx.organizations.find((o) => o.slug === orgSlug) ?? null
+  const kitchen = organization ? defaultKitchen(ctx, organization.id) : null
+  const target = accountPathForOrgSection(`${rest}${search}`)
+  if (!kitchen || target === null) return <Navigate to="/cuentas" replace />
+  return <Navigate to={kitchenPath(kitchen.slug, target)} replace />
 }
 
 /** Fuera de una Cuenta (selector, plataforma) ninguna petición debe llevar la anterior ni su rol. */

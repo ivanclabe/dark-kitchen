@@ -1,28 +1,31 @@
 import { clearActiveKitchen } from '@/app/kitchenEntry'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { kitchenPath, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
-import type { MyKitchen, MyOrganization } from '@/shared/kitchen/kitchensApi'
+import { setAccountsActive } from '@/modules/organization/api/organization'
+import { kitchenPath, MY_KITCHENS_KEY, useMyContext, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
+import type { MyKitchen } from '@/shared/kitchen/kitchensApi'
 import { AccountIcon } from '@/shared/avatars/Avatar'
-import { canOpenAdminCenter, orgPath } from '@/shared/org/orgContext'
-import { tenantHostLabel, tenantUrl } from '@/shared/tenant/host'
+import { tenantHostLabel } from '@/shared/tenant/host'
 import { useTenant } from '@/shared/tenant/tenantContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
+import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
+import { getErrorMessage } from '@/shared/utils/errors'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { ArrowRight, Building2, ChefHat, ExternalLink, Flame, LogOut, Plus, Store } from 'lucide-react'
+import { ArrowRight, ChefHat, ExternalLink, Flame, LogOut, Plus, Power, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
 
 /**
- * "Tus cuentas": después del login, cuando la persona tiene varias Cuentas
- * (o ninguna), y desde el menú para cambiar. Agrupadas por organización
- * cuando hay más de una. El SUPER_ADMIN además crea Cuentas en su
- * organización. Un solo login para todos: la Cuenta se elige aquí.
+ * "Tus cuentas" (ADR 0024): after login, when the person has several accounts
+ * (or none), and from the menu to switch. One flat list: accounts of another
+ * business open on their own subdomain (ADR 0021/0022) without the word
+ * "organización". Whoever may create accounts creates them here.
  */
 export function KitchenSelectorPage() {
   clearActiveKitchen()
@@ -32,19 +35,15 @@ export function KitchenSelectorPage() {
   const missingSlug = (location.state as { missingSlug?: string } | null)?.missingSlug
   const { data: ctx } = useMyContext()
   const { data: kitchens, isLoading, isError, error, refetch } = useMyKitchens()
-  const [creatingIn, setCreatingIn] = useState<MyOrganization | null>(null)
+  const [creating, setCreating] = useState(false)
 
   const tenant = useTenant()
-  const onTenant = tenant.mode === 'tenant'
-  // On an organization's subdomain, only its accounts; the others are links to their subdomains (ADR 0021).
-  const allOrganizations = ctx?.organizations ?? []
-  const organizations = onTenant ? allOrganizations.filter((o) => o.tenantCode === tenant.code) : allOrganizations
-  const otherOrganizations = onTenant ? allOrganizations.filter((o) => o.tenantCode !== tenant.code && o.status === 'active' && o.active) : []
-  const groups = organizations
-    .map((org) => ({ org, kitchens: (kitchens ?? []).filter((k) => k.organizationId === org.id) }))
-    .filter((g) => g.kitchens.length > 0 || g.org.permissions.includes('accounts.create'))
-  const showGroupTitles = groups.length > 1
-  const canCreateSomewhere = organizations.some((o) => o.permissions.includes('accounts.create'))
+  const organizations = ctx?.organizations ?? []
+  const here = tenant.mode === 'tenant' ? organizations.find((o) => o.tenantCode === tenant.code) ?? null : null
+  // The accounts of this subdomain first; the others open on their own subdomain.
+  const accounts = [...(kitchens ?? [])].sort((a, b) => Number(b.organizationId === here?.id) - Number(a.organizationId === here?.id))
+  const creatable = here ? (here.permissions.includes('accounts.create') ? here : null) : (organizations.find((o) => o.permissions.includes('accounts.create')) ?? null)
+  const codeOf = (k: MyKitchen) => organizations.find((o) => o.id === k.organizationId)?.tenantCode ?? null
 
   return (
     <div className="min-h-screen bg-neutral-950 px-4 py-10 text-neutral-100 sm:px-6">
@@ -60,6 +59,11 @@ export function KitchenSelectorPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {creatable && (
+              <Button variant="secondary" icon={Plus} onClick={() => setCreating(true)}>
+                Nueva cuenta
+              </Button>
+            )}
             <Button variant="ghost" icon={LogOut} onClick={() => void signOut()}>
               Cerrar sesión
             </Button>
@@ -76,99 +80,58 @@ export function KitchenSelectorPage() {
           <LoadingState variant="cards" rows={1} cols={3} />
         ) : isError ? (
           <ErrorState error={error} onRetry={() => void refetch()} />
-        ) : groups.length === 0 ? (
-          <EmptyState
-            icon={Store}
-            title="Aún no tienes acceso a ninguna cuenta"
-            description="Pide al administrador de tu negocio que te agregue al equipo. Cuando lo haga, aparecerá aquí."
-          />
+        ) : accounts.length === 0 ? (
+          creatable ? (
+            <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea la primera cuenta para empezar a operar." />
+          ) : (
+            <EmptyState
+              icon={Store}
+              title="Aún no tienes acceso a ninguna cuenta"
+              description="Pide al administrador de tu negocio que te agregue al equipo. Cuando lo haga, aparecerá aquí."
+            />
+          )
         ) : (
-          <div className="space-y-8">
-            {groups.map(({ org, kitchens: orgKitchens }) => {
-              const canCreate = org.permissions.includes('accounts.create')
-              return (
-                <section key={org.id} aria-label={org.name} className="space-y-3">
-                  {(showGroupTitles || canCreate || canOpenAdminCenter(org)) && (
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      {showGroupTitles || canCreateSomewhere ? (
-                        <h2 className={clsx(typography.h3, 'flex items-center gap-2')}>
-                          {org.name}
-                          {tenant.mode !== 'path' && <span className="font-mono text-xs font-normal text-neutral-500">{tenantHostLabel(org.tenantCode)}</span>}
-                          {org.isSuperAdmin && (
-                            <Badge tone="brand" size="sm">
-                              SUPER_ADMIN
-                            </Badge>
-                          )}
-                        </h2>
-                      ) : (
-                        <span />
-                      )}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {canOpenAdminCenter(org) && (
-                          <Link
-                            to={orgPath(org.slug)}
-                            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-700 px-3 text-sm text-neutral-200 hover:border-neutral-500 hover:text-neutral-50"
-                          >
-                            <Building2 size={14} aria-hidden /> Administrar organización
-                          </Link>
-                        )}
-                        {canCreate && (
-                          <Button variant="secondary" size="sm" icon={Plus} onClick={() => setCreatingIn(org)}>
-                            Nueva cuenta
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {orgKitchens.length === 0 ? (
-                    <EmptyState icon={Store} title="Todavía no hay cuentas" description="Crea la primera cuenta para empezar a operar." compact />
-                  ) : (
-                    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {orgKitchens.map((k) => (
-                        <AccountCard key={k.id} kitchen={k} />
-                      ))}
-                    </ul>
-                  )}
-                </section>
-              )
-            })}
-          </div>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {accounts.map((k) => (
+              <AccountCard
+                key={k.id}
+                kitchen={k}
+                elsewhere={tenant.mode !== 'path' && here !== null && k.organizationId !== here.id ? codeOf(k) : null}
+                canActivate={!k.active && (organizations.find((o) => o.id === k.organizationId)?.permissions.includes('accounts.manage') ?? false)}
+              />
+            ))}
+          </ul>
         )}
       </div>
 
-      {otherOrganizations.length > 0 && (
-        <section aria-label="Tus otras organizaciones" className="mx-auto mt-10 max-w-4xl space-y-3">
-          <h2 className={typography.h3}>Tus otras organizaciones</h2>
-          <ul className="flex flex-wrap gap-2">
-            {otherOrganizations.map((o) => (
-              <li key={o.id}>
-                <a
-                  href={tenantUrl(o.tenantCode, '/') ?? '/'}
-                  className="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-500 hover:text-neutral-50"
-                >
-                  <Building2 size={14} aria-hidden /> {o.name}
-                  <span className="font-mono text-xs text-neutral-500">{tenantHostLabel(o.tenantCode)}</span>
-                  <ExternalLink size={12} className="text-neutral-500" aria-hidden />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {creatingIn && (
-        <CreateKitchenDialog
-          organizationId={creatingIn.id}
-          organizationName={organizations.length > 1 ? creatingIn.name : undefined}
-          onClose={() => setCreatingIn(null)}
-          onCreated={(slug) => navigate(kitchenPath(slug, '/'))}
-        />
+      {creating && creatable && (
+        <CreateKitchenDialog organizationId={creatable.id} onClose={() => setCreating(false)} onCreated={(slug) => navigate(kitchenPath(slug, '/'))} />
       )}
     </div>
   )
 }
 
-function AccountCard({ kitchen: k }: { kitchen: MyKitchen }) {
+/** Activates a deactivated account again (accounts.manage; the database checks it). */
+function ActivateButton({ kitchen }: { kitchen: MyKitchen }) {
+  const queryClient = useQueryClient()
+  const { show } = useToast()
+  const activate = useMutation({
+    mutationFn: () => setAccountsActive([kitchen.id], true),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
+      show(`${kitchen.name} está activa de nuevo.`)
+    },
+    onError: (err) => show(getErrorMessage(err, 'No se pudo activar la cuenta'), 'error'),
+  })
+  return (
+    <Button variant="secondary" size="sm" icon={Power} loading={activate.isPending} onClick={() => activate.mutate()}>
+      Activar
+    </Button>
+  )
+}
+
+/** `elsewhere`: the code of another subdomain where this account opens. */
+function AccountCard({ kitchen: k, elsewhere, canActivate }: { kitchen: MyKitchen; elsewhere: string | null; canActivate: boolean }) {
   return (
     <li>
       <Link
@@ -180,11 +143,15 @@ function AccountCard({ kitchen: k }: { kitchen: MyKitchen }) {
       >
         <div className="flex items-start justify-between gap-3">
           <AccountIcon iconKey={k.iconKey} seed={k.id} size="lg" />
-          <ArrowRight size={16} className="mt-1 text-neutral-600 transition-colors group-hover:text-brasa-400" aria-hidden />
+          {elsewhere ? (
+            <ExternalLink size={15} className="mt-1 text-neutral-600 transition-colors group-hover:text-brasa-400" aria-label="Se abre en su propio espacio" />
+          ) : (
+            <ArrowRight size={16} className="mt-1 text-neutral-600 transition-colors group-hover:text-brasa-400" aria-hidden />
+          )}
         </div>
         <div className="min-w-0">
           <p className="truncate font-semibold text-neutral-50">{k.name}</p>
-          <p className="truncate text-xs text-neutral-500">/k/{k.slug}</p>
+          <p className="truncate text-xs text-neutral-500">{elsewhere ? tenantHostLabel(elsewhere) : `/k/${k.slug}`}</p>
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2">
           <Badge tone={k.superAdmin ? 'brand' : 'neutral'} size="sm" icon={ChefHat}>
@@ -197,6 +164,11 @@ function AccountCard({ kitchen: k }: { kitchen: MyKitchen }) {
           )}
         </div>
       </Link>
+      {canActivate && (
+        <div className="mt-2 flex justify-end">
+          <ActivateButton kitchen={k} />
+        </div>
+      )}
     </li>
   )
 }

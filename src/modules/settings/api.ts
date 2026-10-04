@@ -1,35 +1,23 @@
 import { supabase } from '@/shared/lib/supabase'
 
-/** Observabilidad y bitácora del centro de administración (ADR 0012). Todo lo valida la base. */
+/**
+ * Configuración of the active account (ADR 0024): alerts, operation, activity
+ * log, billing and AI usage. Everything is read for the ACTIVE account (the
+ * x-dk-kitchen-id header) and the database checks every permission again.
+ */
 
 export type AlertSeverity = 'info' | 'warning' | 'error'
 
-export interface OrgAlert {
+export interface AccountAlert {
   severity: AlertSeverity
   type: string
   message: string
-  accountId?: string
 }
 
-export interface OrgAccountStats {
-  id: string
-  name: string
-  slug: string
-  iconKey: string | null
-  active: boolean
-  timezone: string
-  ordersToday: number
-  salesToday: number
-  cancelledToday: number
-  deliveredToday: number
-  ordersWeek: number
-  salesWeek: number
-  inProgress: number
-  late: number
-  lowStock: number
-  aiRuns24h: number
-  aiErrors24h: number
-  lastActivityAt: string | null
+export async function fetchAccountAlerts(): Promise<AccountAlert[]> {
+  const { data, error } = await supabase.rpc('dk_account_alerts')
+  if (error) throw error
+  return (data as unknown as { alerts: AccountAlert[] }).alerts
 }
 
 export interface RecentEvent {
@@ -41,29 +29,6 @@ export interface RecentEvent {
   result: 'success' | 'failure'
   actor: string | null
   account?: string | null
-}
-
-export interface OrgObservability {
-  generatedAt: string
-  totals: {
-    accountsActive: number
-    accountsInactive: number
-    users: number
-    activeUsers7d: number
-    ordersToday: number
-    salesToday: number
-    late: number
-    aiErrors24h: number
-  }
-  accounts: OrgAccountStats[]
-  alerts: OrgAlert[]
-  recentEvents: RecentEvent[]
-}
-
-export async function fetchOrgObservability(organizationId: string): Promise<OrgObservability> {
-  const { data, error } = await supabase.rpc('dk_org_observability', { p_organization_id: organizationId })
-  if (error) throw error
-  return data as unknown as OrgObservability
 }
 
 export interface AccountObservability {
@@ -95,7 +60,7 @@ export async function fetchAccountObservability(organizationId: string, accountI
 }
 
 // ---------------------------------------------------------------------------
-// Bitácora
+// Activity log
 // ---------------------------------------------------------------------------
 export const EVENT_CATEGORIES: { value: string; label: string }[] = [
   { value: 'accounts', label: 'Cuentas' },
@@ -134,7 +99,6 @@ export interface AuditEvent {
 }
 
 export interface EventFilters {
-  accountId?: string
   category?: string
   actorId?: string
   from?: string
@@ -147,10 +111,8 @@ export interface EventPage {
   hasMore: boolean
 }
 
-export async function fetchOrgEvents(organizationId: string, filters: EventFilters, cursor?: { at: string; id: string }, limit = 30): Promise<EventPage> {
-  const { data, error } = await supabase.rpc('dk_org_events', {
-    p_organization_id: organizationId,
-    ...(filters.accountId ? { p_kitchen_id: filters.accountId } : {}),
+export async function fetchAccountEvents(filters: EventFilters, cursor?: { at: string; id: string }, limit = 30): Promise<EventPage> {
+  const { data, error } = await supabase.rpc('dk_account_events', {
     ...(filters.category ? { p_category: filters.category } : {}),
     ...(filters.actorId ? { p_actor: filters.actorId } : {}),
     ...(filters.from ? { p_from: filters.from } : {}),
@@ -164,7 +126,7 @@ export async function fetchOrgEvents(organizationId: string, filters: EventFilte
 }
 
 // ---------------------------------------------------------------------------
-// Facturación
+// Billing
 // ---------------------------------------------------------------------------
 export interface Invoice {
   id: string
@@ -201,23 +163,18 @@ export async function fetchInvoices(organizationId: string): Promise<Invoice[]> 
   }))
 }
 
-export async function logSignIn(): Promise<void> {
-  await supabase.rpc('dk_log_sign_in')
-}
-
 // ---------------------------------------------------------------------------
-// AI usage of the organization (ADR 0014; no costs: those are the platform's)
+// AI usage of the active account (ADR 0014; no costs: those are the platform's)
 // ---------------------------------------------------------------------------
-export interface OrgAiUsage {
+export interface AccountAiUsage {
   days: number
   dailyLimit: number
   totals: { runs: number; errors: number; runs24h: number }
   byFeature: { key: string; label: string | null; runs: number; errors: number }[]
-  byAccount: { id: string; name: string; iconKey: string | null; runs: number; errors: number; runs24h: number }[]
 }
 
-export async function fetchOrgAiUsage(organizationId: string, days = 30): Promise<OrgAiUsage> {
-  const { data, error } = await supabase.rpc('dk_org_ai_usage', { p_organization_id: organizationId, p_days: days })
+export async function fetchAccountAiUsage(days = 30): Promise<AccountAiUsage> {
+  const { data, error } = await supabase.rpc('dk_account_ai_usage', { p_days: days })
   if (error) throw error
-  return data as unknown as OrgAiUsage
+  return data as unknown as AccountAiUsage
 }

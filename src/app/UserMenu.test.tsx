@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-// ADR 0023: the user menu, by permissions, with Apariencia and Ayuda.
+// ADR 0023 / ADR 0024: the user menu, by permissions, with Apariencia and Ayuda, and no "organización".
 const state = vi.hoisted(() => ({ perms: new Set<string>(), orgPerms: [] as string[] }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/hooks/useAuth', () => ({
@@ -25,11 +25,17 @@ vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
     },
     organization: { id: 'o1', slug: 'dark-kitchen', tenantCode: 'FR3RK6', name: 'Dark Kitchen', active: true, isOwner: true, isSuperAdmin: true, status: 'active', permissions: state.orgPerms },
     can: (p: string) => state.perms.has(p),
+    canShared: (p: string) => state.orgPerms.includes(p),
     path: (to: string) => `/k/brasa-centro${to}`,
     setActiveRole: vi.fn(),
   }),
-  useMyKitchens: () => ({ data: [{ id: 'k1', slug: 'brasa-centro', name: 'Brasa Centro', organizationId: 'o1', roleName: 'Administrador', active: true }] }),
-  useMyContext: () => ({ data: { profile: { isPlatformAdmin: false }, organizations: [{ id: 'o1', tenantCode: 'FR3RK6', name: 'Dark Kitchen', status: 'active', active: true }] } }),
+  useMyKitchens: () => ({
+    data: [
+      { id: 'k1', slug: 'brasa-centro', name: 'Brasa Centro', organizationId: 'o1', roleName: 'Administrador', active: true },
+      // An account of another business: same list, no grouping.
+      { id: 'k9', slug: 'julian', name: 'Julian Hamburguesas', organizationId: 'o2', roleName: 'Cajero', active: true },
+    ],
+  }),
   kitchenPath: (slug: string, to: string) => `/k/${slug}${to}`,
 }))
 vi.mock('@/modules/copilot/copilotContext', () => ({ useCopilot: () => ({ available: true, open: vi.fn() }) }))
@@ -55,24 +61,28 @@ function openMenu(perms: string[], orgPerms: string[] = []) {
 }
 
 describe('UserMenu (ADR 0023)', () => {
-  it('who I am, role and account with the organization code', () => {
-    openMenu([])
+  it('who I am, role and account; all your accounts in one list, without "organización"', () => {
+    openMenu([], ['users.view', 'billing.view'])
     expect(screen.getByText('Ana Ruiz')).toBeTruthy()
     expect(screen.getByText('Cambiar de rol')).toBeTruthy()
     fireEvent.click(screen.getByRole('menuitem', { name: /Brasa Centro/ }))
-    // In the account's hint and at the top of its submenu.
-    expect(screen.getAllByText(/FR3RK6/).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText('FR3RK6')).toBeTruthy()
     expect(screen.getByRole('menuitemradio', { name: /Brasa Centro/ }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('menuitemradio', { name: /Julian Hamburguesas/ })).toBeTruthy()
+    expect(document.body.textContent).not.toMatch(/organizaci/i)
   })
 
-  it('options follow permissions', () => {
+  it('options follow permissions, always about this account', () => {
     openMenu([])
-    expect(screen.queryByRole('menuitem', { name: 'Configuración' })).toBeNull()
-    expect(screen.queryByRole('menuitem', { name: 'Administración de la organización' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Configuración de la cuenta' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Usuarios' })).toBeNull()
     cleanup()
-    openMenu(['settings.manage'], ['users.view', 'users.manage'])
-    expect(screen.getByRole('menuitem', { name: 'Configuración' })).toBeTruthy()
-    expect(screen.getByRole('menuitem', { name: 'Administración de la organización' })).toBeTruthy()
+    openMenu(['settings.manage', 'team.view'], ['billing.view'])
+    expect(screen.getByRole('menuitem', { name: 'Usuarios' })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: 'Roles y permisos' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Configuración de la cuenta' }))
+    for (const name of ['General', 'Facturación', 'IA y voz', 'Integraciones']) expect(screen.getByRole('menuitem', { name })).toBeTruthy()
+    expect(screen.queryByRole('menuitem', { name: 'Actividad' })).toBeNull()
   })
 
   it('Apariencia changes the theme on this device without closing the menu', () => {
@@ -96,7 +106,7 @@ describe('UserMenu (ADR 0023)', () => {
     openMenu([])
     fireEvent.click(screen.getByRole('menuitem', { name: 'Detalles de la sesión' }))
     const dialog = screen.getByRole('dialog', { name: 'Detalles de la sesión' })
-    expect(dialog.textContent).toContain('Dark Kitchen · FR3RK6')
+    expect(dialog.textContent).toContain('FR3RK6 · Dark Kitchen')
     expect(dialog.textContent).toContain('Brasa Centro (brasa-centro)')
     expect(dialog.textContent).not.toMatch(/token/i)
   })

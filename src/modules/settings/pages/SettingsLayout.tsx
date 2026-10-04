@@ -1,20 +1,25 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { RouteTabs, type RouteTabItem } from '@/shared/ui/RouteTabs'
-import { Mic, Settings, Store } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { settingsSections } from '../sections'
 
-/** Configuración de la Cuenta activa: datos generales y la voz en este equipo. La IA la configura la organización (ADR 0018). */
+/** Configuración of the active account: General, Facturación, IA y voz, Integraciones and Actividad. */
 export function SettingsLayout() {
-  const { can, path, kitchen } = useActiveKitchen()
+  const active = useActiveKitchen()
+  const { path, kitchen } = active
   const { pathname } = useLocation()
-  const tabs: RouteTabItem[] = [
-    ...(can('settings.manage') ? [{ to: path('/settings/general'), label: 'General', icon: Store }] : []),
-    ...(can('settings.manage') ? [{ to: path('/settings/features'), label: 'Voz en este equipo', icon: Mic }] : []),
-  ]
+  const sections = settingsSections(active)
+  const tabs: RouteTabItem[] = sections.map((s) => ({ to: path(s.to), label: s.label, icon: s.icon }))
 
   if (tabs.length === 0) return <Navigate to={path('/')} replace />
-  if (pathname.replace(/\/$/, '') === path('/settings')) return <Navigate to={tabs[0].to} replace />
+  const current = pathname.replace(/\/$/, '')
+  if (current === path('/settings')) return <Navigate to={tabs[0].to} replace />
+  // Old address of the AI and voice tab.
+  if (current === path('/settings/features')) return <Navigate to={path('/settings/ai')} replace />
+  // A section the active role cannot open (an old link, a role switch): go to the first one it can.
+  if (!tabs.some((t) => current === t.to || current.startsWith(`${t.to}/`))) return <Navigate to={tabs[0].to} replace />
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

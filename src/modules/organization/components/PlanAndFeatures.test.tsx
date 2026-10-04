@@ -31,7 +31,8 @@ vi.mock('@/shared/plans/subscription', async (original) => ({
 }))
 vi.mock('@/shared/features/features', async (original) => ({
   ...(await original<typeof import('@/shared/features/features')>()),
-  fetchFeatureMatrix: async () => ({
+  fetchAccountFeatureMatrix: async () => ({
+    accountCount: 1,
     plan: { key: 'standard', name: 'Standard' },
     features: [
       { key: 'supply_reorder', category: 'ai', label: 'Sugerencias de compra', description: '', usesModel: true, platformActive: true, includedInPlan: false, minPlan: 'Business', available: false, accountOverride: true, settings: {}, platformSettings: {}, dependsOn: [] },
@@ -70,16 +71,14 @@ describe('pestaña Plan', () => {
   })
 })
 
-describe('Funciones de la organización', () => {
-  it('lo que el plan no incluye va con candado y no se puede activar', async () => {
-    wrap(<FeaturesPanel organizationId="o1" />)
+describe('Funciones de la cuenta (ADR 0024)', () => {
+  it('lo que el plan no incluye va con candado; lo incluido se activa solo en esta cuenta', async () => {
+    wrap(<FeaturesPanel organizationId="o1" accountId="k1" />)
     expect(await screen.findByText('Incluida en Business')).toBeTruthy()
-    expect(screen.queryByRole('switch', { name: 'Ofrecer Sugerencias de compra en la organización' })).toBeNull()
-    expect((screen.getByRole('switch', { name: 'Sugerencias de compra en Taquería Sur' }) as HTMLButtonElement).disabled).toBe(true)
-    // Lo incluido sí se administra.
-    const voice = screen.getByRole('switch', { name: 'Ofrecer Comandos de voz en la organización' }) as HTMLButtonElement
+    expect(screen.queryByRole('switch', { name: 'Sugerencias de compra en esta cuenta' })).toBeNull()
+    const voice = screen.getByRole('switch', { name: 'Comandos de voz en esta cuenta' }) as HTMLButtonElement
     expect(voice.disabled).toBe(false)
     expect(voice.getAttribute('aria-checked')).toBe('true')
-    expect(within(document.body).getByText(/Tu plan no la incluye/)).toBeTruthy()
+    expect(within(document.body).getByText(/no la activa en tus otras cuentas/)).toBeTruthy()
   })
 })

@@ -1,13 +1,8 @@
-import { AccountIcon } from '@/shared/avatars/Avatar'
-import { kitchenPath } from '@/shared/kitchen/activeKitchenContext'
-import { useOrgAdmin } from '@/shared/org/orgContext'
-import { ActiveBadge, Badge } from '@/shared/ui/Badge'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
-import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { StatCard } from '@/shared/ui/StatCard'
 import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { typography } from '@/shared/ui/typography'
@@ -16,7 +11,7 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Activity, Bot, Boxes, Check, Clock, Gauge, Minus, Radio, ScrollText, ShoppingBag, Store, Truck, Users, Wallet } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
 import { fetchAccountObservability, type AccountObservability } from '../api'
 import { EventLog } from '../components/EventLog'
@@ -43,26 +38,12 @@ function Flag({ ok, label }: { ok: boolean; label: string }) {
   )
 }
 
-function AccountOperation({ data }: { data: AccountObservability }) {
-  const { path } = useOrgAdmin()
+function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onOpenLog: (() => void) | null }) {
   const channels = Object.entries(data.orders.byChannel)
   const movements = Object.entries(data.inventory.movements)
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <AccountIcon iconKey={data.account.iconKey} seed={data.account.id} size="lg" />
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 text-lg font-semibold text-neutral-50">
-            {data.account.name} <ActiveBadge active={data.account.active} />
-          </p>
-          <p className={typography.caption}>Horas en {data.account.timezone} · actualizado {formatDateTime(data.generatedAt)}</p>
-        </div>
-        {data.account.active && (
-          <Link to={kitchenPath(data.account.slug, '/')} className="text-sm text-brasa-400 hover:underline">
-            Entrar a la cuenta
-          </Link>
-        )}
-      </div>
+      <p className={typography.caption}>Horas en {data.account.timezone} · actualizado {formatDateTime(data.generatedAt)}</p>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Pedidos de hoy" value={data.orders.today.created} hint={`${data.orders.today.delivered} entregados · ${data.orders.today.cancelled} cancelados`} icon={ShoppingBag} tone="brand" />
@@ -134,9 +115,11 @@ function AccountOperation({ data }: { data: AccountObservability }) {
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className={typography.h3}>Cambios recientes en la cuenta</h2>
-          <Link to={path(`/observabilidad?tab=bitacora&cuenta=${data.account.id}`)} className="text-sm text-brasa-400 hover:underline">
-            Ver en la bitácora
-          </Link>
+          {onOpenLog && (
+            <button type="button" onClick={onOpenLog} className="text-sm text-brasa-400 hover:underline">
+              Ver en la bitácora
+            </button>
+          )}
         </div>
         {data.recentChanges.length === 0 ? (
           <p className={typography.caption}>Sin cambios registrados.</p>
@@ -170,68 +153,40 @@ function AccountOperation({ data }: { data: AccountObservability }) {
 }
 
 /**
- * Observabilidad (ADR 0012, secciones 4, 5 y 7), con dos preguntas separadas:
- * "Operación" responde ¿cómo está funcionando cada Cuenta? y "Bitácora",
- * ¿quién hizo qué y cuándo?
+ * Actividad of the active account (ADR 0012, ADR 0024): "Operación" answers
+ * how is this account working? and "Bitácora", who did what and when? Only
+ * this account; to see another one, switch accounts.
  */
-export function OrgObservabilityPage() {
-  const { organization, accounts } = useOrgAdmin()
+export function ActivitySettingsPage() {
+  const { organization, kitchen, can, canShared } = useActiveKitchen()
   const [params, setParams] = useSearchParams()
-  const tab: Tab = params.get('tab') === 'bitacora' ? 'bitacora' : 'operacion'
-  const accountId = params.get('cuenta') ?? accounts[0]?.id ?? ''
-
-  const setParam = (patch: Record<string, string | null>) =>
-    setParams(
-      (current) => {
-        const next = new URLSearchParams(current)
-        for (const [k, v] of Object.entries(patch)) {
-          if (v) next.set(k, v)
-          else next.delete(k)
-        }
-        return next
-      },
-      { replace: true },
-    )
+  const seeOperation = canShared('observability.view') && organization !== null
+  const seeLog = can('audit.view') || canShared('observability.view')
+  const tabs: TabItem<Tab>[] = [
+    ...(seeOperation ? [{ value: 'operacion' as const, label: 'Operación', icon: Activity }] : []),
+    ...(seeLog ? [{ value: 'bitacora' as const, label: 'Bitácora', icon: ScrollText }] : []),
+  ]
+  const tab: Tab = tabs.find((t) => t.value === params.get('tab'))?.value ?? tabs[0]?.value ?? 'bitacora'
+  const setTab = (t: Tab) => setParams(t === tabs[0]?.value ? {} : { tab: t }, { replace: true })
 
   const detail = useQuery({
-    queryKey: ['org', organization.id, 'observability', accountId],
-    queryFn: () => fetchAccountObservability(organization.id, accountId),
-    enabled: tab === 'operacion' && Boolean(accountId),
+    queryKey: ['account', kitchen.id, 'observability'],
+    queryFn: () => fetchAccountObservability(organization!.id, kitchen.id),
+    enabled: tab === 'operacion' && seeOperation,
     refetchInterval: 60_000,
   })
 
-  const tabs: TabItem<Tab>[] = [
-    { value: 'operacion', label: 'Operación', icon: Activity },
-    { value: 'bitacora', label: 'Bitácora', icon: ScrollText },
-  ]
-
   return (
     <div className="space-y-6">
-      <PageHeader title="Observabilidad" icon={Activity} description="Cómo opera cada cuenta y quién hizo qué en la organización." />
-      <Tabs value={tab} onChange={(t) => setParam({ tab: t === 'bitacora' ? 'bitacora' : null })} items={tabs} />
-
+      {tabs.length > 1 && <Tabs value={tab} onChange={setTab} items={tabs} />}
       {tab === 'bitacora' ? (
-        <EventLog key={params.get('cuenta') ?? 'todas'} initialAccountId={params.get('cuenta') ?? undefined} />
-      ) : accounts.length === 0 ? (
-        <EmptyState icon={Store} title="Todavía no hay cuentas" compact />
+        <EventLog />
+      ) : detail.isLoading ? (
+        <LoadingState variant="cards" rows={1} cols={4} />
+      ) : detail.isError || !detail.data ? (
+        <ErrorState error={detail.error} onRetry={() => void detail.refetch()} />
       ) : (
-        <div className="space-y-5">
-          <Select value={accountId} onChange={(e) => setParam({ cuenta: e.target.value })} aria-label="Cuenta" className="!mt-0 max-w-sm">
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-                {a.active ? '' : ' (desactivada)'}
-              </option>
-            ))}
-          </Select>
-          {detail.isLoading ? (
-            <LoadingState variant="cards" rows={1} cols={4} />
-          ) : detail.isError || !detail.data ? (
-            <ErrorState error={detail.error} onRetry={() => void detail.refetch()} />
-          ) : (
-            <AccountOperation data={detail.data} />
-          )}
-        </div>
+        <AccountOperation data={detail.data} onOpenLog={seeLog ? () => setTab('bitacora') : null} />
       )}
     </div>
   )

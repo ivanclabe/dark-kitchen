@@ -59,7 +59,7 @@ export function diagnostics(input: DiagnosticsInput): [string, string][] {
   const fmt = (d: Date) => d.toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })
   const rows: [string, string][] = [
     ['Usuario', [input.userName, input.email].filter(Boolean).join(' · ') || '—'],
-    ['Organización', input.organization ? `${input.organization.name} · ${input.organization.code}` : '—'],
+    ['Código', input.organization ? `${input.organization.code} · ${input.organization.name}` : '—'],
     ['Cuenta', input.account ? `${input.account.name} (${input.account.slug})` : '—'],
     ['Rol activo', input.role ?? '—'],
     ['Permisos', input.permissionCount != null ? String(input.permissionCount) : '—'],
@@ -80,7 +80,7 @@ export function diagnosticsText(rows: [string, string][]): string {
 
 /** mailto: for "Reportar un problema" — the person's words plus the diagnostics. */
 export function reportMailto(email: string, description: string, rows: [string, string][]): string {
-  const subject = `Problema en Quanela${rows.find(([k]) => k === 'Organización')?.[1] ? ` · ${rows.find(([k]) => k === 'Organización')![1]}` : ''}`
+  const subject = `Problema en Quanela${rows.find(([k]) => k === 'Código')?.[1] ? ` · ${rows.find(([k]) => k === 'Código')![1]}` : ''}`
   const body = `${description.trim()}\n\n— Datos para soporte —\n${diagnosticsText(rows)}`
   return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

@@ -1,4 +1,6 @@
 import { useReceivables } from '@/modules/cartera/hooks/useReceivables'
+import { fetchAccountAlerts } from '@/modules/settings/api'
+import { AlertList } from '@/modules/settings/components/AlertList'
 import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/orders/lib/orderVisuals'
 import { useLiveOrders, useOrderSearch } from '@/modules/orders/hooks/useOrders'
@@ -16,6 +18,7 @@ import { Tooltip } from '@/shared/ui/Tooltip'
 import { iconButtonClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { formatDate, formatDateLong, formatDateTime, formatMoney, toDateInput, todayStr } from '@/shared/utils/format'
+import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import {
   ArrowRight,
@@ -666,6 +669,18 @@ function CarteraCard({ summary, liveOps }: { summary: DashboardSummary | undefin
  * Cocina/Despacho/Cartera) — ningún dato nuevo. Los roles sin acceso a
  * Cocina/Cartera (INVENTORY) no disparan esas consultas ni ven esas filas.
  */
+/** Alerts of this account (ADR 0024, D5: they come from the old organization summary). Nothing when all is fine. */
+function AccountAlerts() {
+  const { kitchen } = useActiveKitchen()
+  const { data } = useQuery({ queryKey: ['account', kitchen.id, 'alerts'], queryFn: fetchAccountAlerts, refetchInterval: 60_000 })
+  if (!data?.length) return null
+  return (
+    <section aria-label="Alertas de la cuenta">
+      <AlertList alerts={data} />
+    </section>
+  )
+}
+
 export function DashboardPage() {
   const { profile } = useAuth()
   const { data, isLoading, isError, error, refetch } = useDashboardSummary()
@@ -677,6 +692,8 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <DashboardHero firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
+
+      <AccountAlerts />
 
       <SalesOverview />
 

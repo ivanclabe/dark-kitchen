@@ -8,7 +8,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: '¿Qué es una cuenta?',
-    a: 'Un establecimiento completo: su cocina, pedidos, clientes, menú e inventario. Si tienes varios locales, cada uno es una cuenta dentro de tu organización.',
+    a: 'Un establecimiento completo: su cocina, pedidos, clientes, menú e inventario. Si tienes varios locales, cada uno es una cuenta y todas quedan en tu mismo espacio.',
   },
   {
     q: '¿Puedo cambiar de plan después?',

@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ContextIndicator } from './AccountSwitcher'
 import { CopilotButton, CopilotProvider } from '@/modules/copilot/CopilotProvider'
-import { homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS } from './navigation'
+import { ADMIN_NAV_ITEMS, homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS, type NavItem } from './navigation'
 import { UserMenu } from './UserMenu'
 import { WelcomeCard } from './WelcomeCard'
 
@@ -20,7 +20,51 @@ export function AppLayout() {
   const section = pathname.startsWith(path('/')) ? pathname.slice(path('/').length) || '/' : '/'
 
   const visibleItems = NAV_ITEMS.filter((item) => canAccessAnyModule(can, item.modules))
-  const currentItem = visibleItems.find((item) => isNavItemActive(section, item))
+  const adminItems = ADMIN_NAV_ITEMS.filter((item) => canAccessAnyModule(can, item.modules))
+  const currentItem = [...visibleItems, ...adminItems].find((item) => isNavItemActive(section, item))
+
+  const railLink = (item: NavItem) => {
+    const Icon = item.icon
+    const active = isNavItemActive(section, item)
+    return (
+      <Tooltip key={item.to} label={item.label}>
+        <Link
+          to={path(item.to)}
+          aria-label={item.label}
+          aria-current={active ? 'page' : undefined}
+          className={clsx(
+            'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+            active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
+          )}
+        >
+          <Icon size={19} strokeWidth={2} aria-hidden />
+        </Link>
+      </Tooltip>
+    )
+  }
+
+  const drawerLink = (item: NavItem) => {
+    const Icon = item.icon
+    const active = isNavItemActive(section, item)
+    return (
+      <Link
+        key={item.to}
+        to={path(item.to)}
+        onClick={() => setMobileNavOpen(false)}
+        aria-current={active ? 'page' : undefined}
+        className={clsx(
+          'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors',
+          active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-300 hover:bg-neutral-800 hover:text-neutral-50',
+        )}
+      >
+        <Icon size={18} aria-hidden />
+        <span className="min-w-0">
+          <span className="block text-sm font-medium">{item.label}</span>
+          <span className="block text-xs text-neutral-500">{item.description}</span>
+        </span>
+      </Link>
+    )
+  }
 
   // Una sección que el rol activo no puede abrir (enlace directo, o recién
   // cambió a un rol con menos permisos) lleva a su inicio. La base igual
@@ -54,27 +98,13 @@ export function AppLayout() {
 
         {/* Sin overflow-y-auto: recortaría el tooltip, que sale a la derecha del rail. */}
         <nav aria-label="Principal" className="flex flex-1 flex-col items-center gap-1.5">
-          {visibleItems.map((item) => {
-            const Icon = item.icon
-            const active = isNavItemActive(section, item)
-            return (
-              <Tooltip key={item.to} label={item.label}>
-                <Link
-                  to={path(item.to)}
-                  aria-label={item.label}
-                  aria-current={active ? 'page' : undefined}
-                  className={clsx(
-                    'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
-                    active
-                      ? 'bg-brasa-500/10 text-brasa-400'
-                      : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
-                  )}
-                >
-                  <Icon size={19} strokeWidth={2} aria-hidden />
-                </Link>
-              </Tooltip>
-            )
-          })}
+          {visibleItems.map(railLink)}
+          {adminItems.length > 0 && (
+            <>
+              <span className="my-1.5 h-px w-8 bg-neutral-800/80" aria-hidden />
+              {adminItems.map(railLink)}
+            </>
+          )}
         </nav>
 
         <div className="mt-2 border-t border-neutral-800/60 pt-3">
@@ -121,28 +151,13 @@ export function AppLayout() {
 
       <Drawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title={kitchen.name} subtitle={currentItem ? `Estás en ${currentItem.label}` : kitchen.roleName} side="left" size="sm">
         <nav aria-label="Principal" className="-mx-2 flex flex-col gap-1">
-          {visibleItems.map((item) => {
-            const Icon = item.icon
-            const active = isNavItemActive(section, item)
-            return (
-              <Link
-                key={item.to}
-                to={path(item.to)}
-                onClick={() => setMobileNavOpen(false)}
-                aria-current={active ? 'page' : undefined}
-                className={clsx(
-                  'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors',
-                  active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-300 hover:bg-neutral-800 hover:text-neutral-50',
-                )}
-              >
-                <Icon size={18} aria-hidden />
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">{item.label}</span>
-                  <span className="block text-xs text-neutral-500">{item.description}</span>
-                </span>
-              </Link>
-            )
-          })}
+          {visibleItems.map(drawerLink)}
+          {adminItems.length > 0 && (
+            <>
+              <span className="mx-3 my-2 h-px bg-neutral-800/80" aria-hidden />
+              {adminItems.map(drawerLink)}
+            </>
+          )}
         </nav>
       </Drawer>
     </div>

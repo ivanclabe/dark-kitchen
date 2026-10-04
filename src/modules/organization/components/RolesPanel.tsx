@@ -7,17 +7,24 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Copy, Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { deleteRole, type OrgRole, type OrgUser, type PermissionDef } from '../api/organization'
+import { deleteRole, type OrgRole, type OrgUser, type PermissionDef, type RoleUsage } from '../api/organization'
 import { orgKey } from '../hooks/useOrganization'
 import { RoleEditorDrawer } from './RoleEditorDrawer'
 
 type Editing = { role: OrgRole | null; draft?: { name: string; permissions: string[] } }
 
+/** D2: "Usado en 2 de tus 3 cuentas". */
+function accountsLabel(used: number, total: number): string {
+  if (used === 0) return 'Sin usar en tus cuentas'
+  return `Usado en ${used} de tus ${total} cuentas`
+}
+
 /**
- * Roles de la organización (ADR 0008, sección 11): plantillas del sistema
- * (solo lectura, se pueden duplicar) y roles propios. Crear y editar es del
- * SUPER_ADMIN (roles.manage); el resto los ve. Muestra cuántas personas
- * tienen cada rol y quiénes.
+ * Roles y permisos (ADR 0008, sección 11; ADR 0024, D2): plantillas del
+ * sistema (solo lectura, se pueden duplicar) y roles propios, que sirven en
+ * todas tus cuentas. Crear y editar es del SUPER_ADMIN (roles.manage); el
+ * resto los ve. Muestra cuántas personas de esta cuenta tienen cada rol y en
+ * cuántas de tus cuentas se usa.
  */
 export function RolesPanel({
   organizationId,
@@ -25,12 +32,14 @@ export function RolesPanel({
   users,
   catalog,
   canManage,
+  usage,
 }: {
   organizationId: string
   roles: OrgRole[]
   users: OrgUser[]
   catalog: PermissionDef[]
   canManage: boolean
+  usage?: RoleUsage
 }) {
   const queryClient = useQueryClient()
   const { show } = useToast()
@@ -72,7 +81,15 @@ export function RolesPanel({
           {role.description && <p className={`mt-0.5 ${typography.caption}`}>{role.description}</p>}
         </div>
         <p className="text-xs text-neutral-500">
-          {role.permissions.length} permisos · {holders.length === 1 ? '1 persona' : `${holders.length} personas`}
+          {role.permissions.length} permisos · {holders.length === 1 ? '1 persona aquí' : `${holders.length} personas aquí`}
+          {!role.isSystem && usage && usage.accountCount > 1 && (
+            <>
+              {' · '}
+              <span className={(usage.accountsByRole[role.id] ?? 0) > 1 ? 'text-amber-300' : undefined}>
+                {accountsLabel(usage.accountsByRole[role.id] ?? 0, usage.accountCount)}
+              </span>
+            </>
+          )}
         </p>
         <div className="mt-auto flex flex-wrap gap-1">
           <Button variant="link" size="sm" icon={role.isSystem || !canManage ? Eye : Pencil} onClick={() => setEditing({ role })}>
@@ -97,7 +114,7 @@ export function RolesPanel({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className={typography.small}>
-          Las plantillas son iguales en toda la plataforma. Los roles propios son de tu organización y sirven en todas sus cuentas.
+          Las plantillas son iguales en toda la plataforma. Los roles propios sirven en todas tus cuentas: un cambio aplica a todas las que lo usan.
         </p>
         {canManage && (
           <Button variant="secondary" icon={Plus} onClick={() => setEditing({ role: null })}>
@@ -109,7 +126,7 @@ export function RolesPanel({
       <section className="space-y-3">
         <h3 className={typography.h3}>Roles propios</h3>
         {custom.length === 0 ? (
-          <p className={typography.caption}>{canManage ? 'Todavía no hay. Crea uno o duplica una plantilla para ajustarla.' : 'La organización aún no tiene roles propios.'}</p>
+          <p className={typography.caption}>{canManage ? 'Todavía no hay. Crea uno o duplica una plantilla para ajustarla.' : 'Todavía no hay roles propios.'}</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {custom.map((r) => (
@@ -148,7 +165,7 @@ export function RolesPanel({
         confirmLabel="Sí, eliminar"
         danger
         pending={remove.isPending}
-        description={<p>El rol {deleting?.name} deja de existir en la organización. Si alguien lo tiene asignado, primero cámbiale el rol.</p>}
+        description={<p>El rol {deleting?.name} deja de existir en todas tus cuentas. Si alguien lo tiene asignado, primero cámbiale el rol.</p>}
       />
     </div>
   )

@@ -1,6 +1,6 @@
 import type { AccountPermission, Can } from '@/shared/rbac/roles'
 import { describe, expect, it } from 'vitest'
-import { homeSection, isSectionAllowed } from './navigation'
+import { ADMIN_NAV_ITEMS, homeSection, isSectionAllowed } from './navigation'
 
 const can =
   (...perms: AccountPermission[]): Can =>
@@ -56,5 +56,18 @@ describe('secciones permitidas según el rol activo', () => {
 
   it('el Administrador empieza en el Dashboard', () => {
     expect(homeSection(can('dashboard.view', 'kitchen.view', 'orders.create', 'settings.manage'))).toBe('/dashboard')
+  })
+})
+
+// ADR 0024: Usuarios and Configuración, below the rail's divider, open by module.
+describe('administración de la cuenta en el rail', () => {
+  it('Usuarios y Configuración van aparte, después de la operación', () => {
+    expect(ADMIN_NAV_ITEMS.map((i) => i.label)).toEqual(['Usuarios', 'Configuración'])
+  })
+
+  it('Actividad se abre con audit.view (sin settings.manage)', () => {
+    expect(isSectionAllowed('/settings/activity', can('audit.view'))).toBe(true)
+    expect(isSectionAllowed('/users', can('team.view'))).toBe(true)
+    expect(isSectionAllowed('/settings/billing', can('orders.view'))).toBe(false)
   })
 })

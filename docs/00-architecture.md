@@ -77,8 +77,8 @@ src/
     copilot/                 # Quanela Copilot (ADR 0020): panel y renderizado seguro de respuestas
     customers/
     reports/
-    organization/            # equipos, roles, cuentas, funciones y plan (componentes que reutiliza el centro)
-    orgAdmin/                # centro de administración /o/:org (ADR 0012): layout, Resumen, Observabilidad, Bitácora, Facturación, IA y voz…
+    organization/            # Usuarios y Roles y permisos de la cuenta, funciones de IA y plan (ADR 0024)
+    settings/                # Configuración de la cuenta (ADR 0024): General, Facturación, IA y voz, Integraciones, Actividad (operación y bitácora)
     platform/                # paneles de plataforma (ai/: control central de IA y voz, ADR 0014; planes; cuentas) que usa el portal Global Admin
   types/
     database.ts             # tipos generados por Supabase CLI (supabase gen types)
@@ -105,7 +105,9 @@ modules/inventory/
   schemas/         # validación (zod) de formularios
 ```
 
-**Dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md)).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector. La plataforma ya no vive en Quanela: `/admin` redirige a inicio.
+**La Cuenta es el único nivel visible ([ADR 0024](./adr/0024-cuenta-como-unico-nivel.md)).** Todo vive en `/k/:cuenta/…`. La administración también es de la cuenta: **Usuarios** (Usuarios · Roles y permisos) y **Configuración** (General · Facturación · IA y voz · Integraciones · Actividad), debajo del rail. La organización sigue existiendo por dentro (tenant, plan, roles propios, IA), pero no tiene interfaz: lo compartido dice «Aplica a todas tus cuentas» y se evalúa con `useActiveKitchen().canShared(perm)`. Lo que se lee es de la cuenta activa (`dk_account_users`, `dk_account_events`, `dk_account_feature_matrix`, `dk_account_ai_usage`, `dk_account_alerts`, `dk_account_role_usage`); la suite SQL `account_scope` verifica que nadie, ni el SUPER_ADMIN, vea otra cuenta desde ahí. Las direcciones viejas `/o/{slug}/…` solo redirigen a su equivalente (`src/app/legacyOrgRoutes.ts`). `/cuentas` es «Tus cuentas», una sola lista: las cuentas de otro negocio abren su subdominio.
+
+**Antes: dos contextos de navegación ([ADR 0012](./adr/0012-centro-de-administracion.md), interfaz reemplazada por el ADR 0024).** `/k/:cuenta/…` es la **operación** de una Cuenta: `KitchenScope` fija la Cuenta y el rol activos, que viajan en `x-dk-kitchen-id`/`x-dk-role-id`. `/o/:organización/…` es el **centro de administración**: `OrgScope` resuelve la organización contra `dk_my_context`, **limpia** la Cuenta y el rol activos y expone `useOrgAdmin()` (`organization`, `can(perm)`, `path(to)`, `accounts`). Las consultas del centro usan claves `['org', orgId, …]` y la base valida el `organization_id` en cada RPC. `/cuentas` es el selector. La plataforma ya no vive en Quanela: `/admin` redirige a inicio.
 
 **Pedidos como centro ([ADR 0020](./adr/0020-pedidos-como-centro-personal-y-copilot.md)).**
 - **Una sola fuente del pedido en la interfaz.** El pedido se lee con una única consulta y un único tipo (`orders/api/orders.ts` → `Order`), bajo una sola raíz de caché `['orders']`. Pedidos (Tablero, Lista, Despacho), Cocina, el Dashboard y Clientes la comparten: un cambio en una vista se ve en todas. Ninguna tiene su propia copia.
@@ -118,11 +120,11 @@ modules/inventory/
 - **Resolución del tenant.** `src/shared/tenant` lee el host, y `dk_tenant_public` dice si la organización existe y está activa. `TenantProvider`/`useTenant()` es el único contexto de organización; `TenantGate` exige la membresía antes de montar cualquier ruta.
 - **Cuenta en la URL y redirección.** La cuenta sigue en la ruta (`/k/{cuenta}`). Una cuenta u organización de otro tenant lleva a su subdominio.
 - **Sesión compartida.** La sesión es una cookie de `.quanela.com`, compartida por todas tus organizaciones. En `*.localhost` es por subdominio.
-- **Código inmutable.** El código lo genera la base al crear la organización y nadie lo cambia. El `slug` queda como dato interno (`/o/{slug}`).
+- **Código inmutable.** El código lo genera la base al crear la organización y nadie lo cambia. El `slug` queda como dato interno.
 - **Autoridad de los datos.** Sigue siendo la RLS por cuenta y membresía.
 
 **Menú de usuario y Apariencia ([ADR 0023](./adr/0023-menu-de-usuario.md)).**
-- **Menú con submenús.** `MenuPanel` (`src/shared/ui`) arma menús descritos como datos, con submenús laterales en escritorio y dentro del mismo panel en el celular. El menú de usuario es el mismo en la cuenta y en el centro de administración.
+- **Menú con submenús.** `MenuPanel` (`src/shared/ui`) arma menús descritos como datos, con submenús laterales en escritorio y dentro del mismo panel en el celular. El menú de usuario lista todas tus cuentas en una sola lista y la administración de la cuenta activa (ADR 0024).
 - **Tema.** El tema claro (beta) invierte la escala `neutral` en un solo lugar (`[data-theme='light']` en `index.css`).
 - **Preferencias del equipo.** Apariencia se guarda por equipo, en una cookie del dominio raíz para que se vea igual en todos los subdominios.
 
@@ -339,7 +341,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 - [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
-- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md) · [ADR 0023 — Menú de usuario, Apariencia y Ayuda](./adr/0023-menu-de-usuario.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md) · [ADR 0023 — Menú de usuario, Apariencia y Ayuda](./adr/0023-menu-de-usuario.md) · [ADR 0024 — La Cuenta como único nivel visible](./adr/0024-cuenta-como-unico-nivel.md)
 
 ---
 

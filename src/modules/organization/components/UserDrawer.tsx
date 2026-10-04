@@ -16,7 +16,7 @@ import {
   activationLink,
   createOrgUser,
   removeFromAccount,
-  removeOrgMember,
+  removeFromActiveAccount,
   resendActivation,
   setMemberRoles,
   setOrgMemberActive,
@@ -39,17 +39,17 @@ interface Assignment {
 }
 
 export interface UserDrawerAccess {
-  /** SUPER_ADMIN (users.manage): toda la organización. */
+  /** SUPER_ADMIN (users.manage): also activates and deactivates people (applies to all your accounts). */
   manageOrg: boolean
   /** Permisos propios en la Cuenta activa (para no ofrecer roles con más permisos). */
   myPermissions: ReadonlySet<string>
 }
 
 /**
- * Crear o editar un usuario de la organización (ADR 0008, secciones 10–11):
- * datos, Cuentas y roles (varios por Cuenta, con uno
- * predeterminado), permisos efectivos y estado. Todo lo valida también la
- * base: aquí solo se evita ofrecer lo que va a rechazar.
+ * Crear o editar un usuario de la cuenta activa (ADR 0008, secciones 10–11;
+ * ADR 0024): datos, roles en esta cuenta (varios, con uno predeterminado),
+ * permisos efectivos y estado. Todo lo valida también la base: aquí solo se
+ * evita ofrecer lo que va a rechazar.
  */
 export function UserDrawer({
   organizationId,
@@ -81,7 +81,7 @@ export function UserDrawer({
 
   const [fullName, setFullName] = useState(user?.fullName ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
-  // SUPER_ADMIN no se asigna: es solo del creador de la organización (se muestra, no se edita).
+  // SUPER_ADMIN no se asigna: es solo de quien creó el negocio (se muestra, no se edita).
   const superAdmin = user?.isSuperAdmin ?? false
   const [assignments, setAssignments] = useState<Map<string, Assignment>>(
     () =>
@@ -178,12 +178,12 @@ export function UserDrawer({
 
   const statusChange = useMutation({
     mutationFn: async (kind: 'remove' | 'toggle') => {
-      if (kind === 'remove') await removeOrgMember(organizationId, user!.userId)
+      if (kind === 'remove') await removeFromActiveAccount(user!.userId)
       else await setOrgMemberActive(organizationId, user!.userId, user!.status !== 'active')
     },
     onSuccess: async (_, kind) => {
       await refresh()
-      show(kind === 'remove' ? `${user!.fullName} salió de la organización.` : user!.status === 'active' ? `${user!.fullName} ya no tiene acceso.` : `${user!.fullName} vuelve a tener acceso.`)
+      show(kind === 'remove' ? `${user!.fullName} salió de esta cuenta.` : user!.status === 'active' ? `${user!.fullName} ya no tiene acceso.` : `${user!.fullName} vuelve a tener acceso.`)
       setConfirm(null)
       onClose()
     },
@@ -231,7 +231,7 @@ export function UserDrawer({
 
         {user?.isSuperAdmin && (
           <p className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm text-neutral-300">
-            <span className="font-semibold text-neutral-100">SUPER_ADMIN</span> es el creador de la organización: tiene acceso global a todas sus cuentas. Es
+            <span className="font-semibold text-neutral-100">SUPER_ADMIN</span> es quien creó el negocio en Quanela: tiene acceso a todas tus cuentas. Es
             intransferible y no se asigna a otros usuarios.
           </p>
         )}
@@ -239,7 +239,7 @@ export function UserDrawer({
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className={typography.label}>Cuentas y roles</p>
+              <p className={typography.label}>{accounts.length === 1 ? 'Roles en esta cuenta' : 'Cuentas y roles'}</p>
               <p className={typography.caption}>
                 {superAdmin
                   ? 'Como SUPER_ADMIN ya entra a todas. Los roles que marques aquí son para "trabajar como" (opcional).'
@@ -341,7 +341,7 @@ export function UserDrawer({
             )}
             {user && !lockedStatus && (
               <Button variant="link" size="sm" icon={UserMinus} className="!text-neutral-400 hover:!text-red-400" onClick={() => setConfirm('remove')}>
-                {access.manageOrg || pending ? 'Quitar de la organización' : 'Quitar de mis cuentas'}
+                {pending ? 'Cancelar la invitación a esta cuenta' : 'Quitar de esta cuenta'}
               </Button>
             )}
           </div>
@@ -366,9 +366,9 @@ export function UserDrawer({
         confirmLabel={confirm === 'remove' ? 'Sí, quitar' : user?.status === 'active' ? 'Sí, desactivar' : 'Sí, activar'}
         description={
           confirm === 'remove' ? (
-            <p>{user?.fullName} deja de tener acceso y sale de las cuentas. Su historial (pedidos, movimientos) se conserva.</p>
+            <p>{user?.fullName} deja de tener acceso a esta cuenta. Su historial (pedidos, movimientos) se conserva.</p>
           ) : user?.status === 'active' ? (
-            <p>{user?.fullName} pierde el acceso a todas las cuentas de la organización de inmediato. Puedes volver a activarlo cuando quieras.</p>
+            <p>{user?.fullName} pierde el acceso de inmediato. Aplica a todas tus cuentas. Puedes volver a activarlo cuando quieras.</p>
           ) : (
             <p>{user?.fullName} vuelve a entrar a sus cuentas con los roles que tenía.</p>
           )

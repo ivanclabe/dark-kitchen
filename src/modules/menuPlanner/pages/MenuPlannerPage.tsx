@@ -1,13 +1,14 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import type { Product } from '@/modules/products/types'
-import { Button } from '@/shared/ui/Button'
+import { Button, buttonClass } from '@/shared/ui/Button'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tabs } from '@/shared/ui/Tabs'
 import { useToast } from '@/shared/ui/Toast'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
-import { CalendarDays, CalendarRange, Copy, Soup } from 'lucide-react'
+import { CalendarDays, CalendarRange, Copy, Layers, Soup } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CatalogSidebar } from '../components/CatalogSidebar'
 import { CopyMenuDialog } from '../components/CopyMenuDialog'
@@ -25,7 +26,7 @@ import type { MenuPlanItem } from '../types'
 type ViewMode = 'week' | 'month'
 
 export function MenuPlannerPage() {
-  const { can } = useActiveKitchen()
+  const { can, canShared } = useActiveKitchen()
   const [view, setView] = useState<ViewMode>('week')
   const [weekStart, setWeekStart] = useState(() => startOfWeek(todayStr()))
   const [monthAnchor, setMonthAnchor] = useState(todayStr())
@@ -181,6 +182,11 @@ export function MenuPlannerPage() {
                 <Button variant="secondary" icon={Copy} onClick={() => setCopyOpen(true)}>
                   Copiar
                 </Button>
+              )}
+              {canShared('master_menus.manage') && (
+                <Link to="/menu-planner?view=shared" className={buttonClass({ variant: 'ghost' })}>
+                  <Layers size={16} aria-hidden /> Platos compartidos
+                </Link>
               )}
             </div>
           }

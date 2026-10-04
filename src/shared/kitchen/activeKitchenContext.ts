@@ -1,4 +1,5 @@
 import { featureLookup, type FeatureKey, type FeatureState } from '@/shared/features/features'
+import type { OrganizationPermission } from '@/shared/rbac/permissions'
 import { canAccessModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, use, useCallback } from 'react'
@@ -48,6 +49,13 @@ export interface ActiveKitchen {
   accountRoles: AccountRole[]
   /** ¿Tiene este permiso del catálogo (p. ej. 'orders.confirm') con su rol activo en esta Cuenta? */
   can: Can
+  /**
+   * Permission over what this account shares with your other accounts (plan,
+   * custom roles, AI: 'billing.view', 'roles.manage', 'features.manage'…).
+   * ADR 0024: it is still checked by the database, and the screens that use
+   * it only show this account.
+   */
+  canShared: (permission: OrganizationPermission) => boolean
   /** Funciones de la Cuenta activa con su estado (organización ∧ Cuenta ∧ permiso). */
   features: readonly FeatureState[]
   feature: (key: FeatureKey) => FeatureState | null
@@ -87,6 +95,7 @@ export function buildActiveKitchen(
     organizationRole: organization?.isSuperAdmin || kitchen.superAdmin ? 'SUPER_ADMIN' : 'MIEMBRO',
     accountRoles: kitchen.roleOptions,
     can,
+    canShared: (permission) => organization?.permissions.includes(permission) ?? false,
     ...featureLookup(extras.features),
     path: (to) => kitchenPath(kitchen.slug, to),
     setActiveRole: extras.setActiveRole ?? (() => {}),

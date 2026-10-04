@@ -140,6 +140,21 @@ export async function fetchFeatureMatrix(organizationId: string): Promise<Featur
   return data as unknown as FeatureMatrix
 }
 
+/** ADR 0024: the matrix of the ACTIVE account only, plus how many accounts share the general values. */
+export type AccountFeatureMatrix = FeatureMatrix & { accountCount: number }
+
+export async function fetchAccountFeatureMatrix(): Promise<AccountFeatureMatrix> {
+  const { data, error } = await supabase.rpc('dk_account_feature_matrix')
+  if (error) throw error
+  return data as unknown as AccountFeatureMatrix
+}
+
+/** Switches a feature on or off in the active account only (ADR 0024); the base never turns it on in another account. */
+export async function setAccountFeature(key: FeatureKey, enabled: boolean): Promise<void> {
+  const { error } = await supabase.rpc('dk_account_set_feature', { p_key: key, p_enabled: enabled })
+  if (error) throw error
+}
+
 export interface FeatureLookup {
   features: readonly FeatureState[]
   feature: (key: FeatureKey) => FeatureState | null
@@ -172,7 +187,7 @@ export function unavailableReason(state: FeatureState | null): UnavailableReason
 export const UNAVAILABLE_MESSAGE: Record<UnavailableReason, string> = {
   platform: 'La plataforma tiene apagada esta función por ahora.',
   plan: 'Tu plan no incluye esta función.',
-  organization: 'Tu organización no ofrece esta función.',
-  account: 'No está activa en esta cuenta. La activa el SUPER_ADMIN de la organización.',
+  organization: 'No está activa en esta cuenta. La activa el SUPER_ADMIN en Configuración → IA y voz.',
+  account: 'No está activa en esta cuenta. La activa el SUPER_ADMIN en Configuración → IA y voz.',
   permission: 'Tu rol activo no puede usar esta función.',
 }

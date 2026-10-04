@@ -40,6 +40,31 @@ export async function listOrgUsers(organizationId: string): Promise<OrgUser[]> {
   return (data as unknown as OrgUser[]) ?? []
 }
 
+/** ADR 0024: the members of the ACTIVE account only, with their roles in it (dk_account_users). */
+export async function listAccountUsers(): Promise<OrgUser[]> {
+  const { data, error } = await supabase.rpc('dk_account_users')
+  if (error) throw error
+  return (data as unknown as OrgUser[]) ?? []
+}
+
+/** Takes a person out of the active account only; an invitation left without accounts is cancelled. */
+export async function removeFromActiveAccount(userId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_account_remove_member', { p_user_id: userId })
+  if (error) throw error
+}
+
+/** D2: in how many of your accounts each role is used (a number, nothing about the other accounts). */
+export interface RoleUsage {
+  accountCount: number
+  accountsByRole: Record<string, number>
+}
+
+export async function fetchRoleUsage(): Promise<RoleUsage> {
+  const { data, error } = await supabase.rpc('dk_account_role_usage')
+  if (error) throw error
+  return data as unknown as RoleUsage
+}
+
 export interface AccountAssignment {
   kitchenId: string
   roleIds: string[]
