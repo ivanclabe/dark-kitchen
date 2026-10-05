@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Page } from '@/shared/ui/Page'
 import type { Product } from '@/modules/products/types'
 import { Button, buttonClass } from '@/shared/ui/Button'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
@@ -163,7 +164,7 @@ export function MenuPlannerPage() {
 
   return (
     <DndContext sensors={can('menus.edit') ? sensors : []} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
-      <div className="flex h-full min-h-0 flex-col gap-4">
+      <Page variant="board">
         <PageHeader
           title="Planificador de Menús"
           description="Platos, calendario y disponibilidad en un solo lugar."
@@ -213,7 +214,7 @@ export function MenuPlannerPage() {
 
           <div className="min-h-0 min-w-0 flex-1">{calendar}</div>
         </div>
-      </div>
+      </Page>
 
       {/* No animation back to the origin: the dish lands where it is dropped (ADR 0018). */}
       <DragOverlay dropAnimation={null}>

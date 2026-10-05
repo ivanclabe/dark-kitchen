@@ -5,7 +5,7 @@ import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { Copy } from 'lucide-react'
 import { SettingsPage } from '../ui/SettingsPage'
-import { SettingsSection } from '../ui/SettingsSection'
+import { Section } from '@/shared/ui/Section'
 
 /**
  * Integrations of the active account (ADR 0012, ADR 0024): an external system
@@ -17,7 +17,7 @@ export function IntegrationsSettingsPage() {
   const { show } = useToast()
   return (
     <SettingsPage title="Integraciones" description="Conecta sistemas externos a esta cuenta.">
-      <SettingsSection title="ID de la cuenta" description="Por ejemplo, para pedidos por WhatsApp con n8n: la integración lo envía en cada petición y con él solo ve esta cuenta." card>
+      <Section title="ID de la cuenta" description="Por ejemplo, para pedidos por WhatsApp con n8n: la integración lo envía en cada petición y con él solo ve esta cuenta." card>
         <FormField
           label="ID de la cuenta"
           hint={
@@ -44,7 +44,7 @@ export function IntegrationsSettingsPage() {
             </div>
           )}
         </FormField>
-      </SettingsSection>
+      </Section>
       <p className={typography.caption}>Las fallas de las integraciones todavía no se registran; la actividad por canal sí (Actividad → Operación).</p>
     </SettingsPage>
   )

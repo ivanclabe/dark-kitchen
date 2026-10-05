@@ -5,21 +5,21 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Accordion } from '@/shared/ui/Accordion'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { StatCard } from '@/shared/ui/StatCard'
+import { KpiStrip } from '@/shared/ui/KpiStrip'
 import { typography } from '@/shared/ui/typography'
 import { toVoiceSettings } from '@/shared/voice/catalog'
 import { DeviceVoicePanel } from '@/shared/voice/DeviceVoicePanel'
 import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
 import { useQuery } from '@tanstack/react-query'
-import { Activity, AlertTriangle, BarChart3, Volume2 } from 'lucide-react'
+import { Volume2 } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchAccountAiUsage } from '../api'
 import { AiStatusPanel } from '../components/AiStatusPanel'
 import { FeatureStatusCard } from '../components/FeatureStatus'
 import { KitchenVoicePanel } from '../components/KitchenVoicePanel'
 import { SettingsPage } from '../ui/SettingsPage'
-import { SettingsSection } from '../ui/SettingsSection'
-import { SettingsSubNav, type SubNavItem } from '../ui/SettingsSubNav'
+import { Section } from '@/shared/ui/Section'
+import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
 
 type Tab = 'features' | 'device' | 'usage'
 
@@ -36,29 +36,29 @@ function ThisDevice({ showStatus }: { showStatus: boolean }) {
   return (
     <>
       {speech?.usable && (
-        <SettingsSection title="Voz de cocina" description="Con qué voz habla este equipo." card>
+        <Section title="Voz de cocina" description="Con qué voz habla este equipo." card>
           <DeviceVoicePanel lang={toVoiceSettings(speech.settings).lang} />
-        </SettingsSection>
+        </Section>
       )}
       {commands?.usable && (
-        <SettingsSection title="Comandos de voz" description="Qué reconocedor usa este equipo y si escucha manos libres." card>
+        <Section title="Comandos de voz" description="Qué reconocedor usa este equipo y si escucha manos libres." card>
           <CommandRecognitionPanel />
           {wakeWord?.usable && (
             <div className="mt-5 border-t border-neutral-800/60 pt-5">
               <WakeWordPanel tuning={wakeWordTuning(wakeWord)} />
             </div>
           )}
-        </SettingsSection>
+        </Section>
       )}
       {!speech?.usable && !commands?.usable && <p className={typography.small}>La voz no está activa en esta cuenta: no hay nada que ajustar en este equipo.</p>}
       {showStatus && (
-        <SettingsSection title="Funciones de IA y voz en esta cuenta" description="Las activa quien administra las funciones.">
+        <Section title="Funciones de IA y voz en esta cuenta" description="Las activa quien administra las funciones.">
           <div className="space-y-3">
             {features.map((state) => (
               <FeatureStatusCard key={state.key} state={state} />
             ))}
           </div>
-        </SettingsSection>
+        </Section>
       )}
     </>
   )
@@ -75,27 +75,24 @@ function UsageAndState() {
 
   return (
     <>
-      <SettingsSection title="Estado">
+      <Section title="Estado">
         <AiStatusPanel />
-      </SettingsSection>
-      <SettingsSection title="Uso" description="Análisis de IA de esta cuenta en los últimos 30 días.">
+      </Section>
+      <Section title="Uso" description="Análisis de IA de esta cuenta en los últimos 30 días.">
         {isLoading ? (
           <LoadingState variant="block" />
         ) : isError || !data ? (
           <ErrorState error={error} onRetry={() => void refetch()} />
         ) : (
           <div className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-3">
-              <StatCard label="Análisis (30 días)" value={data.totals.runs} icon={BarChart3} tone="brand" />
-              <StatCard
-                label="Últimas 24 horas"
-                value={data.totals.runs24h}
-                hint={`Tope del plan: ${data.dailyLimit} al día`}
-                icon={Activity}
-                tone={data.totals.runs24h >= 0.8 * data.dailyLimit ? 'warn' : 'neutral'}
-              />
-              <StatCard label="Con error" value={data.totals.errors} icon={AlertTriangle} tone={data.totals.errors > 0 ? 'warn' : 'neutral'} />
-            </div>
+            <KpiStrip
+              columns={3}
+              items={[
+                { id: 'runs', label: 'Análisis (30 días)', value: String(data.totals.runs), change: null, goodWhen: 'neutral' },
+                { id: 'day', label: 'Últimas 24 horas', value: String(data.totals.runs24h), change: null, goodWhen: 'neutral', hint: `Tope del plan: ${data.dailyLimit} al día` },
+                { id: 'errors', label: 'Con error', value: String(data.totals.errors), change: null, goodWhen: 'neutral' },
+              ]}
+            />
             {data.byFeature.length > 0 ? (
               <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
                 {data.byFeature.map((f) => (
@@ -113,7 +110,7 @@ function UsageAndState() {
             <p className={typography.caption}>La voz de cocina usa la voz de cada equipo: no genera llamadas ni costo, por eso no aparece aquí.</p>
           </div>
         )}
-      </SettingsSection>
+      </Section>
     </>
   )
 }
@@ -142,7 +139,7 @@ export function AiSettingsPage() {
     <SettingsPage
       title="IA y voz"
       description="Funciones de IA y voz de esta cuenta y cómo se comportan."
-      subNav={tabs.length > 1 ? <SettingsSubNav label="Secciones de IA y voz" items={tabs} value={tab} onChange={(t) => setParams(t === tabs[0].value ? {} : { tab: t }, { replace: true })} /> : undefined}
+      subNav={tabs.length > 1 ? <SubNav label="Secciones de IA y voz" items={tabs} value={tab} onChange={(t) => setParams(t === tabs[0].value ? {} : { tab: t }, { replace: true })} /> : undefined}
     >
       {tab === 'features' && organization ? (
         <FeaturesPanel

@@ -23,7 +23,7 @@ export function KitchenStatusLine({ lateCount, canConfigure, onConfigure }: { la
   const label = status.state === 'unconfigured' ? 'En vivo' : describeStatus(status, new Date(now))
 
   return (
-    <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
+    <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
       <span className="relative flex size-2 shrink-0" aria-hidden>
         {status.state !== 'closed' && <span className={clsx('absolute inline-flex size-full animate-ping rounded-full opacity-60', dot)} />}
         <span className={clsx('relative inline-flex size-2 rounded-full', dot)} />

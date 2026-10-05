@@ -1,4 +1,5 @@
 import { Avatar } from '@/shared/avatars/Avatar'
+import { Page } from '@/shared/ui/Page'
 import { resolveAvatarKey, type AvatarKey } from '@/shared/avatars/catalog'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { kitchenPath, useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
@@ -52,7 +53,7 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-5">
+    <Page variant="narrow">
       <PageHeader title="Mi perfil" icon={UserRound} description="Tu nombre, tu avatar y tu contraseña. Se ven igual en todas tus cuentas." />
 
       <form onSubmit={onSubmit}>
@@ -99,7 +100,7 @@ export function ProfilePage() {
 
       <PasswordCard email={user?.email ?? ''} />
       <AccessCard />
-    </div>
+    </Page>
   )
 }
 

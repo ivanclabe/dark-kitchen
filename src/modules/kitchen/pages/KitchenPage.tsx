@@ -13,6 +13,8 @@ import { useNow } from '@/shared/hooks/useNow'
 import { IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
+import { Page } from '@/shared/ui/Page'
+import { PageHeader } from '@/shared/ui/PageHeader'
 import { typography } from '@/shared/ui/typography'
 import { kitchenSpeech } from '@/shared/voice/speechQueue'
 import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
@@ -192,15 +194,14 @@ export function KitchenPage() {
 
   return (
     <BoardActionsContext.Provider value={boardActions}>
-      <div className="flex h-full min-h-0 flex-col gap-4">
+      <Page variant="board">
         <div className="shrink-0 space-y-4">
-          <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-            <div className="min-w-0">
-              <h1 className={typography.h1}>Cocina</h1>
-              <KitchenStatusLine lateCount={kpis.late} canConfigure={canConfigure} onConfigure={() => setConfigTab('semanal')} />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
+          <PageHeader
+            title="Cocina"
+            icon={ChefHat}
+            description={<KitchenStatusLine lateCount={kpis.late} canConfigure={canConfigure} onConfigure={() => setConfigTab('semanal')} />}
+            actions={
+              <>
               {searchOpen ? (
                 <div className="relative">
                   <Search size={14} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500" aria-hidden />
@@ -250,8 +251,9 @@ export function KitchenPage() {
                   </button>
                 )}
               />
-            </div>
-          </header>
+              </>
+            }
+          />
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Kpi label="En cola" value={kpis.cola} />
@@ -297,7 +299,7 @@ export function KitchenPage() {
             <SlaView tickets={prepOrders} now={now} />
           )}
         </div>
-      </div>
+      </Page>
 
       {configTab && <KitchenConfigDrawer initialTab={configTab} canEdit={canConfigure} onClose={() => setConfigTab(null)} />}
       <OrderDetailDrawer orderId={detailOrderId} onClose={() => setDetailOrder(null)} />

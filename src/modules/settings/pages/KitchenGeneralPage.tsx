@@ -18,8 +18,8 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AccountStatusCard } from '../components/AccountStatusCard'
 import { SettingsPage } from '../ui/SettingsPage'
-import { SettingsSaveBar } from '../ui/SettingsSaveBar'
-import { SettingsSection } from '../ui/SettingsSection'
+import { SaveBar } from '@/shared/ui/SaveBar'
+import { Section } from '@/shared/ui/Section'
 
 const TIMEZONES: { value: string; label: string }[] = [
   { value: 'America/Bogota', label: 'Colombia (Bogotá)' },
@@ -46,9 +46,9 @@ export function KitchenGeneralPage() {
       {can('settings.manage') && <AccountDetailsForm />}
       {organization && canShared('organization.manage') && <BusinessSection organizationId={organization.id} />}
       {canShared('accounts.manage') && (
-        <SettingsSection title="Zona de peligro" description="Desactivar la cuenta detiene toda su operación; sus datos se conservan." card tone="danger">
+        <Section title="Zona de peligro" description="Desactivar la cuenta detiene toda su operación; sus datos se conservan." card tone="danger">
           <AccountStatusCard />
-        </SettingsSection>
+        </Section>
       )}
     </SettingsPage>
   )
@@ -57,7 +57,7 @@ export function KitchenGeneralPage() {
 function BusinessSection({ organizationId }: { organizationId: string }) {
   const details = useOrganizationDetails(organizationId)
   return (
-    <SettingsSection title="Tu negocio" description="Aplica a todas tus cuentas.">
+    <Section title="Tu negocio" description="Aplica a todas tus cuentas.">
       {details.isLoading ? (
         <LoadingState variant="block" />
       ) : details.isError || !details.data ? (
@@ -65,7 +65,7 @@ function BusinessSection({ organizationId }: { organizationId: string }) {
       ) : (
         <OrgGeneralForm key={details.data.id} org={details.data} />
       )}
-    </SettingsSection>
+    </Section>
   )
 }
 
@@ -135,7 +135,7 @@ function AccountDetailsForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-      <SettingsSection title="Esta cuenta" description="Cómo se ve en la app y en su dirección." card>
+      <Section title="Esta cuenta" description="Cómo se ve en la app y en su dirección." card>
         <div className="space-y-5">
           <FormGrid>
             <FormField label="Nombre" required error={edited ? nameError : null}>
@@ -177,18 +177,18 @@ function AccountDetailsForm() {
             <AccountIconPicker value={resolveAccountIconKey(form.iconKey, kitchen.id)} onChange={(iconKey) => set({ iconKey })} />
           </div>
         </div>
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection title="Datos fiscales y de contacto" description="Opcionales: aparecen en documentos y soporte." card>
+      <Section title="Datos fiscales y de contacto" description="Opcionales: aparecen en documentos y soporte." card>
         <FormGrid>
           <FormField label="Razón social">{(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
           <FormField label="NIT / identificación">{(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
           <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
           <FormField label="Dirección">{(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} />}</FormField>
         </FormGrid>
-      </SettingsSection>
+      </Section>
 
-      <SettingsSaveBar
+      <SaveBar
         dirty={edited !== null}
         saving={save.isPending}
         savedAt={savedAt}

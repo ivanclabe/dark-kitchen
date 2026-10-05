@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { listPaymentsByCustomer, listReceivables, listRecentPayments, registerPayment } from '../api/receivables'
+import { listPaymentsByCustomer, listReceivables, listReceivablesByCustomer, listRecentPayments, registerPayment } from '../api/receivables'
 import type { RegisterPaymentInput } from '../types'
 
 const RECEIVABLES_KEY = ['receivables'] as const
@@ -7,6 +7,11 @@ const PAYMENTS_KEY = ['payments'] as const
 
 export function useReceivables(enabled = true) {
   return useQuery({ queryKey: RECEIVABLES_KEY, queryFn: listReceivables, enabled })
+}
+
+/** Under RECEIVABLES_KEY: a registered payment refreshes it too. */
+export function useCustomerReceivables(customerId: string | null | undefined, enabled = true) {
+  return useQuery({ queryKey: [...RECEIVABLES_KEY, 'by-customer', customerId], queryFn: () => listReceivablesByCustomer(customerId!), enabled: !!customerId && enabled })
 }
 
 export function usePaymentsByCustomer(customerId: string) {
@@ -25,6 +30,8 @@ export function useRegisterPayment() {
       queryClient.invalidateQueries({ queryKey: RECEIVABLES_KEY })
       queryClient.invalidateQueries({ queryKey: PAYMENTS_KEY })
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      // Balances of the customers list and detail (ADR 0028).
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
     },
   })
 }

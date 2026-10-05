@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Lock, Sparkles, Workflow } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { SettingsSection } from '@/modules/settings/ui/SettingsSection'
+import { Section } from '@/shared/ui/Section'
 import { cardClass } from '@/shared/ui/formClasses'
 import { accountFeaturesKey, useAccountFeatureMatrix } from '../hooks/useAccountFeatures'
 import { FeatureSettingsSection } from './FeatureSettings'
@@ -62,7 +62,7 @@ export function FeaturesPanel({
   return (
     <div className="space-y-8">
       {categories.map((category) => (
-        <SettingsSection
+        <Section
           key={category}
           title={FEATURE_CATEGORY_LABEL[category]}
           description={category === 'ai' ? 'Activar una función aquí no la activa en tus otras cuentas.' : undefined}
@@ -84,7 +84,7 @@ export function FeaturesPanel({
                   />
                 ))}
             </div>
-        </SettingsSection>
+        </Section>
       ))}
     </div>
   )

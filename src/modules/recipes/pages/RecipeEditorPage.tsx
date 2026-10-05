@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Page } from '@/shared/ui/Page'
 import { useIngredients } from '@/modules/supply/hooks/useIngredients'
 import type { Ingredient } from '@/modules/supply/types'
 import { useProducts } from '@/modules/products/hooks/useProducts'
@@ -150,7 +151,7 @@ function RecipeForm({
   ]
 
   return (
-    <div className="space-y-6">
+    <Page>
       <PageHeader
         title={`Receta — ${product.name}`}
         description={`Precio de venta: ${formatMoney(product.price)}`}
@@ -235,7 +236,7 @@ function RecipeForm({
         </p>
       )}
       <p className={typography.caption}>Guardar crea una nueva versión de la receta (v{nextVersion}) sin borrar el historial de versiones anteriores.</p>
-    </div>
+    </Page>
   )
 }
 
@@ -251,9 +252,9 @@ export function RecipeEditorPage() {
 
   if (!product || !ingredients || isLoading) {
     return (
-      <div className="space-y-6">
+      <Page>
         <LoadingState variant="block" label="Cargando receta…" />
-      </div>
+      </Page>
     )
   }
 

@@ -1,73 +1,172 @@
+import { useRecentPayments } from '@/modules/cartera/hooks/useReceivables'
+import { Page } from '@/shared/ui/Page'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
-import { useRecentPayments, useReceivables } from '@/modules/cartera/hooks/useReceivables'
-import type { Receivable } from '@/modules/cartera/types'
 import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { Input } from '@/shared/ui/FormField'
-import { LoadingState } from '@/shared/ui/LoadingState'
+import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { StatCard } from '@/shared/ui/StatCard'
-import { formatDateTime, formatMoney, todayStr } from '@/shared/utils/format'
-import { AlertTriangle, Clock, Plus, Search, Sparkles, Users, Wallet } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { CustomerCard } from '../components/CustomerCard'
+import { Pagination } from '@/shared/ui/Pagination'
+import { typography } from '@/shared/ui/typography'
+import { formatDateTime, formatMoney } from '@/shared/utils/format'
+import clsx from 'clsx'
+import { Plus, Search, SlidersHorizontal, Users, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
-import { useCustomers } from '../hooks/useCustomers'
-import { computeCustomerBalance } from '../lib/balance'
+import { CustomerTable } from '../components/CustomerTable'
+import { useCustomersPage, useCustomersSummary } from '../hooks/useCustomers'
+import type { CustomerListQuery, CustomerSort, CustomerStatusFilter } from '../types'
 
-type Filter = 'todos' | 'con_saldo' | 'vencidos'
+const PAGE_SIZE = 25
+/** Wait after typing before searching (one query per pause, not per key). */
+const SEARCH_DELAY_MS = 300
 
-/** Dashboard único de Clientes — fusiona lo que antes eran las pestañas "Cuentas por cobrar" y "Clientes", sin tabla gigante: tarjetas + estado en lenguaje simple. */
+function useDebounced<T>(value: T, ms: number): T {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), ms)
+    return () => window.clearTimeout(id)
+  }, [value, ms])
+  return debounced
+}
+
+interface MoreFilters {
+  createdFrom: string
+  createdTo: string
+  minOrders: string
+  minBalance: string
+  maxBalance: string
+}
+const NO_MORE: MoreFilters = { createdFrom: '', createdTo: '', minOrders: '', minBalance: '', maxBalance: '' }
+const num = (s: string) => (s.trim() === '' || Number.isNaN(Number(s)) ? null : Number(s))
+
+/**
+ * Clientes — the customer management center (ADR 0028). Everything heavy
+ * happens in the database: the search (name, phone, address), the filters,
+ * the sort and the pages of 25. The browser never downloads every customer.
+ */
 export function CustomersPage() {
   const { can } = useActiveKitchen()
-  const { data: customers, isLoading, isError, error, refetch } = useCustomers()
-  const { data: receivables } = useReceivables()
-  const { data: recentPayments } = useRecentPayments(8)
-  const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<Filter>('todos')
+  const showDebt = can('receivables.view')
+  const showOrders = can('orders.view') || showDebt
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounced(search, SEARCH_DELAY_MS)
+  const [status, setStatus] = useState<CustomerStatusFilter>('all')
+  const [sort, setSort] = useState<{ key: CustomerSort; dir: 'asc' | 'desc' } | null>(null)
+  const [page, setPage] = useState(0)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [more, setMore] = useState<MoreFilters>(NO_MORE)
   const [createOpen, setCreateOpen] = useState(false)
-  const today = todayStr()
 
-  const receivablesByCustomer = useMemo(() => {
-    const map = new Map<string, Receivable[]>()
-    for (const r of receivables ?? []) {
-      const list = map.get(r.customerId)
-      if (list) list.push(r)
-      else map.set(r.customerId, [r])
-    }
-    return map
-  }, [receivables])
+  const query: CustomerListQuery = useMemo(
+    () => ({
+      search: debouncedSearch,
+      status,
+      sort: sort?.key ?? null,
+      dir: sort?.dir ?? null,
+      page,
+      pageSize: PAGE_SIZE,
+      createdFrom: more.createdFrom || null,
+      createdTo: more.createdTo || null,
+      minOrders: showOrders ? num(more.minOrders) : null,
+      minBalance: showDebt ? num(more.minBalance) : null,
+      maxBalance: showDebt ? num(more.maxBalance) : null,
+    }),
+    [debouncedSearch, status, sort, page, more, showOrders, showDebt],
+  )
+  const list = useCustomersPage(query)
+  const summary = useCustomersSummary()
+  const { data: recentPayments } = useRecentPayments(6)
 
-  const summary = useMemo(() => {
-    const rows = receivables ?? []
-    const totalPending = rows.reduce((sum, r) => sum + r.balance, 0)
-    const overdueRows = rows.filter((r) => r.dueDate && r.dueDate < today)
-    const totalOverdue = overdueRows.reduce((sum, r) => sum + r.balance, 0)
-    const customersWithBalance = receivablesByCustomer.size
-    const recentCustomerIds = new Set((recentPayments ?? []).map((p) => p.customerId))
-    return { totalPending, totalOverdue, customersWithBalance, recentPaymentsCount: recentPayments?.length ?? 0, recentCustomers: recentCustomerIds.size }
-  }, [receivables, today, receivablesByCustomer, recentPayments])
+  // Any change of search or filters starts again at page 1.
+  const resetPage = <T,>(fn: (v: T) => void) => (v: T) => {
+    fn(v)
+    setPage(0)
+  }
+  const onSort = (key: CustomerSort) => {
+    const current = sort ?? (list.data ? { key: list.data.sort, dir: list.data.dir } : null)
+    setSort({ key, dir: current?.key === key ? (current.dir === 'desc' ? 'asc' : 'desc') : key === 'name' ? 'asc' : 'desc' })
+    setPage(0)
+  }
+  const activeSort = sort ?? (list.data ? { key: list.data.sort, dir: list.data.dir } : { key: 'name' as const, dir: 'asc' as const })
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return (customers ?? []).filter((c) => {
-      if (q && !c.fullName.toLowerCase().includes(q) && !(c.phone?.toLowerCase().includes(q) ?? false)) return false
-      const balance = computeCustomerBalance(receivablesByCustomer.get(c.id) ?? [])
-      if (filter === 'con_saldo' && balance.balance <= 0) return false
-      if (filter === 'vencidos' && !balance.overdue) return false
-      return true
-    })
-  }, [customers, query, filter, receivablesByCustomer])
+  const moreCount = Object.values(more).filter((v) => v.trim() !== '').length
+  const filtered = debouncedSearch.trim() !== '' || status !== 'all' || moreCount > 0
+  const clearAll = () => {
+    setSearch('')
+    setStatus('all')
+    setMore(NO_MORE)
+    setPage(0)
+  }
+
+  const s = summary.data
+  const kpis: Kpi[] = [
+    { id: 'total', label: 'Total clientes', value: (s?.total ?? 0).toLocaleString('es-CO'), change: null, goodWhen: 'neutral', onSelect: () => resetPage(setStatus)('all') },
+    ...(showOrders
+      ? [{ id: 'active', label: 'Activos', value: (s?.active ?? 0).toLocaleString('es-CO'), change: null, goodWhen: 'neutral' as const, hint: 'Con un pedido en 90 días', onSelect: () => resetPage(setStatus)('active') }]
+      : []),
+    ...(showDebt
+      ? [
+          { id: 'debt', label: 'Con deuda', value: (s?.withDebt ?? 0).toLocaleString('es-CO'), change: null, goodWhen: 'neutral' as const, onSelect: () => resetPage(setStatus)('debt') },
+          {
+            id: 'balance',
+            label: 'Saldo pendiente',
+            value: formatMoney(s?.pendingBalance ?? 0),
+            change: null,
+            goodWhen: 'neutral' as const,
+            hint: s?.overdueBalance ? `${formatMoney(s.overdueBalance)} vencido` : 'Nada vencido',
+            onSelect: () => resetPage(setStatus)(s?.overdueBalance ? 'overdue' : 'debt'),
+          },
+        ]
+      : []),
+  ]
+
+  const chips: { value: CustomerStatusFilter; label: string; show: boolean }[] = [
+    { value: 'all', label: 'Todos', show: true },
+    { value: 'active', label: 'Activos', show: showOrders },
+    { value: 'inactive', label: 'Inactivos', show: showOrders },
+    { value: 'debt', label: 'Con deuda', show: showDebt },
+    { value: 'no_debt', label: 'Sin deuda', show: showDebt },
+    { value: 'overdue', label: 'Vencidos', show: showDebt },
+  ]
+
+  const isEmptyBusiness = !filtered && (s?.total ?? list.data?.total) === 0
+  const emptyState = isEmptyBusiness ? (
+    <EmptyState
+      icon={Users}
+      title="No hay clientes todavía"
+      description="Agrega tu primer cliente para comenzar. También se crean solos al registrar un pedido por WhatsApp."
+      action={
+        can('customers.create') ? (
+          <Button variant="primary" size="sm" icon={Plus} onClick={() => setCreateOpen(true)}>
+            Nuevo cliente
+          </Button>
+        ) : undefined
+      }
+      compact
+    />
+  ) : (
+    <EmptyState
+      icon={Search}
+      title="No encontramos clientes que coincidan con tu búsqueda"
+      description="Prueba con otro nombre, teléfono o dirección, o quita los filtros."
+      action={
+        <Button variant="secondary" size="sm" icon={X} onClick={clearAll}>
+          Quitar filtros
+        </Button>
+      }
+      compact
+    />
+  )
 
   return (
-    <div className="space-y-6">
+    <Page>
       <PageHeader
         title="Clientes"
-        description={customers ? `${customers.length} clientes` : 'Clientes, saldos y pagos en un solo lugar.'}
         icon={Users}
+        description="Gestiona y consulta los clientes de tu negocio."
         actions={
           can('customers.create') && (
             <Button variant="primary" icon={Plus} onClick={() => setCreateOpen(true)}>
@@ -77,82 +176,109 @@ export function CustomersPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard label="Total pendiente" value={formatMoney(summary.totalPending)} hint={`${receivables?.length ?? 0} pedidos con saldo`} icon={Wallet} tone="brand" emphasis />
-        <StatCard
-          label="Vencido"
-          value={formatMoney(summary.totalOverdue)}
-          hint={summary.totalOverdue > 0 ? 'Requiere seguimiento' : 'Nada vencido'}
-          icon={AlertTriangle}
-          tone={summary.totalOverdue > 0 ? 'warn' : 'good'}
-        />
-        <StatCard label="Clientes con saldo" value={summary.customersWithBalance} icon={Clock} />
-        <StatCard label="Pagos recientes" value={summary.recentPaymentsCount} hint={`${summary.recentCustomers} clientes`} icon={Sparkles} tone="good" />
-      </div>
+      <KpiStrip items={kpis} columns={4} />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative max-w-sm flex-1">
-              <Search size={14} className="pointer-events-none absolute left-3.5 top-1/2 mt-[3px] -translate-y-1/2 text-neutral-500" aria-hidden />
-              <Input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre o teléfono…" aria-label="Buscar clientes" className="pl-9" />
-            </div>
-            <Chip label="Todos" active={filter === 'todos'} onClick={() => setFilter('todos')} />
-            <Chip label="Con saldo" active={filter === 'con_saldo'} onClick={() => setFilter('con_saldo')} />
-            <Chip label="Vencidos" active={filter === 'vencidos'} onClick={() => setFilter('vencidos')} />
-          </div>
-
-          {isError ? (
-            <ErrorState error={error} onRetry={() => void refetch()} />
-          ) : isLoading ? (
-            <LoadingState variant="cards" rows={2} cols={3} />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title={query || filter !== 'todos' ? 'Sin resultados' : 'Todavía no hay clientes'}
-              description={
-                query || filter !== 'todos' ? 'Ajusta la búsqueda o el filtro.' : 'Los clientes también se crean solos al registrar un pedido por WhatsApp.'
-              }
-              action={
-                !query && filter === 'todos' && can('customers.create') ? (
-                  <Button variant="primary" size="sm" icon={Plus} onClick={() => setCreateOpen(true)}>
-                    Crear el primero
-                  </Button>
-                ) : undefined
-              }
-              compact
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative min-w-0 flex-1 basis-64">
+            <Search size={15} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-neutral-500" aria-hidden />
+            <Input
+              type="search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(0)
+              }}
+              placeholder="Buscar por nombre, teléfono o dirección…"
+              aria-label="Buscar clientes"
+              className="!mt-0 pl-10"
             />
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((customer) => (
-                <CustomerCard key={customer.id} customer={customer} balance={computeCustomerBalance(receivablesByCustomer.get(customer.id) ?? [])} />
-              ))}
-            </div>
+          </div>
+          <Button variant={moreOpen || moreCount ? 'secondary' : 'ghost'} icon={SlidersHorizontal} onClick={() => setMoreOpen((v) => !v)} aria-expanded={moreOpen}>
+            Más filtros{moreCount ? ` (${moreCount})` : ''}
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar clientes">
+          {chips
+            .filter((c) => c.show)
+            .map((c) => (
+              <Chip key={c.value} label={c.label} active={status === c.value} onClick={() => resetPage(setStatus)(c.value)} />
+            ))}
+          {filtered && (
+            <button type="button" onClick={clearAll} className="ml-1 text-sm text-neutral-400 hover:text-neutral-200">
+              Quitar filtros
+            </button>
           )}
         </div>
-
-        <Card title="Actividad reciente" icon={Sparkles} className="h-fit">
-          {!recentPayments || recentPayments.length === 0 ? (
-            <p className="text-sm text-neutral-500">Todavía no hay pagos registrados.</p>
-          ) : (
-            <ul className="space-y-3">
-              {recentPayments.map((p) => (
-                <li key={p.id} className="flex items-start justify-between gap-2 text-sm">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-neutral-200">{p.customerName}</p>
-                    <p className="text-xs text-neutral-500">
-                      #{p.orderNumber} · {formatDateTime(p.createdAt)}
-                    </p>
-                  </div>
-                  <span className="shrink-0 font-semibold tabular-nums text-emerald-400">+{formatMoney(p.amount)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+        {moreOpen && (
+          <div className="grid gap-3 rounded-2xl border border-neutral-800/60 p-4 sm:grid-cols-2 lg:grid-cols-5">
+            <label className="text-xs text-neutral-400">
+              Registrado desde
+              <Input type="date" value={more.createdFrom} onChange={(e) => resetPage(setMore)({ ...more, createdFrom: e.target.value })} />
+            </label>
+            <label className="text-xs text-neutral-400">
+              Registrado hasta
+              <Input type="date" value={more.createdTo} onChange={(e) => resetPage(setMore)({ ...more, createdTo: e.target.value })} />
+            </label>
+            {showOrders && (
+              <label className="text-xs text-neutral-400">
+                Pedidos mínimos
+                <Input type="number" min={0} inputMode="numeric" value={more.minOrders} onChange={(e) => resetPage(setMore)({ ...more, minOrders: e.target.value })} />
+              </label>
+            )}
+            {showDebt && (
+              <>
+                <label className="text-xs text-neutral-400">
+                  Saldo desde
+                  <Input type="number" min={0} inputMode="numeric" value={more.minBalance} onChange={(e) => resetPage(setMore)({ ...more, minBalance: e.target.value })} />
+                </label>
+                <label className="text-xs text-neutral-400">
+                  Saldo hasta
+                  <Input type="number" min={0} inputMode="numeric" value={more.maxBalance} onChange={(e) => resetPage(setMore)({ ...more, maxBalance: e.target.value })} />
+                </label>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
+      {list.isError ? (
+        <ErrorState error={list.error} onRetry={() => void list.refetch()} />
+      ) : (
+        <div className={clsx('space-y-4 transition-opacity', list.isPlaceholderData && 'opacity-60')} aria-busy={list.isFetching}>
+          <CustomerTable
+            rows={list.data?.rows}
+            showOrders={list.data?.orders ?? showOrders}
+            showDebt={list.data?.debt ?? showDebt}
+            sort={activeSort}
+            onSort={onSort}
+            isLoading={list.isLoading}
+            emptyState={emptyState}
+          />
+          {list.data && <Pagination page={page} pageSize={PAGE_SIZE} total={list.data.total} onPage={setPage} label="clientes" />}
+        </div>
+      )}
+
+      {showDebt && !!recentPayments?.length && (
+        <section className="space-y-3">
+          <h2 className={typography.h3}>Últimos pagos</h2>
+          <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
+            {recentPayments.map((p) => (
+              <li key={p.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <span className="min-w-0 truncate">
+                  <span className="font-medium text-neutral-200">{p.customerName}</span>
+                  <span className="ml-2 text-neutral-500">
+                    #{p.orderNumber} · {formatDateTime(p.createdAt)}
+                  </span>
+                </span>
+                <span className="shrink-0 font-medium tabular-nums text-emerald-400">+{formatMoney(p.amount)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <CustomerFormModal open={createOpen} onClose={() => setCreateOpen(false)} />
-    </div>
+    </Page>
   )
 }

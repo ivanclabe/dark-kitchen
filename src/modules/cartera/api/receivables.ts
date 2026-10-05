@@ -41,6 +41,17 @@ export async function listReceivables(): Promise<Receivable[]> {
   return (data as unknown as ReceivableRow[]).map(mapRow)
 }
 
+/** Pedidos con saldo de UN cliente, filtrados en la base (ADR 0028: nunca todos para filtrar en el navegador). */
+export async function listReceivablesByCustomer(customerId: string): Promise<Receivable[]> {
+  const { data, error } = await supabase
+    .from('dk_receivables')
+    .select('order_id, order_number, customer_id, customer_name, customer_phone, status, total, paid_amount, balance, due_date, created_at')
+    .eq('customer_id', customerId)
+    .order('due_date', { ascending: true, nullsFirst: false })
+  if (error) throw error
+  return (data as unknown as ReceivableRow[]).map(mapRow)
+}
+
 /** Registra un abono/pago contra un pedido vía dk_register_payment (valida rol, estado y que no exceda el saldo). */
 export async function registerPayment(input: RegisterPaymentInput): Promise<void> {
   const { error } = await supabase.rpc('dk_register_payment', {

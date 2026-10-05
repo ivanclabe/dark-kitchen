@@ -1,15 +1,15 @@
-import { SettingsSection } from '@/modules/settings/ui/SettingsSection'
+import { Section } from '@/shared/ui/Section'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Info } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { InsightsData, ProductRow } from '../api'
-import { BarList } from '../components/BarList'
-import { KpiStrip, type Kpi } from '../components/KpiStrip'
-import { SortableHeader, type SortDir } from '../components/SortableHeader'
+import { BarList } from './BarList'
+import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
+import { SortableHeader, type SortDir } from '@/shared/ui/SortableHeader'
 import { sortProducts, type ProductSort } from '../lib/sort'
-import { TrendChart } from '../components/TrendChart'
+import { TrendChart } from './TrendChart'
 import { change, formatChange, formatMoney, formatNumber, formatPercent, formatPoints } from '../lib/format'
 import { CHANNEL_LABEL, dayLabel, NO_CATEGORY, WEEKDAY_LABEL } from '../lib/labels'
 import type { Insight } from '../lib/summary'
@@ -94,7 +94,7 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
     <>
       <KpiStrip items={kpis} compareLabel={compareLabel} />
 
-      <SettingsSection title="Resumen del negocio" description="Conclusiones calculadas con reglas fijas sobre tus datos; nada es estimado por IA.">
+      <Section title="Resumen del negocio" description="Conclusiones calculadas con reglas fijas sobre tus datos; nada es estimado por IA.">
         <ul className="space-y-2">
           {summary.map((i) => {
             const Icon = i.tone === 'warning' ? AlertTriangle : i.tone === 'positive' ? ArrowUpRight : i.tone === 'negative' ? ArrowDownRight : Info
@@ -116,9 +116,9 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
             )
           })}
         </ul>
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection
+      <Section
         title={data.profitability ? 'Ingresos y rentabilidad' : 'Ingresos'}
         description={data.profitability ? 'Por día: ingresos netos de productos, utilidad bruta y margen bruto.' : 'Ingresos por día.'}
         card
@@ -136,10 +136,10 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
               : [{ key: 'revenue', label: 'Ingresos', color: COLORS.revenue, kind: 'bar' }]
           }
         />
-      </SettingsSection>
+      </Section>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <SettingsSection title="Productos que más venden" description="Toca uno para ver sus pedidos.">
+        <Section title="Productos que más venden" description="Toca uno para ver sus pedidos.">
           <BarList
             items={data.products.slice(0, 5).map((p) => ({
               id: p.id,
@@ -150,8 +150,8 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
               onSelect: () => onProduct(p),
             }))}
           />
-        </SettingsSection>
-        <SettingsSection title="Categorías" description="Toca una para ver sus productos.">
+        </Section>
+        <Section title="Categorías" description="Toca una para ver sus productos.">
           <BarList
             items={data.categories.map((c) => ({
               id: c.id ?? 'none',
@@ -167,7 +167,7 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
                 : undefined,
             }))}
           />
-        </SettingsSection>
+        </Section>
       </div>
     </>
   )
@@ -181,7 +181,7 @@ export function SalesTab({ data }: TabProps) {
   const hours = data.byHour.filter((h) => h.orders > 0)
   return (
     <>
-      <SettingsSection title="Ingresos y pedidos por día" card>
+      <Section title="Ingresos y pedidos por día" card>
         <TrendChart
           data={trend}
           format={formatMoney}
@@ -190,22 +190,22 @@ export function SalesTab({ data }: TabProps) {
             { key: 'orders', label: 'Pedidos', color: COLORS.orders, kind: 'line', axis: 'count' },
           ]}
         />
-      </SettingsSection>
+      </Section>
       <div className="grid gap-8 lg:grid-cols-2">
-        <SettingsSection title="Por canal" description="Por dónde llegan los pedidos.">
+        <Section title="Por canal" description="Por dónde llegan los pedidos.">
           <BarList
             items={data.channels.map((c) => ({ id: c.channel, label: CHANNEL_LABEL[c.channel] ?? c.channel, value: c.revenue, valueLabel: formatMoney(c.revenue), detail: `${c.orders} ped.` }))}
           />
-        </SettingsSection>
-        <SettingsSection title="Por día de la semana">
+        </Section>
+        <Section title="Por día de la semana">
           <BarList
             items={data.byWeekday.map((d) => ({ id: String(d.weekday), label: WEEKDAY_LABEL[d.weekday], value: d.revenue, valueLabel: formatMoney(d.revenue), detail: `${d.orders} ped.` }))}
           />
-        </SettingsSection>
+        </Section>
       </div>
-      <SettingsSection title="Por hora del día" description="Hora local de la cuenta.">
+      <Section title="Por hora del día" description="Hora local de la cuenta.">
         <BarList items={hours.map((h) => ({ id: String(h.hour), label: `${String(h.hour).padStart(2, '0')}:00`, value: h.revenue, valueLabel: formatMoney(h.revenue), detail: `${h.orders} ped.` }))} />
-      </SettingsSection>
+      </Section>
     </>
   )
 }
@@ -258,7 +258,7 @@ export function ProductsTab({ data, onProduct, onCategory, compareLabel }: TabPr
   return (
     <>
       {data.categories.length > 0 && (
-        <SettingsSection title="Por categoría" description={data.profitability ? 'Ingresos y margen bruto. Toca una para filtrar.' : 'Toca una para filtrar.'}>
+        <Section title="Por categoría" description={data.profitability ? 'Ingresos y margen bruto. Toca una para filtrar.' : 'Toca una para filtrar.'}>
           <BarList
             items={data.categories.map((c) => ({
               id: c.id ?? 'none',
@@ -269,14 +269,14 @@ export function ProductsTab({ data, onProduct, onCategory, compareLabel }: TabPr
               onSelect: c.id ? () => onCategory(c.id) : undefined,
             }))}
           />
-        </SettingsSection>
+        </Section>
       )}
-      <SettingsSection title="Rentabilidad por producto" description="Ordena por cualquier columna; toca un producto para ver sus pedidos.">
+      <Section title="Rentabilidad por producto" description="Ordena por cualquier columna; toca un producto para ver sus pedidos.">
         <DataTable columns={columns} rows={rows} getRowId={(p) => p.id} onRowClick={onProduct} emptyState={<p className="p-4 text-sm text-neutral-500">Sin ventas de productos en este periodo.</p>} />
         {data.profitability && rows.some((p) => p.costCoverage != null && p.costCoverage < 1) && (
           <p className={typography.caption}>* Parte de sus ventas no tiene costo registrado (producto sin receta): su margen puede estar sobreestimado.</p>
         )}
-      </SettingsSection>
+      </Section>
     </>
   )
 }
@@ -300,7 +300,7 @@ export function CostsTab({ data, compareLabel }: TabProps) {
   return (
     <>
       {data.profitability && (
-        <SettingsSection title="Costo de ventas por día" description="Costo real de lo vendido (y estimado de lo que aún no se prepara), con el margen bruto." card>
+        <Section title="Costo de ventas por día" description="Costo real de lo vendido (y estimado de lo que aún no se prepara), con el margen bruto." card>
           <TrendChart
             data={trend}
             format={formatMoney}
@@ -309,10 +309,10 @@ export function CostsTab({ data, compareLabel }: TabProps) {
               { key: 'margin', label: 'Margen bruto', color: COLORS.margin, kind: 'line', axis: 'percent' },
             ]}
           />
-        </SettingsSection>
+        </Section>
       )}
       {data.profitability && unitCosts.length > 0 && (
-        <SettingsSection title="Costo por unidad" description="Costo real promedio de cada unidad vendida.">
+        <Section title="Costo por unidad" description="Costo real promedio de cada unidad vendida.">
           <DataTable
             columns={[
               { key: 'name', header: 'Producto', cell: (p: ProductRow) => <span className="font-medium text-neutral-100">{p.name}</span> },
@@ -327,10 +327,10 @@ export function CostsTab({ data, compareLabel }: TabProps) {
             rows={unitCosts}
             getRowId={(p) => p.id}
           />
-        </SettingsSection>
+        </Section>
       )}
       <div className="grid gap-8 lg:grid-cols-2">
-        <SettingsSection
+        <Section
           title="Compras por proveedor"
           description={`${formatMoney(data.purchases.total)} en compras confirmadas${data.purchases.previousTotal != null && compareLabel ? ` (antes ${formatMoney(data.purchases.previousTotal)})` : ''}.`}
         >
@@ -338,8 +338,8 @@ export function CostsTab({ data, compareLabel }: TabProps) {
             items={data.purchases.bySupplier.map((s) => ({ id: s.id, label: s.name, value: s.total, valueLabel: formatMoney(s.total), detail: `${s.purchases} compra${s.purchases === 1 ? '' : 's'}` }))}
             emptyText="Sin compras confirmadas en este periodo."
           />
-        </SettingsSection>
-        <SettingsSection
+        </Section>
+        <Section
           title="Mermas"
           description={`${formatMoney(data.waste.total)} perdido${data.waste.previousTotal != null && compareLabel ? ` (antes ${formatMoney(data.waste.previousTotal)})` : ''}.`}
         >
@@ -347,11 +347,11 @@ export function CostsTab({ data, compareLabel }: TabProps) {
             items={data.waste.byIngredient.map((w) => ({ id: w.id, label: w.name, value: w.value, valueLabel: formatMoney(w.value), detail: `${formatNumber(w.quantity)} ${w.unit ?? ''}` }))}
             emptyText="Sin mermas registradas en este periodo."
           />
-        </SettingsSection>
+        </Section>
       </div>
-      <SettingsSection title="Precio de compra de insumos" description="Precio promedio pagado por unidad de compra.">
+      <Section title="Precio de compra de insumos" description="Precio promedio pagado por unidad de compra.">
         <DataTable columns={ingredientColumns} rows={data.purchases.ingredients} getRowId={(i) => `${i.id}-${i.unit}`} emptyState={<p className="p-4 text-sm text-neutral-500">Sin compras en este periodo.</p>} />
-      </SettingsSection>
+      </Section>
       <p className={typography.caption}>No incluye nómina, arriendo ni otros gastos operativos: Quanela todavía no los registra. Por eso se muestra la utilidad bruta y no la utilidad neta.</p>
     </>
   )

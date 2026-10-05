@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Page } from '@/shared/ui/Page'
 import { useNow } from '@/shared/hooks/useNow'
 import { Button, IconButton } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/FormField'
@@ -133,7 +134,7 @@ export function OrdersPage() {
 
   return (
     <BoardActionsContext.Provider value={boardActions}>
-      <div className="flex h-full min-h-0 flex-col gap-4">
+      <Page variant="board">
         <div className="shrink-0 space-y-4">
           <PageHeader
             title="Pedidos"
@@ -218,7 +219,7 @@ export function OrdersPage() {
           {view === 'list' && <OrderListView ref={listSearchRef} onOpen={openDetail} />}
           {view === 'dispatch' && <DispatchView orders={sorted} isLoading={isLoading} now={now} />}
         </div>
-      </div>
+      </Page>
 
       {newOrderOpen && <NewOrderDrawer open onClose={() => setNewOrderOpen(false)} />}
       <RidersDrawer open={ridersOpen} onClose={() => setRidersOpen(false)} canManage={can('dispatch.riders')} />

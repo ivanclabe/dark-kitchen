@@ -9,7 +9,7 @@ import { Copy, Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { deleteRole, type OrgRole, type OrgUser, type PermissionDef, type RoleUsage } from '../api/organization'
 import { orgKey } from '../hooks/useOrganization'
-import { SettingsSection } from '@/modules/settings/ui/SettingsSection'
+import { Section } from '@/shared/ui/Section'
 import { RoleEditorDrawer } from './RoleEditorDrawer'
 
 type Editing = { role: OrgRole | null; draft?: { name: string; permissions: string[] } }
@@ -113,7 +113,7 @@ export function RolesPanel({
 
   return (
     <div className="space-y-8">
-      <SettingsSection
+      <Section
         title="Roles propios"
         description="Aplican a todas tus cuentas: un cambio afecta a todas las que usan el rol."
         actions={
@@ -133,15 +133,15 @@ export function RolesPanel({
             ))}
           </ul>
         )}
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection title="Plantillas del sistema" description="Iguales en toda la plataforma: no se editan, pero puedes duplicarlas.">
+      <Section title="Plantillas del sistema" description="Iguales en toda la plataforma: no se editan, pero puedes duplicarlas.">
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {system.map((r) => (
             <RoleCard key={r.id} role={r} />
           ))}
         </ul>
-      </SettingsSection>
+      </Section>
 
       {editing && (
         <RoleEditorDrawer

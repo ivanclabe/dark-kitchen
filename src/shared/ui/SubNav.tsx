@@ -11,7 +11,7 @@ export interface SubNavItem<T extends string> {
  * an underline, smaller and lighter than the main navigation so they never
  * compete with it. Real ARIA tabs (arrows ←/→ move the selection).
  */
-export function SettingsSubNav<T extends string>({ items, value, onChange, label }: { items: SubNavItem<T>[]; value: T; onChange: (value: T) => void; label: string }) {
+export function SubNav<T extends string>({ items, value, onChange, label }: { items: SubNavItem<T>[]; value: T; onChange: (value: T) => void; label: string }) {
   const refs = useRef<Partial<Record<T, HTMLButtonElement | null>>>({})
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {

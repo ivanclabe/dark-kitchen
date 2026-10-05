@@ -11,7 +11,7 @@ import clsx from 'clsx'
 import { RotateCcw, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 import { ScopeChoice, type SettingsScope } from './ScopeChoice'
-import { SettingsSaveBar } from '@/modules/settings/ui/SettingsSaveBar'
+import { SaveBar } from '@/shared/ui/SaveBar'
 import { diffFrom, fieldError, fieldsFor, settingsSummary, type EditableField } from '../lib/featureSettingFields'
 
 type Feature = FeatureMatrix['features'][number]
@@ -207,7 +207,7 @@ export function FeatureSettingsSection({
           </div>
         )}
         {canEdit && (
-          <SettingsSaveBar
+          <SaveBar
             dirty={draft !== null}
             saving={busy}
             savedAt={savedAt}

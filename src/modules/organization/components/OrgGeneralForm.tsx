@@ -1,5 +1,5 @@
 import { MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
-import { SettingsSaveBar } from '@/modules/settings/ui/SettingsSaveBar'
+import { SaveBar } from '@/shared/ui/SaveBar'
 import { cardClass } from '@/shared/ui/formClasses'
 import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
@@ -108,7 +108,7 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
           </FormField>
         </FormGrid>
       </div>
-      <SettingsSaveBar
+      <SaveBar
         dirty={edited !== null}
         saving={save.isPending}
         savedAt={savedAt}

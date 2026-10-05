@@ -8,11 +8,11 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { Input, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
-import { ShieldCheck, UserPlus, Users } from 'lucide-react'
+import { ShieldCheck, UserCog, UserPlus, Users } from 'lucide-react'
 import { formatDate, formatDateTime } from '@/shared/utils/format'
 import { useMemo, useState } from 'react'
 import { Navigate, Outlet, useSearchParams } from 'react-router-dom'
-import { SectionLayout } from '@/modules/settings/ui/SectionLayout'
+import { SectionLayout } from '@/shared/ui/SectionLayout'
 import { SettingsPage } from '@/modules/settings/ui/SettingsPage'
 import type { OrgAccount, OrgRole, OrgUser } from '../api/organization'
 import { RolesPanel } from '../components/RolesPanel'
@@ -62,6 +62,7 @@ export function UsersLayout() {
     <SectionLayout
       title="Usuarios"
       description={`Personas de ${kitchen.name} y lo que puede hacer cada una.`}
+      icon={UserCog}
       navLabel="Secciones de usuarios"
       sections={[
         { to: path('/users'), label: 'Usuarios', icon: Users, end: true },

@@ -1,4 +1,5 @@
 import { MasterMenusPanel } from '@/modules/platform/components/MasterMenusPanel'
+import { Page } from '@/shared/ui/Page'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { buttonClass } from '@/shared/ui/Button'
@@ -13,7 +14,7 @@ import { ArrowLeft, Layers } from 'lucide-react'
 export function SharedDishesPage() {
   const { kitchen } = useActiveKitchen()
   return (
-    <div className="space-y-6">
+    <Page>
       <PageHeader
         title="Platos compartidos"
         icon={Layers}
@@ -25,6 +26,6 @@ export function SharedDishesPage() {
         }
       />
       <MasterMenusPanel organizationId={kitchen.organizationId} account={{ id: kitchen.id, name: kitchen.name }} />
-    </div>
+    </Page>
   )
 }

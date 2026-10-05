@@ -1,7 +1,6 @@
-import { typography } from '@/shared/ui/typography'
+import { typography } from './typography'
 import clsx from 'clsx'
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
-import { formatChange } from '../lib/format'
 
 /** Which direction is good news for this figure (costs going up is not). */
 export type GoodWhen = 'up' | 'down' | 'neutral'
@@ -34,15 +33,26 @@ function Sparkline({ values }: { values: number[] }) {
   )
 }
 
+/** +0.124 → "+12,4 %". */
+function formatChange(ratio: number): string {
+  const sign = ratio > 0 ? '+' : ratio < 0 ? '−' : ''
+  return `${sign}${Math.abs(ratio * 100).toLocaleString('es-CO', { maximumFractionDigits: 1 })} %`
+}
+
 /**
- * The key figures in ONE strip (ADR 0027): value, change vs the previous
+ * The key figures in ONE strip (ADR 0027, used by Insights and Clientes): value, change vs the previous
  * period and a tiny trend — not a wall of separate cards. A figure with no
  * previous value says so instead of showing a made-up percentage.
  */
-export function KpiStrip({ items, compareLabel }: { items: Kpi[]; compareLabel: string | null }) {
+export function KpiStrip({ items, compareLabel = null, columns = 6 }: { items: Kpi[]; compareLabel?: string | null; columns?: 3 | 4 | 6 }) {
   return (
     // gap-px over the line color draws the dividers between tiles at every breakpoint.
-    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-neutral-800/60 bg-neutral-800/60 sm:grid-cols-3 xl:grid-cols-6">
+    <div
+      className={clsx(
+        'grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-neutral-800/60 bg-neutral-800/60',
+        columns === 6 ? 'sm:grid-cols-3 xl:grid-cols-6' : columns === 4 ? 'lg:grid-cols-4' : 'sm:grid-cols-3',
+      )}
+    >
       {items.map((k) => {
         const tone =
           k.change === null || k.goodWhen === 'neutral' || k.change === 0

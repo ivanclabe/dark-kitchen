@@ -1,14 +1,16 @@
-import { SettingsSubNav } from '@/modules/settings/ui/SettingsSubNav'
+import { SubNav } from '@/shared/ui/SubNav'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { Input, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
+import { Page } from '@/shared/ui/Page'
+import { PageHeader } from '@/shared/ui/PageHeader'
 import { Switch } from '@/shared/ui/Switch'
 import { typography } from '@/shared/ui/typography'
 import { todayStr } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { Download, X } from 'lucide-react'
+import { BarChart3, Download, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ProductRow } from '../api'
@@ -18,7 +20,7 @@ import { downloadCsv, toCsv } from '../lib/csv'
 import { exportRows } from '../lib/exportTab'
 import { compareRange, presetRange, PRESET_LABEL, rangeLabel, type DateRange, type PeriodPreset } from '../lib/periods'
 import { businessSummary } from '../lib/summary'
-import { CostsTab, OverviewTab, ProductsTab, SalesTab, type InsightsTab } from './tabs'
+import { CostsTab, OverviewTab, ProductsTab, SalesTab, type InsightsTab } from '../components/InsightsTabs'
 
 const TABS: { value: InsightsTab; label: string }[] = [
   { value: 'overview', label: 'Resumen' },
@@ -74,19 +76,21 @@ export function InsightsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
-      <header className="mb-5 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0">
-          <h1 className={typography.h1}>Insights</h1>
-          <p className={clsx('mt-1', typography.small)}>Cómo va {kitchen.name}: ventas, costos y rentabilidad.</p>
-        </div>
-        <Button variant="secondary" icon={Download} onClick={exportCsv} disabled={!data}>
-          Exportar CSV
-        </Button>
-      </header>
+    <Page>
+      <PageHeader
+        title="Insights"
+        icon={BarChart3}
+        description={`Cómo va ${kitchen.name}: ventas, costos y rentabilidad.`}
+        actions={
+          <Button variant="secondary" icon={Download} onClick={exportCsv} disabled={!data}>
+            Exportar CSV
+          </Button>
+        }
+      />
 
       {/* One row of filters for every tab. */}
-      <div className="mb-5 flex flex-wrap items-center gap-2" role="group" aria-label="Filtros de Insights">
+      <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filtros de Insights">
         <Select value={preset} onChange={(e) => setPreset(e.target.value as PeriodPreset)} aria-label="Periodo" className="!mt-0 w-auto min-w-[10rem]">
           {(Object.keys(PRESET_LABEL) as PeriodPreset[]).map((p) => (
             <option key={p} value={p}>
@@ -145,15 +149,14 @@ export function InsightsPage() {
           </span>
         </label>
       </div>
-      <p className={clsx('mb-4', typography.caption)}>
+      <p className={typography.caption}>
         {rangeLabel(range)}
         {data ? ` · hora de ${data.timezone}` : ''}
         {filtered ? ' · con filtros: los indicadores cuentan solo los productos filtrados' : ''}
       </p>
-
-      <div className="mb-6">
-        <SettingsSubNav label="Secciones de Insights" items={TABS} value={tab} onChange={setTab} />
       </div>
+
+      <SubNav label="Secciones de Insights" items={TABS} value={tab} onChange={setTab} />
 
       {!validRange ? (
         <p className="text-sm text-amber-300">La fecha inicial debe ser anterior a la final.</p>
@@ -171,6 +174,6 @@ export function InsightsPage() {
       )}
 
       {openProduct && <ProductOrdersDrawer product={openProduct} from={range.from} to={range.to} periodLabel={rangeLabel(range)} onClose={() => setOpenProduct(null)} />}
-    </div>
+    </Page>
   )
 }

@@ -1,7 +1,8 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Settings } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { settingsSections } from '../sections'
-import { SectionLayout } from '../ui/SectionLayout'
+import { SectionLayout } from '@/shared/ui/SectionLayout'
 
 /**
  * Configuración of the active account (ADR 0024, ADR 0026): General,
@@ -24,7 +25,7 @@ export function SettingsLayout() {
   if (!sections.some((s) => current === s.to || current.startsWith(`${s.to}/`))) return <Navigate to={sections[0].to} replace />
 
   return (
-    <SectionLayout title="Configuración" description={`Ajustes de ${kitchen.name}.`} navLabel="Secciones de configuración" sections={sections}>
+    <SectionLayout title="Configuración" description={`Ajustes de ${kitchen.name}.`} icon={Settings} navLabel="Secciones de configuración" sections={sections}>
       <Outlet />
     </SectionLayout>
   )

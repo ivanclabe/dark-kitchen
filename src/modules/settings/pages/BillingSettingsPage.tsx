@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FileText, Wallet } from 'lucide-react'
 import { fetchInvoices, type Invoice } from '../api'
 import { SettingsPage } from '../ui/SettingsPage'
-import { SettingsSection } from '../ui/SettingsSection'
+import { Section } from '@/shared/ui/Section'
 import { StatusBadge } from '../ui/StatusBadge'
 
 /**
@@ -53,11 +53,11 @@ function Billing({ organizationId }: { organizationId: string }) {
 
   return (
     <SettingsPage title="Facturación" description="Tu plan, su uso y tus facturas.">
-      <SettingsSection title="Plan" description="Aplica a todas tus cuentas: qué plan tienes, cuánto usas y qué incluye.">
+      <Section title="Plan" description="Aplica a todas tus cuentas: qué plan tienes, cuánto usas y qué incluye.">
         <PlanPanel organizationId={organizationId} />
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection title="Facturas">
+      <Section title="Facturas">
         <DataTable
           columns={columns}
           rows={invoices.data}
@@ -67,9 +67,9 @@ function Billing({ organizationId }: { organizationId: string }) {
           onRetry={() => void invoices.refetch()}
           emptyState={<EmptyState icon={FileText} title="Aún no hay facturas" description="Los pagos en línea todavía no están activos. Cuando lo estén, aquí verás cada factura." compact />}
         />
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection title="Método de pago" card>
+      <Section title="Método de pago" card>
         <div className="flex items-start gap-3">
           <Wallet size={18} className="mt-0.5 shrink-0 text-neutral-500" aria-hidden />
           <div className="min-w-0">
@@ -79,7 +79,7 @@ function Billing({ organizationId }: { organizationId: string }) {
             </p>
           </div>
         </div>
-      </SettingsSection>
+      </Section>
     </SettingsPage>
   )
 }

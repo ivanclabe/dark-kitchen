@@ -1,4 +1,5 @@
 import { useReceivables } from '@/modules/cartera/hooks/useReceivables'
+import { Page } from '@/shared/ui/Page'
 import { fetchAccountAlerts } from '@/modules/settings/api'
 import { AlertList } from '@/modules/settings/components/AlertList'
 import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
@@ -690,7 +691,7 @@ export function DashboardPage() {
   const firstName = profile?.fullName?.split(' ')[0] ?? 'usuario'
 
   return (
-    <div className="space-y-6">
+    <Page>
       <DashboardHero firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
 
       <AccountAlerts />
@@ -705,6 +706,6 @@ export function DashboardPage() {
         <CarteraCard summary={data} liveOps={canSeeLiveOps} />
         {can('staff.view') && <OnShiftCard />}
       </div>
-    </div>
+    </Page>
   )
 }

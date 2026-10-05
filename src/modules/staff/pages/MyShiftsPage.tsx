@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { Page } from '@/shared/ui/Page'
 import { useNow } from '@/shared/hooks/useNow'
 import { Card } from '@/shared/ui/Card'
 import { PageHeader } from '@/shared/ui/PageHeader'
@@ -25,7 +26,7 @@ export function MyShiftsPage() {
   const day = (iso: string) => new Date(iso).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' })
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
+    <Page variant="narrow">
       <PageHeader title="Mis turnos" icon={CalendarClock} description="Tus turnos en esta cuenta y tu entrada y salida." />
       <ClockCard />
       <Card title="Próximos turnos" icon={CalendarDays}>
@@ -45,6 +46,6 @@ export function MyShiftsPage() {
         )}
       </Card>
       {past.length > 0 && <p className="text-sm text-neutral-500">Última semana: {formatHours(workedLastWeek)} trabajadas en {past.length} turnos.</p>}
-    </div>
+    </Page>
   )
 }

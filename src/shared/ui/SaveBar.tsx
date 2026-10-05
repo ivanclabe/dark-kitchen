@@ -1,4 +1,4 @@
-import { Button } from '@/shared/ui/Button'
+import { Button } from './Button'
 import clsx from 'clsx'
 import { Check } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -12,7 +12,7 @@ const SAVED_MS = 3000
  * saves; «✓ Guardado» for a moment after; the error inline with «Reintentar».
  * Inside a <form> the save button submits it; otherwise it calls `onSave`.
  */
-export function SettingsSaveBar({
+export function SaveBar({
   dirty,
   saving,
   savedAt,

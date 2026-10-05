@@ -46,7 +46,7 @@ export function PageHeader({
               <h1 className={typography.h1}>{title}</h1>
               {meta}
             </div>
-            {description && <p className={`mt-0.5 ${typography.small}`}>{description}</p>}
+            {description && <div className={`mt-0.5 ${typography.small}`}>{description}</div>}
           </div>
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

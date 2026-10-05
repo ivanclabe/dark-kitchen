@@ -3,21 +3,21 @@ import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { StatCard } from '@/shared/ui/StatCard'
+import { KpiStrip } from '@/shared/ui/KpiStrip'
 import { Button } from '@/shared/ui/Button'
 import { typography } from '@/shared/ui/typography'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { Check, Clock, Gauge, Minus, ShoppingBag, Wallet } from 'lucide-react'
+import { Check, Minus } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
 import { fetchAccountObservability, type AccountObservability } from '../api'
 import { EventLog } from '../components/EventLog'
 import { SettingsPage } from '../ui/SettingsPage'
-import { SettingsSection } from '../ui/SettingsSection'
-import { SettingsSubNav, type SubNavItem } from '../ui/SettingsSubNav'
+import { Section } from '@/shared/ui/Section'
+import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
 
 type Tab = 'operacion' | 'bitacora'
 
@@ -46,14 +46,17 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
   const movements = Object.entries(data.inventory.movements)
   return (
     <>
-      <SettingsSection title="Hoy y esta semana" description={`Horas en ${data.account.timezone} · actualizado ${formatDateTime(data.generatedAt)}`}>
+      <Section title="Hoy y esta semana" description={`Horas en ${data.account.timezone} · actualizado ${formatDateTime(data.generatedAt)}`}>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Pedidos de hoy" value={data.orders.today.created} hint={`${data.orders.today.delivered} entregados · ${data.orders.today.cancelled} cancelados`} icon={ShoppingBag} tone="brand" />
-        <StatCard label="Ventas de hoy" value={formatMoney(data.orders.today.sales)} hint={`7 días: ${formatMoney(data.orders.week.sales)}`} icon={Wallet} tone="good" />
-        <StatCard label="En curso ahora" value={data.inProgress} hint={data.late > 0 ? `${data.late} atrasados` : 'Ninguno atrasado'} icon={Clock} tone={data.late > 0 ? 'warn' : 'neutral'} />
-        <StatCard label="Preparación promedio" value={data.avgPrepMinutes !== null ? `${data.avgPrepMinutes} min` : '—'} hint="De en cola a listo, últimos 7 días" icon={Gauge} />
-      </div>
+      <KpiStrip
+        columns={4}
+        items={[
+          { id: 'orders', label: 'Pedidos de hoy', value: String(data.orders.today.created), change: null, goodWhen: 'neutral', hint: `${data.orders.today.delivered} entregados · ${data.orders.today.cancelled} cancelados` },
+          { id: 'sales', label: 'Ventas de hoy', value: formatMoney(data.orders.today.sales), change: null, goodWhen: 'neutral', hint: `7 días: ${formatMoney(data.orders.week.sales)}` },
+          { id: 'progress', label: 'En curso ahora', value: String(data.inProgress), change: null, goodWhen: 'neutral', hint: data.late > 0 ? `${data.late} atrasados` : 'Ninguno atrasado' },
+          { id: 'prep', label: 'Preparación promedio', value: data.avgPrepMinutes !== null ? `${data.avgPrepMinutes} min` : '—', change: null, goodWhen: 'neutral', hint: 'De en cola a listo, 7 días' },
+        ]}
+      />
 
       <Card title="Pedidos por día" description="Últimos 7 días, sin cancelados">
         <div className="h-40">
@@ -71,9 +74,9 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
         </div>
       </Card>
 
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection title="Últimos 7 días">
+      <Section title="Últimos 7 días">
       <div className="grid gap-4 sm:grid-cols-2">
         <Card title="Canales">
           {channels.length === 0 ? <p className={typography.caption}>Sin pedidos.</p> : channels.map(([c, n]) => <Row key={c} label={CHANNEL_LABEL[c] ?? c}>{n}</Row>)}
@@ -118,9 +121,9 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
         </Card>
       </div>
 
-      </SettingsSection>
+      </Section>
 
-      <SettingsSection
+      <Section
         title="Cambios recientes"
         actions={
           onOpenLog && (
@@ -146,7 +149,7 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
             ))}
           </ul>
         )}
-      </SettingsSection>
+      </Section>
 
       <details className="rounded-xl border border-neutral-800/60 px-4 py-3 text-sm text-neutral-400">
         <summary className="cursor-pointer text-neutral-300">Qué no se mide todavía</summary>
@@ -189,7 +192,7 @@ export function ActivitySettingsPage() {
     <SettingsPage
       title="Actividad"
       description="Cómo opera esta cuenta y quién hizo qué."
-      subNav={tabs.length > 1 ? <SettingsSubNav label="Secciones de actividad" items={tabs} value={tab} onChange={setTab} /> : undefined}
+      subNav={tabs.length > 1 ? <SubNav label="Secciones de actividad" items={tabs} value={tab} onChange={setTab} /> : undefined}
     >
       {tab === 'bitacora' ? (
         <EventLog />

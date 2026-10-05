@@ -1,5 +1,5 @@
-import { cardClass } from '@/shared/ui/formClasses'
-import { typography } from '@/shared/ui/typography'
+import { cardClass } from './formClasses'
+import { typography } from './typography'
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
 
@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
  * of its own (a form, a summary); lists and tables already have their frame.
  * `tone="danger"` is the "Zona de peligro".
  */
-export function SettingsSection({
+export function Section({
   title,
   description,
   actions,

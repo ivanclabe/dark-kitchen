@@ -1,7 +1,8 @@
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { Tabs, type TabItem } from '@/shared/ui/Tabs'
-import { Boxes, ShoppingCart, Truck, Warehouse } from 'lucide-react'
+import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
+import { ShoppingCart, Truck, Warehouse } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -22,10 +23,10 @@ import type { Ingredient } from '../types'
 
 type SupplyView = 'stock' | 'compras' | 'proveedores'
 
-const VIEWS: TabItem<SupplyView>[] = [
-  { value: 'stock', label: 'Stock', icon: Boxes },
-  { value: 'compras', label: 'Compras', icon: ShoppingCart },
-  { value: 'proveedores', label: 'Proveedores', icon: Truck },
+const VIEWS: SubNavItem<SupplyView>[] = [
+  { value: 'stock', label: 'Stock' },
+  { value: 'compras', label: 'Compras' },
+  { value: 'proveedores', label: 'Proveedores' },
 ]
 
 function isView(value: string | undefined): value is SupplyView {
@@ -116,13 +117,13 @@ export function SupplyPage() {
   const supplierForDrawer = supplierDrawer.supplierId ? (suppliers?.find((s) => s.id === supplierDrawer.supplierId) ?? null) : null
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4">
+    <Page variant="board">
       <PageHeader
         title="Abastecimiento"
         description="Stock, compras y proveedores en un solo lugar."
         icon={Warehouse}
-        actions={<Tabs value={view} onChange={(next) => go(next)} items={VIEWS} />}
       />
+      <SubNav label="Secciones de abastecimiento" items={VIEWS} value={view} onChange={(next) => go(next)} />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="shrink-0 lg:w-80 xl:w-96">{panel}</div>
@@ -161,6 +162,6 @@ export function SupplyPage() {
           onCreated={(purchaseId) => go('compras', purchaseId)}
         />
       )}
-    </div>
+    </Page>
   )
 }

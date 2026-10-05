@@ -11,7 +11,7 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { toVoiceSettings, type KitchenVoiceSettings } from '@/shared/voice/catalog'
 import { useVoiceProfiles } from '@/shared/voice/hooks'
 import { VoiceSettingsForm } from '@/shared/voice/VoiceSettingsForm'
-import { SettingsSaveBar } from '../ui/SettingsSaveBar'
+import { SaveBar } from '@/shared/ui/SaveBar'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
@@ -137,7 +137,7 @@ export function KitchenVoicePanel({ organizationId }: { organizationId: string }
           Restablecer
         </Button>
       )}
-      <SettingsSaveBar
+      <SaveBar
         dirty={edited !== null}
         saving={busy}
         savedAt={savedAt}

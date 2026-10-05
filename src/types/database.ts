@@ -3623,6 +3623,41 @@ export type Database = {
       }
       dk_current_kitchen_id: { Args: never; Returns: string }
       dk_current_profile_id: { Args: never; Returns: string }
+      dk_customer_detail: { Args: { p_id: string }; Returns: Json }
+      dk_customers_list: {
+        Args: {
+          p_created_from?: string
+          p_created_to?: string
+          p_dir?: string
+          p_limit?: number
+          p_max_balance?: number
+          p_min_balance?: number
+          p_min_orders?: number
+          p_offset?: number
+          p_search?: string
+          p_sort?: string
+          p_status?: string
+        }
+        Returns: Json
+      }
+      dk_customers_summary: { Args: never; Returns: Json }
+      dk_customers_with_stats: {
+        Args: { p_kitchen: string; p_today: string }
+        Returns: {
+          address: string
+          balance: number
+          created_at: string
+          full_name: string
+          id: string
+          last_order_at: string
+          notes: string
+          orders: number
+          overdue: number
+          phone: string
+          total_purchased: number
+          whatsapp_id: string
+        }[]
+      }
       dk_dashboard_summary: { Args: never; Returns: Json }
       dk_default_organization_id: { Args: never; Returns: string }
       dk_delete_master_menu: { Args: { p_menu_id: string }; Returns: undefined }

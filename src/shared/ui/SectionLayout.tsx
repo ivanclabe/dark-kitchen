@@ -1,4 +1,4 @@
-import { typography } from '@/shared/ui/typography'
+import { PageHeader } from './PageHeader'
 import clsx from 'clsx'
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, type ReactNode } from 'react'
@@ -19,7 +19,22 @@ export interface SectionLink {
  * so moving between their sections feels like the same place. Wide screens:
  * a vertical list that stays in view; phones and tablets: a neutral bar.
  */
-export function SectionLayout({ title, description, navLabel, sections, children }: { title: string; description: ReactNode; navLabel: string; sections: SectionLink[]; children: ReactNode }) {
+export function SectionLayout({
+  title,
+  description,
+  icon,
+  navLabel,
+  sections,
+  children,
+}: {
+  title: string
+  description: ReactNode
+  /** The icon of the area, the same as in the rail (ADR 0029). */
+  icon: LucideIcon
+  navLabel: string
+  sections: SectionLink[]
+  children: ReactNode
+}) {
   const { pathname, search } = useLocation()
   const root = useRef<HTMLDivElement>(null)
   // A new section (or sub-section) starts at the top: otherwise a shorter page clamps the scroll and the header lands elsewhere.
@@ -29,10 +44,9 @@ export function SectionLayout({ title, description, navLabel, sections, children
 
   return (
     <div ref={root} className="mx-auto w-full max-w-6xl">
-      <header className="mb-6 lg:mb-8">
-        <h1 className={typography.h1}>{title}</h1>
-        <p className={clsx('mt-1', typography.small)}>{description}</p>
-      </header>
+      <div className="mb-6 lg:mb-8">
+        <PageHeader title={title} description={description} icon={icon} />
+      </div>
 
       <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
         {sections.length > 1 && (

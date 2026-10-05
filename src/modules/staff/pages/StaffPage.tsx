@@ -1,4 +1,5 @@
 import { useKitchenSchedule } from '@/modules/kitchen/hooks/useKitchenSchedule'
+import { Page } from '@/shared/ui/Page'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useNow } from '@/shared/hooks/useNow'
 import { Button, IconButton } from '@/shared/ui/Button'
@@ -89,7 +90,7 @@ export function StaffPage() {
   const error = members.error ?? shifts.error
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4">
+    <Page variant="board">
       <PageHeader
         title="Personal"
         icon={CalendarClock}
@@ -168,6 +169,6 @@ export function StaffPage() {
         confirmLabel="Copiar turnos"
         description={<p>Los turnos de {weekLabel(addDays(weekStart, -7))} se copian a esta semana, mismo día y hora. Los que se crucen con un turno existente se omiten.</p>}
       />
-    </div>
+    </Page>
   )
 }
