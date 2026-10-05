@@ -1,9 +1,9 @@
 import { setAccountsActive } from '@/modules/organization/api/organization'
 import { MY_KITCHENS_KEY, useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
 import { ConfirmDialog } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
+import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Power } from 'lucide-react'
@@ -32,12 +32,14 @@ export function AccountStatusCard() {
   })
 
   return (
-    <Card title="Estado de la cuenta" description="Desactivarla detiene toda su operación; sus datos se conservan" icon={Power}>
-      <div className="flex justify-end">
-        <Button variant="danger" icon={Power} onClick={() => setConfirm(true)}>
-          Desactivar cuenta
-        </Button>
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-neutral-100">Desactivar esta cuenta</p>
+        <p className={typography.caption}>Nadie podrá operarla hasta que la actives de nuevo desde «Tus cuentas».</p>
       </div>
+      <Button variant="danger" icon={Power} onClick={() => setConfirm(true)}>
+        Desactivar cuenta
+      </Button>
       <ConfirmDialog
         open={confirm}
         onClose={() => setConfirm(false)}
@@ -48,6 +50,6 @@ export function AccountStatusCard() {
         confirmLabel="Sí, desactivar"
         description={<p>Nadie podrá operar {kitchen.name} (pedidos, inventario, todo) hasta que la actives de nuevo desde «Tus cuentas». Sus datos se conservan.</p>}
       />
-    </Card>
+    </div>
   )
 }

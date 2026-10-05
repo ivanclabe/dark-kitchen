@@ -143,7 +143,8 @@ export function AppLayout() {
             propio scroll interno, en vez de que toda la página crezca y
             scrollee como un bloque. Las demás páginas siguen funcionando
             igual — su contenido simplemente scrollea dentro de <main>. */}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+        {/* scrollbar-gutter: a short page and a long one keep the same width (no sideways jump when the scrollbar appears). */}
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 [scrollbar-gutter:stable] sm:p-6 lg:p-8">
           <WelcomeCard />
           <Outlet />
         </main>

@@ -9,6 +9,7 @@ import { Copy, Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { deleteRole, type OrgRole, type OrgUser, type PermissionDef, type RoleUsage } from '../api/organization'
 import { orgKey } from '../hooks/useOrganization'
+import { SettingsSection } from '@/modules/settings/ui/SettingsSection'
 import { RoleEditorDrawer } from './RoleEditorDrawer'
 
 type Editing = { role: OrgRole | null; draft?: { name: string; permissions: string[] } }
@@ -68,7 +69,7 @@ export function RolesPanel({
   function RoleCard({ role }: { role: OrgRole }) {
     const holders = usersWith(role.id)
     return (
-      <li className="flex flex-col gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-4">
+      <li className="flex flex-col gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-5">
         <div className="min-w-0">
           <p className="flex items-center gap-2 font-semibold text-neutral-100">
             {role.name}
@@ -111,22 +112,20 @@ export function RolesPanel({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className={typography.small}>
-          Las plantillas son iguales en toda la plataforma. Los roles propios sirven en todas tus cuentas: un cambio aplica a todas las que lo usan.
-        </p>
-        {canManage && (
-          <Button variant="secondary" icon={Plus} onClick={() => setEditing({ role: null })}>
-            Nuevo rol
-          </Button>
-        )}
-      </div>
-
-      <section className="space-y-3">
-        <h3 className={typography.h3}>Roles propios</h3>
+    <div className="space-y-8">
+      <SettingsSection
+        title="Roles propios"
+        description="Aplican a todas tus cuentas: un cambio afecta a todas las que usan el rol."
+        actions={
+          canManage ? (
+            <Button variant="secondary" size="sm" icon={Plus} onClick={() => setEditing({ role: null })}>
+              Nuevo rol
+            </Button>
+          ) : undefined
+        }
+      >
         {custom.length === 0 ? (
-          <p className={typography.caption}>{canManage ? 'Todavía no hay. Crea uno o duplica una plantilla para ajustarla.' : 'Todavía no hay roles propios.'}</p>
+          <p className={typography.small}>{canManage ? 'Todavía no hay. Crea uno o duplica una plantilla para ajustarla.' : 'Todavía no hay roles propios.'}</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {custom.map((r) => (
@@ -134,16 +133,15 @@ export function RolesPanel({
             ))}
           </ul>
         )}
-      </section>
+      </SettingsSection>
 
-      <section className="space-y-3">
-        <h3 className={typography.h3}>Plantillas del sistema</h3>
+      <SettingsSection title="Plantillas del sistema" description="Iguales en toda la plataforma: no se editan, pero puedes duplicarlas.">
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {system.map((r) => (
             <RoleCard key={r.id} role={r} />
           ))}
         </ul>
-      </section>
+      </SettingsSection>
 
       {editing && (
         <RoleEditorDrawer

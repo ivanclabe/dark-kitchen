@@ -72,17 +72,14 @@ describe('UserMenu (ADR 0023)', () => {
     expect(document.body.textContent).not.toMatch(/organizaci/i)
   })
 
-  it('options follow permissions, always about this account', () => {
+  it('one link to the account settings (ADR 0026); Usuarios lives in the rail', () => {
     openMenu([])
     expect(screen.queryByRole('menuitem', { name: 'Configuración de la cuenta' })).toBeNull()
-    expect(screen.queryByRole('menuitem', { name: 'Usuarios' })).toBeNull()
     cleanup()
     openMenu(['settings.manage', 'team.view'], ['billing.view'])
-    expect(screen.getByRole('menuitem', { name: 'Usuarios' })).toBeTruthy()
-    expect(screen.getByRole('menuitem', { name: 'Roles y permisos' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Configuración de la cuenta' }))
-    for (const name of ['General', 'Facturación', 'IA y voz', 'Integraciones']) expect(screen.getByRole('menuitem', { name })).toBeTruthy()
-    expect(screen.queryByRole('menuitem', { name: 'Actividad' })).toBeNull()
+    expect(screen.getByRole('menuitem', { name: 'Configuración de la cuenta' }).getAttribute('aria-haspopup')).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Usuarios' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Roles y permisos' })).toBeNull()
   })
 
   it('Apariencia changes the theme on this device without closing the menu', () => {

@@ -91,6 +91,16 @@ export function pendingPlanOf(metadata: Record<string, unknown> | undefined): st
   return typeof value === 'string' && value ? value : null
 }
 
+/**
+ * ADR 0025: someone who signed in with Google, Instagram or phone saves the
+ * business data on their user (the same metadata the email sign-up carries),
+ * and /registro/confirmado creates everything at once.
+ */
+export async function savePendingBusiness(input: { fullName: string; organization: PendingOrganization; plan: string }): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ data: { full_name: input.fullName, pending_organization: input.organization, plan: input.plan } })
+  if (error) throw error
+}
+
 /** Cambia el plan guardado con el registro (si el elegido dejó de estar disponible). */
 export async function updatePendingPlan(plan: string): Promise<void> {
   const { error } = await supabase.auth.updateUser({ data: { plan } })

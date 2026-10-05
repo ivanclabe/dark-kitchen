@@ -32,7 +32,8 @@ export default defineConfig(({ mode }) => {
       port: process.env.PORT ? Number(process.env.PORT) : 5173,
       strictPort: false,
     },
-    // Tests run in path mode (no subdomains) unless a test sets the root domain itself (ADR 0021).
-    test: { env: { VITE_TENANT_ROOT_DOMAIN: '' } },
+    // Tests run in path mode (no subdomains) unless a test sets the root domain itself (ADR 0021),
+    // and with the owner sign-up methods off unless a test turns them on (ADR 0025): .env.local never leaks in.
+    test: { env: { VITE_TENANT_ROOT_DOMAIN: '', VITE_AUTH_GOOGLE: '', VITE_AUTH_INSTAGRAM: '', VITE_AUTH_PHONE: '' } },
   }
 })

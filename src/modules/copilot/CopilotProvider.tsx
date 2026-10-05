@@ -27,7 +27,7 @@ const SCREEN_NAME: Record<string, string> = {
   '/customers': 'Clientes',
   '/staff': 'Personal',
   '/my-shifts': 'Mis turnos',
-  '/reports': 'Reportes',
+  '/insights': 'Insights',
 }
 
 /**

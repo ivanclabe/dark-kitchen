@@ -49,7 +49,7 @@ describe('AI settings in an account (ADR 0018, ADR 0024)', () => {
     const input = screen.getByLabelText('Plato sin avanzar más de')
     expect((input as HTMLInputElement).value).toBe('12')
     fireEvent.change(input, { target: { value: '15' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar para todas tus cuentas' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
     await waitFor(() => expect(rpc.org).toHaveBeenCalledWith('o1', 'kitchen_stall_alerts', { dish_stall_min: 15, repeat_min: 5, voice: true }))
   })
 
@@ -57,14 +57,14 @@ describe('AI settings in an account (ADR 0018, ADR 0024)', () => {
     wrap()
     fireEvent.change(screen.getByLabelText('Plato sin avanzar más de'), { target: { value: '1' } })
     expect(screen.getByText('Mínimo 3')).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Guardar para todas tus cuentas' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: 'Guardar cambios' }) as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('"Solo esta cuenta" stores only what differs from the general values, for this account', async () => {
     wrap()
     fireEvent.click(screen.getByRole('radio', { name: 'Solo esta cuenta' }))
     fireEvent.change(screen.getByLabelText('Repetir el aviso cada'), { target: { value: '10' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar solo para esta cuenta' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
     await waitFor(() => expect(rpc.account).toHaveBeenCalledWith('k2', 'kitchen_stall_alerts', { repeat_min: 10 }))
     expect(rpc.org).not.toHaveBeenCalled()
   })
@@ -73,7 +73,7 @@ describe('AI settings in an account (ADR 0018, ADR 0024)', () => {
     wrap(withOwn)
     expect(screen.getByText('Esta cuenta usa sus propios valores.')).toBeTruthy()
     expect((screen.getByLabelText('Plato sin avanzar más de') as HTMLInputElement).value).toBe('3')
-    fireEvent.click(screen.getByRole('button', { name: 'Usar los valores generales' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Restablecer' }))
     await waitFor(() => expect(rpc.account).toHaveBeenCalledWith('k1', 'kitchen_stall_alerts', {}))
   })
 

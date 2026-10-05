@@ -1,8 +1,9 @@
 import { useNow } from '@/shared/hooks/useNow'
 import { formatPlanPrice, limitLabel } from '@/shared/plans/plans'
-import { atLimit, fetchSubscription, SUBSCRIPTION_STATUS_LABEL, trialDaysLeft } from '@/shared/plans/subscription'
+import { atLimit, fetchSubscription, trialDaysLeft } from '@/shared/plans/subscription'
 import { usePublicPricing } from '@/shared/plans/usePlans'
-import { Badge } from '@/shared/ui/Badge'
+import { StatusBadge } from '@/modules/settings/ui/StatusBadge'
+import { cardClass } from '@/shared/ui/formClasses'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
@@ -50,16 +51,13 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
   const featureLabel = (key: string) => catalog.data?.features.find((f) => f.key === key)?.label ?? key
 
   return (
-    <div className="max-w-4xl space-y-6">
-      <section className="rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-5">
+    <div className="space-y-6">
+      <section className={cardClass}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className={typography.overline}>Tu plan</p>
-            <h2 className="mt-1 flex flex-wrap items-center gap-2 text-2xl font-semibold text-neutral-50">
+                        <h2 className="mt-1 flex flex-wrap items-center gap-2 text-2xl font-semibold text-neutral-50">
               {sub.plan.name}
-              <Badge tone={sub.status === 'active' ? 'success' : sub.status === 'trialing' ? 'brand' : 'warning'} size="sm" dot>
-                {SUBSCRIPTION_STATUS_LABEL[sub.status]}
-              </Badge>
+              <StatusBadge status={sub.status} />
             </h2>
             <p className={clsx('mt-1', typography.small)}>{sub.plan.description}</p>
             <p className="mt-2 text-sm text-neutral-300">{formatPlanPrice(sub.plan, sub.billingPeriod)}</p>

@@ -11,7 +11,9 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { toVoiceSettings, type KitchenVoiceSettings } from '@/shared/voice/catalog'
 import { useVoiceProfiles } from '@/shared/voice/hooks'
 import { VoiceSettingsForm } from '@/shared/voice/VoiceSettingsForm'
+import { SettingsSaveBar } from '../ui/SettingsSaveBar'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
 /**
@@ -33,24 +35,37 @@ export function KitchenVoicePanel({ organizationId }: { organizationId: string }
     await queryClient.invalidateQueries({ queryKey: FEATURES_KEY })
   }
 
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const failed = (err: unknown) => {
+    const message = getErrorMessage(err, 'No se pudo guardar la voz')
+    setSaveError(message)
+    show(message, 'error')
+  }
+  const done = () => {
+    setEdited(null)
+    setSaveError(null)
+    setSavedAt(Date.now())
+  }
+
   const saveGeneral = useMutation({
     mutationFn: (settings: Partial<KitchenVoiceSettings>) => setOrganizationFeatureSettings(organizationId, 'voice_speech', { ...settings }),
     onSuccess: async () => {
       await refresh()
-      setEdited(null)
-      show('Voz de cocina guardada.')
+      done()
+      show('Voz de cocina: cambios guardados.')
     },
-    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar la voz'), 'error'),
+    onError: failed,
   })
   const saveOwn = useMutation({
     mutationFn: (settings: Partial<KitchenVoiceSettings>) => setKitchenFeatureSettings(kitchen.id, 'voice_speech', { ...settings }),
     onSuccess: async (_, settings) => {
       await refresh()
-      setEdited(null)
+      done()
       if (Object.keys(settings).length === 0) setScope('all')
-      show(Object.keys(settings).length === 0 ? 'Esta cuenta vuelve a usar la voz general.' : 'Voz guardada solo para esta cuenta.')
+      show(Object.keys(settings).length === 0 ? 'Esta cuenta vuelve a usar la voz general.' : 'Voz de cocina: cambios guardados solo para esta cuenta.')
     },
-    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar la voz'), 'error'),
+    onError: failed,
   })
 
   if (isLoading) return <LoadingState variant="block" />
@@ -84,60 +99,55 @@ export function KitchenVoicePanel({ organizationId }: { organizationId: string }
     Object.fromEntries(Object.entries(settings).filter(([k, v]) => general[k as keyof KitchenVoiceSettings] !== v)) as Partial<KitchenVoiceSettings>
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <p className={typography.small}>
-        La voz que escuchan los equipos de cocina de esta cuenta. Las frases son cortas y naturales («Pedido 1042 listo.»). La vista previa usa la voz de este equipo.
+    <div className="space-y-4">
+      <p className={typography.caption}>
+        La voz que escuchan los equipos de cocina de esta cuenta, con frases cortas («Pedido 1042 listo.»). La vista previa usa la voz de este equipo.
+        {!enabledHere && ' Se escuchará cuando actives «Voz de la aplicación».'}
       </p>
-      {!enabledHere && (
-        <p className="rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
-          La voz de la aplicación está apagada en esta cuenta: actívala en la pestaña Funciones para que se escuche.
-        </p>
-      )}
-
-      <section className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-5">
-        {shared && (
-          <div className="space-y-2">
-            <ScopeChoice
-              value={activeScope}
-              onChange={(next) => {
-                setScope(next)
-                setEdited(null)
-              }}
-              disabled={busy}
-            />
-            <p className={typography.caption}>
-              {ownScope
-                ? hasOwn
-                  ? 'Esta cuenta usa su propia voz.'
-                  : 'Elige una voz distinta solo para esta cuenta; tus otras cuentas siguen con la general.'
-                : `La voz general aplica a todas tus cuentas${hasOwn ? ' menos a esta, que tiene la suya' : ''}.`}
-            </p>
-          </div>
-        )}
-        <VoiceSettingsForm value={form} onChange={setEdited} profiles={profiles} disabled={busy} />
-        <div className="flex flex-wrap justify-end gap-2">
-          {!edited && ownScope && hasOwn && (
-            <Button variant="ghost" size="sm" onClick={() => saveOwn.mutate({})} loading={saveOwn.isPending}>
-              Usar la voz general
-            </Button>
-          )}
-          {!edited && !ownScope && (
-            <Button variant="ghost" size="sm" onClick={() => saveGeneral.mutate({})} loading={saveGeneral.isPending}>
-              Usar la voz de la plataforma ({profileName(platformDefault.profile)})
-            </Button>
-          )}
-          {edited && (
-            <>
-              <Button variant="ghost" size="sm" onClick={() => setEdited(null)} disabled={busy}>
-                Descartar
-              </Button>
-              <Button variant="primary" size="sm" loading={busy} onClick={() => (ownScope ? saveOwn.mutate(diff(edited)) : saveGeneral.mutate({ ...edited }))}>
-                {ownScope ? 'Guardar solo para esta cuenta' : shared ? 'Guardar para todas tus cuentas' : 'Guardar'}
-              </Button>
-            </>
-          )}
+      {shared && (
+        <div className="space-y-2">
+          <ScopeChoice
+            value={activeScope}
+            onChange={(next) => {
+              setScope(next)
+              setEdited(null)
+            }}
+            disabled={busy}
+          />
+          <p className={typography.caption}>
+            {ownScope
+              ? hasOwn
+                ? 'Esta cuenta usa su propia voz.'
+                : 'Elige una voz distinta solo para esta cuenta; tus otras cuentas siguen con la general.'
+              : `La voz general aplica a todas tus cuentas${hasOwn ? ' menos a esta, que tiene la suya' : ''}.`}
+          </p>
         </div>
-      </section>
+      )}
+      <VoiceSettingsForm value={form} onChange={setEdited} profiles={profiles} disabled={busy} />
+      {!edited && (
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={RotateCcw}
+          onClick={() => (ownScope ? saveOwn.mutate({}) : saveGeneral.mutate({}))}
+          loading={busy}
+          disabled={ownScope && !hasOwn}
+          title={ownScope ? 'Esta cuenta vuelve a usar la voz general' : `Vuelve a la voz de la plataforma (${profileName(platformDefault.profile)})`}
+        >
+          Restablecer
+        </Button>
+      )}
+      <SettingsSaveBar
+        dirty={edited !== null}
+        saving={busy}
+        savedAt={savedAt}
+        error={saveError}
+        onDiscard={() => {
+          setEdited(null)
+          setSaveError(null)
+        }}
+        onSave={() => edited && (ownScope ? saveOwn.mutate(diff(edited)) : saveGeneral.mutate({ ...edited }))}
+      />
     </div>
   )
 }

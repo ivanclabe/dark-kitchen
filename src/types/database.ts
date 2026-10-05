@@ -3754,6 +3754,57 @@ export type Database = {
         Returns: boolean
       }
       dk_hash_token: { Args: { p_token: string }; Returns: string }
+      dk_insights: {
+        Args: {
+          p_category?: string
+          p_compare_from?: string
+          p_compare_to?: string
+          p_from: string
+          p_product?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      dk_insights_items: {
+        Args: {
+          p_category: string
+          p_from: string
+          p_kitchen: string
+          p_product: string
+          p_to: string
+          p_tz: string
+        }
+        Returns: {
+          category_id: string
+          category_name: string
+          cost: number
+          cost_source: string
+          item_id: string
+          line_total: number
+          local_day: string
+          order_at: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+        }[]
+      }
+      dk_insights_kpis: {
+        Args: {
+          p_category: string
+          p_costs: boolean
+          p_from: string
+          p_kitchen: string
+          p_product: string
+          p_to: string
+          p_tz: string
+        }
+        Returns: Json
+      }
+      dk_insights_product_orders: {
+        Args: { p_from: string; p_product: string; p_to: string }
+        Returns: Json
+      }
       dk_inventory_signals: {
         Args: {
           p_coverage_days?: number
@@ -3909,6 +3960,7 @@ export type Database = {
         Returns: Json
       }
       dk_org_users: { Args: { p_organization_id: string }; Returns: Json }
+      dk_owner_signup_verified: { Args: { p_auth: unknown }; Returns: boolean }
       dk_plan_includes: {
         Args: { p_feature_key: string; p_organization_id: string }
         Returns: boolean

@@ -2,7 +2,6 @@ import {
   FEATURE_CATEGORY_LABEL,
   setAccountFeature,
   type AccountFeatureMatrix,
-  type FeatureCategory,
   type FeatureKey,
 } from '@/shared/features/features'
 import { FEATURES_KEY } from '@/shared/kitchen/activeKitchenContext'
@@ -15,11 +14,12 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { Lock, Mic, Sparkles, Store, Workflow } from 'lucide-react'
+import { Lock, Sparkles, Workflow } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { SettingsSection } from '@/modules/settings/ui/SettingsSection'
+import { cardClass } from '@/shared/ui/formClasses'
 import { accountFeaturesKey, useAccountFeatureMatrix } from '../hooks/useAccountFeatures'
 import { FeatureSettingsSection } from './FeatureSettings'
-
-const CATEGORY_ICON: Record<FeatureCategory, typeof Sparkles> = { ai: Sparkles, voice: Mic, general: Store }
 
 /**
  * Functions of the active account (ADR 0009, ADR 0018, ADR 0024): one switch
@@ -27,7 +27,16 @@ const CATEGORY_ICON: Record<FeatureCategory, typeof Sparkles> = { ai: Sparkles, 
  * switches it on in another account (the database guarantees it). Settings
  * can apply to all your accounts or only to this one.
  */
-export function FeaturesPanel({ organizationId, accountId }: { organizationId: string; accountId: string }) {
+export function FeaturesPanel({
+  organizationId,
+  accountId,
+  extra,
+}: {
+  organizationId: string
+  accountId: string
+  /** More settings under a feature (e.g. the kitchen voice under «Voz de la aplicación», ADR 0026). */
+  extra?: (key: FeatureKey) => ReactNode
+}) {
   const queryClient = useQueryClient()
   const { show } = useToast()
   const { data, isLoading, isError, error, refetch } = useAccountFeatureMatrix(accountId)
@@ -52,17 +61,13 @@ export function FeaturesPanel({ organizationId, accountId }: { organizationId: s
 
   return (
     <div className="space-y-8">
-      <p className={typography.small}>
-        Decide qué funciones usa esta cuenta{data.plan ? ` (plan ${data.plan.name})` : ''} y cómo se comportan. Activar una función aquí no la activa en tus otras cuentas.
-      </p>
-      {categories.map((category) => {
-        const Icon = CATEGORY_ICON[category]
-        return (
-          <section key={category} className="space-y-3">
-            <h2 className={clsx('flex items-center gap-2', typography.overline)}>
-              <Icon size={13} aria-hidden /> {FEATURE_CATEGORY_LABEL[category]}
-            </h2>
-            <div className="grid gap-4 xl:grid-cols-2">
+      {categories.map((category) => (
+        <SettingsSection
+          key={category}
+          title={FEATURE_CATEGORY_LABEL[category]}
+          description={category === 'ai' ? 'Activar una función aquí no la activa en tus otras cuentas.' : undefined}
+        >
+            <div className="space-y-3">
               {data.features
                 .filter((f) => f.category === category)
                 .map((f) => (
@@ -75,12 +80,12 @@ export function FeaturesPanel({ organizationId, accountId }: { organizationId: s
                     onChanged={refresh}
                     disabled={setEnabled.isPending}
                     onEnabled={(enabled) => setEnabled.mutate({ key: f.key, enabled })}
+                    extra={extra?.(f.key)}
                   />
                 ))}
             </div>
-          </section>
-        )
-      })}
+        </SettingsSection>
+      ))}
     </div>
   )
 }
@@ -93,6 +98,7 @@ function FeatureCard({
   onChanged,
   disabled,
   onEnabled,
+  extra,
 }: {
   feature: AccountFeatureMatrix['features'][number]
   account: AccountFeatureMatrix['accounts'][number]
@@ -101,11 +107,12 @@ function FeatureCard({
   onChanged: () => Promise<unknown>
   disabled: boolean
   onEnabled: (enabled: boolean) => void
+  extra?: ReactNode
 }) {
   const on = feature.available && account.enabled[feature.key] === true
   const platformOff = !feature.platformActive
   return (
-    <article className={clsx('space-y-4 rounded-2xl border bg-neutral-900/60 p-5', on ? 'border-brasa-500/30' : 'border-neutral-800/60', platformOff && 'opacity-70')}>
+    <article className={clsx(cardClass, 'space-y-4', platformOff && 'opacity-70')}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -127,7 +134,7 @@ function FeatureCard({
               {feature.key === 'voice_wake_word' ? 'Necesita «Comandos de voz».' : 'Para hablar usa «Voz de la aplicación».'}
             </p>
           )}
-          {feature.key === 'voice_speech' && <p className="mt-1 text-[11px] text-neutral-500">La voz, el estilo y la velocidad se ajustan en la pestaña «Voz de cocina».</p>}
+          {feature.key === 'voice_speech' && extra && <p className="mt-1 text-[11px] text-neutral-500">La voz, el estilo y la velocidad se ajustan abajo, en «Voz de cocina».</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {platformOff ? (
@@ -152,6 +159,7 @@ function FeatureCard({
       {feature.platformActive && feature.includedInPlan && (
         <FeatureSettingsSection organizationId={organizationId} feature={feature} account={account} accountCount={accountCount} canEdit onChanged={onChanged} />
       )}
+      {feature.platformActive && feature.includedInPlan && extra}
     </article>
   )
 }

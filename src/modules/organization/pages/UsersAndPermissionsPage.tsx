@@ -7,106 +7,168 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { Input, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { PageHeader } from '@/shared/ui/PageHeader'
-import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { typography } from '@/shared/ui/typography'
 import { ShieldCheck, UserPlus, Users } from 'lucide-react'
 import { formatDate, formatDateTime } from '@/shared/utils/format'
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, Outlet, useSearchParams } from 'react-router-dom'
+import { SectionLayout } from '@/modules/settings/ui/SectionLayout'
+import { SettingsPage } from '@/modules/settings/ui/SettingsPage'
 import type { OrgAccount, OrgRole, OrgUser } from '../api/organization'
 import { RolesPanel } from '../components/RolesPanel'
 import { UserDrawer } from '../components/UserDrawer'
 import { useAccountUsers, useOrgRoles, usePermissionCatalog, useRoleUsage } from '../hooks/useOrganization'
 
-type Tab = 'users' | 'roles'
-
-/**
- * Usuarios of the active account (ADR 0008 §10–11, ADR 0024): two tabs,
- * Usuarios and Roles y permisos. Only the people of THIS account, with their
- * roles in it, also for whoever manages several accounts or the SUPER_ADMIN.
- * The database checks everything again (no shortcuts to RBAC).
- */
-export function UsersAndPermissionsPage() {
+/** Data shared by Usuarios and Roles y permisos (one query each, cached between both pages). */
+function useTeamData() {
   const { kitchen, organization, can, canShared } = useActiveKitchen()
-  const [params, setParams] = useSearchParams()
   const organizationId = organization?.id ?? kitchen.organizationId
   const users = useAccountUsers(organizationId, kitchen.id)
   const roles = useOrgRoles(organizationId)
   const catalog = usePermissionCatalog()
   const usage = useRoleUsage(organizationId, kitchen.id)
+  const manageOrg = canShared('users.manage')
+  return {
+    kitchen,
+    organizationId,
+    users,
+    roles,
+    catalog,
+    usage,
+    manageOrg,
+    manageTeam: can('team.manage') || manageOrg,
+    manageRoles: canShared('roles.manage'),
+    showActivity: canShared('users.view') || can('team.manage'),
+    loading: users.isLoading || roles.isLoading || catalog.isLoading,
+    error: users.error ?? roles.error ?? catalog.error,
+    retry: () => void Promise.all([users.refetch(), roles.refetch(), catalog.refetch()]),
+  }
+}
+
+const SUPPORT_NOTE = 'El equipo de soporte de la plataforma Quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.'
+
+/**
+ * Usuarios of the active account (ADR 0008 §10–11, ADR 0024, ADR 0026): the
+ * same shell as Configuración, with two sections — Usuarios and Roles y
+ * permisos. Only the people of THIS account, with their roles in it; the
+ * database checks everything again (no shortcuts to RBAC).
+ */
+export function UsersLayout() {
+  const { kitchen, path } = useActiveKitchen()
+  const [params] = useSearchParams()
+  // Old address of the roles tab (ADR 0024).
+  if (params.get('tab') === 'roles') return <Navigate to={path('/users/roles')} replace />
+  return (
+    <SectionLayout
+      title="Usuarios"
+      description={`Personas de ${kitchen.name} y lo que puede hacer cada una.`}
+      navLabel="Secciones de usuarios"
+      sections={[
+        { to: path('/users'), label: 'Usuarios', icon: Users, end: true },
+        { to: path('/users/roles'), label: 'Roles y permisos', icon: ShieldCheck },
+      ]}
+    >
+      <Outlet />
+    </SectionLayout>
+  )
+}
+
+/** Usuarios: who works in this account, their roles and state; create and edit people. */
+export function UsersPage() {
+  const team = useTeamData()
+  const [editing, setEditing] = useState<{ user: OrgUser | null } | null>(null)
+  const { kitchen } = team
   const assignable: OrgAccount[] = useMemo(
     () => [{ id: kitchen.id, slug: kitchen.slug, name: kitchen.name, iconKey: kitchen.iconKey, active: kitchen.active, createdAt: '' }],
     [kitchen],
   )
-  const manageOrg = canShared('users.manage')
-  const manageTeam = can('team.manage') || manageOrg
-  const showActivity = canShared('users.view') || can('team.manage')
-
-  const tab: Tab = params.get('tab') === 'roles' ? 'roles' : 'users'
-  const tabs: TabItem<Tab>[] = [
-    { value: 'users', label: users.data ? `Usuarios (${users.data.length})` : 'Usuarios', icon: Users },
-    { value: 'roles', label: 'Roles y permisos', icon: ShieldCheck },
-  ]
-
-  const loading = users.isLoading || roles.isLoading || catalog.isLoading
-  const error = users.error ?? roles.error ?? catalog.error
+  const count = team.users.data?.length
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Usuarios" icon={Users} description={`Quién trabaja en ${kitchen.name} y con qué roles.`} />
-      <Tabs value={tab} onChange={(t) => setParams(t === 'roles' ? { tab: 'roles' } : {}, { replace: true })} items={tabs} />
-
-      {error ? (
-        <ErrorState error={error} onRetry={() => void Promise.all([users.refetch(), roles.refetch(), catalog.refetch()])} />
-      ) : loading || !users.data || !roles.data || !catalog.data ? (
+    <SettingsPage
+      title="Usuarios"
+      description={count === undefined ? 'Quién trabaja en esta cuenta.' : `${count} ${count === 1 ? 'persona trabaja' : 'personas trabajan'} en esta cuenta.`}
+      actions={
+        team.manageTeam ? (
+          <Button variant="primary" icon={UserPlus} onClick={() => setEditing({ user: null })}>
+            Crear usuario
+          </Button>
+        ) : undefined
+      }
+    >
+      {team.error ? (
+        <ErrorState error={team.error} onRetry={team.retry} />
+      ) : team.loading || !team.users.data || !team.roles.data || !team.catalog.data ? (
         <LoadingState variant="block" />
-      ) : tab === 'users' ? (
-        <UsersPanel
-          organizationId={organizationId}
-          users={users.data}
-          roles={roles.data}
-          catalog={catalog.data}
-          assignable={assignable}
-          manageOrg={manageOrg}
-          manageTeam={manageTeam}
-          myPermissions={kitchen.permissions}
-          showActivity={showActivity}
-        />
       ) : (
-        <RolesPanel organizationId={organizationId} roles={roles.data} users={users.data} catalog={catalog.data} canManage={canShared('roles.manage')} usage={usage.data} />
+        <UsersPanel
+          users={team.users.data}
+          roles={team.roles.data}
+          manageOrg={team.manageOrg}
+          manageTeam={team.manageTeam}
+          showActivity={team.showActivity}
+          onEdit={(user) => setEditing({ user })}
+        />
       )}
+      <p className={typography.caption}>{SUPPORT_NOTE}</p>
 
-      <p className={typography.caption}>El equipo de soporte de la plataforma Quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.</p>
-    </div>
+      {editing && team.roles.data && team.catalog.data && (
+        <UserDrawer
+          organizationId={team.organizationId}
+          user={editing.user}
+          accounts={assignable}
+          roles={team.roles.data}
+          catalog={team.catalog.data}
+          access={{ manageOrg: team.manageOrg, myPermissions: kitchen.permissions }}
+          onClose={() => setEditing(null)}
+        />
+      )}
+    </SettingsPage>
+  )
+}
+
+/** Roles y permisos: system templates and own roles (they apply to all your accounts). */
+export function RolesPage() {
+  const team = useTeamData()
+  return (
+    <SettingsPage title="Roles y permisos" description="Qué puede hacer cada rol en esta cuenta.">
+      {team.error ? (
+        <ErrorState error={team.error} onRetry={team.retry} />
+      ) : team.loading || !team.users.data || !team.roles.data || !team.catalog.data ? (
+        <LoadingState variant="block" />
+      ) : (
+        <RolesPanel
+          organizationId={team.organizationId}
+          roles={team.roles.data}
+          users={team.users.data}
+          catalog={team.catalog.data}
+          canManage={team.manageRoles}
+          usage={team.usage.data}
+        />
+      )}
+      <p className={typography.caption}>{SUPPORT_NOTE}</p>
+    </SettingsPage>
   )
 }
 
 function UsersPanel({
-  organizationId,
   users,
   roles,
-  catalog,
-  assignable,
   manageOrg,
   manageTeam,
-  myPermissions,
   showActivity,
+  onEdit,
 }: {
-  organizationId: string
   users: OrgUser[]
   roles: OrgRole[]
-  catalog: Parameters<typeof UserDrawer>[0]['catalog']
-  assignable: OrgAccount[]
   manageOrg: boolean
   manageTeam: boolean
-  myPermissions: ReadonlySet<string>
   showActivity: boolean
+  onEdit: (user: OrgUser) => void
 }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
-  const [editing, setEditing] = useState<{ user: OrgUser | null } | null>(null)
   const roleName = (id: string) => roles.find((r) => r.id === id)?.name ?? '—'
 
   const q = query.trim().toLowerCase()
@@ -210,18 +272,13 @@ function UsersPanel({
             </option>
           ))}
         </Select>
-        {manageTeam && (
-          <Button variant="primary" icon={UserPlus} className="ml-auto" onClick={() => setEditing({ user: null })}>
-            Crear usuario
-          </Button>
-        )}
       </div>
 
       <DataTable
         columns={columns}
         rows={shown}
         getRowId={(u) => u.userId}
-        onRowClick={manageTeam ? (u) => setEditing({ user: u }) : undefined}
+        onRowClick={manageTeam ? onEdit : undefined}
         emptyState={
           <EmptyState
             icon={Users}
@@ -232,17 +289,6 @@ function UsersPanel({
         }
       />
 
-      {editing && (
-        <UserDrawer
-          organizationId={organizationId}
-          user={editing.user}
-          accounts={assignable}
-          roles={roles}
-          catalog={catalog}
-          access={{ manageOrg, myPermissions }}
-          onClose={() => setEditing(null)}
-        />
-      )}
     </div>
   )
 }

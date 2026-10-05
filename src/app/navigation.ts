@@ -65,7 +65,14 @@ export const NAV_ITEMS: NavItem[] = [
     modules: ['staff'],
     icon: CalendarClock,
   },
-  { to: '/reports', label: 'Reportes', description: 'Ventas, compras y rentabilidad', modules: ['reports'], icon: BarChart3 },
+  {
+    to: '/insights',
+    label: 'Insights',
+    description: 'Cómo va el negocio: ventas, costos y rentabilidad',
+    modules: ['reports'],
+    icon: BarChart3,
+    matchPrefixes: ['/insights', '/reports'],
+  },
 ]
 
 /**

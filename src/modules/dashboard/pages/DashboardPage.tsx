@@ -164,7 +164,7 @@ function DashboardHero({
         <div className="flex items-start gap-5">
           <HeroAction icon={ShoppingCart} label="Compras" to="/supply/compras" />
           <HeroAction icon={Users} label="Clientes" to="/customers" />
-          <HeroAction icon={BarChart3} label="Reportes" to="/reports" />
+          <HeroAction icon={BarChart3} label="Insights" to="/insights" />
         </div>
       </div>
     </div>
@@ -308,8 +308,8 @@ function SalesSummaryPanel({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link to="/reports" className={buttonClass({ variant: 'secondary' })}>
-          <BarChart3 aria-hidden /> Reportes
+        <Link to="/insights" className={buttonClass({ variant: 'secondary' })}>
+          <BarChart3 aria-hidden /> Insights
         </Link>
         <Link to="/kitchen" className={buttonClass({ variant: 'ghost' })}>
           <ChefHat aria-hidden /> Cocina
@@ -390,8 +390,8 @@ function SalesChartCard({
             <Users size={17} aria-hidden />
           </Link>
         </Tooltip>
-        <Tooltip label="Ver reporte completo" side="bottom">
-          <Link to="/reports" aria-label="Ver reporte completo" className={toolbarIconClass}>
+        <Tooltip label="Ver en Insights" side="bottom">
+          <Link to="/insights" aria-label="Ver en Insights" className={toolbarIconClass}>
             <Maximize2 size={17} aria-hidden />
           </Link>
         </Tooltip>
@@ -404,8 +404,8 @@ function SalesChartCard({
               <Chip key={r} label={RANGE_LABEL[r]} active={range === r} onClick={() => onRangeChange(r)} />
             ))}
           </div>
-          <Link to="/reports" className="inline-flex items-center gap-1 px-1 text-xs font-medium text-neutral-400 transition-colors hover:text-neutral-100">
-            Ver en Reportes <ArrowRight size={12} aria-hidden />
+          <Link to="/insights?tab=sales" className="inline-flex items-center gap-1 px-1 text-xs font-medium text-neutral-400 transition-colors hover:text-neutral-100">
+            Ver en Insights <ArrowRight size={12} aria-hidden />
           </Link>
         </div>
 

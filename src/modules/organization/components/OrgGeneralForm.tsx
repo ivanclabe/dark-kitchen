@@ -1,11 +1,10 @@
 import { MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
-import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
-import { FormActions, FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
+import { SettingsSaveBar } from '@/modules/settings/ui/SettingsSaveBar'
+import { cardClass } from '@/shared/ui/formClasses'
+import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Building2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { updateOrganization, type OrganizationDetails, type OrganizationInput } from '../api/organization'
 import { orgKey } from '../hooks/useOrganization'
@@ -33,15 +32,23 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
   const set = (patch: Partial<OrganizationInput>) => setEdited({ ...form, ...patch })
   const nameError = form.name.trim().length >= 2 ? null : 'Mínimo 2 caracteres'
 
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const save = useMutation({
     mutationFn: () => updateOrganization(org.id, form),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: orgKey(org.id) })
       await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
       setEdited(null)
+      setSaveError(null)
+      setSavedAt(Date.now())
       show('Datos del negocio guardados.')
     },
-    onError: (err) => show(getErrorMessage(err, 'No se pudieron guardar los datos'), 'error'),
+    onError: (err) => {
+      const message = getErrorMessage(err, 'No se pudieron guardar los datos')
+      setSaveError(message)
+      show(message, 'error')
+    },
   })
 
   function onSubmit(e: FormEvent) {
@@ -50,8 +57,8 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-3xl space-y-5">
-      <Card title="Identidad del negocio" description="Así se identifica tu negocio en Quanela" icon={Building2}>
+    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <div className={cardClass}>
         <FormGrid>
           <FormField label="Nombre" required error={edited ? nameError : null}>
             {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} />}
@@ -93,10 +100,6 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
           </FormField>
           <FormField label="Ciudad">{(a11y) => <Input {...a11y} value={form.city ?? ''} onChange={(e) => set({ city: e.target.value })} />}</FormField>
           <FormField label="Dirección">{(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} />}</FormField>
-        </FormGrid>
-      </Card>
-      <Card title="Datos legales y de contacto" description="Opcionales" icon={Building2}>
-        <FormGrid>
           <FormField label="Razón social">{(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
           <FormField label="NIT / identificación">{(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
           <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
@@ -104,17 +107,18 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
             {(a11y) => <Input {...a11y} value={form.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase().slice(0, 3) })} maxLength={3} />}
           </FormField>
         </FormGrid>
-      </Card>
-      <FormActions>
-        {edited && (
-          <Button variant="ghost" onClick={() => setEdited(null)} disabled={save.isPending}>
-            Descartar
-          </Button>
-        )}
-        <Button type="submit" variant="primary" loading={save.isPending} disabled={!edited || Boolean(nameError)}>
-          Guardar cambios
-        </Button>
-      </FormActions>
+      </div>
+      <SettingsSaveBar
+        dirty={edited !== null}
+        saving={save.isPending}
+        savedAt={savedAt}
+        error={saveError}
+        invalid={Boolean(nameError)}
+        onDiscard={() => {
+          setEdited(null)
+          setSaveError(null)
+        }}
+      />
     </form>
   )
 }

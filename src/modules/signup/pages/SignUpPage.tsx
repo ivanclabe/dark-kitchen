@@ -2,6 +2,7 @@ import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/busin
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { suggestAccountIcon, type AccountIconKey } from '@/shared/avatars/catalog'
 import { AccountIconPicker } from '@/shared/avatars/GalleryPicker'
+import { FullScreenLoading } from '@/app/FullScreenLoading'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanSummary } from '@/shared/plans/PlanSummary'
@@ -13,16 +14,21 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import clsx from 'clsx'
 import { ArrowLeft, ArrowRight, Check, Flame, MailCheck, RotateCw } from 'lucide-react'
-import { useCallback, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { CONFIRMED_PATH, PUBLIC_SIGNUP_ENABLED, resendConfirmation, signUpBusiness, TURNSTILE_SITE_KEY, type PendingOrganization } from '../api'
+import { CONFIRMED_PATH, PUBLIC_SIGNUP_ENABLED, resendConfirmation, savePendingBusiness, signUpBusiness, TURNSTILE_SITE_KEY, type PendingOrganization } from '../api'
+import { OwnerMethodButtons, PhoneSignIn } from '../components/OwnerMethods'
 import { TurnstileWidget } from '../components/TurnstileWidget'
+import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
+import { NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
 
 type Step = 'user' | 'plan' | 'business' | 'sent'
+/** How the person creates their user (ADR 0025): choose a method, or the email form, or the phone code. */
+type Entry = 'choose' | 'email' | 'phone'
 const STEP_NUMBER: Record<Exclude<Step, 'sent'>, number> = { user: 1, plan: 2, business: 3 }
 
 function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' | 'md' | 'xl' }) {
@@ -66,22 +72,28 @@ function PlanPicker({ plans, selected, onSelect }: { plans: Plan[]; selected: st
 }
 
 /**
- * Registro de un negocio nuevo (ADR 0008 §8 y ADR 0010 §3.4), en tres pasos:
- * tu usuario → tu plan → tu negocio y tu primera cuenta, y "Revisa tu
- * correo". Si se llega con un plan (?plan=business, desde Precios), ese paso
- * no se repite: se muestra el plan con "Cambiar plan". Nada se crea en la
- * base hasta confirmar el correo; el enlace lleva a /registro/confirmado,
- * que crea organización, suscripción, primera Cuenta y roles juntos.
+ * Registro de un negocio nuevo (ADR 0008 §8, ADR 0010 §3.4 y ADR 0025), en
+ * tres pasos: tu usuario → tu plan → tu negocio y tu primera cuenta.
+ *   - Con email (como siempre): "Revisa tu correo"; nada se crea hasta
+ *     confirmarlo, y el enlace lleva a /registro/confirmado.
+ *   - Con Google, Instagram o teléfono: primero te autenticas (vuelves con
+ *     sesión y sin perfil), luego plan y negocio, y /registro/confirmado crea
+ *     todo de una vez. Quien ya tiene usuario va a su cuenta (D4).
+ * Si se llega con un plan (?plan=business, desde Precios), ese paso no se
+ * repite: se muestra el plan con "Cambiar plan".
  */
 export function SignUpPage() {
-  const { session } = useAuth()
+  const { session, profile, loading, profileLoading, signOut } = useAuth()
   const navigate = useNavigate()
   const { data: pricing, isLoading: plansLoading, isError: plansError, refetch: refetchPlans } = usePublicPricing()
   const { plan: requestedPlan, setPlan } = useSelectedPlan()
   const selectedPlan = isSelectablePlan(pricing?.plans, requestedPlan) ? (pricing?.plans.find((p) => p.key === requestedPlan) ?? null) : null
 
+  const methods = enabledOwnerMethods()
   const [step, setStep] = useState<Step>('user')
+  const [entry, setEntry] = useState<Entry>(methods.length ? 'choose' : 'email')
   const [fullName, setFullName] = useState('')
+  const [nameTouched, setNameTouched] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [org, setOrg] = useState<PendingOrganization>({ name: '', sector: '', category: '', country: 'CO', address: '', city: '' })
@@ -89,14 +101,38 @@ export function SignUpPage() {
   const [accountIcon, setAccountIcon] = useState<AccountIconKey | null>(null)
   const [pickingIcon, setPickingIcon] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  // An OAuth provider sends its errors back in the address.
+  const [error, setError] = useState<string | null>(() => oauthErrorFromUrl(window.location.href))
   const [busy, setBusy] = useState(false)
   const [resent, setResent] = useState(false)
   const [resendLocked, setResendLocked] = useState(false)
   const set = (patch: Partial<PendingOrganization>) => setOrg((o) => ({ ...o, ...patch }))
   const onCaptcha = useCallback((token: string | null) => setCaptchaToken(token), [])
 
-  if (session && step !== 'sent') return <Navigate to="/" replace />
+  // Signed in with Google, Instagram or phone and no profile yet: the onboarding continues here.
+  const onboarding = Boolean(session) && !loading && !profileLoading && !profile && step !== 'sent'
+  const existingUser = Boolean(session && profile) && step !== 'sent'
+
+  // Someone who already has a user goes to their account (D4). D3: if they came with Google,
+  // Instagram or phone and own no business (an invited user), they sign in with email instead.
+  const guarded = useRef(false)
+  const [leaving, setLeaving] = useState<'home' | null>(null)
+  useEffect(() => {
+    if (!existingUser || guarded.current) return
+    guarded.current = true
+    // Without the mark (signed in with email) there is nothing to check.
+    const check = takeOwnerSignInMark() ? ownsABusiness() : Promise.resolve(true)
+    check
+      .then(async (owner) => {
+        if (owner) return setLeaving('home')
+        await signOut()
+        navigate('/login', { replace: true, state: { notice: NOT_AN_OWNER_NOTICE } })
+      })
+      .catch(() => setLeaving('home'))
+  }, [existingUser, signOut, navigate])
+
+  if (leaving === 'home') return <Navigate to="/" replace />
+  if (session && step !== 'sent' && (loading || profileLoading || existingUser)) return <FullScreenLoading />
 
   const salesUrl = pricing?.plans.find((p) => p.cta === 'contact_sales')?.contactUrl ?? null
 
@@ -131,14 +167,24 @@ export function SignUpPage() {
   const stepUserValid = !Object.values(stepUserErrors).some(Boolean)
   const effectiveAccountName = accountName.trim() || org.name.trim()
   const effectiveIcon = accountIcon ?? suggestAccountIcon(effectiveAccountName)
+  const providerName = String(session?.user.user_metadata?.full_name ?? session?.user.user_metadata?.name ?? '').trim()
+  const ownerName = nameTouched ? fullName : fullName || providerName
+  const signedInAs = session?.user.email ?? (session?.user.phone ? `+${session.user.phone.replace(/^\+/, '')}` : null)
   const stepBusinessValid =
-    org.name.trim().length >= 2 && effectiveAccountName.length >= 2 && Boolean(org.sector) && Boolean(org.category) && (!TURNSTILE_SITE_KEY || Boolean(captchaToken))
+    org.name.trim().length >= 2 &&
+    effectiveAccountName.length >= 2 &&
+    Boolean(org.sector) &&
+    Boolean(org.category) &&
+    (onboarding ? ownerName.trim().length >= 2 : !TURNSTILE_SITE_KEY || Boolean(captchaToken))
+  // With a session the user step is done: straight to the plan (or the business, with a plan).
+  // ("sent" has its own screen below.)
+  const current = (onboarding && step === 'user' ? (selectedPlan ? 'business' : 'plan') : step) as Exclude<Step, 'sent'>
 
   /** Después de tu usuario: al plan si falta elegirlo; si no, al negocio. */
   const afterUser = () => setStep(selectedPlan ? 'business' : 'plan')
   const choosePlan = (plan: string) => {
     setPlan(plan)
-    setStep(stepUserValid ? 'business' : 'user')
+    setStep(onboarding || stepUserValid ? 'business' : 'user')
   }
 
   async function submit(e: FormEvent) {
@@ -157,6 +203,12 @@ export function SignUpPage() {
         legalName: org.legalName?.trim() || undefined,
         accountName: effectiveAccountName,
         accountIcon: effectiveIcon,
+      }
+      if (onboarding) {
+        // Already signed in (Google, Instagram, phone): the business is created right away.
+        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key })
+        navigate(CONFIRMED_PATH, { replace: true })
+        return
       }
       const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, captchaToken: captchaToken ?? undefined })
       // Si el proyecto no exige confirmar el correo, ya hay sesión: se crea el negocio de una vez.
@@ -212,23 +264,41 @@ export function SignUpPage() {
   }
 
   const titles = {
-    user: ['Crea tu usuario', 'Con él entrarás a Quanela.'],
+    user: ['Crea tu usuario', entry === 'phone' ? 'Te enviaremos un código por SMS.' : entry === 'choose' ? 'Elige cómo vas a entrar a Quanela.' : 'Con él entrarás a Quanela.'],
     plan: ['Elige el plan para tu negocio', 'Empieza gratis; puedes cambiar de plan más adelante.'],
     business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu espacio y tu primera cuenta.'],
-  }[step]
-  const planSummary = selectedPlan && step !== 'plan' ? <PlanSummary plan={selectedPlan} onChange={() => setStep('plan')} /> : null
+  }[current]
+  const planSummary = selectedPlan && current !== 'plan' ? <PlanSummary plan={selectedPlan} onChange={() => setStep('plan')} /> : null
 
   return (
-    <Shell width={step === 'plan' ? 'xl' : step === 'business' ? 'md' : 'sm'}>
+    <Shell width={current === 'plan' ? 'xl' : current === 'business' ? 'md' : 'sm'}>
       <div>
-        <p className={typography.overline}>Paso {STEP_NUMBER[step]} de 3</p>
+        <p className={typography.overline}>Paso {STEP_NUMBER[current]} de 3</p>
         <h1 className={`mt-1 ${typography.h2}`}>{titles[0]}</h1>
         <p className={`mt-1 ${typography.small}`}>{titles[1]}</p>
       </div>
 
       {planSummary}
 
-      {step === 'user' && (
+      {onboarding && signedInAs && (
+        <p className={typography.caption}>
+          Entraste como <span className="text-neutral-300">{signedInAs}</span>.{' '}
+          <button type="button" className="text-brasa-400 hover:underline" onClick={() => void signOut()}>
+            Usar otra cuenta
+          </button>
+        </p>
+      )}
+
+      {current === 'user' && entry === 'choose' && (
+        <>
+          <OwnerMethodButtons methods={methods} onPhone={() => { setError(null); setEntry('phone') }} onEmail={() => { setError(null); setEntry('email') }} onError={setError} />
+          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+        </>
+      )}
+
+      {current === 'user' && entry === 'phone' && <PhoneSignIn create onBack={() => setEntry('choose')} onSignedIn={() => setError(null)} />}
+
+      {current === 'user' && entry === 'email' && (
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -249,10 +319,15 @@ export function SignUpPage() {
           <Button type="submit" variant="primary" size="lg" iconRight={ArrowRight} className="w-full" disabled={!stepUserValid}>
             Continuar
           </Button>
+          {methods.length > 0 && (
+            <button type="button" onClick={() => setEntry('choose')} className="flex w-full items-center justify-center gap-1 text-sm text-neutral-400 hover:text-neutral-200">
+              <ArrowLeft size={14} aria-hidden /> Otros métodos
+            </button>
+          )}
         </form>
       )}
 
-      {step === 'plan' &&
+      {current === 'plan' &&
         (plansLoading ? (
           <div className="grid gap-4 lg:grid-cols-3" aria-busy="true" aria-label="Cargando planes">
             {[0, 1, 2].map((i) => (
@@ -270,9 +345,13 @@ export function SignUpPage() {
           <>
             <PlanPicker plans={pricing.plans} selected={selectedPlan?.key ?? null} onSelect={choosePlan} />
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <Button variant="ghost" icon={ArrowLeft} onClick={() => setStep('user')}>
-                Atrás
-              </Button>
+              {onboarding ? (
+                <span />
+              ) : (
+                <Button variant="ghost" icon={ArrowLeft} onClick={() => setStep('user')}>
+                  Atrás
+                </Button>
+              )}
               <Link to="/landing#precios" className="text-sm text-neutral-400 hover:text-neutral-200">
                 Comparar planes en detalle
               </Link>
@@ -280,8 +359,24 @@ export function SignUpPage() {
           </>
         ))}
 
-      {step === 'business' && (
+      {current === 'business' && (
         <form onSubmit={(e) => void submit(e)} className="space-y-4" noValidate>
+          {onboarding && (
+            <FormField label="Tu nombre" required hint="Así te verá tu equipo.">
+              {(a11y) => (
+                <Input
+                  {...a11y}
+                  autoComplete="name"
+                  value={ownerName}
+                  onChange={(e) => {
+                    setNameTouched(true)
+                    setFullName(e.target.value)
+                  }}
+                  maxLength={80}
+                />
+              )}
+            </FormField>
+          )}
           <FormField label="Nombre del negocio" required hint="Así se llamará tu negocio. Puedes cambiarlo después.">
             {(a11y) => <Input {...a11y} value={org.name} onChange={(e) => set({ name: e.target.value })} placeholder="Grupo XYZ" maxLength={80} autoFocus />}
           </FormField>
@@ -356,12 +451,14 @@ export function SignUpPage() {
               </button>
             </p>
           )}
-          {TURNSTILE_SITE_KEY && <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={onCaptcha} />}
+          {TURNSTILE_SITE_KEY && !onboarding && <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={onCaptcha} />}
           {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-2">
-            <Button variant="ghost" icon={ArrowLeft} onClick={() => setStep(selectedPlan ? 'user' : 'plan')} disabled={busy}>
-              Atrás
-            </Button>
+            {!(onboarding && selectedPlan) && (
+              <Button variant="ghost" icon={ArrowLeft} onClick={() => setStep(onboarding || !selectedPlan ? 'plan' : 'user')} disabled={busy}>
+                Atrás
+              </Button>
+            )}
             <Button type="submit" variant="primary" size="lg" className="flex-1" loading={busy} disabled={!stepBusinessValid || !selectedPlan}>
               Crear mi negocio
             </Button>
@@ -369,12 +466,14 @@ export function SignUpPage() {
         </form>
       )}
 
+      {!onboarding && (
       <p className="text-center text-sm text-neutral-500">
         ¿Ya tienes usuario?{' '}
         <Link to="/login" className="text-brasa-400 hover:underline">
           Inicia sesión
         </Link>
       </p>
+      )}
     </Shell>
   )
 }

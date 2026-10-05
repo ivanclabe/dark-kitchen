@@ -1,10 +1,11 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
-import { Copy, Plug } from 'lucide-react'
+import { Copy } from 'lucide-react'
+import { SettingsPage } from '../ui/SettingsPage'
+import { SettingsSection } from '../ui/SettingsSection'
 
 /**
  * Integrations of the active account (ADR 0012, ADR 0024): an external system
@@ -15,14 +16,13 @@ export function IntegrationsSettingsPage() {
   const { kitchen } = useActiveKitchen()
   const { show } = useToast()
   return (
-    <div className="max-w-3xl space-y-5">
-      <Card title="Conectar un sistema externo" description="Por ejemplo, pedidos por WhatsApp con n8n" icon={Plug}>
+    <SettingsPage title="Integraciones" description="Conecta sistemas externos a esta cuenta.">
+      <SettingsSection title="ID de la cuenta" description="Por ejemplo, para pedidos por WhatsApp con n8n: la integración lo envía en cada petición y con él solo ve esta cuenta." card>
         <FormField
           label="ID de la cuenta"
           hint={
             <>
-              Cada integración envía este valor en el encabezado <code className="text-neutral-300">x-dk-kitchen-id</code>. Sin él no ve ni registra nada, y con él
-              solo ve esta cuenta.
+              Va en el encabezado <code className="text-neutral-300">x-dk-kitchen-id</code>. Sin él la integración no ve ni registra nada.
             </>
           }
         >
@@ -44,8 +44,8 @@ export function IntegrationsSettingsPage() {
             </div>
           )}
         </FormField>
-      </Card>
-      <p className={typography.caption}>Las fallas de las integraciones todavía no se registran; la actividad por canal sí (Configuración → Actividad).</p>
-    </div>
+      </SettingsSection>
+      <p className={typography.caption}>Las fallas de las integraciones todavía no se registran; la actividad por canal sí (Actividad → Operación).</p>
+    </SettingsPage>
   )
 }

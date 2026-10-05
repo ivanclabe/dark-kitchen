@@ -11,7 +11,7 @@ import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
 import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
 import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
 import { StaffPage } from '@/modules/staff/pages/StaffPage'
-import { UsersAndPermissionsPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
+import { RolesPage, UsersLayout, UsersPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
 import { SignUpConfirmedPage } from '@/modules/signup/pages/SignUpConfirmedPage'
@@ -51,13 +51,13 @@ function LegacyPurchaseRedirect() {
   return <KitchenRedirect to={id ? `/supply/compras/${id}` : '/supply/compras'} />
 }
 
-// recharts (usado solo por Dashboard y Reportes) pesa bastante — se separa en
+// recharts (usado solo por Dashboard e Insights) pesa bastante — se separa en
 // su propio chunk para que el resto de la app (cocina, pedidos, etc.) no
 // pague ese costo en la carga inicial.
 const DashboardPage = lazy(() =>
   import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
-const ReportsPage = lazy(() => import('@/modules/reports/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })))
+const InsightsPage = lazy(() => import('@/modules/insights/pages/InsightsPage').then((m) => ({ default: m.InsightsPage })))
 
 const loading = <p className="text-neutral-400">Cargando…</p>
 
@@ -155,11 +155,21 @@ const routes: RouteObject[] = [
           // Clientes — saldos, pagos e historial.
           { path: 'customers', element: <CustomersPage /> },
           { path: 'customers/:id', element: <CustomerDetailPage /> },
-          { path: 'reports', element: <Suspense fallback={loading}><ReportsPage /></Suspense> },
+          // Insights (ADR 0027): how the business is doing. /reports is its old address.
+          { path: 'insights', element: <Suspense fallback={loading}><InsightsPage /></Suspense> },
+          { path: 'reports', element: <KitchenRedirect to="/insights" /> },
           // Mi perfil: nombre, avatar y contraseña de la persona (ADR 0008, Fase A).
           { path: 'perfil', element: <ProfilePage /> },
-          // Usuarios: Usuarios · Roles y permisos, always of this account (ADR 0024).
-          { path: 'users', element: <UsersAndPermissionsPage /> },
+          // Usuarios: Usuarios · Roles y permisos, always of this account (ADR 0024), in the shell of Configuración (ADR 0026).
+          {
+            path: 'users',
+            element: <UsersLayout />,
+            children: [
+              { index: true, element: <UsersPage /> },
+              { path: 'roles', element: <RolesPage /> },
+              { path: '*', element: <Navigate to=".." replace /> },
+            ],
+          },
           // Old address of the organization settings.
           { path: 'organizacion', element: <KitchenRedirect to="/settings/general" /> },
           // Configuración of the account (ADR 0024): General, Facturación, IA y voz, Integraciones, Actividad.

@@ -11,6 +11,7 @@ import clsx from 'clsx'
 import { RotateCcw, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 import { ScopeChoice, type SettingsScope } from './ScopeChoice'
+import { SettingsSaveBar } from '@/modules/settings/ui/SettingsSaveBar'
 import { diffFrom, fieldError, fieldsFor, settingsSummary, type EditableField } from '../lib/featureSettingFields'
 
 type Feature = FeatureMatrix['features'][number]
@@ -115,25 +116,36 @@ export function FeatureSettingsSection({
   const shared = accountCount > 1
   const [draft, setDraft] = useState<FeatureSettings | null>(null)
   const [scope, setScope] = useState<SettingsScope>(hasOwn ? 'account' : 'all')
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const failed = (err: unknown) => {
+    const message = getErrorMessage(err, 'No se pudo guardar')
+    setSaveError(message)
+    show(message, 'error')
+  }
 
   const saveGeneral = useMutation({
     mutationFn: (settings: FeatureSettings) => setOrganizationFeatureSettings(organizationId, feature.key, settings),
     onSuccess: async (_, settings) => {
       await onChanged()
       setDraft(null)
-      show(Object.keys(settings).length === 0 ? `${feature.label}: valores de fábrica.` : `${feature.label}: guardado${shared ? ' para todas tus cuentas' : ''}.`)
+      setSaveError(null)
+      setSavedAt(Date.now())
+      show(Object.keys(settings).length === 0 ? `${feature.label}: valores restablecidos.` : `${feature.label}: cambios guardados${shared ? ' para todas tus cuentas' : ''}.`)
     },
-    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
+    onError: failed,
   })
   const saveOwn = useMutation({
     mutationFn: (settings: FeatureSettings) => setKitchenFeatureSettings(account.id, feature.key, settings),
     onSuccess: async (_, settings) => {
       await onChanged()
       setDraft(null)
+      setSaveError(null)
+      setSavedAt(Date.now())
       if (Object.keys(settings).length === 0) setScope('all')
-      show(Object.keys(settings).length === 0 ? 'Esta cuenta vuelve a usar los valores generales.' : `${feature.label}: guardado solo para esta cuenta.`)
+      show(Object.keys(settings).length === 0 ? 'Esta cuenta vuelve a usar los valores generales.' : `${feature.label}: cambios guardados solo para esta cuenta.`)
     },
-    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
+    onError: failed,
   })
 
   if (fields.length === 0) return null
@@ -180,29 +192,33 @@ export function FeatureSettingsSection({
                 : 'Valores de esta cuenta.'}
         </p>
         <SettingsFields fields={fields} values={form} onChange={setDraft} disabled={!canEdit || busy} idPrefix={`${scope}-${feature.key}`} />
-        {canEdit && (
-          <div className="flex flex-wrap justify-end gap-2">
-            {!draft && ownScope && hasOwn && (
-              <Button variant="ghost" size="sm" icon={RotateCcw} onClick={() => saveOwn.mutate({})} loading={saveOwn.isPending}>
-                Usar los valores generales
-              </Button>
-            )}
-            {!draft && !ownScope && !isFactory && (
-              <Button variant="ghost" size="sm" icon={RotateCcw} onClick={() => saveGeneral.mutate({})} loading={saveGeneral.isPending}>
-                Valores de fábrica
-              </Button>
-            )}
-            {draft && (
-              <>
-                <Button variant="ghost" size="sm" onClick={() => setDraft(null)} disabled={busy}>
-                  Descartar
-                </Button>
-                <Button variant="primary" size="sm" loading={busy} disabled={!isValid(fields, draft)} onClick={() => save(draft)}>
-                  {ownScope ? 'Guardar solo para esta cuenta' : shared ? 'Guardar para todas tus cuentas' : 'Guardar'}
-                </Button>
-              </>
-            )}
+        {canEdit && !draft && ((ownScope && hasOwn) || (!ownScope && !isFactory)) && (
+          <div className="flex justify-start">
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={RotateCcw}
+              onClick={() => (ownScope ? saveOwn.mutate({}) : saveGeneral.mutate({}))}
+              loading={busy}
+              title={ownScope ? 'Esta cuenta vuelve a usar los valores generales' : 'Vuelve a los valores de fábrica'}
+            >
+              Restablecer
+            </Button>
           </div>
+        )}
+        {canEdit && (
+          <SettingsSaveBar
+            dirty={draft !== null}
+            saving={busy}
+            savedAt={savedAt}
+            error={saveError}
+            invalid={draft ? !isValid(fields, draft) : false}
+            onDiscard={() => {
+              setDraft(null)
+              setSaveError(null)
+            }}
+            onSave={() => draft && save(draft)}
+          />
         )}
       </div>
     </Accordion>

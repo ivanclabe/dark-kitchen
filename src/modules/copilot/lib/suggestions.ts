@@ -9,9 +9,9 @@ interface Suggestion {
 }
 
 const SUGGESTIONS: Suggestion[] = [
-  { text: '¿Cuánto vendimos esta semana frente a la pasada?', needs: 'reports.view', screens: ['/dashboard', '/reports'] },
-  { text: '¿Cuáles son los 5 platos más vendidos del mes?', needs: 'reports.view', screens: ['/reports', '/menu-planner'] },
-  { text: '¿A qué hora vendemos más?', needs: 'reports.view', screens: ['/reports'] },
+  { text: '¿Cuánto vendimos esta semana frente a la pasada?', needs: 'reports.view', screens: ['/dashboard', '/insights'] },
+  { text: '¿Cuáles son los 5 platos más vendidos del mes?', needs: 'reports.view', screens: ['/insights', '/menu-planner'] },
+  { text: '¿A qué hora vendemos más?', needs: 'reports.view', screens: ['/insights'] },
   { text: '¿Qué pedidos de hoy se demoraron más de 30 minutos?', needs: 'orders.view', screens: ['/orders'] },
   { text: '¿Cómo van los tiempos de cocina esta semana?', needs: 'kitchen.view', screens: ['/kitchen'] },
   { text: '¿Qué insumos están por agotarse?', needs: 'inventory.view', screens: ['/supply', '/kitchen'] },

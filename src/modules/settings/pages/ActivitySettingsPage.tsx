@@ -4,17 +4,20 @@ import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { StatCard } from '@/shared/ui/StatCard'
-import { Tabs, type TabItem } from '@/shared/ui/Tabs'
+import { Button } from '@/shared/ui/Button'
 import { typography } from '@/shared/ui/typography'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { Activity, Bot, Boxes, Check, Clock, Gauge, Minus, Radio, ScrollText, ShoppingBag, Store, Truck, Users, Wallet } from 'lucide-react'
+import { Check, Clock, Gauge, Minus, ShoppingBag, Wallet } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
 import { fetchAccountObservability, type AccountObservability } from '../api'
 import { EventLog } from '../components/EventLog'
+import { SettingsPage } from '../ui/SettingsPage'
+import { SettingsSection } from '../ui/SettingsSection'
+import { SettingsSubNav, type SubNavItem } from '../ui/SettingsSubNav'
 
 type Tab = 'operacion' | 'bitacora'
 
@@ -42,17 +45,17 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
   const channels = Object.entries(data.orders.byChannel)
   const movements = Object.entries(data.inventory.movements)
   return (
-    <div className="space-y-6">
-      <p className={typography.caption}>Horas en {data.account.timezone} · actualizado {formatDateTime(data.generatedAt)}</p>
+    <>
+      <SettingsSection title="Hoy y esta semana" description={`Horas en ${data.account.timezone} · actualizado ${formatDateTime(data.generatedAt)}`}>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Pedidos de hoy" value={data.orders.today.created} hint={`${data.orders.today.delivered} entregados · ${data.orders.today.cancelled} cancelados`} icon={ShoppingBag} tone="brand" />
         <StatCard label="Ventas de hoy" value={formatMoney(data.orders.today.sales)} hint={`7 días: ${formatMoney(data.orders.week.sales)}`} icon={Wallet} tone="good" />
         <StatCard label="En curso ahora" value={data.inProgress} hint={data.late > 0 ? `${data.late} atrasados` : 'Ninguno atrasado'} icon={Clock} tone={data.late > 0 ? 'warn' : 'neutral'} />
         <StatCard label="Preparación promedio" value={data.avgPrepMinutes !== null ? `${data.avgPrepMinutes} min` : '—'} hint="De en cola a listo, últimos 7 días" icon={Gauge} />
       </div>
 
-      <Card title="Pedidos por día" description="Últimos 7 días, sin cancelados" icon={Activity}>
+      <Card title="Pedidos por día" description="Últimos 7 días, sin cancelados">
         <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.orders.byDay.map((d) => ({ ...d, label: d.date.slice(5) }))}>
@@ -68,34 +71,37 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
         </div>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-        <Card title="Canales (7 días)" icon={Radio}>
+      </SettingsSection>
+
+      <SettingsSection title="Últimos 7 días">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card title="Canales">
           {channels.length === 0 ? <p className={typography.caption}>Sin pedidos.</p> : channels.map(([c, n]) => <Row key={c} label={CHANNEL_LABEL[c] ?? c}>{n}</Row>)}
           <p className={clsx('mt-2', typography.caption)}>Los errores de las integraciones todavía no se registran.</p>
         </Card>
-        <Card title="Inventario (7 días)" icon={Boxes}>
+        <Card title="Inventario">
           {movements.length === 0 ? <p className={typography.caption}>Sin movimientos.</p> : movements.map(([t, n]) => <Row key={t} label={MOVEMENT_LABEL[t] ?? t}>{n}</Row>)}
           <Row label="Insumos bajo el mínimo">
             <span className={data.inventory.lowStock > 0 ? 'text-amber-300' : undefined}>{data.inventory.lowStock}</span>
           </Row>
         </Card>
-        <Card title="Compras y cobros (7 días)" icon={Truck}>
+        <Card title="Compras y cobros">
           <Row label="Compras confirmadas">{data.purchases.confirmed} · {formatMoney(data.purchases.confirmedAmount)}</Row>
           <Row label="Compras en borrador">{data.purchases.drafts}</Row>
           <Row label="Cobros a clientes">{data.payments.count} · {formatMoney(data.payments.amount)}</Row>
         </Card>
-        <Card title="Inteligencia artificial" icon={Bot}>
+        <Card title="Inteligencia artificial">
           <Row label="Análisis en 24 h">{data.ai.runs24h} de {data.ai.limitPerDay}</Row>
           <Row label="Con error">
             <span className={data.ai.errors24h > 0 ? 'text-red-300' : undefined}>{data.ai.errors24h}</span>
           </Row>
         </Card>
-        <Card title="Equipo" icon={Users}>
+        <Card title="Equipo">
           <Row label="Personas con acceso">{data.team.members}</Row>
           <Row label="Activas en 7 días">{data.team.active7d}</Row>
           <Row label="Último inicio de sesión">{data.team.lastSignInAt ? formatDateTime(data.team.lastSignInAt) : '—'}</Row>
         </Card>
-        <Card title="Estado de módulos" icon={Store}>
+        <Card title="Estado de módulos">
           <div className="flex flex-col gap-1.5">
             <Flag ok={data.modules.accountActive} label="Cuenta activa" />
             <Flag ok={data.modules.hoursConfigured} label="Horario de atención configurado" />
@@ -112,19 +118,22 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
         </Card>
       </div>
 
-      <section className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className={typography.h3}>Cambios recientes en la cuenta</h2>
-          {onOpenLog && (
-            <button type="button" onClick={onOpenLog} className="text-sm text-brasa-400 hover:underline">
+      </SettingsSection>
+
+      <SettingsSection
+        title="Cambios recientes"
+        actions={
+          onOpenLog && (
+            <Button variant="link" size="sm" onClick={onOpenLog}>
               Ver en la bitácora
-            </button>
-          )}
-        </div>
+            </Button>
+          )
+        }
+      >
         {data.recentChanges.length === 0 ? (
           <p className={typography.caption}>Sin cambios registrados.</p>
         ) : (
-          <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 px-4">
+          <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
             {data.recentChanges.map((e) => (
               <li key={e.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5 text-sm">
                 <span className="text-neutral-200">
@@ -137,7 +146,7 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
             ))}
           </ul>
         )}
-      </section>
+      </SettingsSection>
 
       <details className="rounded-xl border border-neutral-800/60 px-4 py-3 text-sm text-neutral-400">
         <summary className="cursor-pointer text-neutral-300">Qué no se mide todavía</summary>
@@ -148,7 +157,7 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
           <li>Operaciones rechazadas por permisos: la base las rechaza, pero no quedan registradas.</li>
         </ul>
       </details>
-    </div>
+    </>
   )
 }
 
@@ -162,9 +171,9 @@ export function ActivitySettingsPage() {
   const [params, setParams] = useSearchParams()
   const seeOperation = canShared('observability.view') && organization !== null
   const seeLog = can('audit.view') || canShared('observability.view')
-  const tabs: TabItem<Tab>[] = [
-    ...(seeOperation ? [{ value: 'operacion' as const, label: 'Operación', icon: Activity }] : []),
-    ...(seeLog ? [{ value: 'bitacora' as const, label: 'Bitácora', icon: ScrollText }] : []),
+  const tabs: SubNavItem<Tab>[] = [
+    ...(seeOperation ? [{ value: 'operacion' as const, label: 'Operación' }] : []),
+    ...(seeLog ? [{ value: 'bitacora' as const, label: 'Bitácora' }] : []),
   ]
   const tab: Tab = tabs.find((t) => t.value === params.get('tab'))?.value ?? tabs[0]?.value ?? 'bitacora'
   const setTab = (t: Tab) => setParams(t === tabs[0]?.value ? {} : { tab: t }, { replace: true })
@@ -177,17 +186,20 @@ export function ActivitySettingsPage() {
   })
 
   return (
-    <div className="space-y-6">
-      {tabs.length > 1 && <Tabs value={tab} onChange={setTab} items={tabs} />}
+    <SettingsPage
+      title="Actividad"
+      description="Cómo opera esta cuenta y quién hizo qué."
+      subNav={tabs.length > 1 ? <SettingsSubNav label="Secciones de actividad" items={tabs} value={tab} onChange={setTab} /> : undefined}
+    >
       {tab === 'bitacora' ? (
         <EventLog />
       ) : detail.isLoading ? (
-        <LoadingState variant="cards" rows={1} cols={4} />
+        <LoadingState variant="block" />
       ) : detail.isError || !detail.data ? (
         <ErrorState error={detail.error} onRetry={() => void detail.refetch()} />
       ) : (
         <AccountOperation data={detail.data} onOpenLog={seeLog ? () => setTab('bitacora') : null} />
       )}
-    </div>
+    </SettingsPage>
   )
 }

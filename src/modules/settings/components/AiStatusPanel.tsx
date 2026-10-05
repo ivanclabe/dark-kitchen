@@ -1,29 +1,18 @@
 import { useAiConnectionStatus } from '@/modules/ai/hooks/useAi'
-import { useAccountFeatureMatrix } from '@/modules/organization/hooks/useAccountFeatures'
-import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { typography } from '@/shared/ui/typography'
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { CheckCircle2, Gauge, KeyRound, ShieldCheck } from 'lucide-react'
-import { fetchAccountAiUsage } from '../api'
+import { CheckCircle2, KeyRound, ShieldCheck, type LucideIcon } from 'lucide-react'
 
 /**
- * Read-only state of AI in the active account (ADR 0018, ADR 0024): whether
- * the platform connected it, the principle the features follow, and the plan
- * limits. Models, providers and costs are managed by the platform.
+ * State of AI in the active account (ADR 0018, ADR 0026): whether the platform
+ * connected it and the principle the features follow. The plan lives in
+ * Facturación; models, providers and costs are the platform's.
  */
 export function AiStatusPanel() {
-  const { kitchen } = useActiveKitchen()
   const connection = useAiConnectionStatus()
-  const matrix = useAccountFeatureMatrix(kitchen.id)
-  const usage = useQuery({ queryKey: ['account', kitchen.id, 'ai-usage'], queryFn: () => fetchAccountAiUsage() })
   const configured = connection.data?.configured === true
-  const account = matrix.data?.accounts.find((a) => a.id === kitchen.id)
-  const active = matrix.data?.features.filter((f) => f.category === 'ai' && f.available && account?.enabled[f.key]).length ?? 0
-  const included = matrix.data?.features.filter((f) => f.category === 'ai' && f.includedInPlan).length ?? 0
-
   return (
-    <div className="grid max-w-4xl gap-3 lg:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-2">
       <StatusCard
         icon={configured ? CheckCircle2 : KeyRound}
         tone={configured ? 'ok' : 'warn'}
@@ -39,20 +28,11 @@ export function AiStatusPanel() {
         title="La IA recomienda, tú decides"
         body="Las cifras las calcula el sistema; la IA solo prioriza y explica. No crea compras ni cambia pedidos: cada acción es un botón que alguien pulsa."
       />
-      <StatusCard
-        icon={Gauge}
-        title={matrix.data?.plan ? `Plan ${matrix.data.plan.name}` : 'Plan'}
-        body={
-          usage.data
-            ? `Hasta ${usage.data.dailyLimit} análisis de IA al día en esta cuenta. Tiene activas ${active} de ${included} funciones de IA que incluye tu plan.`
-            : 'Límites del plan para los análisis de IA.'
-        }
-      />
     </div>
   )
 }
 
-function StatusCard({ icon: Icon, title, body, tone = 'neutral' }: { icon: typeof Gauge; title: string; body: string; tone?: 'ok' | 'warn' | 'neutral' }) {
+function StatusCard({ icon: Icon, title, body, tone = 'neutral' }: { icon: LucideIcon; title: string; body: string; tone?: 'ok' | 'warn' | 'neutral' }) {
   return (
     <div
       className={clsx(

@@ -15,7 +15,7 @@ export const MODULE_LABEL: Record<string, string> = {
   purchasing: 'Compras',
   suppliers: 'Proveedores',
   invoices: 'Facturas',
-  reports: 'Reportes',
+  reports: 'Insights',
   ai: 'IA',
   settings: 'Configuración',
   team: 'Equipo de la cuenta',

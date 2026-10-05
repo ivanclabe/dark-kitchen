@@ -6,19 +6,20 @@ import { AccountIconPicker } from '@/shared/avatars/GalleryPicker'
 import { MY_KITCHENS_KEY, kitchenPath, useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { getKitchenDetails, updateKitchenDetails, type KitchenDetailsInput } from '@/shared/kitchen/kitchensApi'
 import { slugError } from '@/shared/kitchen/slug'
-import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { FormActions, FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
+import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Building2, Link2 } from 'lucide-react'
+import { Link2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AccountStatusCard } from '../components/AccountStatusCard'
+import { SettingsPage } from '../ui/SettingsPage'
+import { SettingsSaveBar } from '../ui/SettingsSaveBar'
+import { SettingsSection } from '../ui/SettingsSection'
 
 const TIMEZONES: { value: string; label: string }[] = [
   { value: 'America/Bogota', label: 'Colombia (Bogotá)' },
@@ -34,32 +35,29 @@ const TIMEZONES: { value: string; label: string }[] = [
 ]
 
 /**
- * General settings (ADR 0024): the data of this account and, for whoever
- * manages the business, the data that applies to all your accounts.
+ * General (ADR 0024, ADR 0026): the data of this account in one form (two
+ * groups), then — for whoever manages the business — the data that applies to
+ * all your accounts, and the danger zone.
  */
 export function KitchenGeneralPage() {
   const { can, canShared, organization } = useActiveKitchen()
   return (
-    <div className="space-y-10">
+    <SettingsPage title="General" description="Nombre, identificador y datos de esta cuenta.">
       {can('settings.manage') && <AccountDetailsForm />}
       {organization && canShared('organization.manage') && <BusinessSection organizationId={organization.id} />}
       {canShared('accounts.manage') && (
-        <div className="max-w-3xl">
+        <SettingsSection title="Zona de peligro" description="Desactivar la cuenta detiene toda su operación; sus datos se conservan." card tone="danger">
           <AccountStatusCard />
-        </div>
+        </SettingsSection>
       )}
-    </div>
+    </SettingsPage>
   )
 }
 
 function BusinessSection({ organizationId }: { organizationId: string }) {
   const details = useOrganizationDetails(organizationId)
   return (
-    <section className="space-y-3">
-      <div>
-        <h2 className={typography.h3}>Tu negocio</h2>
-        <p className={typography.caption}>Aplica a todas tus cuentas.</p>
-      </div>
+    <SettingsSection title="Tu negocio" description="Aplica a todas tus cuentas.">
       {details.isLoading ? (
         <LoadingState variant="block" />
       ) : details.isError || !details.data ? (
@@ -67,18 +65,17 @@ function BusinessSection({ organizationId }: { organizationId: string }) {
       ) : (
         <OrgGeneralForm key={details.data.id} org={details.data} />
       )}
-    </section>
+    </SettingsSection>
   )
 }
 
 /**
- * Datos generales de la cuenta activa. El Administrador (settings:manage)
- * edita nombre, identificador y datos del negocio; activar o desactivar la
- * cuenta es solo del superusuario (lo impide la base).
+ * Datos de la cuenta activa (settings.manage): nombre, identificador, icono,
+ * zona horaria y datos fiscales y de contacto. Activar o desactivar la cuenta
+ * es de quien administra las cuentas (lo exige la base).
  */
 function AccountDetailsForm() {
-  const { kitchen, can } = useActiveKitchen()
-  const canEdit = can('settings.manage')
+  const { kitchen } = useActiveKitchen()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { show } = useToast()
@@ -88,6 +85,8 @@ function AccountDetailsForm() {
   })
 
   const [edited, setEdited] = useState<KitchenDetailsInput | null>(null)
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const saved: KitchenDetailsInput | null = details
     ? {
         name: details.name,
@@ -108,13 +107,17 @@ function AccountDetailsForm() {
       await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
       await queryClient.invalidateQueries({ queryKey: ['kitchen-details', kitchen.id] })
       setEdited(null)
+      setSaveError(null)
+      setSavedAt(Date.now())
       show('Datos de la cuenta guardados.')
       // El identificador es parte de la URL: si cambió, se sigue en la dirección nueva.
       if (input.slug !== kitchen.slug) navigate(kitchenPath(input.slug, '/settings/general'), { replace: true })
     },
     onError: (err) => {
-      const message = getErrorMessage(err, 'No se pudieron guardar los datos')
-      show(message.includes('dk_kitchens_slug_key') ? 'Ese identificador ya lo usa otra cuenta.' : message, 'error')
+      const raw = getErrorMessage(err, 'No se pudieron guardar los datos')
+      const message = raw.includes('dk_kitchens_slug_key') ? 'Ese identificador ya lo usa otra cuenta.' : raw
+      setSaveError(message)
+      show(message, 'error')
     },
   })
 
@@ -131,82 +134,71 @@ function AccountDetailsForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
-      <Card title="Esta cuenta" description="Cómo se ve esta cuenta en la app y en su dirección" icon={Building2}>
-        <FormGrid>
-          <FormField label="Nombre" required error={edited ? nameError : null}>
-            {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} disabled={!canEdit} />}
-          </FormField>
-          <FormField
-            label="Identificador (URL)"
-            required
-            error={edited ? slugProblem : null}
-            hint={
-              <span className="inline-flex items-center gap-1">
-                <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta.
-              </span>
-            }
-          >
-            {(a11y) => (
-              <Input {...a11y} value={form.slug} onChange={(e) => set({ slug: e.target.value.toLowerCase() })} maxLength={60} disabled={!canEdit} />
-            )}
-          </FormField>
-        </FormGrid>
-        <div className="mt-5 space-y-3">
-          <div className="flex items-center gap-3">
-            <AccountIcon iconKey={form.iconKey} seed={kitchen.id} size="lg" />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-neutral-200">Icono de la cuenta</p>
-              <p className={typography.caption}>Representa al establecimiento en el selector de cuentas.</p>
+    <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+      <SettingsSection title="Esta cuenta" description="Cómo se ve en la app y en su dirección." card>
+        <div className="space-y-5">
+          <FormGrid>
+            <FormField label="Nombre" required error={edited ? nameError : null}>
+              {(a11y) => <Input {...a11y} value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} />}
+            </FormField>
+            <FormField
+              label="Identificador (URL)"
+              required
+              error={edited ? slugProblem : null}
+              hint={
+                <span className="inline-flex items-center gap-1">
+                  <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta.
+                </span>
+              }
+            >
+              {(a11y) => <Input {...a11y} value={form.slug} onChange={(e) => set({ slug: e.target.value.toLowerCase() })} maxLength={60} />}
+            </FormField>
+            <FormField label="Zona horaria" hint="Define el “hoy” de la cuenta: menú del día, ventas de hoy y horario.">
+              {(a11y) => (
+                <Select {...a11y} value={form.timezone} onChange={(e) => set({ timezone: e.target.value })}>
+                  {!TIMEZONES.some((t) => t.value === form.timezone) && <option value={form.timezone}>{form.timezone}</option>}
+                  {TIMEZONES.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </FormField>
+          </FormGrid>
+          <div className="space-y-3 border-t border-neutral-800/60 pt-5">
+            <div className="flex items-center gap-3">
+              <AccountIcon iconKey={form.iconKey} seed={kitchen.id} size="lg" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-neutral-200">Icono de la cuenta</p>
+                <p className={typography.caption}>Representa al establecimiento en el selector de cuentas.</p>
+              </div>
             </div>
+            <AccountIconPicker value={resolveAccountIconKey(form.iconKey, kitchen.id)} onChange={(iconKey) => set({ iconKey })} />
           </div>
-          {canEdit && <AccountIconPicker value={resolveAccountIconKey(form.iconKey, kitchen.id)} onChange={(iconKey) => set({ iconKey })} />}
         </div>
-      </Card>
+      </SettingsSection>
 
-      <Card title="Datos de esta cuenta" description="Opcionales: aparecen en documentos y soporte" icon={Building2}>
+      <SettingsSection title="Datos fiscales y de contacto" description="Opcionales: aparecen en documentos y soporte." card>
         <FormGrid>
-          <FormField label="Razón social">
-            {(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} disabled={!canEdit} />}
-          </FormField>
-          <FormField label="NIT / identificación">
-            {(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} disabled={!canEdit} />}
-          </FormField>
-          <FormField label="Teléfono">
-            {(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} disabled={!canEdit} />}
-          </FormField>
-          <FormField label="Dirección">
-            {(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} disabled={!canEdit} />}
-          </FormField>
-          <FormField label="Zona horaria" hint="Define el “hoy” de la cuenta: menú del día, ventas de hoy y horario.">
-            {(a11y) => (
-              <Select {...a11y} value={form.timezone} onChange={(e) => set({ timezone: e.target.value })} disabled={!canEdit}>
-                {!TIMEZONES.some((t) => t.value === form.timezone) && <option value={form.timezone}>{form.timezone}</option>}
-                {TIMEZONES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </FormField>
+          <FormField label="Razón social">{(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
+          <FormField label="NIT / identificación">{(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
+          <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
+          <FormField label="Dirección">{(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} />}</FormField>
         </FormGrid>
-      </Card>
+      </SettingsSection>
 
-      {canEdit ? (
-        <FormActions>
-          {edited && (
-            <Button variant="ghost" onClick={() => setEdited(null)} disabled={save.isPending}>
-              Descartar
-            </Button>
-          )}
-          <Button type="submit" variant="primary" loading={save.isPending} disabled={!edited || Boolean(nameError || slugProblem)}>
-            Guardar cambios
-          </Button>
-        </FormActions>
-      ) : (
-        <p className={typography.caption}>Solo el administrador de la cuenta puede cambiar estos datos.</p>
-      )}
+      <SettingsSaveBar
+        dirty={edited !== null}
+        saving={save.isPending}
+        savedAt={savedAt}
+        error={saveError}
+        invalid={Boolean(nameError || slugProblem)}
+        onDiscard={() => {
+          setEdited(null)
+          setSaveError(null)
+        }}
+      />
     </form>
   )
 }

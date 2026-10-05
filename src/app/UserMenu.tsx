@@ -4,7 +4,6 @@ import { Avatar } from '@/shared/avatars/Avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useActiveKitchen, useMyKitchens } from '@/shared/kitchen/activeKitchenContext'
 import { settingsSections } from '@/modules/settings/sections'
-import { canAccessModule } from '@/shared/rbac/roles'
 import { tenantHostLabel } from '@/shared/tenant/host'
 import { MenuPanel, type MenuNode } from '@/shared/ui/MenuPanel'
 import { useToast } from '@/shared/ui/Toast'
@@ -23,11 +22,9 @@ import {
   Mail,
   MessageCircle,
   Settings,
-  ShieldCheck,
   Sparkles,
   Store,
   UserRound,
-  Users,
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -168,7 +165,6 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
 
   const activeRole = kitchen.roleOptions.find((r) => r.id === kitchen.activeRoleId)
   const sections = settingsSections(active)
-  const canUsers = canAccessModule(can, 'users')
   const go = (to: string) => () => navigate(path(to))
 
   const common = useCommonMenu({
@@ -241,23 +237,9 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
     { kind: 'separator', id: 'sep-account' },
     { kind: 'item', id: 'profile', label: 'Mi perfil', icon: UserRound, onSelect: go('/perfil') },
     { kind: 'item', id: 'shifts', label: 'Mis turnos', icon: CalendarClock, onSelect: go('/my-shifts') },
-    ...(sections.length > 0 || canUsers ? [{ kind: 'separator' as const, id: 'sep-admin' }] : []),
+    // One place to configure the account (ADR 0026, D5): its sections live inside Configuración; Usuarios is in the rail.
     ...(sections.length > 0
-      ? [
-          {
-            kind: 'submenu' as const,
-            id: 'settings',
-            label: 'Configuración de la cuenta',
-            icon: Settings,
-            children: sections.map((section) => ({ kind: 'item' as const, id: `settings-${section.to}`, label: section.label, icon: section.icon, onSelect: go(section.to) })),
-          },
-        ]
-      : []),
-    ...(canUsers
-      ? [
-          { kind: 'item' as const, id: 'users', label: 'Usuarios', icon: Users, onSelect: go('/users') },
-          { kind: 'item' as const, id: 'roles', label: 'Roles y permisos', icon: ShieldCheck, onSelect: go('/users?tab=roles') },
-        ]
+      ? [{ kind: 'item' as const, id: 'settings', label: 'Configuración de la cuenta', icon: Settings, onSelect: go('/settings') }]
       : []),
     ...common.nodes,
   ]

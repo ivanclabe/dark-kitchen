@@ -93,7 +93,7 @@ export function EventLog() {
 
   return (
     <div className="space-y-4">
-      <p className={typography.small}>Quién hizo qué y cuándo en esta cuenta. La registra la base de datos y nadie puede modificarla ni borrarla; se conserva 400 días.</p>
+      <p className={typography.caption}>Quién hizo qué y cuándo en esta cuenta. La registra la base de datos y nadie puede modificarla ni borrarla; se conserva 400 días.</p>
       <div className="flex flex-wrap items-center gap-2">
         <Input value={filters.search ?? ''} onChange={(e) => set({ search: e.target.value })} placeholder="Buscar en la bitácora" aria-label="Buscar en la bitácora" className="!mt-0 max-w-xs" />
         <Select value={filters.category ?? ''} onChange={(e) => set({ category: e.target.value || undefined })} aria-label="Filtrar por categoría" className="!mt-0 max-w-[12rem]">
@@ -121,7 +121,7 @@ export function EventLog() {
         <EmptyState icon={ScrollText} title="No hay eventos" description="Prueba con otros filtros." compact />
       ) : (
         <>
-          <ol className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 px-4">
+          <ol className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
             {events.map((e) => (
               <EventRow key={e.id} event={e} />
             ))}
