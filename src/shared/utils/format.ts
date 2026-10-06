@@ -1,10 +1,34 @@
 /**
  * Formateadores únicos de la app. Antes había 4 copias de money() con dos
  * formatos incompatibles ($25.000 vs $25000.00) y 5 de todayStr().
- * Moneda: pesos colombianos, sin decimales, separador de miles "." (es-CO).
+ * Moneda: pesos colombianos (ADR 0039): «$25.000», separador de miles «.»,
+ * decimales con «,», negativos «-$5.000».
  */
-export function formatMoney(n: number): string {
-  return `$${n.toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+export interface MoneyFormat {
+  /**
+   * 0 (default): whole pesos. 'auto': up to 2 decimals when the amount has them
+   * (a cost per gram, $3,25); a whole amount stays whole.
+   */
+  decimals?: 0 | 'auto'
+  /** «$25.000 COP»: where the currency must be explicit (totals, payments, billing). */
+  code?: boolean
+}
+
+export function formatMoney(n: number, { decimals = 0, code = false }: MoneyFormat = {}): string {
+  const value = Number.isFinite(n) ? n : 0
+  const digits = decimals === 'auto' && !Number.isInteger(Math.round(value * 100) / 100) ? 2 : 0
+  const body = Math.abs(value).toLocaleString('es-CO', { minimumFractionDigits: digits, maximumFractionDigits: digits })
+  const sign = value < 0 && body.replace(/[0.,]/g, '') !== '' ? '-' : ''
+  return `${sign}$${body}${code ? ' COP' : ''}`
+}
+
+/** «$1,2 M», «$850 mil», «$900»: short amounts for chart axes. */
+export function formatMoneyCompact(n: number): string {
+  const abs = Math.abs(n)
+  const sign = n < 0 ? '-' : ''
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} M`
+  if (abs >= 1000) return `${sign}$${Math.round(abs / 1000).toLocaleString('es-CO')} mil`
+  return formatMoney(n)
 }
 
 /** "17/9/2026, 3:35 p. m." — para timestamps en tablas y detalles. */

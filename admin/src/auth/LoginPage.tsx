@@ -1,4 +1,6 @@
 import { Button } from '@/shared/ui/Button'
+import { normalizeEmail } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
 import { Input } from '@/shared/ui/FormField'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { KeyRound, Lock, ShieldAlert, ShieldCheck, Smartphone } from 'lucide-react'
@@ -52,7 +54,7 @@ function PasswordStep() {
     e.preventDefault()
     setBusy(true)
     setError(null)
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email: normalizeEmail(email), password })
     if (signInError) {
       setError(signInError.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : signInError.message)
       setBusy(false)
@@ -69,7 +71,7 @@ function PasswordStep() {
       </Heading>
       <label className="block text-xs text-neutral-400">
         Correo
-        <Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className="!mt-1" />
+        <EmailInput autoComplete="username" required value={email} onValueChange={setEmail} className="!mt-1" />
       </label>
       <label className="block text-xs text-neutral-400">
         Contraseña

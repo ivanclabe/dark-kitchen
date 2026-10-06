@@ -1,4 +1,5 @@
 import { useBackTarget, useHere } from '@/shared/hooks/useBackTarget'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { Page } from '@/shared/ui/Page'
@@ -11,7 +12,6 @@ import { Button, buttonClass } from '@/shared/ui/Button'
 import { Combobox } from '@/shared/ui/Combobox'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
-import { Input } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { StatCard } from '@/shared/ui/StatCard'
@@ -130,22 +130,21 @@ function RecipeForm({
     },
     {
       key: 'quantity',
-      header: 'Cantidad (unidad base)',
+      header: 'Cantidad',
       cell: (row) => {
         const ingredient = ingredients.find((i) => i.id === row.ingredientId)
         return (
           <span className="inline-flex items-center gap-2">
-            <Input
-              type="number"
-              step="any"
-              min="0"
-              value={row.quantity || ''}
-              onChange={(e) => updateRow(row.key, { quantity: Number(e.target.value) })}
+            <NumberInput
+              value={row.quantity || null}
+              onValueChange={(v) => updateRow(row.key, { quantity: v ?? 0 })}
+              decimals={3}
+              min={0}
+              unit={ingredient?.baseUnitCode}
               disabled={readOnly}
               aria-label={ingredient ? `Cantidad de ${ingredient.name}` : 'Cantidad'}
-              className="!mt-0 w-32"
+              className="!mt-0 w-36"
             />
-            {ingredient && <span className={typography.caption}>{ingredient.baseUnitCode}</span>}
           </span>
         )
       },
@@ -153,7 +152,7 @@ function RecipeForm({
     {
       key: 'lineCost',
       header: 'Costo línea',
-      cell: (row) => <span className="tabular-nums">{formatMoney(row.quantity * ingredientAvgCost(row.ingredientId))}</span>,
+      cell: (row) => <span className="tabular-nums">{formatMoney(row.quantity * ingredientAvgCost(row.ingredientId), { decimals: 'auto' })}</span>,
       align: 'right',
       hideBelow: 'sm',
     },

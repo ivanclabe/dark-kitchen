@@ -30,6 +30,7 @@ export function VoiceDeviceSettings() {
   const { feature } = useActiveKitchen()
   const [replies, setReplies] = useVoiceFlag('replies', true)
   const [readTyped, setReadTyped] = useVoiceFlag('readTyped', false)
+  const [followUp, setFollowUp] = useVoiceFlag('followUp', true)
   const speech = feature('voice_speech')
   const commands = feature('voice_commands')
   const wakeWord = feature('voice_wake_word')
@@ -46,6 +47,14 @@ export function VoiceDeviceSettings() {
           {wakeWord?.usable && (
             <div className="mt-5 border-t border-neutral-800/60 pt-5">
               <WakeWordPanel tuning={wakeWordTuning(wakeWord)} />
+              <div className="mt-5">
+                <Toggle
+                  label="Seguir escuchando después de responder"
+                  hint="Tras «Oye Quanela», puedes hacer otra pregunta sin repetir la frase. Termina si te quedas en silencio unos segundos o dices «gracias»."
+                  checked={followUp}
+                  onChange={setFollowUp}
+                />
+              </div>
             </div>
           )}
         </Section>

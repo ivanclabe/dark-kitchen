@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -7,10 +7,21 @@ const FOCUSABLE_SELECTOR =
  * Comportamiento estándar de diálogo modal (Modal, Drawer, ConfirmDialog):
  * al abrir, mueve el foco adentro y lo atrapa con Tab/Shift+Tab; Escape
  * cierra; al cerrar, devuelve el foco a quien abrió el diálogo.
+ *
+ * El efecto depende SOLO de `open`: `onClose` y el elemento a restaurar se
+ * leen de refs. Antes dependía de `onClose`, y un formulario que lo crea en
+ * cada render (casi todos) reiniciaba el efecto en cada tecla: el foco
+ * saltaba a la ✕ mientras se escribía.
  */
 export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open: boolean, onClose: () => void) {
   const [previouslyFocused, setPreviouslyFocused] = useState<HTMLElement | null>(null)
   const [wasOpen, setWasOpen] = useState(false)
+  const onCloseRef = useRef(onClose)
+  const previouslyFocusedRef = useRef(previouslyFocused)
+  useEffect(() => {
+    onCloseRef.current = onClose
+    previouslyFocusedRef.current = previouslyFocused
+  })
 
   // Captura el elemento enfocado antes de que el diálogo se abra, en el
   // propio render (no en un efecto): si se capturara en un useEffect, un
@@ -26,12 +37,15 @@ export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open:
     if (!open) return
 
     const container = containerRef.current
-    const focusable = container?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-    ;(focusable?.[0] ?? container)?.focus()
+    // A field with autoFocus already took it: keep it there. Otherwise, the first focusable.
+    if (!container?.contains(document.activeElement)) {
+      const focusable = container?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      ;(focusable?.[0] ?? container)?.focus()
+    }
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
         return
       }
       if (e.key !== 'Tab' || !container) return
@@ -53,7 +67,7 @@ export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open:
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
-      previouslyFocused?.focus?.()
+      previouslyFocusedRef.current?.focus?.()
     }
-  }, [open, onClose, containerRef, previouslyFocused])
+  }, [open, containerRef])
 }

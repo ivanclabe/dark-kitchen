@@ -24,3 +24,27 @@ export function playWakeTone(): Promise<void> {
     }
   })
 }
+
+/** One soft note: «still listening» for the next question of a conversation (ADR 0038). */
+export function playFollowUpTone(): Promise<void> {
+  return new Promise((resolve) => {
+    try {
+      const context = new AudioContext()
+      const gain = context.createGain()
+      gain.connect(context.destination)
+      const t = context.currentTime
+      const osc = context.createOscillator()
+      osc.frequency.value = 880
+      osc.connect(gain)
+      osc.start(t)
+      osc.stop(t + 0.07)
+      gain.gain.setValueAtTime(0.06, t)
+      setTimeout(() => {
+        void context.close()
+        resolve()
+      }, 120)
+    } catch {
+      resolve()
+    }
+  })
+}

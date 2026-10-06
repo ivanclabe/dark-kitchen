@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -53,7 +54,7 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
 
   const [productId, setProductId] = useState('')
   const [quantity, setQuantity] = useState(1)
-  const [unitPrice, setUnitPrice] = useState('')
+  const [unitPrice, setUnitPrice] = useState<number | null>(null)
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -81,7 +82,7 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
   function handleProductChange(id: string) {
     setProductId(id)
     const product = products?.find((p) => p.id === id)
-    if (product) setUnitPrice(String(product.price))
+    if (product) setUnitPrice(product.price)
   }
 
   async function handleAddItem(e: FormEvent) {
@@ -91,12 +92,12 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
       await addItem.mutateAsync({
         productId,
         quantity,
-        unitPrice: Number(unitPrice),
+        unitPrice: unitPrice ?? 0,
         observation: observation || undefined,
       })
       setProductId('')
       setQuantity(1)
-      setUnitPrice('')
+      setUnitPrice(null)
       setObservation('')
     } catch (err) {
       setError(getErrorMessage(err, 'Error al agregar el plato'))
@@ -153,10 +154,10 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
               )}
             </FormField>
             <FormField label="Cantidad" required>
-              {() => <NumberStepper value={quantity} onChange={setQuantity} min={1} step={1} required />}
+              {(a11y) => <NumberStepper {...a11y} value={quantity} onChange={setQuantity} min={1} step={1} required />}
             </FormField>
-            <FormField label="Precio unitario" required>
-              {(a11y) => <Input {...a11y} type="number" step="any" min="0" inputMode="decimal" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} required />}
+            <FormField label="Precio unitario" required info="Viene con el precio de venta del plato. Cámbialo solo si en este pedido lleva otro precio.">
+              {(a11y) => <CurrencyInput {...a11y} value={unitPrice} onValueChange={setUnitPrice} required />}
             </FormField>
             <FormField label="Observación" className="sm:col-span-2 lg:col-span-4">
               {(a11y) => (
@@ -197,7 +198,7 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
             <TotalRow label="Subtotal" value={formatMoney(order.subtotal)} trailingCols={trailingCols} />
             <TotalRow label="Descuento" value={`-${formatMoney(order.discount)}`} trailingCols={trailingCols} />
             <TotalRow label="Domicilio" value={`+${formatMoney(order.deliveryFee)}`} trailingCols={trailingCols} />
-            <TotalRow label="Total" value={formatMoney(order.total)} trailingCols={trailingCols} emphasis />
+            <TotalRow label="Total" value={formatMoney(order.total, { code: true })} trailingCols={trailingCols} emphasis />
           </>
         }
       />

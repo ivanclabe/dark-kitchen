@@ -1,4 +1,5 @@
 import { useUnits } from '@/shared/hooks/useUnits'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
@@ -25,7 +26,7 @@ function CreateIngredientForm({ initialQuery, onClose, onCreated }: Omit<Props, 
   const [code, setCode] = useState('')
   const [name, setName] = useState(initialQuery)
   const [baseUnitId, setBaseUnitId] = useState('')
-  const [minStock, setMinStock] = useState('0')
+  const [minStock, setMinStock] = useState<number | null>(0)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
@@ -36,7 +37,7 @@ function CreateIngredientForm({ initialQuery, onClose, onCreated }: Omit<Props, 
         code,
         name,
         baseUnitId,
-        minStock: Number(minStock),
+        minStock: minStock ?? 0,
         perishable: false,
       })
       show(`Insumo "${ingredient.name}" creado.`)
@@ -66,8 +67,8 @@ function CreateIngredientForm({ initialQuery, onClose, onCreated }: Omit<Props, 
           </Select>
         )}
       </FormField>
-      <FormField label="Stock mínimo" hint="Se marca “Bajo mínimo” cuando el disponible cae a este valor.">
-        {(a11y) => <Input {...a11y} type="number" step="any" min="0" inputMode="decimal" value={minStock} onChange={(e) => setMinStock(e.target.value)} />}
+      <FormField label="Stock mínimo" info="Cuando el disponible llega a esta cantidad, el insumo se marca «Bajo mínimo» y aparece en «Reponer».">
+        {(a11y) => <NumberInput {...a11y} value={minStock} onValueChange={setMinStock} decimals={3} min={0} />}
       </FormField>
       <p className={typography.caption}>Categoría, proveedor principal y demás datos se pueden completar después desde Inventario.</p>
       <div className="flex justify-end gap-2 pt-2">

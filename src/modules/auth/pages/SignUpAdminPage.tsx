@@ -1,4 +1,6 @@
 import { supabase } from '@/shared/lib/supabase'
+import { normalizeEmail } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
@@ -22,7 +24,7 @@ export function SignUpAdminPage() {
     setError(null)
     setInfo(null)
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    const { data, error: signUpError } = await supabase.auth.signUp({ email: normalizeEmail(email), password })
 
     if (signUpError) {
       setError(signUpError.message)
@@ -69,7 +71,7 @@ export function SignUpAdminPage() {
             {(a11y) => <Input {...a11y} required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} autoFocus />}
           </FormField>
           <FormField label="Correo" required>
-            {(a11y) => <Input {...a11y} type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />}
+            {(a11y) => <EmailInput {...a11y} required autoComplete="username" value={email} onValueChange={setEmail} />}
           </FormField>
           <FormField label="Contraseña" required hint="Mínimo 6 caracteres.">
             {(a11y) => (

@@ -1,7 +1,8 @@
 import { setKitchenFeatureSettings, setOrganizationFeatureSettings, type FeatureMatrix, type FeatureSettings } from '@/shared/features/features'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { Accordion } from '@/shared/ui/Accordion'
 import { Button } from '@/shared/ui/Button'
-import { Input, Select } from '@/shared/ui/FormField'
+import { Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
@@ -61,19 +62,17 @@ export function SettingsFields({
               </Select>
             ) : (
               <div className="relative mt-1">
-                <Input
+                <NumberInput
                   id={id}
-                  type="number"
-                  inputMode="numeric"
                   min={field.min}
                   max={field.max}
-                  value={typeof value === 'number' ? value : ''}
-                  onChange={(e) => onChange({ ...values, [field.key]: e.target.value === '' ? Number.NaN : Number(e.target.value) })}
+                  unit={field.unit}
+                  value={typeof value === 'number' && !Number.isNaN(value) ? value : null}
+                  onValueChange={(v) => onChange({ ...values, [field.key]: v === null ? Number.NaN : v })}
                   disabled={disabled}
                   aria-invalid={Boolean(error)}
-                  className={clsx('!mt-0', field.unit && 'pr-12')}
+                  className="!mt-0"
                 />
-                {field.unit && <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs text-neutral-500">{field.unit}</span>}
               </div>
             )}
             {error ? <p className="mt-1 text-[11px] text-red-300">{error}</p> : field.hint && <p className={clsx('mt-1', typography.caption)}>{field.hint}</p>}

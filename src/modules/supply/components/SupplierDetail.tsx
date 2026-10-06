@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { formatPhone } from '@/shared/utils/phone'
 import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -76,7 +77,7 @@ export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplie
         </div>
 
         <div className="space-y-1.5 border-t border-neutral-800/60 pt-3">
-          <ContactRow icon={Phone} value={supplier.phone} />
+          <ContactRow icon={Phone} value={supplier.phone ? formatPhone(supplier.phone) : null} />
           <ContactRow icon={Mail} value={supplier.email} />
           <ContactRow icon={User} value={supplier.contactName} />
           <ContactRow icon={MapPin} value={supplier.address} />

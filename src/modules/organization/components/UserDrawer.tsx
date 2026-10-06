@@ -1,4 +1,6 @@
 import { Avatar } from '@/shared/avatars/Avatar'
+import { emailError } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -31,7 +33,6 @@ import { canGrantRole, maxPermissions } from '../lib/effectivePermissions'
 import { actionLabel, groupCatalog } from '../lib/permissionCatalog'
 import { ActivationLinkModal } from './ActivationLinkModal'
 
-const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 interface Assignment {
   roleIds: string[]
@@ -96,9 +97,9 @@ export function UserDrawer({
 
   const grantable = useMemo(() => roles.filter((r) => canGrantRole(r, access.myPermissions, access.manageOrg)), [roles, access])
   const nameError = fullName.trim().length >= 2 ? null : 'Mínimo 2 caracteres'
-  const emailError = EMAIL.test(email.trim()) ? null : 'Correo inválido'
+  const emailProblem = emailError(email, { required: true })
   const missingAccess = !superAdmin && assignments.size === 0
-  const invalid = Boolean((editableIdentity && (nameError || emailError)) || missingAccess || [...assignments.values()].some((a) => a.roleIds.length === 0))
+  const invalid = Boolean((editableIdentity && (nameError || emailProblem)) || missingAccess || [...assignments.values()].some((a) => a.roleIds.length === 0))
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: orgKey(organizationId) })
 
@@ -223,8 +224,8 @@ export function UserDrawer({
             <FormField label="Nombre" required error={fullName ? nameError : null}>
               {(a11y) => <Input {...a11y} value={fullName} onChange={(e) => setFullName(e.target.value)} autoFocus={!user} maxLength={80} />}
             </FormField>
-            <FormField label="Correo" required error={email ? emailError : null}>
-              {(a11y) => <Input {...a11y} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="persona@correo.com" />}
+            <FormField label="Correo" required error={email ? emailProblem : null}>
+              {(a11y) => <EmailInput {...a11y} value={email} onValueChange={setEmail} placeholder="persona@correo.com" autoComplete="off" />}
             </FormField>
           </div>
         )}

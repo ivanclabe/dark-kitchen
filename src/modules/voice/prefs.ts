@@ -13,7 +13,7 @@ function subscribe(callback: () => void) {
 }
 
 /** An on/off voice preference of this device (ADR 0033). */
-export function useVoiceFlag(pref: Extract<VoicePref, 'replies' | 'readTyped'>, fallback: boolean): [boolean, (on: boolean) => void] {
+export function useVoiceFlag(pref: Extract<VoicePref, 'replies' | 'readTyped' | 'followUp'>, fallback: boolean): [boolean, (on: boolean) => void] {
   const read = useCallback(() => {
     const v = readVoicePref(pref)
     return v === null ? fallback : v === 'on'

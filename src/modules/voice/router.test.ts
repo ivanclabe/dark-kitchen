@@ -40,4 +40,10 @@ describe('«Oye Quanela» routes each phrase (ADR 0033)', () => {
     expect(id(routeUtterance('  ', [copilot], 'browser'))).toBe('none:empty')
     expect(id(routeUtterance('hola', [], 'browser'))).toBe('none:no-handler')
   })
+
+  it('«gracias», «listo», «eso es todo» alone close the conversation (ADR 0038); inside a question they do not', () => {
+    for (const phrase of ['Gracias.', 'listo', 'Eso es todo', 'nada más, gracias', 'terminar']) expect(id(routeUtterance(phrase, [kitchen, copilot], 'browser'))).toBe('close')
+    expect(id(routeUtterance('gracias, ¿y cuánto vendimos ayer?', [kitchen, copilot], 'browser'))).toBe('copilot')
+    expect(id(routeUtterance('pedido 1042 listo', [kitchen, copilot], 'browser'))).toBe('kitchen')
+  })
 })

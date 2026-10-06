@@ -3,6 +3,9 @@ import { supabase } from '@/shared/lib/supabase'
 export interface CopilotTurn {
   role: 'user' | 'assistant'
   content: string
+  /** An answer's intent and what it consulted (ADR 0038): context for a follow-up. */
+  intent?: string
+  tools?: string[]
 }
 
 /** Whether the question could be answered (ADR 0033, the answer contract). */
@@ -17,7 +20,8 @@ export interface CopilotAnswer {
   followUp: string[]
   /** Help center articles to open (ADR 0034), only real ones. */
   links?: { id: string; title: string; url: string }[]
-  steps: { tool: string; label: string; ok: boolean }[]
+  /** What each step consulted; `context` is the tool with its arguments («sales {"from":…}»). */
+  steps: { tool: string; label: string; ok: boolean; context?: string }[]
   runId: string
   remainingToday: number | null
   timings: { rounds: number[]; total: number }

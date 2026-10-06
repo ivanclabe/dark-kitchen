@@ -1,4 +1,6 @@
 import { useRegisterPayment, useVoidPayment } from '@/modules/cartera/hooks/useReceivables'
+import { OTHER_PAYMENT_METHOD, PAYMENT_METHODS } from '../lib/paymentMethods'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
@@ -28,13 +30,13 @@ export function PaymentBadge({ order, size = 'md' }: { order: Pick<Order, 'total
 }
 
 /** The usual ways to pay: one tap. The method stays free text in the ledger, as before. */
-const METHODS = ['Efectivo', 'Transferencia', 'Tarjeta'] as const
-const OTHER = 'Otro'
+const METHODS = PAYMENT_METHODS
+const OTHER = OTHER_PAYMENT_METHOD
 
 function RegisterForm({ order, balance, onDone }: { order: Order; balance: number; onDone: () => void }) {
   const register = useRegisterPayment()
   const { show } = useToast()
-  const [amount, setAmount] = useState(String(balance))
+  const [amount, setAmount] = useState<number | null>(balance)
   const [method, setMethod] = useState<string>(METHODS.includes(order.paymentMethod as (typeof METHODS)[number]) ? order.paymentMethod! : 'Efectivo')
   const [otherMethod, setOtherMethod] = useState('')
   const [note, setNote] = useState('')
@@ -43,12 +45,12 @@ function RegisterForm({ order, balance, onDone }: { order: Order; balance: numbe
   async function submit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-    const value = Number(amount)
+    const value = amount ?? 0
     if (!(value > 0)) return setError('El monto debe ser mayor a cero.')
     if (value > balance) return setError(`El monto supera el saldo de ${formatMoney(balance)}.`)
     try {
       await register.mutateAsync({ orderId: order.id, amount: value, method: method === OTHER ? otherMethod.trim() : method, note: note.trim() })
-      show(`Pago de ${formatMoney(value)} registrado en el pedido #${order.orderNumber}.`)
+      show(`Pago de ${formatMoney(value, { code: true })} registrado en el pedido #${order.orderNumber}.`)
       onDone()
     } catch (err) {
       setError(getErrorMessage(err, 'No se pudo registrar el pago'))
@@ -59,7 +61,7 @@ function RegisterForm({ order, balance, onDone }: { order: Order; balance: numbe
     <form onSubmit={(e) => void submit(e)} className="mt-3 space-y-3 rounded-xl border border-neutral-800/60 bg-neutral-950/40 p-3" aria-label="Registrar pago">
       <label className="block text-xs text-neutral-400">
         Monto
-        <Input type="number" inputMode="decimal" min="0" step="any" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus className="mt-1" aria-label="Monto del pago" />
+        <CurrencyInput value={amount} onValueChange={setAmount} autoFocus className="!mt-1" aria-label="Monto del pago" />
       </label>
       <div role="group" aria-label="Método de pago" className="flex flex-wrap gap-1.5">
         {[...METHODS, OTHER].map((m) => (

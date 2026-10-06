@@ -1,5 +1,6 @@
 import { Button } from '@/shared/ui/Button'
-import { FormActions, FormField, Input } from '@/shared/ui/FormField'
+import { NumberInput } from '@/shared/ui/NumberInput'
+import { FormActions, FormField } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
@@ -34,8 +35,8 @@ export function SlaSettingsPanel({ canEdit }: { canEdit: boolean }) {
     }
   }
 
-  const field = (key: keyof SlaThresholds, props: { min: number; max?: number }) => (a11y: Parameters<Parameters<typeof FormField>[0]['children']>[0]) => (
-    <Input {...a11y} {...props} type="number" inputMode="numeric" required disabled={!canEdit} value={form[key]} onChange={(e) => setField(key, e.target.value)} />
+  const field = (key: keyof SlaThresholds, props: { min: number; max?: number; unit?: string }) => (a11y: Parameters<Parameters<typeof FormField>[0]['children']>[0]) => (
+    <NumberInput {...a11y} unit="min" {...props} required disabled={!canEdit} value={form[key]} onValueChange={(v) => setField(key, v === null ? '' : String(v))} />
   )
 
   return (
@@ -51,7 +52,7 @@ export function SlaSettingsPanel({ canEdit }: { canEdit: boolean }) {
         {field('listoAlertMin', { min: 1 })}
       </FormField>
       <FormField label='Umbral de "cerca del límite" (%)' required hint="Porcentaje del umbral a partir del cual el pedido se marca en ámbar.">
-        {field('nearThresholdPct', { min: 1, max: 100 })}
+        {field('nearThresholdPct', { min: 1, max: 100, unit: '%' })}
       </FormField>
 
       {canEdit ? (

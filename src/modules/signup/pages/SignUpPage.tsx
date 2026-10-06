@@ -1,4 +1,8 @@
 import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/business'
+import { emailError } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { suggestAccountIcon, type AccountIconKey } from '@/shared/avatars/catalog'
@@ -23,7 +27,6 @@ import { TurnstileWidget } from '../components/TurnstileWidget'
 import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
 import { NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
 
-const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
 
@@ -162,7 +165,7 @@ export function SignUpPage() {
 
   const stepUserErrors = {
     fullName: fullName.trim().length >= 2 ? null : 'Mínimo 2 caracteres',
-    email: EMAIL.test(email.trim()) ? null : 'Correo inválido',
+    email: emailError(email, { required: true }),
     password: password.length >= 8 ? null : 'Mínimo 8 caracteres',
   }
   const stepUserValid = !Object.values(stepUserErrors).some(Boolean)
@@ -176,6 +179,7 @@ export function SignUpPage() {
     effectiveAccountName.length >= 2 &&
     Boolean(org.sector) &&
     Boolean(org.category) &&
+    !phoneError(org.phone ?? '') &&
     (onboarding ? ownerName.trim().length >= 2 : !TURNSTILE_SITE_KEY || Boolean(captchaToken))
   // With a session the user step is done: straight to the plan (or the business, with a plan).
   // ("sent" has its own screen below.)
@@ -312,7 +316,7 @@ export function SignUpPage() {
             {(a11y) => <Input {...a11y} autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} autoFocus />}
           </FormField>
           <FormField label="Correo" required error={email ? stepUserErrors.email : null}>
-            {(a11y) => <Input {...a11y} type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />}
+            {(a11y) => <EmailInput {...a11y} autoComplete="username" value={email} onValueChange={setEmail} />}
           </FormField>
           <FormField label="Contraseña" required hint="Mínimo 8 caracteres." error={password ? stepUserErrors.password : null}>
             {(a11y) => <Input {...a11y} type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />}
@@ -419,7 +423,9 @@ export function SignUpPage() {
                 </Select>
               )}
             </FormField>
-            <FormField label="Teléfono (opcional)">{(a11y) => <Input {...a11y} type="tel" value={org.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
+            <FormField label="Teléfono (opcional)" error={phoneError(org.phone ?? '')}>
+              {(a11y) => <PhoneInput {...a11y} value={org.phone ?? ''} onValueChange={(v) => set({ phone: v })} />}
+            </FormField>
             <FormField label="NIT (opcional)">{(a11y) => <Input {...a11y} value={org.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
             <FormField label="Razón social (opcional)">{(a11y) => <Input {...a11y} value={org.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
           </FormGrid>

@@ -31,7 +31,7 @@ screenshots:
 ## Crear un cliente
 
 1. Abre **Clientes** y toca **Nuevo cliente**.
-2. Escribe el **Nombre** (obligatorio). Opcional: **Teléfono** (con él se reconoce al cliente en pedidos por WhatsApp), **Dirección** y **Notas**.
+2. Escribe el **Nombre** (obligatorio). Opcional: **Teléfono** (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), **Dirección** y **Notas**. Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número.
 3. Toca **Crear cliente**.
 
 También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos.

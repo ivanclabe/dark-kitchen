@@ -1,4 +1,6 @@
 import { useRecentPayments } from '@/modules/cartera/hooks/useReceivables'
+import { NumberInput } from '@/shared/ui/NumberInput'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { Page } from '@/shared/ui/Page'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
@@ -246,18 +248,18 @@ export function CustomersPage() {
             {showOrders && (
               <label className="text-xs text-neutral-400">
                 Pedidos mínimos
-                <Input type="number" min={0} inputMode="numeric" value={more.minOrders} onChange={(e) => resetPage(setMore)({ ...more, minOrders: e.target.value })} />
+                <NumberInput value={num(more.minOrders)} onValueChange={(v) => resetPage(setMore)({ ...more, minOrders: v === null ? '' : String(v) })} min={0} className="!mt-1" />
               </label>
             )}
             {showDebt && (
               <>
                 <label className="text-xs text-neutral-400">
                   Saldo desde
-                  <Input type="number" min={0} inputMode="numeric" value={more.minBalance} onChange={(e) => resetPage(setMore)({ ...more, minBalance: e.target.value })} />
+                  <CurrencyInput value={num(more.minBalance)} onValueChange={(v) => resetPage(setMore)({ ...more, minBalance: v === null ? '' : String(v) })} className="!mt-1" />
                 </label>
                 <label className="text-xs text-neutral-400">
                   Saldo hasta
-                  <Input type="number" min={0} inputMode="numeric" value={more.maxBalance} onChange={(e) => resetPage(setMore)({ ...more, maxBalance: e.target.value })} />
+                  <CurrencyInput value={num(more.maxBalance)} onValueChange={(v) => resetPage(setMore)({ ...more, maxBalance: v === null ? '' : String(v) })} className="!mt-1" />
                 </label>
               </>
             )}

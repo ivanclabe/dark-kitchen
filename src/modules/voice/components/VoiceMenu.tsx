@@ -1,7 +1,7 @@
 import { Drawer } from '@/shared/ui/Drawer'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
 import clsx from 'clsx'
-import { AlertTriangle, BookOpen, Ear, EarOff, Loader2, Mic, Pause, Play, Settings2 } from 'lucide-react'
+import { AlertTriangle, BookOpen, Ear, EarOff, Loader2, MessagesSquare, Mic, Pause, Play, Settings2, Square } from 'lucide-react'
 import { useState } from 'react'
 import { useVoice } from '../voiceContext'
 import { VoiceDeviceSettings } from './VoiceDeviceSettings'
@@ -22,7 +22,14 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
   const routed = !voice.dictating
   const active = routed && (voice.state === 'listening' || voice.state === 'processing')
 
-  const view = active
+  const conversing = routed && voice.conversation.active
+  const view = conversing
+    ? voice.state === 'listening'
+      ? { icon: Mic, text: 'Conversación · te escucho', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
+      : voice.state === 'processing'
+        ? { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-300', iconClassName: 'animate-spin' }
+        : { icon: MessagesSquare, text: 'Conversación · respondiendo', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
+    : active
     ? voice.state === 'listening'
       ? { icon: Mic, text: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
       : { icon: Loader2, text: 'Pensando…', className: 'border-neutral-700 bg-neutral-900 text-neutral-300', iconClassName: 'animate-spin' }
@@ -37,7 +44,9 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
             : { icon: Ear, text: 'Oye Quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
   const Icon = view.icon
 
-  const label = active
+  const label = conversing
+    ? `${view.text}. Di tu siguiente pregunta o «gracias» para terminar.`
+    : active
     ? view.text
     : listeningForPhrase
       ? handsFree.paused
@@ -50,6 +59,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
       : 'Oye Quanela: háblale a Quanela'
 
   const items: MenuItem[] = [
+    ...(conversing ? [{ label: 'Terminar conversación', icon: Square, onSelect: voice.conversation.end }] : []),
     { label: 'Hablar ahora (Ctrl/⌘ + Shift + J)', icon: Mic, onSelect: voice.listen },
     ...(handsFree.allowed ? [{ label: 'Manos libres en este equipo', icon: Ear, checked: handsFree.on, onSelect: () => handsFree.setOn(!handsFree.on) }] : []),
     ...(listeningForPhrase ? [{ label: handsFree.paused ? 'Reanudar' : 'Pausar', icon: handsFree.paused ? Play : Pause, onSelect: handsFree.togglePause }] : []),

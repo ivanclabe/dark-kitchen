@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
   said: [] as { text: string; priority: string }[],
   readTyped: false,
   asked: [] as { question: string; channel: string }[],
+  histories: [] as unknown[][],
   rated: [] as unknown[],
   next: [] as (CopilotAnswer | Error)[],
 }))
@@ -36,8 +37,9 @@ vi.mock('@/modules/voice/voiceContext', () => ({
 vi.mock('@/modules/voice/prefs', () => ({ useVoiceFlag: () => [state.readTyped, vi.fn()] }))
 vi.mock('./api', async (original) => ({
   ...(await original<typeof import('./api')>()),
-  askCopilot: async ({ question, channel }: { question: string; channel: string }) => {
+  askCopilot: async ({ question, channel, history }: { question: string; channel: string; history: unknown[] }) => {
     state.asked.push({ question, channel })
+    state.histories.push(history)
     const next = state.next.shift()
     if (next instanceof Error) throw next
     return next
@@ -55,7 +57,7 @@ const answer = (over: Partial<CopilotAnswer> = {}): CopilotAnswer => ({
   intent: 'sales',
   scope: 'answered',
   followUp: ['¿Y ayer?'],
-  steps: [{ tool: 'sales', label: 'Consultando ventas', ok: true }],
+  steps: [{ tool: 'sales', label: 'Consultando ventas', ok: true, context: 'sales {"from":"2026-10-06"}' }],
   runId: 'run-1',
   remainingToday: 24,
   timings: { rounds: [900], total: 1200 },
@@ -87,9 +89,12 @@ beforeEach(() => {
   state.handler = null
   state.said = []
   state.asked = []
+  state.histories = []
   state.rated = []
   state.next = []
   state.readTyped = false
+  // ADR 0038: the conversation is kept in this tab; every test starts a new one.
+  sessionStorage.clear()
 })
 afterEach(cleanup)
 
@@ -122,6 +127,7 @@ describe('Copilot (ADR 0033)', () => {
     await screen.findByText('Consultando ventas')
     expect(state.asked).toHaveLength(2)
     cleanup()
+    sessionStorage.clear()
     state.next = [new CopilotError('Llegaste al límite diario de preguntas a Copilot en esta cuenta.', 'NOT_ALLOWED', false)]
     renderCopilot()
     await ask('¿y ayer?')
@@ -136,7 +142,7 @@ describe('Copilot (ADR 0033)', () => {
     expect(state.said).toEqual([{ text: 'Hoy vendiste veinte mil pesos.', priority: 'answer' }])
   })
 
-  it('by voice: «Oye Quanela» hands it the question; the panel opens and the reply is the spoken summary', async () => {
+  it('by voice: «Oye Quanela» hands it the question; the panel stays closed, ✦ says there is an answer to see', async () => {
     state.next = [answer()]
     renderCopilot()
     expect(state.handler).toMatchObject({ id: 'copilot', fallback: true })
@@ -146,7 +152,37 @@ describe('Copilot (ADR 0033)', () => {
     })
     expect(state.asked).toEqual([{ question: 'cuánto vendimos hoy', channel: 'voice' }])
     expect(reply).toMatchObject({ spoken: 'Hoy vendiste veinte mil pesos.', priority: 'answer' })
+    expect(screen.queryByLabelText('Pregunta para Copilot')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir Quanela Copilot: 1 respuesta sin ver' }))
     expect(screen.getByText('Consultando ventas')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Abrir Quanela Copilot' })).toBeTruthy()
+  })
+
+  it('the next question carries the recent conversation, with what the last answer consulted (ADR 0038)', async () => {
+    state.next = [answer(), answer()]
+    renderCopilot()
+    await act(async () => {
+      await state.handler!.handle('cuánto vendimos hoy', { engine: 'browser', signal: new AbortController().signal })
+    })
+    await act(async () => {
+      await state.handler!.handle('y ayer', { engine: 'browser', signal: new AbortController().signal })
+    })
+    expect(state.histories[1]).toEqual([
+      { role: 'user', content: 'cuánto vendimos hoy' },
+      expect.objectContaining({ role: 'assistant', intent: 'sales', tools: ['sales {"from":"2026-10-06"}'] }),
+    ])
+  })
+
+  it('the conversation survives a reload of the tab', async () => {
+    state.next = [answer()]
+    renderCopilot()
+    await act(async () => {
+      await state.handler!.handle('cuánto vendimos hoy', { engine: 'browser', signal: new AbortController().signal })
+    })
+    cleanup()
+    renderCopilot()
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir Quanela Copilot' }))
+    expect(screen.getByText('cuánto vendimos hoy')).toBeTruthy()
   })
 
   it('Ctrl/⌘ + J opens Copilot; with Shift it is «Oye Quanela», not this', () => {

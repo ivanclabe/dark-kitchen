@@ -11,7 +11,7 @@ questions:
   - ¿Qué le puedo preguntar a Quanela?
   - ¿Copilot puede hacer cambios?
   - ¿De dónde saca Copilot los datos?
-keywords: [copilot, asistente, IA, inteligencia artificial, preguntar, chat, consultar, ayuda]
+keywords: [copilot, asistente, IA, inteligencia artificial, preguntar, chat, consultar, ayuda, conversación, historial, respuestas sin ver]
 related: [oye-quanela, copilot-limits]
 updated: 2026-10-06
 order: 1
@@ -49,6 +49,8 @@ screenshots:
 - **Solo lectura:** Copilot consulta, nunca crea, cambia ni borra nada.
 - Responde con los datos de **la cuenta activa** y **solo lo que tu rol puede ver**. Si algo no lo puedes ver, te lo dice.
 - Si una respuesta queda incompleta, lo indica. Para cifras exactas de un periodo, revisa [Insights](help:insights).
+- Recuerda **la conversación**: en «¿cuánto vendimos hoy?» … «¿y ayer?», entiende que hablas de las ventas. Se mantiene si recargas la página (30 minutos, solo en esa pestaña).
+- Lo que preguntas por voz no abre el chat: el botón **✦ Copilot** muestra cuántas respuestas tienes **sin ver**.
 - **Nueva conversación** empieza de cero.
 
 > **Bueno saber:** también puedes preguntar con la voz desde cualquier pantalla. Ver [«Oye Quanela»: háblale a Quanela](help:oye-quanela).

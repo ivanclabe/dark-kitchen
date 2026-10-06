@@ -12,38 +12,38 @@ export function exportRows(tab: 'overview' | 'sales' | 'products' | 'costs', dat
         name: 'resumen',
         headers: ['Indicador', `Periodo ${data.period.from} a ${data.period.to}`, data.compare ? `Periodo ${data.compare.from} a ${data.compare.to}` : 'Periodo anterior'],
         rows: [
-          row('Ingresos', (k) => k.revenue),
-          row('Ingresos netos de productos', (k) => k.netRevenue),
+          row('Ingresos (COP)', (k) => k.revenue),
+          row('Ingresos netos de productos (COP)', (k) => k.netRevenue),
           ...(costs
             ? [
-                row('Costo de ventas', (k) => k.cogs),
-                row('Costo de ventas estimado', (k) => k.estimatedCogs),
-                row('Utilidad bruta', (k) => k.grossProfit),
+                row('Costo de ventas (COP)', (k) => k.cogs),
+                row('Costo de ventas estimado (COP)', (k) => k.estimatedCogs),
+                row('Utilidad bruta (COP)', (k) => k.grossProfit),
                 row('Margen bruto', (k) => k.grossMargin),
                 row('Cobertura de costo', (k) => k.costCoverage),
               ]
             : []),
           row('Pedidos', (k) => k.orders),
           row('Unidades', (k) => k.units),
-          row('Ticket promedio', (k) => k.averageOrderValue),
+          row('Ticket promedio (COP)', (k) => k.averageOrderValue),
         ],
       }
     }
     case 'sales':
       return {
         name: 'ventas',
-        headers: ['Fecha', 'Ingresos', 'Ingresos netos de productos', 'Pedidos', ...(costs ? ['Costo de ventas'] : [])],
+        headers: ['Fecha', 'Ingresos (COP)', 'Ingresos netos de productos (COP)', 'Pedidos', ...(costs ? ['Costo de ventas (COP)'] : [])],
         rows: [
           ...data.daily.map((d) => [d.date, d.revenue, d.netRevenue, d.orders, ...(costs ? [d.cogs ?? 0] : [])]),
           [],
-          ['Canal', 'Ingresos', '', 'Pedidos'],
+          ['Canal', 'Ingresos (COP)', '', 'Pedidos'],
           ...data.channels.map((c) => [CHANNEL_LABEL[c.channel] ?? c.channel, c.revenue, null, c.orders]),
         ],
       }
     case 'products':
       return {
         name: 'productos',
-        headers: ['Producto', 'Categoría', 'Unidades', 'Ingresos', ...(costs ? ['Costo', 'Utilidad bruta', 'Margen bruto', 'Cobertura de costo'] : []), 'Ingresos periodo anterior'],
+        headers: ['Producto', 'Categoría', 'Unidades', 'Ingresos (COP)', ...(costs ? ['Costo (COP)', 'Utilidad bruta (COP)', 'Margen bruto', 'Cobertura de costo'] : []), 'Ingresos periodo anterior (COP)'],
         rows: data.products.map((p) => [
           p.name,
           p.categoryName ?? NO_CATEGORY,
@@ -56,11 +56,11 @@ export function exportRows(tab: 'overview' | 'sales' | 'products' | 'costs', dat
     case 'costs':
       return {
         name: 'costos',
-        headers: ['Insumo', 'Unidad', 'Cantidad comprada', 'Total', 'Precio promedio', 'Precio promedio anterior', 'Compras'],
+        headers: ['Insumo', 'Unidad', 'Cantidad comprada', 'Total (COP)', 'Precio promedio (COP)', 'Precio promedio anterior (COP)', 'Compras'],
         rows: [
           ...data.purchases.ingredients.map((i) => [i.name, i.unit, i.quantity, i.total, i.averagePrice, i.previousAveragePrice, i.purchases]),
           [],
-          ['Merma', 'Unidad', 'Cantidad', 'Valor'],
+          ['Merma', 'Unidad', 'Cantidad', 'Valor (COP)'],
           ...data.waste.byIngredient.map((w) => [w.name, w.unit, w.quantity, w.value]),
         ],
       }

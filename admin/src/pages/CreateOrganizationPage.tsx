@@ -1,4 +1,6 @@
 import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/business'
+import { EmailInput } from '@/shared/ui/EmailInput'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
 import { Button } from '@/shared/ui/Button'
 import { FormActions, FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
@@ -190,7 +192,9 @@ export function CreateOrganizationPage() {
                 )}
               </FormField>
               <FormField label="Ciudad">{(p) => <Input {...p} value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} maxLength={80} />}</FormField>
-              <FormField label="Teléfono">{(p) => <Input {...p} type="tel" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} maxLength={30} />}</FormField>
+              <FormField label="Teléfono" error={errors.phone}>
+                {(p) => <PhoneInput {...p} value={form.phone ?? ''} onValueChange={(v) => set('phone', v)} maxLength={30} />}
+              </FormField>
               <FormField label="NIT" hint="Opcional. Ayuda a detectar organizaciones repetidas.">
                 {(p) => <Input {...p} value={form.taxId ?? ''} onChange={(e) => set('taxId', e.target.value)} maxLength={30} />}
               </FormField>
@@ -221,7 +225,7 @@ export function CreateOrganizationPage() {
                 {(p) => <Input {...p} value={form.adminName} onChange={(e) => set('adminName', e.target.value)} maxLength={80} autoFocus autoComplete="off" />}
               </FormField>
               <FormField label="Correo" required error={errors.adminEmail}>
-                {(p) => <Input {...p} type="email" value={form.adminEmail} onChange={(e) => set('adminEmail', e.target.value)} maxLength={254} autoComplete="off" />}
+                {(p) => <EmailInput {...p} value={form.adminEmail} onValueChange={(v) => set('adminEmail', v)} maxLength={254} autoComplete="off" />}
               </FormField>
             </FormGrid>
             <FormActions>

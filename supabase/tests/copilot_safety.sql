@@ -48,7 +48,7 @@ insert into dk_kitchen_features (kitchen_id, feature_key, enabled) values (pg_te
 on conflict (kitchen_id, feature_key) do update set enabled = true;
 
 -- Data for the tools: a customer with a phone, an order ready, one unconfirmed.
-insert into dk_customers (id, kitchen_id, full_name, phone) values ('30000000-0000-0000-0000-000000033a01', pg_temp.k('A'), 'Cliente Seguro', '3001112233');
+insert into dk_customers (id, kitchen_id, full_name, phone) values ('30000000-0000-0000-0000-000000033a01', pg_temp.k('A'), 'Cliente Seguro', '3009990033');
 insert into dk_orders (id, kitchen_id, customer_id, status, subtotal) values
   ('40000000-0000-0000-0000-000000033a01', pg_temp.k('A'), '30000000-0000-0000-0000-000000033a01', 'LISTO', 12000),
   ('40000000-0000-0000-0000-000000033a02', pg_temp.k('A'), '30000000-0000-0000-0000-000000033a01', 'NUEVO', 8000);
@@ -158,7 +158,7 @@ set local role authenticated;
 insert into _t (area, test, expected, got) values
   ('Tools', 'Customers: no phone by default', 'null · false',
     coalesce(dk_copilot_customers('Cliente Seguro') -> 'customers' -> 0 ->> 'phone', 'null') || ' · ' || (dk_copilot_customers('Cliente Seguro') ->> 'contactIncluded')),
-  ('Tools', 'Customers: the phone when asked for contact', '3001112233',
+  ('Tools', 'Customers: the phone when asked for contact', '+573009990033',
     dk_copilot_customers('Cliente Seguro', p_include_contact => true) -> 'customers' -> 0 ->> 'phone'),
   ('Tools', 'Order: the admin sees «paid»', 'true · 0',
     (select (v ->> 'paymentVisible') || ' · ' || (v ->> 'paid') from (select dk_copilot_order((select order_number from dk_orders where id = pg_temp.k('order'))) v) x)),

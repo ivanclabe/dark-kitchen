@@ -1,11 +1,15 @@
 import { Button } from '@/shared/ui/Button'
+import { emailError } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Plus } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCreateSupplier, useUpdateSupplier } from '../hooks/useSuppliers'
 import type { Supplier } from '../types'
@@ -14,7 +18,10 @@ const schema = z.object({
   name: z.string().min(1, 'Requerido'),
   taxId: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email('Correo inválido').optional().or(z.literal('')),
+  email: z
+    .string()
+    .optional()
+    .refine((v) => !emailError(v ?? ''), { message: 'Revisa el correo: falta la @ o el dominio (por ejemplo, ventas@proveedor.com).' }),
   address: z.string().optional(),
   contactName: z.string().optional(),
 })
@@ -31,6 +38,7 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
@@ -83,11 +91,24 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
             {(a11y) => <Input {...a11y} {...register('taxId')} />}
           </FormField>
           <FormField label="Teléfono" error={errors.phone?.message}>
-            {(a11y) => <Input {...a11y} type="tel" inputMode="tel" {...register('phone')} autoComplete="tel" />}
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="phone"
+                rules={{ validate: (v) => phoneError(v ?? '', { original: supplier?.phone }) ?? true }}
+                render={({ field }) => <PhoneInput {...a11y} name={field.name} value={field.value ?? ''} onValueChange={field.onChange} onBlur={field.onBlur} />}
+              />
+            )}
           </FormField>
         </div>
         <FormField label="Correo" error={errors.email?.message}>
-          {(a11y) => <Input {...a11y} inputMode="email" {...register('email')} autoComplete="email" />}
+          {(a11y) => (
+            <Controller
+              control={control}
+              name="email"
+              render={({ field }) => <EmailInput {...a11y} name={field.name} value={field.value ?? ''} onValueChange={field.onChange} onBlur={field.onBlur} placeholder="ventas@proveedor.com" />}
+            />
+          )}
         </FormField>
         <FormField label="Contacto" error={errors.contactName?.message}>
           {(a11y) => <Input {...a11y} {...register('contactName')} />}

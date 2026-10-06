@@ -1,4 +1,5 @@
 import { formatPercent } from '../lib/format'
+import { formatMoneyCompact } from '@/shared/utils/format'
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 export interface TrendSeries {
@@ -10,7 +11,6 @@ export interface TrendSeries {
   axis?: 'money' | 'percent' | 'count'
 }
 
-const compact = (n: number) => (Math.abs(n) >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : Math.abs(n) >= 1000 ? `$${Math.round(n / 1000)}k` : `$${Math.round(n)}`)
 
 /**
  * One trend chart for the whole module (ADR 0027): money as bars, the margin
@@ -34,7 +34,7 @@ export function TrendChart({
         <ComposedChart data={data} margin={{ top: 8, right: right ? 4 : 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="#262626" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={16} />
-          <YAxis yAxisId="money" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={compact} width={52} />
+          <YAxis yAxisId="money" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={formatMoneyCompact} width={52} />
           {right === 'percent' && (
             <YAxis yAxisId="percent" orientation="right" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${Math.round(v * 100)}%`} width={40} domain={[0, 1]} />
           )}

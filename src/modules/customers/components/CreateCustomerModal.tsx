@@ -1,8 +1,11 @@
 import { Button } from '@/shared/ui/Button'
+import { toE164 } from '@/shared/utils/phone'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { FormField, Input, Textarea } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
-import { getErrorMessage } from '@/shared/utils/errors'
+import { getErrorMessage, isUniqueViolation } from '@/shared/utils/errors'
 import { useState, type FormEvent } from 'react'
 import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
 import type { Customer } from '../types'
@@ -29,7 +32,8 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
   const updateCustomer = useUpdateCustomer()
   const { show } = useToast()
   const [fullName, setFullName] = useState(() => customer?.fullName ?? (looksLikePhone(initialQuery) ? '' : initialQuery))
-  const [phone, setPhone] = useState(() => customer?.phone ?? (looksLikePhone(initialQuery) ? initialQuery : ''))
+  const [phone, setPhone] = useState(() => customer?.phone ?? (looksLikePhone(initialQuery) ? (toE164('CO', initialQuery) ?? initialQuery) : ''))
+  const phoneProblem = phoneError(phone, { original: customer?.phone })
   const [address, setAddress] = useState(customer?.address ?? '')
   const [notes, setNotes] = useState(customer?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +42,7 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    if (phoneProblem) return
     const input = { fullName: fullName.trim(), phone: phone.trim() || null, address: address.trim() || null, notes: notes.trim() || null }
     try {
       if (customer) {
@@ -51,7 +56,7 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
       }
       onClose()
     } catch (err) {
-      setError(getErrorMessage(err, customer ? 'Error al actualizar el cliente' : 'Error al crear el cliente'))
+      setError(isUniqueViolation(err) ? 'Ya hay un cliente con ese teléfono en esta cuenta. Búscalo en la lista.' : getErrorMessage(err, customer ? 'Error al actualizar el cliente' : 'Error al crear el cliente'))
     }
   }
 
@@ -60,8 +65,8 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
       <FormField label="Nombre" required error={error}>
         {(a11y) => <Input {...a11y} value={fullName} onChange={(e) => setFullName(e.target.value)} required autoFocus autoComplete="name" />}
       </FormField>
-      <FormField label="Teléfono" hint="Se usa para reconocer al cliente en pedidos por WhatsApp.">
-        {(a11y) => <Input {...a11y} type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />}
+      <FormField label="Teléfono" error={phoneProblem} info="Con este número reconocemos al cliente cuando pide por WhatsApp, y no se repite en la cuenta.">
+        {(a11y) => <PhoneInput {...a11y} value={phone} onValueChange={setPhone} />}
       </FormField>
       <FormField label="Dirección">{(a11y) => <Input {...a11y} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />}</FormField>
       <FormField label="Notas">{(a11y) => <Textarea {...a11y} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />}</FormField>

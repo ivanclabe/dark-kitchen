@@ -29,7 +29,10 @@ export const KB: KbArticle[] = [
       "preguntar",
       "chat",
       "consultar",
-      "ayuda"
+      "ayuda",
+      "conversación",
+      "historial",
+      "respuestas sin ver"
     ],
     "steps": [
       "Toca el ícono de Copilot arriba a la derecha (o Ctrl/⌘ + J ).",
@@ -41,7 +44,7 @@ export const KB: KbArticle[] = [
       "Qué preguntarle",
       "Lo que debes saber"
     ],
-    "body": "Toca el ícono de Copilot arriba a la derecha (o Ctrl/⌘ + J ). Escribe tu pregunta y presiona Enter , o toca una de las sugerencias. También puedes tocar el micrófono para dictarla . Lee la respuesta. Si preguntaste cómo hacer algo, aparece la tarjeta Centro de ayuda con la guía paso a paso. Califica con 👍 o 👎: así sabemos qué mejorar. Qué preguntarle Sobre Ejemplo --- Ventas «¿Cuánto vendimos hoy?», «¿Qué plato vendió más esta semana?» Pedidos «¿Cuántos pedidos hay pendientes?», «¿Cómo va el pedido 1042?» Cocina «¿Qué hay listo para despachar?», «¿Hay pedidos atrasados?» Inventario «¿Qué insumos están bajo el mínimo?» Clientes y cobros «¿Quién me debe?», «¿Cuánto se ha cobrado hoy?» Equipo «¿Quién trabaja hoy?» Cómo usar Quanela «¿Cómo registro una compra?», «¿Dónde cambio el horario de la cocina?» Lo que debes saber Solo lectura: Copilot consulta, nunca crea, cambia ni borra nada. Responde con los datos de la cuenta activa y solo lo que tu rol puede ver . Si algo no lo puedes ver, te lo dice. Si una respuesta queda incompleta, lo indica. Para cifras exactas de un periodo, revisa Insights. Nueva conversación empieza de cero. Bueno saber: también puedes preguntar con la voz desde cualquier pantalla. Ver «Oye Quanela»: háblale a Quanela."
+    "body": "Toca el ícono de Copilot arriba a la derecha (o Ctrl/⌘ + J ). Escribe tu pregunta y presiona Enter , o toca una de las sugerencias. También puedes tocar el micrófono para dictarla . Lee la respuesta. Si preguntaste cómo hacer algo, aparece la tarjeta Centro de ayuda con la guía paso a paso. Califica con 👍 o 👎: así sabemos qué mejorar. Qué preguntarle Sobre Ejemplo --- Ventas «¿Cuánto vendimos hoy?», «¿Qué plato vendió más esta semana?» Pedidos «¿Cuántos pedidos hay pendientes?», «¿Cómo va el pedido 1042?» Cocina «¿Qué hay listo para despachar?», «¿Hay pedidos atrasados?» Inventario «¿Qué insumos están bajo el mínimo?» Clientes y cobros «¿Quién me debe?», «¿Cuánto se ha cobrado hoy?» Equipo «¿Quién trabaja hoy?» Cómo usar Quanela «¿Cómo registro una compra?», «¿Dónde cambio el horario de la cocina?» Lo que debes saber Solo lectura: Copilot consulta, nunca crea, cambia ni borra nada. Responde con los datos de la cuenta activa y solo lo que tu rol puede ver . Si algo no lo puedes ver, te lo dice. Si una respuesta queda incompleta, lo indica. Para cifras exactas de un periodo, revisa Insights. Recuerda la conversación : en «¿cuánto vendimos hoy?» … «¿y ayer?», entiende que hablas de las ventas. Se mantiene si recargas la página (30 minutos, solo en esa pestaña). Lo que preguntas por voz no abre el chat: el botón ✦ Copilot muestra cuántas respuestas tienes sin ver . Nueva conversación empieza de cero. Bueno saber: también puedes preguntar con la voz desde cualquier pantalla. Ver «Oye Quanela»: háblale a Quanela."
   },
   {
     "id": "concepts",
@@ -316,7 +319,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [
       "Abre Clientes y toca Nuevo cliente .",
-      "Escribe el Nombre (obligatorio). Opcional: Teléfono (con él se reconoce al cliente en pedidos por WhatsApp), Dirección y Notas .",
+      "Escribe el Nombre (obligatorio). Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número.",
       "Toca Crear cliente ."
     ],
     "headings": [
@@ -325,7 +328,7 @@ export const KB: KbArticle[] = [
       "La ficha del cliente",
       "Registrar un abono"
     ],
-    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Escribe el Nombre (obligatorio). Opcional: Teléfono (con él se reconoce al cliente en pedidos por WhatsApp), Dirección y Notas . Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos. Encontrar un cliente Escribe en el buscador o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). Toca el encabezado de una columna para ordenar. La ficha del cliente Toca un cliente. Arriba ves sus Pedidos , el Total comprado , el Saldo pendiente y su Último pedido . Las pestañas: Pedidos : todos sus pedidos. Cuenta : los Pedidos con saldo y los Pagos recibidos . Información : sus datos. Desde la ficha: Editar , Registrar pago y Nuevo pedido (ya con el cliente elegido). Registrar un abono En la ficha, toca Registrar pago (o en la lista, en el menú ⋯ del cliente). Elige el Pedido , escribe el Monto a abonar , el Método de pago y, si quieres, una Nota . Confirma. El saldo del pedido y del cliente bajan de inmediato. Bueno saber: las deudas solo las ve quien tiene permiso de cartera. Para el pago completo de un pedido, ver Registrar y anular pagos."
+    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Escribe el Nombre (obligatorio). Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos. Encontrar un cliente Escribe en el buscador o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). Toca el encabezado de una columna para ordenar. La ficha del cliente Toca un cliente. Arriba ves sus Pedidos , el Total comprado , el Saldo pendiente y su Último pedido . Las pestañas: Pedidos : todos sus pedidos. Cuenta : los Pedidos con saldo y los Pagos recibidos . Información : sus datos. Desde la ficha: Editar , Registrar pago y Nuevo pedido (ya con el cliente elegido). Registrar un abono En la ficha, toca Registrar pago (o en la lista, en el menú ⋯ del cliente). Elige el Pedido , escribe el Monto a abonar , el Método de pago y, si quieres, una Nota . Confirma. El saldo del pedido y del cliente bajan de inmediato. Bueno saber: las deudas solo las ve quien tiene permiso de cartera. Para el pago completo de un pedido, ver Registrar y anular pagos."
   },
   {
     "id": "dishes-and-menu",
@@ -1017,7 +1020,7 @@ export const KB: KbArticle[] = [
     "section": "assistant",
     "url": "/help/assistant/oye-quanela",
     "title": "«Oye Quanela»: háblale a Quanela",
-    "summary": "Con el micrófono de arriba (o Ctrl/⌘ + Shift + J) le preguntas en voz alta a Quanela desde cualquier pantalla; con el manos libres basta decir «Oye Quanela» y te responde hablando.",
+    "summary": "Con el micrófono de arriba (o Ctrl/⌘ + Shift + J) le preguntas en voz alta a Quanela; con el manos libres dices «Oye Quanela» y conversas, sin repetir la frase en cada pregunta.",
     "audience": [
       "everyone"
     ],
@@ -1031,7 +1034,9 @@ export const KB: KbArticle[] = [
       "¿Cómo enciendo el manos libres?",
       "No me oye el micrófono",
       "¿Cómo cambio la voz de Quanela?",
-      "¿Por qué no veo «Oye Quanela»?"
+      "¿Por qué no veo «Oye Quanela»?",
+      "¿Tengo que decir «Oye Quanela» en cada pregunta?",
+      "¿Cómo termino la conversación con Quanela?"
     ],
     "keywords": [
       "oye quanela",
@@ -1042,7 +1047,11 @@ export const KB: KbArticle[] = [
       "escuchar",
       "respuestas habladas",
       "dictar",
-      "palabra clave"
+      "palabra clave",
+      "conversación",
+      "seguir escuchando",
+      "gracias",
+      "terminar"
     ],
     "steps": [
       "Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J .",
@@ -1053,10 +1062,11 @@ export const KB: KbArticle[] = [
     "headings": [
       "Hablarle una vez",
       "Manos libres",
+      "Conversar sin repetir «Oye Quanela»",
       "Ajustar la voz",
       "Si no lo ves o no funciona"
     ],
-    "body": "Hablarle una vez Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J . La primera vez, el navegador pide permiso para el micrófono: toca Permitir . Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa. Quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace Abrir guía . Manos libres Toca el micrófono de arriba → Manos libres en este equipo . Di «Oye Quanela» y, sin pausa larga, tu pregunta. En la vista Cocina, también tus comandos (ver Comandos de voz en cocina). Para dejar de escuchar un rato, Pausar ; luego Reanudar . Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida. Bueno saber: la frase «Oye Quanela» se detecta en tu equipo : ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador. Ajustar la voz En el micrófono → Voz en este equipo : Escuchar : cómo te oye Quanela y la prueba del manos libres. Hablar : la voz con que responde, Respuestas habladas y Leer también lo que escribes a Copilot . Estos ajustes son de este equipo : cada computador o tableta tiene los suyos. Si no lo ves o no funciona No aparece el micrófono : la voz no está activa en tu cuenta o tu rol no la incluye. Un administrador la activa en Configuración → IA y voz (según tu plan). «Permiso de micrófono denegado» : permite el micrófono en el candado de la barra de direcciones del navegador y recarga. «Este navegador no puede usar manos libres» : usa Chrome o Edge actualizados."
+    "body": "Hablarle una vez Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J . La primera vez, el navegador pide permiso para el micrófono: toca Permitir . Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa. Quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace Abrir guía . El chat de Copilot no se abre solo : la respuesta queda guardada y el botón ✦ Copilot muestra un número con las respuestas sin ver. Tócalo para leerlas completas. Manos libres Toca el micrófono de arriba → Manos libres en este equipo . Di «Oye Quanela» y, sin pausa larga, tu pregunta. En la vista Cocina, también tus comandos (ver Comandos de voz en cocina). Para dejar de escuchar un rato, Pausar ; luego Reanudar . Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida. Conversar sin repetir «Oye Quanela» Después de «Oye Quanela», Quanela sigue escuchando : cuando termina de responder suena un tono corto y tienes unos 8 segundos para la siguiente pregunta, sin repetir la frase. Arriba dice «Conversación · te escucho» . «¿Cuánto vendimos hoy?» … «¿Y ayer?» … «¿Y cuál plato vendió más?» — entiende que hablas de lo mismo. En la cocina también puedes decir comandos («pedido 1042 listo») dentro de la conversación. Para terminar: Quédate en silencio unos segundos. Di «gracias» , «listo» o «eso es todo» (responde «Con gusto.»), o «para» . En el micrófono de arriba → Terminar conversación . Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos. Bueno saber: el botón Hablar ahora y Ctrl/⌘ + Shift + J son para una sola pregunta . La conversación es solo con «Oye Quanela». Bueno saber: la frase «Oye Quanela» se detecta en tu equipo : ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador. Ajustar la voz En el micrófono → Voz en este equipo : Escuchar : cómo te oye Quanela y la prueba del manos libres. Escuchar : también Seguir escuchando después de responder (encendido de fábrica; apágalo y cada pregunta vuelve a necesitar «Oye Quanela»). Hablar : la voz con que responde, Respuestas habladas y Leer también lo que escribes a Copilot . Estos ajustes son de este equipo : cada computador o tableta tiene los suyos. Si no lo ves o no funciona No aparece el micrófono : la voz no está activa en tu cuenta o tu rol no la incluye. Un administrador la activa en Configuración → IA y voz (según tu plan). «Permiso de micrófono denegado» : permite el micróf"
   },
   {
     "id": "product-profitability",
@@ -1282,7 +1292,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver Clientes y saldos pendientes. Registro con Google, Instagram o teléfono , además del correo. Ver Crear tu negocio en Quanela. Configuración ordenada en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola forma de guardar. de octubre de 2026 La cuenta es lo que ves. Cada local es una cuenta ; cambias entre ellas desde arriba. Usuarios y roles se manejan por cuenta. Ver Entrar a Quanela y cambiar de cuenta o de rol. Menú de usuario nuevo con Apariencia (tema claro, oscuro o del sistema, y texto grande) y Ayuda y soporte . de octubre de 2026 Quanela Copilot : pregúntale a tu negocio en lenguaje natural. Personal y turnos : programa la semana, marca entrada y salida y revisa las horas. Ver Turnos y horas del equipo. Buscador de pedidos y despacho para domiciliarios. Dirección propia para tu negocio (por ejemplo fr3rk6.quanela.com ). Sep"
+    "body": "de octubre de 2026 Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve. Conversar con «Oye Quanela». Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver «Oye Quanela». Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver Clientes y saldos pendientes. Registro con Google, Instagram o teléfono , además del correo. Ver Crear tu negocio en Quanela. Configuración ordenada en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola fo"
   },
   {
     "id": "roles",

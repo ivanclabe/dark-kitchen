@@ -14,12 +14,13 @@ import type { Product } from '@/modules/products/types'
 import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button, buttonClass } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BarChart3, BookOpen, Layers, Plus, Power } from 'lucide-react'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { z } from 'zod'
 
@@ -60,6 +61,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues, unknown, FormOutput>({
@@ -195,8 +197,14 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
           </>
         )}
 
-        <FormField label="Precio de venta" required error={errors.price?.message}>
-          {(a11y) => <Input {...a11y} type="number" step="any" min="0" {...register('price')} />}
+        <FormField label="Precio de venta" required error={errors.price?.message} info="Lo que paga el cliente por el plato. Con él se calculan el total del pedido y el margen frente al costo de la receta.">
+          {(a11y) => (
+            <Controller
+              control={control}
+              name="price"
+              render={({ field }) => <CurrencyInput {...a11y} name={field.name} value={typeof field.value === 'number' ? field.value : Number(field.value) || null} onValueChange={(v) => field.onChange(v ?? 0)} onBlur={field.onBlur} />}
+            />
+          )}
         </FormField>
         <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
 

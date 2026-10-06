@@ -1,4 +1,7 @@
 import { Button } from '@/shared/ui/Button'
+import { formatLocaleNumber } from '@/shared/utils/numberInput'
+import { NumberInput } from '@/shared/ui/NumberInput'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
@@ -27,8 +30,8 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
   const [isActive, setIsActive] = useState(item?.isActive ?? true)
   const [startTime, setStartTime] = useState(item?.startTime ?? '')
   const [endTime, setEndTime] = useState(item?.endTime ?? '')
-  const [specialPrice, setSpecialPrice] = useState(item?.specialPrice !== null && item?.specialPrice !== undefined ? String(item.specialPrice) : '')
-  const [unitLimit, setUnitLimit] = useState(item?.unitLimit !== null && item?.unitLimit !== undefined ? String(item.unitLimit) : '')
+  const [specialPrice, setSpecialPrice] = useState<number | null>(item?.specialPrice ?? null)
+  const [unitLimit, setUnitLimit] = useState<number | null>(item?.unitLimit ?? null)
   const [whileSuppliesLast, setWhileSuppliesLast] = useState(item?.whileSuppliesLast ?? false)
   const [rangeUntil, setRangeUntil] = useState('')
 
@@ -38,8 +41,8 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
     isActive,
     startTime: startTime || null,
     endTime: endTime || null,
-    specialPrice: specialPrice.trim() === '' ? null : Number(specialPrice),
-    unitLimit: unitLimit.trim() === '' ? null : Number(unitLimit),
+    specialPrice,
+    unitLimit,
     whileSuppliesLast,
   }
 
@@ -102,14 +105,11 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
           <FormField label="Hasta">{(a11y) => <Input {...a11y} type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />}</FormField>
         </div>
 
-        <FormField label="Precio promocional" hint={`Vacío = precio normal (${formatMoney(item.productPrice)})`}>
-          {(a11y) => (
-            <Input {...a11y} type="number" step="any" min="0" value={specialPrice} onChange={(e) => setSpecialPrice(e.target.value)} placeholder={String(item.productPrice)} />
-          )}
+        <FormField label="Precio promocional" hint={`Vacío = precio normal (${formatMoney(item.productPrice)})`} info="Solo este día, el plato se vende a este precio en los pedidos nuevos.">
+          {(a11y) => <CurrencyInput {...a11y} value={specialPrice} onValueChange={setSpecialPrice} placeholder={formatLocaleNumber(item.productPrice)} />}
         </FormField>
-
-        <FormField label="Límite de unidades" hint="Vacío = sin límite">
-          {(a11y) => <Input {...a11y} type="number" min="1" value={unitLimit} onChange={(e) => setUnitLimit(e.target.value)} placeholder="Ej. 20" />}
+        <FormField label="Límite de unidades" hint="Vacío = sin límite" info="Cuántas unidades se pueden vender este día.">
+          {(a11y) => <NumberInput {...a11y} value={unitLimit} onValueChange={setUnitLimit} min={1} unit="unid." placeholder="Ej. 20" />}
         </FormField>
 
         <label className="flex items-center gap-2 text-sm text-neutral-300">

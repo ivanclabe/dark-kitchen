@@ -1,4 +1,5 @@
 import { RegisterPaymentModal } from '@/modules/cartera/components/RegisterPaymentModal'
+import { formatPhone } from '@/shared/utils/phone'
 import { Page } from '@/shared/ui/Page'
 import { useCustomerReceivables, usePaymentsByCustomer } from '@/modules/cartera/hooks/useReceivables'
 import { useOrderSearch } from '@/modules/orders/hooks/useOrders'
@@ -146,7 +147,7 @@ function CustomerAccount({ customer, onOpen }: { customer: CustomerDetail; onOpe
 function CustomerInfo({ customer }: { customer: CustomerDetail }) {
   const rows: [string, string][] = [
     ['Nombre', customer.fullName],
-    ['Teléfono', customer.phone ?? '—'],
+    ['Teléfono', customer.phone ? formatPhone(customer.phone) : '—'],
     ['Dirección', customer.address ?? '—'],
     ['WhatsApp', customer.hasWhatsapp ? 'Vinculado: sus pedidos pueden llegar por WhatsApp' : 'No vinculado'],
     ['Cliente desde', formatDate(customer.createdAt)],
@@ -246,7 +247,7 @@ export function CustomerDetailPage() {
             )}
           </>
         }
-        description={[customer.phone, customer.address, `Cliente desde ${formatDate(customer.createdAt)}`].filter(Boolean).join(' · ')}
+        description={[formatPhone(customer.phone), customer.address, `Cliente desde ${formatDate(customer.createdAt)}`].filter(Boolean).join(' · ')}
         actions={
           <>
             {can('customers.edit') && (

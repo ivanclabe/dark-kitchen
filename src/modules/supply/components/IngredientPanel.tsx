@@ -142,7 +142,7 @@ export function IngredientPanel({
                     {ing.stockAvailable} {ing.baseUnitCode}
                   </span>
                   <span className="text-neutral-700">·</span>
-                  <span className="tabular-nums">{formatMoney(ing.avgCost)}</span>
+                  <span className="tabular-nums">{formatMoney(ing.avgCost, { decimals: 'auto' })}</span>
                   {ing.categoryName && <span className="truncate text-neutral-600">· {ing.categoryName}</span>}
                 </p>
                 <div className="mt-2">

@@ -1,11 +1,12 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { useUnits } from '@/shared/hooks/useUnits'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Combobox } from '@/shared/ui/Combobox'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { FormField, Input, Select } from '@/shared/ui/FormField'
+import { FormField, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { ConfirmDialog } from '@/shared/ui/Modal'
 import { NumberStepper } from '@/shared/ui/NumberStepper'
@@ -56,7 +57,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const [ingredientId, setIngredientId] = useState('')
   const [quantity, setQuantity] = useState(0)
   const [purchaseUnitId, setPurchaseUnitId] = useState('')
-  const [unitCost, setUnitCost] = useState('')
+  const [unitCost, setUnitCost] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [createIngredientQuery, setCreateIngredientQuery] = useState<string | null>(null)
@@ -74,7 +75,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
 
   function applyLastPrice() {
     if (!lastPrice) return
-    setUnitCost(String(lastPrice.unitCost))
+    setUnitCost(lastPrice.unitCost)
     setPurchaseUnitId(lastPrice.purchaseUnitId)
   }
 
@@ -87,11 +88,11 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
     e.preventDefault()
     setError(null)
     try {
-      await addItem.mutateAsync({ ingredientId, quantity, purchaseUnitId, unitCost: Number(unitCost) })
+      await addItem.mutateAsync({ ingredientId, quantity, purchaseUnitId, unitCost: unitCost ?? 0 })
       setIngredientId('')
       setQuantity(0)
       setPurchaseUnitId('')
-      setUnitCost('')
+      setUnitCost(null)
     } catch (err) {
       setError(getErrorMessage(err, 'Error al agregar la línea'))
     }
@@ -159,7 +160,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
 
         <div className="flex items-end justify-between gap-3 border-t border-neutral-800/60 pt-3">
           <span className={typography.small}>Total de la compra</span>
-          <span className="text-2xl font-semibold tabular-nums text-neutral-50">{formatMoney(total)}</span>
+          <span className="text-2xl font-semibold tabular-nums text-neutral-50">{formatMoney(total, { code: true })}</span>
         </div>
 
         {!isDraft && (
@@ -184,7 +185,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
               hint={
                 lastPrice ? (
                   <Button type="button" variant="link" size="sm" icon={History} onClick={applyLastPrice}>
-                    Último: {formatMoney(lastPrice.unitCost)}/{lastPrice.purchaseUnitCode} · {lastPrice.supplierName} · usar
+                    Último: {formatMoney(lastPrice.unitCost, { decimals: 'auto' })}/{lastPrice.purchaseUnitCode} · {lastPrice.supplierName} · usar
                   </Button>
                 ) : undefined
               }
@@ -203,7 +204,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
             </FormField>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <FormField label="Cantidad" required>
-                {() => <NumberStepper value={quantity} onChange={setQuantity} min={0} step={1} required />}
+                {(a11y) => <NumberStepper {...a11y} value={quantity} onChange={setQuantity} min={0} step={1} required />}
               </FormField>
               <FormField label="Unidad de compra" required>
                 {(a11y) => (
@@ -217,10 +218,8 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                   </Select>
                 )}
               </FormField>
-              <FormField label="Costo unitario" required>
-                {(a11y) => (
-                  <Input {...a11y} type="number" step="any" min="0" inputMode="decimal" value={unitCost} onChange={(e) => setUnitCost(e.target.value)} required />
-                )}
+              <FormField label="Costo unitario" required info="Lo que pagaste por cada unidad de compra, según la factura. Al confirmar la compra, recalcula el costo promedio del insumo.">
+                {(a11y) => <CurrencyInput {...a11y} value={unitCost} onValueChange={setUnitCost} decimals={2} required />}
               </FormField>
             </div>
             <Button type="submit" variant="primary" icon={Plus} loading={addItem.isPending}>
@@ -249,7 +248,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-neutral-100">{item.ingredientName}</p>
                   <p className="text-xs text-neutral-500 tabular-nums">
-                    {item.quantity} {item.purchaseUnitCode} × {formatMoney(item.unitCost)}
+                    {item.quantity} {item.purchaseUnitCode} × {formatMoney(item.unitCost, { decimals: 'auto' })}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
@@ -318,7 +317,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         pending={confirmPurchase.isPending}
         description={
           <p>
-            Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea ({formatMoney(total)} en total) y actualiza el costo promedio de los
+            Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea ({formatMoney(total, { code: true })} en total) y actualiza el costo promedio de los
             insumos. No se puede deshacer — para corregir un error habría que registrar un ajuste manual después.
           </p>
         }

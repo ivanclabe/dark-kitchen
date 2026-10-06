@@ -37,37 +37,8 @@ export async function continueWithProvider(method: 'google' | 'instagram', retur
 // ---------------------------------------------------------------------------
 // Phone
 // ---------------------------------------------------------------------------
-/** Dial codes of the countries of the sign-up (business.ts COUNTRIES). */
-export const DIAL_CODES: Record<string, string> = {
-  CO: '57',
-  MX: '52',
-  PE: '51',
-  EC: '593',
-  CL: '56',
-  AR: '54',
-  PA: '507',
-  VE: '58',
-  US: '1',
-  ES: '34',
-}
-
-/**
- * The number in E.164 (+573001234567), or null when it is not a valid one.
- * Accepts spaces, dashes, dots and parentheses; a number that starts with "+"
- * already carries its country.
- */
-export function toE164(country: string, input: string): string | null {
-  const trimmed = input.trim()
-  if (!/^\+?[\d\s().-]+$/.test(trimmed)) return null
-  const digits = trimmed.replace(/\D/g, '')
-  if (trimmed.startsWith('+')) return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : null
-  const dial = DIAL_CODES[country]
-  if (!dial) return null
-  const national = digits.replace(/^0+/, '')
-  if (national.length < 7 || national.length > 12) return null
-  const full = `${dial}${national}`
-  return full.length <= 15 ? `+${full}` : null
-}
+// Phones are shared by the whole app (ADR 0039).
+export { DIAL_CODES, toE164 } from '@/shared/utils/phone'
 
 /**
  * Sends the SMS code. `create`: true while signing up (the user may not exist

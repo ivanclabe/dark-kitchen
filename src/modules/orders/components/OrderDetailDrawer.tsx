@@ -1,4 +1,5 @@
 import { useHere } from '@/shared/hooks/useBackTarget'
+import { formatPhone } from '@/shared/utils/phone'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { Button, type ButtonProps } from '@/shared/ui/Button'
@@ -154,7 +155,7 @@ function CustomerCard({ order }: { order: Order }) {
         </p>
         {order.customerPhone && (
           <p className="flex items-center gap-1.5 text-neutral-400">
-            <Phone size={13} aria-hidden /> {order.customerPhone}
+            <Phone size={13} aria-hidden /> {formatPhone(order.customerPhone)}
           </p>
         )}
         {order.customerAddress && (

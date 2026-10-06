@@ -1,4 +1,6 @@
 import { Button } from '@/shared/ui/Button'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
@@ -28,6 +30,7 @@ function CreateSupplierForm({ initialQuery, onClose, onCreated }: Omit<Props, 'o
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    if (phoneError(phone)) return
     try {
       const supplier = await createSupplier.mutateAsync({
         name,
@@ -46,7 +49,9 @@ function CreateSupplierForm({ initialQuery, onClose, onCreated }: Omit<Props, 'o
       <FormField label="Nombre" required error={error}>
         {(a11y) => <Input {...a11y} value={name} onChange={(e) => setName(e.target.value)} required autoFocus autoComplete="organization" />}
       </FormField>
-      <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />}</FormField>
+      <FormField label="Teléfono" error={phoneError(phone)}>
+        {(a11y) => <PhoneInput {...a11y} value={phone} onValueChange={setPhone} />}
+      </FormField>
       <FormField label="Contacto">{(a11y) => <Input {...a11y} value={contactName} onChange={(e) => setContactName(e.target.value)} />}</FormField>
       <p className={typography.caption}>NIT, correo y dirección se pueden completar después desde Proveedores.</p>
       <div className="flex justify-end gap-2 pt-2">

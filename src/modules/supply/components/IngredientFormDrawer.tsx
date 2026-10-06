@@ -1,4 +1,5 @@
 import { useUnits } from '@/shared/hooks/useUnits'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
@@ -7,7 +8,7 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { useCategories, useCreateCategory, useCreateIngredient, useUpdateIngredient } from '../hooks/useIngredients'
 import { useSuppliers } from '../hooks/useSuppliers'
@@ -206,11 +207,23 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
         </FormField>
 
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Stock mínimo" hint="Dispara la alerta" error={errors.minStock?.message}>
-            {(a11y) => <Input {...a11y} type="number" step="any" {...register('minStock')} />}
+          <FormField label="Stock mínimo" info="Cuando el disponible llega a esta cantidad, el insumo se marca «Bajo mínimo» y aparece en «Reponer»." error={errors.minStock?.message}>
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="minStock"
+                render={({ field }) => <NumberInput {...a11y} name={field.name} value={field.value === undefined || field.value === '' ? null : Number(field.value)} onValueChange={(v) => field.onChange(v ?? 0)} onBlur={field.onBlur} decimals={3} min={0} />}
+              />
+            )}
           </FormField>
-          <FormField label="Stock máximo" hint="Meta de reposición" error={errors.maxStock?.message}>
-            {(a11y) => <Input {...a11y} type="number" step="any" {...register('maxStock')} />}
+          <FormField label="Stock máximo" info="Hasta dónde reponer: «Reponer» sugiere comprar lo que falta para llegar aquí." error={errors.maxStock?.message}>
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="maxStock"
+                render={({ field }) => <NumberInput {...a11y} name={field.name} value={field.value === undefined || field.value === '' ? null : Number(field.value)} onValueChange={(v) => field.onChange(v ?? undefined)} onBlur={field.onBlur} decimals={3} min={0} />}
+              />
+            )}
           </FormField>
         </div>
 
@@ -220,7 +233,13 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
         </label>
         {perishable && (
           <FormField label="Vida útil (días)" error={errors.shelfLifeDays?.message}>
-            {(a11y) => <Input {...a11y} type="number" {...register('shelfLifeDays')} autoFocus />}
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="shelfLifeDays"
+                render={({ field }) => <NumberInput {...a11y} name={field.name} value={field.value === undefined || field.value === '' ? null : Number(field.value)} onValueChange={(v) => field.onChange(v ?? undefined)} onBlur={field.onBlur} min={0} unit="días" autoFocus />}
+              />
+            )}
           </FormField>
         )}
 

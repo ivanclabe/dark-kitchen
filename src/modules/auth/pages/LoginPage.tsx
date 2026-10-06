@@ -1,4 +1,6 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { normalizeEmail } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
 import { rootUrl, tenantHostLabel } from '@/shared/tenant/host'
@@ -64,7 +66,7 @@ export function LoginPage() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    const { error } = await signIn(email, password)
+    const { error } = await signIn(normalizeEmail(email), password)
     if (error) setError(error)
     setSubmitting(false)
   }
@@ -127,16 +129,7 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <FormField label="Correo electrónico" required>
               {(a11y) => (
-                <Input
-                  {...a11y}
-                  type="email"
-                  required
-                  autoComplete="username"
-                  placeholder="nombre@negocio.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoFocus
-                />
+                <EmailInput {...a11y} required autoComplete="username" placeholder="nombre@negocio.com" value={email} onValueChange={setEmail} autoFocus />
               )}
             </FormField>
             <FormField label="Contraseña" required error={error}>

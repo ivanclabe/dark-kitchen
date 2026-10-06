@@ -300,7 +300,7 @@ export function CostsTab({ data, compareLabel }: TabProps) {
   const ingredientColumns: DataTableColumn<InsightsData['purchases']['ingredients'][number]>[] = [
     { key: 'name', header: 'Insumo', cell: (i) => <span className="font-medium text-neutral-100">{i.name}</span> },
     { key: 'qty', header: 'Comprado', align: 'right', hideBelow: 'sm', cell: (i) => <span className="tabular-nums">{formatNumber(i.quantity)} {i.unit ?? ''}</span> },
-    { key: 'price', header: 'Precio promedio', align: 'right', cell: (i) => <span className="tabular-nums">{i.averagePrice != null ? `${formatMoney(i.averagePrice)}${i.unit ? ` / ${i.unit}` : ''}` : '—'}</span> },
+    { key: 'price', header: 'Precio promedio', align: 'right', cell: (i) => <span className="tabular-nums">{i.averagePrice != null ? `${formatMoney(i.averagePrice, { decimals: 'auto' })}${i.unit ? ` / ${i.unit}` : ''}` : '—'}</span> },
     ...(compareLabel
       ? ([{ key: 'change', header: 'vs. antes', align: 'right', cell: (i) => <ChangeCell value={change(i.averagePrice, i.previousAveragePrice)} goodWhen="down" /> }] satisfies DataTableColumn<InsightsData['purchases']['ingredients'][number]>[])
       : []),
@@ -326,10 +326,10 @@ export function CostsTab({ data, compareLabel }: TabProps) {
           <DataTable
             columns={[
               { key: 'name', header: 'Producto', cell: (p: ProductRow) => <span className="font-medium text-neutral-100">{p.name}</span> },
-              { key: 'unit', header: 'Ahora', align: 'right', cell: (p: ProductRow) => <span className="tabular-nums">{formatMoney(p.unitCost ?? 0)}</span> },
+              { key: 'unit', header: 'Ahora', align: 'right', cell: (p: ProductRow) => <span className="tabular-nums">{formatMoney(p.unitCost ?? 0, { decimals: 'auto' })}</span> },
               ...(compareLabel
                 ? [
-                    { key: 'prev', header: 'Antes', align: 'right' as const, hideBelow: 'sm' as const, cell: (p: ProductRow) => <span className="tabular-nums text-neutral-400">{p.previousUnitCost != null ? formatMoney(p.previousUnitCost) : '—'}</span> },
+                    { key: 'prev', header: 'Antes', align: 'right' as const, hideBelow: 'sm' as const, cell: (p: ProductRow) => <span className="tabular-nums text-neutral-400">{p.previousUnitCost != null ? formatMoney(p.previousUnitCost, { decimals: 'auto' }) : '—'}</span> },
                     { key: 'change', header: 'Cambio', align: 'right' as const, cell: (p: ProductRow) => <ChangeCell value={change(p.unitCost, p.previousUnitCost)} goodWhen="down" /> },
                   ]
                 : []),

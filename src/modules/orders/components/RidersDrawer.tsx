@@ -1,4 +1,7 @@
 import { useCreateRider, useRiders, useSetRiderActive } from '@/modules/orders/hooks/useDispatch'
+import { formatPhone } from '@/shared/utils/phone'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { ActiveBadge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -26,7 +29,7 @@ export function RidersDrawer({ open, onClose, canManage }: { open: boolean; onCl
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault()
-    if (!fullName.trim()) return
+    if (!fullName.trim() || phoneError(phone)) return
     try {
       await createRider.mutateAsync({ fullName: fullName.trim(), phone: phone || null, vehicleType: vehicleType || null })
       show(`Domiciliario "${fullName.trim()}" agregado.`)
@@ -55,7 +58,9 @@ export function RidersDrawer({ open, onClose, canManage }: { open: boolean; onCl
               {(a11y) => <Input {...a11y} value={fullName} onChange={(e) => setFullName(e.target.value)} required autoComplete="off" />}
             </FormField>
             <div className="grid grid-cols-2 gap-3">
-              <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />}</FormField>
+              <FormField label="Teléfono" error={phoneError(phone)} info="Para llamarlo desde el despacho.">
+                {(a11y) => <PhoneInput {...a11y} value={phone} onValueChange={setPhone} />}
+              </FormField>
               <FormField label="Vehículo">
                 {(a11y) => <Input {...a11y} value={vehicleType} onChange={(e) => setVehicleType(e.target.value)} placeholder="Moto, bicicleta…" />}
               </FormField>
@@ -77,7 +82,7 @@ export function RidersDrawer({ open, onClose, canManage }: { open: boolean; onCl
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-neutral-100">{r.fullName}</p>
                   <p className="text-xs text-neutral-500">
-                    {[r.phone, r.vehicleType].filter(Boolean).join(' · ') || 'Sin datos de contacto'}
+                    {[formatPhone(r.phone), r.vehicleType].filter(Boolean).join(' · ') || 'Sin datos de contacto'}
                   </p>
                 </div>
                 <span className="flex shrink-0 items-center gap-2">

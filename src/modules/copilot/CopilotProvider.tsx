@@ -10,23 +10,11 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type Reac
 import { useLocation } from 'react-router-dom'
 import { askCopilot, cancelCopilot, CopilotError, rateCopilotAnswer, type CopilotAnswer, type CopilotScope, type CopilotTurn } from './api'
 import { CopilotContext, useCopilot } from './copilotContext'
+import { historyFor, loadConversation, saveConversation, type CopilotMessage } from './lib/conversation'
 import { CopilotMarkdown } from './lib/markdown'
 import { suggestionsFor } from './lib/suggestions'
 
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-  steps?: CopilotAnswer['steps']
-  scope?: CopilotScope
-  followUp?: string[]
-  links?: CopilotAnswer['links']
-  runId?: string
-  feedback?: 1 | -1 | null
-  /** An error, and the question to ask again (Reintentar). */
-  error?: boolean
-  retryQuestion?: string
-  retryable?: boolean
-}
+type Message = CopilotMessage
 
 const SCREEN_NAME: Record<string, string> = {
   '/dashboard': 'Inicio',
@@ -73,7 +61,10 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
   const screen = Object.entries(SCREEN_NAME).find(([prefix]) => section === prefix || section.startsWith(`${prefix}/`))?.[1] ?? null
 
   const [isOpen, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  // ADR 0038: the conversation survives a reload of this tab (30 min), per account.
+  const [messages, setMessages] = useState<Message[]>(() => loadConversation(kitchen.id))
+  const [unseen, setUnseen] = useState(0)
+  const isOpenRef = useRef(isOpen)
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState(false)
   const [remaining, setRemaining] = useState<number | null>(null)
@@ -81,9 +72,14 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
   const inFlight = useRef<{ abort: AbortController; requestId: string } | null>(null)
   useEffect(() => {
     messagesRef.current = messages
+    isOpenRef.current = isOpen
   })
+  useEffect(() => saveConversation(kitchen.id, messages), [kitchen.id, messages])
 
-  const open = useCallback(() => setOpen(true), [])
+  const open = useCallback(() => {
+    setOpen(true)
+    setUnseen(0)
+  }, [])
 
   useEffect(() => {
     if (!available) return
@@ -91,6 +87,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
       // Ctrl/⌘ + Shift + J is «Oye Quanela» (speak now), not this.
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && (e.key === 'j' || e.key === 'J')) {
         e.preventDefault()
+        setUnseen(0)
         setOpen((o) => !o)
       }
     }
@@ -108,15 +105,28 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
       signal?.addEventListener('abort', () => abort.abort())
       const requestId = newRequestId()
       inFlight.current = { abort, requestId }
-      const history: CopilotTurn[] = messagesRef.current.filter((m) => !m.error).map((m) => ({ role: m.role, content: m.content }))
-      setMessages((prev) => [...prev, { role: 'user', content: question }])
+      const history: CopilotTurn[] = historyFor(messagesRef.current)
+      setMessages((prev) => [...prev, { role: 'user', content: question, channel }])
       setPending(true)
       try {
         const result = await askCopilot({ question, history, screen, channel, requestId, signal: abort.signal })
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: result.answer, steps: result.steps, scope: result.scope, followUp: result.followUp, links: result.links, runId: result.runId, feedback: null },
+          {
+            role: 'assistant',
+            content: result.answer,
+            intent: result.intent,
+            steps: result.steps,
+            scope: result.scope,
+            followUp: result.followUp,
+            links: result.links,
+            runId: result.runId,
+            feedback: null,
+            channel,
+          },
         ])
+        // Answered while the panel is closed (by voice): one more to see on ✦.
+        if (!isOpenRef.current) setUnseen((n) => n + 1)
         setRemaining(result.remainingToday)
         return result
       } catch (err) {
@@ -164,7 +174,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
           id: 'copilot',
           fallback: true,
           handle: async (text, { signal }) => {
-            setOpen(true)
+            // ADR 0038: the voice does not open the panel; the answer is heard and ✦ shows it is there.
             try {
               const result = await ask(text, 'voice', signal)
               if (!result) return null
@@ -198,7 +208,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CopilotContext value={{ available, open }}>
+    <CopilotContext value={{ available, open, unseen, pending }}>
       {children}
       {available && isOpen && (
         <CopilotPanel
@@ -219,7 +229,10 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
           onToggleRead={() => setReadTyped(!readTyped)}
           onRate={(i, v) => void rate(i, v)}
           onReset={() => setMessages([])}
-          onClose={() => setOpen(false)}
+          onClose={() => {
+            setOpen(false)
+            setUnseen(0)
+          }}
         />
       )}
     </CopilotContext>
@@ -486,21 +499,30 @@ function CopilotPanel({
 
 /** The ✦ button of the top bar. */
 export function CopilotButton({ compact = false }: { compact?: boolean }) {
-  const { available, open } = useCopilot()
+  const { available, open, unseen, pending } = useCopilot()
   if (!available) return null
+  const label = unseen > 0 ? `Abrir Quanela Copilot: ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver` : pending ? 'Abrir Quanela Copilot: consultando' : 'Abrir Quanela Copilot'
   return (
     <button
       type="button"
       onClick={open}
-      title="Quanela Copilot (Ctrl/⌘ + J)"
-      aria-label="Abrir Quanela Copilot"
+      title={`${label} (Ctrl/⌘ + J)`}
+      aria-label={label}
       className={clsx(
-        'inline-flex items-center gap-1.5 rounded-full border border-brasa-500/30 bg-brasa-500/10 text-brasa-300 transition-colors hover:bg-brasa-500/20',
+        'relative inline-flex items-center gap-1.5 rounded-full border border-brasa-500/30 bg-brasa-500/10 text-brasa-300 transition-colors hover:bg-brasa-500/20',
         compact ? 'size-10 justify-center' : 'h-8 px-3 text-xs font-medium',
       )}
     >
       <Sparkles size={compact ? 16 : 13} aria-hidden />
       {!compact && 'Copilot'}
+      {/* ADR 0038: answers by voice wait here (the voice never opens the panel). */}
+      {unseen > 0 ? (
+        <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brasa-500 px-1 text-[10px] font-semibold text-white tabular-nums ring-2 ring-neutral-950" aria-hidden>
+          {unseen > 9 ? '9+' : unseen}
+        </span>
+      ) : (
+        pending && <span className="absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full bg-brasa-400 ring-2 ring-neutral-950" aria-hidden />
+      )}
     </button>
   )
 }

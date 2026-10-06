@@ -6,7 +6,7 @@ import { engineFor } from '@/shared/voice/recognition/engines'
 import { useSpeechRecognition } from '@/shared/voice/recognition/useSpeechRecognition'
 import { deviceSpeech } from '@/shared/voice/speechQueue'
 import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
-import { playWakeTone } from '@/shared/voice/wakeWord/tone'
+import { playFollowUpTone, playWakeTone } from '@/shared/voice/wakeWord/tone'
 import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
 import { useWakeWord } from '@/shared/voice/wakeWord/useWakeWord'
 import { isWakeWordSupported } from '@/shared/voice/wakeWord/wakeWordModel'
@@ -14,7 +14,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useVoiceFlag } from './prefs'
 import { routeUtterance, stripWakePhrase } from './router'
 import type { VoiceHandler, VoiceReply, VoiceState } from './types'
-import { DICTATION_DELAY_MS, HANDS_FREE_WINDOW_MS, VOICE_PHRASE_DELAY_MS, VoiceContext, type Dictation, type VoiceContextValue } from './voiceContext'
+import {
+  CONVERSATION_MAX_MS,
+  CONVERSATION_MAX_TURNS,
+  DICTATION_DELAY_MS,
+  ECHO_TAIL_MS,
+  FOLLOW_UP_WINDOW_MS,
+  HANDS_FREE_WINDOW_MS,
+  VOICE_PHRASE_DELAY_MS,
+  VoiceContext,
+  type Dictation,
+  type VoiceContextValue,
+} from './voiceContext'
 
 /** How long the result of a phrase stays shown. */
 const RESULT_DISPLAY_MS = 4000
@@ -50,6 +61,11 @@ function usePageVisible(): boolean {
  * (speech-to-text) and speaking (the device's speech queue). What is heard
  * goes to whoever understands it: the screen's handler (the kitchen's order
  * commands) or Copilot. Mounted once per account, in the app frame.
+ *
+ * Conversation (ADR 0038): after «Oye Quanela», once the answer has been
+ * said (plus the room's echo), it listens again for the next question —
+ * without the wake phrase — until silence, «gracias», «para», a hidden tab or
+ * the safety limits.
  */
 export function VoiceProvider({ children }: { children: ReactNode }) {
   const { canUseFeature, feature } = useActiveKitchen()
@@ -59,6 +75,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const supported = engineFor(engineId).supported()
   const [handsFreeOn, setHandsFreeOn] = useWakeWordPreference()
   const [replies, setReplies] = useVoiceFlag('replies', true)
+  const [followUp, setFollowUp] = useVoiceFlag('followUp', true)
   const visible = usePageVisible()
 
   const handlersRef = useRef(new Map<string, VoiceHandler>())
@@ -78,18 +95,24 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const [lastTranscript, setLastTranscript] = useState('')
   const [lastReply, setLastReply] = useState<VoiceReply | null>(null)
   const [paused, setPaused] = useState(false)
+  const [conversing, setConversing] = useState(false)
 
   const modeRef = useRef<'route' | 'dictate'>('route')
+  /** The conversation in course (null: none), and whether this listening turn is one of its follow-ups. */
+  const conversationRef = useRef<{ turns: number; startedAt: number } | null>(null)
+  const followUpTurnRef = useRef(false)
+  const followUpPrefRef = useRef(followUp)
   const dictationRef = useRef<Dictation | null>(null)
   const processingRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
-  const timers = useRef<{ debounce?: ReturnType<typeof setTimeout>; noSpeech?: ReturnType<typeof setTimeout>; reset?: ReturnType<typeof setTimeout> }>({})
+  const timers = useRef<{ debounce?: ReturnType<typeof setTimeout>; noSpeech?: ReturnType<typeof setTimeout>; reset?: ReturnType<typeof setTimeout>; follow?: ReturnType<typeof setTimeout> }>({})
   const handlersListRef = useRef(handlers)
   const repliesRef = useRef(replies)
   const sayRef = useRef(voice.say)
   useEffect(() => {
     handlersListRef.current = handlers
     repliesRef.current = replies
+    followUpPrefRef.current = followUp
     sayRef.current = voice.say
   })
 
@@ -98,7 +121,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const voiceUsable = canUseFeature('voice_wake_word')
   const available = supported && handlers.length > 0 && (voiceUsable || handlers.some((h) => h.grammar))
 
-  const clearTimer = (key: 'debounce' | 'noSpeech' | 'reset') => {
+  const clearTimer = (key: 'debounce' | 'noSpeech' | 'reset' | 'follow') => {
     if (timers.current[key]) clearTimeout(timers.current[key])
     timers.current[key] = undefined
   }
@@ -114,6 +137,37 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     },
     [show],
   )
+
+  const endConversation = useCallback(() => {
+    conversationRef.current = null
+    followUpTurnRef.current = false
+    clearTimer('follow')
+    setConversing(false)
+  }, [])
+
+  // Defined below (it starts a listening turn); called through a ref by the follow-up.
+  const startSessionRef = useRef<(mode: 'route' | 'dictate', handsFree: boolean, followUpTurn?: boolean) => Promise<void>>(async () => undefined)
+
+  /** After an answer in a conversation: when Quanela is done speaking (and the echo is gone), listen again. */
+  const continueConversation = useCallback(() => {
+    const c = conversationRef.current
+    if (!c) return
+    c.turns += 1
+    if (c.turns >= CONVERSATION_MAX_TURNS || Date.now() - c.startedAt > CONVERSATION_MAX_MS) return endConversation()
+    clearTimer('follow')
+    const since = Date.now()
+    const tick = () => {
+      timers.current.follow = undefined
+      if (!conversationRef.current) return
+      // Still speaking (at most 30 s): wait. The microphone must not hear Quanela's own voice.
+      if (deviceSpeech.isSpeaking(ECHO_TAIL_MS) && Date.now() - since < 30_000) {
+        timers.current.follow = setTimeout(tick, 150)
+        return
+      }
+      void startSessionRef.current('route', true, true)
+    }
+    timers.current.follow = setTimeout(tick, 150)
+  }, [endConversation])
 
   // Defined below; the recognizer calls them through refs (it outlives renders).
   const onTranscriptRef = useRef<(text: string) => void>(() => undefined)
@@ -134,36 +188,66 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       setState('processing')
       setLastTranscript(text)
       const route = routeUtterance(text, handlersListRef.current, engineId)
+      const followUpTurn = followUpTurnRef.current
+      followUpTurnRef.current = false
       if (route.kind === 'stop') {
         abortRef.current?.abort()
         deviceSpeech.clear()
         processingRef.current = false
+        endConversation()
         setState('idle')
         return
       }
+      if (route.kind === 'close') {
+        processingRef.current = false
+        endConversation()
+        return present({ tone: 'info', message: 'Con gusto.', spoken: 'Con gusto.', priority: 'answer' })
+      }
       if (route.kind === 'none') {
         processingRef.current = false
-        if (route.reason === 'empty') return setState('idle')
-        return present(
+        // Silence or a stray word after an answer is not a question: the conversation ends quietly.
+        if (route.reason === 'empty' || (followUpTurn && text.trim().split(/\s+/).length < 2)) {
+          endConversation()
+          return setState('idle')
+        }
+        present(
           route.reason === 'offline-question'
             ? { tone: 'info', message: 'Para preguntas, cambia el reconocedor a «navegador» en este equipo.', spoken: 'Para preguntas, cambia el reconocedor en este equipo.' }
             : { tone: 'error', message: 'No entendí.', spoken: 'No entendí.' },
         )
+        return continueConversation()
+      }
+      // After an answer, one stray word nobody on screen understands is noise, not a question for Copilot.
+      if (followUpTurn && route.handler.fallback && text.trim().split(/\s+/).length < 2) {
+        processingRef.current = false
+        endConversation()
+        return setState('idle')
       }
       const abort = new AbortController()
       abortRef.current = abort
       try {
         const reply = await route.handler.handle(text, { engine: engineId, signal: abort.signal })
-        if (abort.signal.aborted) return setState('idle')
-        if (reply) present(reply)
-        else setState('idle')
+        if (abort.signal.aborted) {
+          endConversation()
+          return setState('idle')
+        }
+        if (reply) {
+          present(reply)
+          continueConversation()
+        } else {
+          endConversation()
+          setState('idle')
+        }
       } catch {
-        if (!abort.signal.aborted) present({ tone: 'error', message: 'No pude responder.', spoken: 'No pude responder.' })
+        if (!abort.signal.aborted) {
+          present({ tone: 'error', message: 'No pude responder.', spoken: 'No pude responder.' })
+          continueConversation()
+        }
       } finally {
         processingRef.current = false
       }
     },
-    [engineId, present],
+    [engineId, present, endConversation, continueConversation],
   )
 
   const finalize = useCallback(
@@ -206,28 +290,37 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   })
 
   const startSession = useCallback(
-    async (mode: 'route' | 'dictate', handsFree: boolean) => {
+    async (mode: 'route' | 'dictate', handsFree: boolean, followUpTurn = false) => {
       processingRef.current = false
       clearTimer('noSpeech')
       clearTimer('debounce')
       clearTimer('reset')
+      clearTimer('follow')
+      followUpTurnRef.current = followUpTurn
       modeRef.current = mode
       setDictating(mode === 'dictate')
       setLiveTranscript('')
       setState('listening')
-      if (handsFree) await playWakeTone()
+      if (handsFree) await (followUpTurn ? playFollowUpTone() : playWakeTone())
       void speechRef.current.start()
       if (handsFree) {
-        // Nobody spoke after «Oye Quanela»: back to waiting, quietly.
-        timers.current.noSpeech = setTimeout(() => {
-          timers.current.noSpeech = undefined
-          speechRef.current.stop()
-          setState('idle')
-        }, HANDS_FREE_WINDOW_MS)
+        // Nobody spoke after «Oye Quanela» (or after the answer): back to waiting, quietly; the conversation ends.
+        timers.current.noSpeech = setTimeout(
+          () => {
+            timers.current.noSpeech = undefined
+            speechRef.current.stop()
+            endConversation()
+            setState('idle')
+          },
+          followUpTurn ? FOLLOW_UP_WINDOW_MS : HANDS_FREE_WINDOW_MS,
+        )
       }
     },
-    [],
+    [endConversation],
   )
+  useEffect(() => {
+    startSessionRef.current = startSession
+  })
 
   const listen = useCallback(() => {
     if (!supported) return present({ tone: 'error', message: 'Este navegador no reconoce la voz. Puedes escribir.' })
@@ -247,6 +340,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   )
 
   const stop = useCallback(() => {
+    endConversation()
     clearTimer('debounce')
     clearTimer('noSpeech')
     speechRef.current.stop()
@@ -256,7 +350,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     dictationRef.current = null
     setDictating(false)
     setState('idle')
-  }, [])
+  }, [endConversation])
 
   const submitText = useCallback((text: string) => {
     modeRef.current = 'route'
@@ -268,10 +362,22 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const busy = state === 'listening' || state === 'processing'
   const wake = useWakeWord({
     active: handsFreeAllowed && handsFreeOn && !paused && visible && available,
-    suspended: busy,
+    suspended: busy || conversing,
     tuning: wakeWordTuning(feature('voice_wake_word')),
-    onDetect: () => void startSession('route', true),
+    onDetect: () => {
+      // «Oye Quanela» starts a conversation (when this device keeps listening after answering).
+      if (followUpPrefRef.current) {
+        conversationRef.current = { turns: 0, startedAt: Date.now() }
+        setConversing(true)
+      }
+      void startSession('route', true)
+    },
   })
+
+  // A hidden tab never keeps the microphone open.
+  useEffect(() => {
+    if (!visible && conversationRef.current) stop()
+  }, [visible, stop])
 
   // Ctrl/⌘ + Shift + J: say one phrase without «Oye Quanela».
   useEffect(() => {
@@ -312,6 +418,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         state: wake.state,
         error: wake.error,
       },
+      conversation: { active: conversing, enabled: followUp, setEnabled: setFollowUp, end: stop },
       replies,
       setReplies,
       speechAllowed: voice.allowed,
@@ -324,7 +431,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     }),
     [
       available, supported, engineId, state, dictating, liveTranscript, lastTranscript, lastReply, handsFreeAllowed, handsFreeOn, setHandsFreeOn,
-      paused, wake.state, wake.error, replies, setReplies, voice.allowed, voice.say, listen, dictate, stop, submitText, registerHandler,
+      paused, wake.state, wake.error, conversing, followUp, setFollowUp, replies, setReplies, voice.allowed, voice.say, listen, dictate, stop, submitText, registerHandler,
     ],
   )
 

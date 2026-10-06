@@ -1,7 +1,8 @@
 import type { NewOrganizationInput } from './api'
+import { emailError } from '@/shared/utils/email'
+import { phoneError } from '@/shared/utils/phone'
 
 /** Client checks of the create-organization form; the database checks again. */
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const EMPTY_ORGANIZATION: NewOrganizationInput = { name: '', sector: '', category: '', adminName: '', adminEmail: '', plan: '', country: 'CO', city: '', phone: '', taxId: '' }
 
@@ -15,10 +16,13 @@ export function validateStep(step: 'business' | 'admin', form: NewOrganizationIn
     if (!form.category) errors.category = 'Elige la categoría'
     if (!form.plan) errors.plan = 'Elige el plan'
     if (!form.country) errors.country = 'Elige el país'
+    const phone = phoneError(form.phone ?? '')
+    if (phone) errors.phone = phone
   } else {
     const adminName = form.adminName.trim()
     if (adminName.length < 2 || adminName.length > 80) errors.adminName = 'Entre 2 y 80 caracteres'
-    if (!EMAIL_RE.test(form.adminEmail.trim())) errors.adminEmail = 'Escribe un correo válido'
+    const email = emailError(form.adminEmail, { required: true })
+    if (email) errors.adminEmail = email
   }
   return errors
 }

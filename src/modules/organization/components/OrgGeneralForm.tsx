@@ -1,4 +1,6 @@
 import { MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { SaveBar } from '@/shared/ui/SaveBar'
 import { cardClass } from '@/shared/ui/formClasses'
 import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
@@ -53,7 +55,7 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
-    if (edited && !nameError) save.mutate()
+    if (edited && !nameError && !phoneError(form.phone ?? '', { original: org.phone })) save.mutate()
   }
 
   return (
@@ -102,7 +104,9 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
           <FormField label="Dirección">{(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} />}</FormField>
           <FormField label="Razón social">{(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
           <FormField label="NIT / identificación">{(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
-          <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
+          <FormField label="Teléfono" error={phoneError(form.phone ?? '', { original: org.phone })}>
+            {(a11y) => <PhoneInput {...a11y} value={form.phone ?? ''} onValueChange={(v) => set({ phone: v || null })} />}
+          </FormField>
           <FormField label="Moneda" hint="Para las cuentas nuevas">
             {(a11y) => <Input {...a11y} value={form.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase().slice(0, 3) })} maxLength={3} />}
           </FormField>

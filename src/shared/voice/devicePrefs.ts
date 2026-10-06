@@ -11,6 +11,8 @@ export const VOICE_KEYS = {
   replies: { key: 'dk-voice-replies', legacy: 'dk-kitchen-voice-tts' },
   /** Read Copilot's answers to typed questions too (🔊 in the panel). New: no legacy key. */
   readTyped: { key: 'dk-voice-read-typed', legacy: null },
+  /** After «Oye Quanela», keep listening for the next question (ADR 0038). New: no legacy key. */
+  followUp: { key: 'dk-voice-follow-up', legacy: null },
 } as const
 
 export type VoicePref = keyof typeof VOICE_KEYS

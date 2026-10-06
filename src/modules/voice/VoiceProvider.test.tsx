@@ -34,11 +34,11 @@ vi.mock('@/shared/voice/wakeWord/useWakeWord', () => ({
   useWakeWord: ({ onDetect }: { onDetect: () => void }) => ((state.onDetect = onDetect), { state: 'listening', error: null }),
 }))
 vi.mock('@/shared/voice/wakeWord/wakeWordModel', () => ({ isWakeWordSupported: () => true }))
-vi.mock('@/shared/voice/wakeWord/tone', () => ({ playWakeTone: async () => undefined }))
+vi.mock('@/shared/voice/wakeWord/tone', () => ({ playWakeTone: async () => undefined, playFollowUpTone: async () => undefined }))
 vi.mock('@/shared/voice/wakeWord/preference', () => ({ useWakeWordPreference: () => [true, vi.fn()] }))
 
 const { VoiceProvider } = await import('./VoiceProvider')
-const { useVoice, useVoiceHandler, VOICE_PHRASE_DELAY_MS, DICTATION_DELAY_MS, HANDS_FREE_WINDOW_MS } = await import('./voiceContext')
+const { useVoice, useVoiceHandler, VOICE_PHRASE_DELAY_MS, DICTATION_DELAY_MS, HANDS_FREE_WINDOW_MS, FOLLOW_UP_WINDOW_MS, CONVERSATION_MAX_TURNS } = await import('./voiceContext')
 
 const calls: string[] = []
 const kitchen: VoiceHandler = {
@@ -62,7 +62,7 @@ function Probe({ withKitchen = true }: { withKitchen?: boolean }) {
   useEffect(() => setApi(voice))
   useVoiceHandler(copilot)
   useVoiceHandler(withKitchen ? kitchen : null)
-  return <p>{`state:${voice.state} reply:${voice.lastReply?.message ?? ''}`}</p>
+  return <p>{`state:${voice.state} reply:${voice.lastReply?.message ?? ''} conversation:${voice.conversation.active}`}</p>
 }
 
 function renderVoice(withKitchen = true) {
@@ -182,3 +182,107 @@ describe('«Oye Quanela» (ADR 0033)', () => {
     expect(localStorage.getItem('dk-voice-replies')).toBe('off')
   })
 })
+
+/** «Oye Quanela», then the question; waits for the answer and for the follow-up turn to start. */
+async function wakeAndAsk(text: string) {
+  await act(async () => {
+    state.onDetect!()
+    await vi.advanceTimersByTimeAsync(0)
+  })
+  await say(text)
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200)
+  })
+}
+
+describe('conversation by voice (ADR 0038)', () => {
+  it('after «Oye Quanela» and an answer, it listens again without the wake phrase', async () => {
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    expect(calls).toEqual(['copilot:¿cuánto vendimos hoy?'])
+    expect(state.started).toBe(2)
+    expect(screen.getByText(/conversation:true/)).toBeTruthy()
+    await say('¿y ayer?')
+    expect(calls).toEqual(['copilot:¿cuánto vendimos hoy?', 'copilot:¿y ayer?'])
+  })
+
+  it('silence after the answer ends the conversation, quietly', async () => {
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(FOLLOW_UP_WINDOW_MS + 10)
+    })
+    expect(screen.getByText(/state:idle .*conversation:false/)).toBeTruthy()
+    expect(calls).toHaveLength(1)
+  })
+
+  it('«gracias» closes it kindly; «para» stops it', async () => {
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    await say('gracias')
+    expect(screen.getByText(/reply:Con gusto\. conversation:false/)).toBeTruthy()
+    expect(state.said.at(-1)).toEqual({ text: 'Con gusto.', priority: 'answer' })
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    await say('para')
+    expect(screen.getByText(/conversation:false/)).toBeTruthy()
+    expect(calls).toHaveLength(2)
+  })
+
+  it('a stray word after an answer is not a question: nothing is asked', async () => {
+    renderVoice(false)
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    await say('eh')
+    expect(calls).toHaveLength(1)
+    expect(screen.getByText(/conversation:false/)).toBeTruthy()
+  })
+
+  it('a kitchen command also works inside the conversation', async () => {
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    await say('pedido 1042 listo')
+    expect(calls.at(-1)).toBe('kitchen:pedido 1042 listo')
+    expect(screen.getByText(/conversation:true/)).toBeTruthy()
+  })
+
+  it('«Hablar ahora» is one phrase only: no conversation', async () => {
+    renderVoice()
+    await act(async () => api!.listen())
+    await say('¿cuánto vendimos hoy?')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200)
+    })
+    expect(state.started).toBe(1)
+    expect(screen.getByText(/conversation:false/)).toBeTruthy()
+  })
+
+  it('with «Seguir escuchando» off on this device, it answers once, as before', async () => {
+    localStorage.setItem('dk-voice-follow-up', 'off')
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    expect(state.started).toBe(1)
+    expect(screen.getByText(/conversation:false/)).toBeTruthy()
+  })
+
+  it('a safety limit of turns', async () => {
+    renderVoice()
+    await wakeAndAsk('pregunta número uno')
+    for (let i = 2; i <= CONVERSATION_MAX_TURNS; i++) {
+      await say(`pregunta número ${i}`)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(200)
+      })
+    }
+    expect(calls).toHaveLength(CONVERSATION_MAX_TURNS)
+    expect(screen.getByText(/conversation:false/)).toBeTruthy()
+  })
+
+  it('«Terminar conversación» ends it and frees the microphone', async () => {
+    renderVoice()
+    await wakeAndAsk('¿cuánto vendimos hoy?')
+    const stoppedBefore = state.stopped
+    await act(async () => api!.conversation.end())
+    expect(screen.getByText(/state:idle .*conversation:false/)).toBeTruthy()
+    expect(state.stopped).toBeGreaterThan(stoppedBefore)
+  })
+})
+

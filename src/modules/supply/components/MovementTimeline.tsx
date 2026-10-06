@@ -48,7 +48,7 @@ export function MovementTimeline({ ingredientId, showIngredientName = false }: {
                 {m.quantityBaseUnit > 0 ? '+' : ''}
                 {m.quantityBaseUnit}
               </p>
-              {m.unitCost !== null && <p className="text-xs text-neutral-500 tabular-nums">{formatMoney(m.unitCost)}</p>}
+              {m.unitCost !== null && <p className="text-xs text-neutral-500 tabular-nums">{formatMoney(m.unitCost, { decimals: 'auto' })}</p>}
             </div>
           </li>
         )

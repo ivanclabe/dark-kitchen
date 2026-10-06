@@ -18,6 +18,8 @@ order: 1
 
 ## 6 de octubre de 2026
 
+- **Pesos, teléfonos y correos más claros.** Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve.
+- **Conversar con «Oye Quanela».** Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver [«Oye Quanela»](help:oye-quanela).
 - **Notificaciones.** Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver [Notificaciones](help:notifications).
 - **`quanela.com` siempre muestra la página de Quanela**, aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en `doc.quanela.com`.
 - **Centro de ayuda.** Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver [Preguntarle a Copilot](help:ask-copilot).

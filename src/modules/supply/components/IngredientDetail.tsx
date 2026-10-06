@@ -159,7 +159,7 @@ export function IngredientDetail({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <StatCard label="Costo promedio" value={formatMoney(ingredient.avgCost)} hint={`por ${ingredient.baseUnitCode}`} />
+        <StatCard label="Costo promedio" value={formatMoney(ingredient.avgCost, { decimals: 'auto' })} hint={`por ${ingredient.baseUnitCode}`} />
         <StatCard label="Valor en stock" value={formatMoney(ingredient.stockOnHand * ingredient.avgCost)} hint={`${ingredient.stockOnHand} en bodega`} />
       </div>
 

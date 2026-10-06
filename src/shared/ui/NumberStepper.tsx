@@ -22,9 +22,10 @@ export function NumberStepper({
   'aria-invalid'?: boolean
   'aria-describedby'?: string
 }) {
+  // Whole numbers typed on the phone's number pad (ADR 0039); empty while typing counts as the minimum.
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-    const next = Number(e.target.value)
-    onChange(Number.isNaN(next) ? min : next)
+    const digits = e.target.value.replace(/\D/g, '')
+    onChange(digits === '' ? min : Math.max(min, Number(digits)))
   }
 
   return (
@@ -38,15 +39,15 @@ export function NumberStepper({
         <Minus size={14} />
       </button>
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
         id={id}
         aria-label={ariaLabel}
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
         value={value}
         onChange={handleInputChange}
-        min={min}
-        step={step}
         required={required}
         className="w-full min-w-0 border-x border-neutral-800 bg-transparent py-2.5 text-center text-sm tabular-nums text-neutral-50 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />

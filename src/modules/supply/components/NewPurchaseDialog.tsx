@@ -140,7 +140,7 @@ export function NewPurchaseDialog({
                   <li key={line.ingredient.id} className="flex items-center justify-between gap-2 text-xs text-neutral-400">
                     <span className="truncate">{line.ingredient.name}</span>
                     <span className="shrink-0 tabular-nums">
-                      {line.quantity} {line.ingredient.baseUnitCode} × {formatMoney(line.ingredient.avgCost)}
+                      {line.quantity} {line.ingredient.baseUnitCode} × {formatMoney(line.ingredient.avgCost, { decimals: 'auto' })}
                     </span>
                   </li>
                 ))}

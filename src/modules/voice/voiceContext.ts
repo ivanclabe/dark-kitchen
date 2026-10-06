@@ -11,6 +11,13 @@ export const VOICE_PHRASE_DELAY_MS = 1800
 export const DICTATION_DELAY_MS = 1500
 /** After «Oye Quanela»: how long to wait for the phrase to start (ADR 0016, D6). */
 export const HANDS_FREE_WINDOW_MS = 5000
+/** Conversation (ADR 0038): after an answer, how long Quanela keeps listening for the next question. */
+export const FOLLOW_UP_WINDOW_MS = 8000
+/** Room echo after Quanela stops speaking, before listening again (so it does not hear itself). */
+export const ECHO_TAIL_MS = 600
+/** Safety limits of one conversation. */
+export const CONVERSATION_MAX_TURNS = 10
+export const CONVERSATION_MAX_MS = 3 * 60_000
 
 export interface Dictation {
   onTranscript: (text: string) => void
@@ -37,6 +44,17 @@ export interface VoiceContextValue {
     togglePause: () => void
     state: WakeWordState
     error: string | null
+  }
+  /**
+   * The conversation started by «Oye Quanela» (ADR 0038): after each answer it
+   * listens again, without the wake phrase, until silence or «gracias».
+   */
+  conversation: {
+    active: boolean
+    /** Device preference: keep listening after answering (on by default). */
+    enabled: boolean
+    setEnabled: (on: boolean) => void
+    end: () => void
   }
   /** Spoken replies to what is said (device preference, on by default). */
   replies: boolean

@@ -1,4 +1,6 @@
 import { FormField, Input, Select } from '@/shared/ui/FormField'
+import { OTHER_PAYMENT_METHOD, PAYMENT_METHODS } from '@/modules/orders/lib/paymentMethods'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
@@ -19,8 +21,9 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
   const registerPayment = useRegisterPayment()
   const { show } = useToast()
   const [orderId, setOrderId] = useState<string | null>(null)
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState<number | null>(null)
   const [method, setMethod] = useState('')
+  const [otherMethod, setOtherMethod] = useState('')
   const [note, setNote] = useState('')
   const [amountError, setAmountError] = useState<string | null>(null)
 
@@ -29,8 +32,9 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
 
   function reset() {
     setOrderId(null)
-    setAmount('')
+    setAmount(null)
     setMethod('')
+    setOtherMethod('')
     setNote('')
     setAmountError(null)
   }
@@ -43,7 +47,7 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!selected) return
-    const value = Number(amount)
+    const value = amount ?? 0
     if (!value || value <= 0) {
       setAmountError('Ingresa un monto mayor a cero.')
       return
@@ -53,8 +57,8 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
       return
     }
     try {
-      await registerPayment.mutateAsync({ orderId: selected.orderId, amount: value, method: method || null, note: note || null })
-      show(`Pago de ${formatMoney(value)} registrado para el pedido #${selected.orderNumber}.`)
+      await registerPayment.mutateAsync({ orderId: selected.orderId, amount: value, method: (method === OTHER_PAYMENT_METHOD ? otherMethod.trim() : method) || null, note: note || null })
+      show(`Pago de ${formatMoney(value, { code: true })} registrado para el pedido #${selected.orderNumber}.`)
       handleClose()
     } catch (err) {
       show(getErrorMessage(err, 'No se pudo registrar el pago'), 'error')
@@ -100,18 +104,13 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
             <span className="text-lg font-semibold tabular-nums text-brasa-400">{formatMoney(selected.balance)}</span>
           </div>
 
-          <FormField label="Monto a abonar" required error={amountError}>
+          <FormField label="Monto a abonar" required error={amountError} info="Puede ser una parte del saldo: el pedido queda en «Pago parcial» hasta completar el total.">
             {(a11y) => (
-              <Input
+              <CurrencyInput
                 {...a11y}
-                type="number"
-                inputMode="decimal"
-                min={1}
-                max={selected.balance}
-                step="1"
                 value={amount}
-                onChange={(e) => {
-                  setAmount(e.target.value)
+                onValueChange={(v) => {
+                  setAmount(v)
                   setAmountError(null)
                 }}
                 required
@@ -120,8 +119,22 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
             )}
           </FormField>
           <FormField label="Método de pago">
-            {(a11y) => <Input {...a11y} value={method} onChange={(e) => setMethod(e.target.value)} placeholder="Efectivo, transferencia…" />}
+            {(a11y) => (
+              <Select {...a11y} value={method} onChange={(e) => setMethod(e.target.value)}>
+                <option value="">Sin especificar</option>
+                {[...PAYMENT_METHODS, OTHER_PAYMENT_METHOD].map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </Select>
+            )}
           </FormField>
+          {method === OTHER_PAYMENT_METHOD && (
+            <FormField label="¿Cuál?">
+              {(a11y) => <Input {...a11y} value={otherMethod} onChange={(e) => setOtherMethod(e.target.value)} placeholder="Ej. Nequi, Daviplata" autoFocus />}
+            </FormField>
+          )}
           <FormField label="Nota">{(a11y) => <Input {...a11y} value={note} onChange={(e) => setNote(e.target.value)} />}</FormField>
         </form>
       )}

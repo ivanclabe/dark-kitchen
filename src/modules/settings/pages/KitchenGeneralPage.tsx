@@ -1,4 +1,6 @@
 import { OrgGeneralForm } from '@/modules/organization/components/OrgGeneralForm'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { phoneError } from '@/shared/utils/phone'
 import { useOrganizationDetails } from '@/modules/organization/hooks/useOrganization'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { resolveAccountIconKey } from '@/shared/avatars/catalog'
@@ -126,11 +128,12 @@ function AccountDetailsForm() {
 
   const nameError = form.name.trim().length >= 2 ? null : 'Mínimo 2 caracteres'
   const slugProblem = slugError(form.slug)
+  const phoneProblem = phoneError(form.phone ?? '', { original: details?.phone })
   const set = (patch: Partial<KitchenDetailsInput>) => setEdited({ ...form, ...patch })
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (form && !nameError && !slugProblem) save.mutate(form)
+    if (form && !nameError && !slugProblem && !phoneProblem) save.mutate(form)
   }
 
   return (
@@ -183,7 +186,9 @@ function AccountDetailsForm() {
         <FormGrid>
           <FormField label="Razón social">{(a11y) => <Input {...a11y} value={form.legalName ?? ''} onChange={(e) => set({ legalName: e.target.value })} />}</FormField>
           <FormField label="NIT / identificación">{(a11y) => <Input {...a11y} value={form.taxId ?? ''} onChange={(e) => set({ taxId: e.target.value })} />}</FormField>
-          <FormField label="Teléfono">{(a11y) => <Input {...a11y} type="tel" value={form.phone ?? ''} onChange={(e) => set({ phone: e.target.value })} />}</FormField>
+          <FormField label="Teléfono" error={phoneProblem}>
+            {(a11y) => <PhoneInput {...a11y} value={form.phone ?? ''} onValueChange={(v) => set({ phone: v || null })} />}
+          </FormField>
           <FormField label="Dirección">{(a11y) => <Input {...a11y} value={form.address ?? ''} onChange={(e) => set({ address: e.target.value })} />}</FormField>
         </FormGrid>
       </Section>

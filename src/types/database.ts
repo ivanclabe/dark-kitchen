@@ -4048,6 +4048,7 @@ export type Database = {
       }
       dk_new_tenant_code: { Args: never; Returns: string }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
+      dk_normalize_phone: { Args: { p_phone: string }; Returns: string }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
       dk_order_search: {
         Args: {

@@ -1,4 +1,6 @@
 import { Button, IconButton } from '@/shared/ui/Button'
+import { NumberInput } from '@/shared/ui/NumberInput'
+import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormActions, FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
@@ -76,7 +78,7 @@ export function MasterProductDrawer({
             {(a11y) => <Input {...a11y} value={categoryName} onChange={(e) => setCategoryName(e.target.value)} placeholder="Hamburguesas" />}
           </FormField>
           <FormField label="Precio de venta" required hint="Cada cuenta puede fijar su propio precio">
-            {(a11y) => <Input {...a11y} type="number" min="0" step="any" value={price} onChange={(e) => setPrice(e.target.value)} />}
+            {(a11y) => <CurrencyInput {...a11y} value={price === '' ? null : Number(price)} onValueChange={(v) => setPrice(v === null ? '' : String(v))} />}
           </FormField>
           <FormField label="Descripción" className="sm:col-span-2">
             {(a11y) => <Input {...a11y} value={description} onChange={(e) => setDescription(e.target.value)} />}
@@ -107,7 +109,7 @@ export function MasterProductDrawer({
                 <li key={i} className="grid grid-cols-[1fr_1.4fr_0.9fr_0.9fr_auto] items-center gap-2">
                   <Input aria-label="Código del insumo" placeholder="CARNE-01" value={r.ingredientCode} onChange={(e) => setItem(i, { ingredientCode: e.target.value.toUpperCase() })} className="!mt-0" />
                   <Input aria-label="Nombre del insumo" placeholder="Carne de res" value={r.ingredientName} onChange={(e) => setItem(i, { ingredientName: e.target.value })} className="!mt-0" />
-                  <Input aria-label="Cantidad" type="number" min="0" step="any" value={r.quantity || ''} onChange={(e) => setItem(i, { quantity: Number(e.target.value) })} className="!mt-0" />
+                  <NumberInput aria-label="Cantidad" value={r.quantity || null} onValueChange={(v) => setItem(i, { quantity: v ?? 0 })} decimals={3} min={0} className="!mt-0" />
                   <Select aria-label="Unidad" value={r.unitCode} onChange={(e) => setItem(i, { unitCode: e.target.value })} className="!mt-0">
                     {units.map((u) => (
                       <option key={u.code} value={u.code}>

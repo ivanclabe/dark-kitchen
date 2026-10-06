@@ -35,7 +35,7 @@ describe('Pago in the order (ADR 0031)', () => {
     renderCard(order())
     expect(screen.getByText('Pago pendiente')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Registrar pago' }))
-    expect((screen.getByLabelText('Monto del pago') as HTMLInputElement).value).toBe('85000')
+    expect((screen.getByLabelText('Monto del pago') as HTMLInputElement).value).toBe('85.000')
     fireEvent.click(screen.getByRole('button', { name: 'Transferencia' }))
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar pago' }))
     await waitFor(() => expect(state.registered).toEqual([{ orderId: 'o1', amount: 85000, method: 'Transferencia', note: '' }]))

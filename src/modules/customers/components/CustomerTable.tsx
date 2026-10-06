@@ -1,4 +1,5 @@
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
+import { formatPhone } from '@/shared/utils/phone'
 import { Badge } from '@/shared/ui/Badge'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { SortableHeader } from '@/shared/ui/SortableHeader'
@@ -82,7 +83,7 @@ export function CustomerTable({
       cell: (c) => (
         <span className="block min-w-0 text-sm">
           <span className="flex items-center gap-1.5 text-neutral-300">
-            {c.phone ?? <span className="text-neutral-600">Sin teléfono</span>}
+            {c.phone ? formatPhone(c.phone) : <span className="text-neutral-600">Sin teléfono</span>}
             {c.hasWhatsapp && <MessageCircle size={13} className="text-emerald-400" aria-label="Vinculado a WhatsApp" />}
           </span>
           {c.address && <span className="block max-w-[14rem] truncate text-xs text-neutral-500">{c.address}</span>}
@@ -133,7 +134,7 @@ export function CustomerTable({
                   <span className="min-w-0">
                     <span className="block truncate font-medium text-neutral-100">{c.fullName}</span>
                     <span className="block truncate text-xs text-neutral-500">
-                      {[c.phone, showOrders ? (c.lastOrderAt ? `Último: ${relativeDay(c.lastOrderAt)}` : 'Sin pedidos') : null].filter(Boolean).join(' · ')}
+                      {[formatPhone(c.phone), showOrders ? (c.lastOrderAt ? `Último: ${relativeDay(c.lastOrderAt)}` : 'Sin pedidos') : null].filter(Boolean).join(' · ')}
                     </span>
                   </span>
                   {showDebt && <BalanceCell balance={c.balance ?? 0} overdue={c.overdue ?? 0} />}

@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { ChevronDown } from 'lucide-react'
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 import { inputClass, labelClass } from './formClasses'
+import { InfoTip } from './InfoTip'
 import { typography } from './typography'
 
 /**
@@ -13,6 +14,7 @@ import { typography } from './typography'
 export function FormField({
   label,
   hint,
+  info,
   error,
   required,
   className,
@@ -20,6 +22,8 @@ export function FormField({
 }: {
   label: string
   hint?: ReactNode
+  /** ⓘ next to the label (ADR 0039): what the field is for and what it changes. */
+  info?: string
   error?: string | null
   required?: boolean
   className?: string
@@ -32,14 +36,18 @@ export function FormField({
 
   return (
     <div className={clsx('min-w-0', className)}>
-      <label htmlFor={id} className={labelClass}>
-        {label}
-        {required && (
-          <span className="ml-0.5 text-brasa-400" aria-hidden>
-            *
-          </span>
-        )}
-      </label>
+      {/* The ⓘ sits next to the label, not inside it: the field's name stays just its label. */}
+      <div className="flex items-center">
+        <label htmlFor={id} className={labelClass}>
+          {label}
+          {required && (
+            <span className="ml-0.5 text-brasa-400" aria-hidden>
+              *
+            </span>
+          )}
+        </label>
+        {info && <InfoTip text={info} label={`Qué es «${label}»`} />}
+      </div>
       {children({ id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
       {error ? (
         <p id={errorId} role="alert" className="mt-1.5 text-xs text-red-400">

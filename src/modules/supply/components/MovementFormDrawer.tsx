@@ -1,4 +1,6 @@
 import { Button } from '@/shared/ui/Button'
+import { formatLocaleNumber } from '@/shared/utils/numberInput'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { Chip } from '@/shared/ui/Chip'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
@@ -37,7 +39,7 @@ export function MovementFormDrawer({
 
   const [mode, setMode] = useState<MovementMode>(initialMode)
   const [ingredientId, setIngredientId] = useState(initialIngredientId ?? '')
-  const [quantity, setQuantity] = useState('')
+  const [quantity, setQuantity] = useState<number | null>(null)
   const [reason, setReason] = useState<WasteReason>('DANO')
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -51,10 +53,10 @@ export function MovementFormDrawer({
     const name = ingredient?.name ?? 'Insumo'
     try {
       if (mode === 'merma') {
-        await registerWaste.mutateAsync({ ingredientId, quantity: Number(quantity), reason, observation: observation || undefined })
-        show(`Merma registrada: ${quantity} de ${name}.`)
+        await registerWaste.mutateAsync({ ingredientId, quantity: quantity ?? 0, reason, observation: observation || undefined })
+        show(`Merma registrada: ${formatLocaleNumber(quantity, { decimals: 3 })} de ${name}.`)
       } else {
-        await registerAdjustment.mutateAsync({ ingredientId, quantity: Number(quantity), observation: observation || undefined })
+        await registerAdjustment.mutateAsync({ ingredientId, quantity: quantity ?? 0, observation: observation || undefined })
         show(`Ajuste registrado en ${name}.`)
       }
       onClose()
@@ -87,19 +89,19 @@ export function MovementFormDrawer({
         </FormField>
 
         <FormField
-          label={mode === 'merma' ? `Cantidad${ingredient ? ` (${ingredient.baseUnitCode})` : ' (unidad base)'}` : 'Cantidad (unidad base, +/-)'}
+          label="Cantidad"
           required
-          hint={mode === 'merma' ? 'Se registra como salida automáticamente.' : 'Positivo suma stock, negativo resta.'}
+          info={mode === 'merma' ? 'Lo que se perdió, en la unidad del insumo. Sale del inventario al registrarla.' : 'Positiva suma al inventario; negativa (con «-») resta. Úsala para corregir el stock tras un conteo.'}
         >
           {(a11y) => (
-            <Input
+            <NumberInput
               {...a11y}
-              type="number"
-              step="any"
-              min={mode === 'merma' ? '0' : undefined}
-              inputMode="decimal"
               value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
+              onValueChange={setQuantity}
+              decimals={3}
+              min={mode === 'merma' ? 0 : undefined}
+              allowNegative={mode !== 'merma'}
+              unit={ingredient?.baseUnitCode}
               required
             />
           )}
@@ -128,7 +130,7 @@ export function MovementFormDrawer({
           variant="primary"
           icon={mode === 'merma' ? Trash2 : SlidersHorizontal}
           loading={pending}
-          disabled={!ingredientId || quantity === ''}
+          disabled={!ingredientId || quantity === null}
           className="w-full"
         >
           {mode === 'merma' ? 'Registrar merma' : 'Registrar ajuste'}

@@ -1,4 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
+import { formatMoney } from '@/shared/utils/format'
 import type { FeatureCategory, FeatureKey } from '@/shared/features/features'
 
 /**
@@ -81,9 +82,9 @@ export async function fetchPublicPricing(): Promise<PublicPricing> {
   }
 }
 
-/** "$99.900" (sin decimales, separador de miles es-CO). */
+/** "$99.900": the app's one money format (ADR 0039). */
 export function formatAmount(amount: number): string {
-  return `$${amount.toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+  return formatMoney(amount)
 }
 
 /** "$99.900 COP/mes" o "$999.000 COP/año". */

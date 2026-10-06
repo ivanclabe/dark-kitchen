@@ -1,11 +1,11 @@
-import { COUNTRIES } from '@/modules/organization/lib/business'
+import { PhoneInput } from '@/shared/ui/PhoneInput'
 import { Button } from '@/shared/ui/Button'
-import { FormField, Input, Select } from '@/shared/ui/FormField'
+import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
 import { ArrowLeft, Mail, MessageSquareText, Smartphone } from 'lucide-react'
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { TURNSTILE_SITE_KEY } from '../api'
-import { continueWithProvider, DIAL_CODES, ownerAuthErrorMessage, requestPhoneCode, toE164, verifyPhoneCode, type OwnerMethod } from '../ownerAuth'
+import { continueWithProvider, ownerAuthErrorMessage, requestPhoneCode, verifyPhoneCode, type OwnerMethod } from '../ownerAuth'
 import { markOwnerSignIn } from '../ownerSession'
 import { TurnstileWidget } from './TurnstileWidget'
 
@@ -102,7 +102,6 @@ export function OwnerMethodButtons({
  * while signing up; false on the login (it never creates users).
  */
 export function PhoneSignIn({ create, onBack, onSignedIn }: { create: boolean; onBack: () => void; onSignedIn: () => void }) {
-  const [country, setCountry] = useState('CO')
   const [number, setNumber] = useState('')
   const [phone, setPhone] = useState<string | null>(null)
   const [code, setCode] = useState('')
@@ -111,7 +110,8 @@ export function PhoneSignIn({ create, onBack, onSignedIn }: { create: boolean; o
   const [wait, setWait] = useState(0)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const onCaptcha = useCallback((token: string | null) => setCaptchaToken(token), [])
-  const e164 = toE164(country, number)
+  // PhoneInput gives E.164 when the number is valid (ADR 0039).
+  const e164 = /^\+\d{8,15}$/.test(number) ? number : null
 
   useEffect(() => {
     if (wait <= 0) return
@@ -194,22 +194,9 @@ export function PhoneSignIn({ create, onBack, onSignedIn }: { create: boolean; o
       className="space-y-4"
       noValidate
     >
-      <div className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-2">
-        <FormField label="País">
-          {(a11y) => (
-            <Select {...a11y} value={country} onChange={(e) => setCountry(e.target.value)}>
-              {COUNTRIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  +{DIAL_CODES[c.value]} {c.label}
-                </option>
-              ))}
-            </Select>
-          )}
-        </FormField>
-        <FormField label="Número de celular" required error={error ?? (number && !e164 ? 'Número no válido' : null)}>
-          {(a11y) => <Input {...a11y} type="tel" inputMode="tel" autoComplete="tel-national" value={number} onChange={(e) => setNumber(e.target.value)} placeholder="300 123 4567" autoFocus />}
-        </FormField>
-      </div>
+      <FormField label="Número de celular" required error={error ?? (number && !e164 ? 'Número no válido' : null)}>
+        {(a11y) => <PhoneInput {...a11y} value={number} onValueChange={setNumber} autoComplete="tel-national" autoFocus />}
+      </FormField>
       {TURNSTILE_SITE_KEY && <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={onCaptcha} />}
       <Button type="submit" variant="primary" size="lg" icon={MessageSquareText} className="w-full" loading={busy} disabled={!e164 || (Boolean(TURNSTILE_SITE_KEY) && !captchaToken)}>
         Enviarme el código

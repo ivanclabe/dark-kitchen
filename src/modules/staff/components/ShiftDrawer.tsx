@@ -1,4 +1,5 @@
 import { Button } from '@/shared/ui/Button'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormActions, FormField, FormGrid, Input, Select, Textarea } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
@@ -37,12 +38,12 @@ export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; me
   const [day, setDay] = useState(editing ? toDateInput(new Date(editing.startsAt)) : (draft.day ?? toDateInput(new Date())))
   const [start, setStart] = useState(editing ? toTimeInput(editing.startsAt) : '08:00')
   const [end, setEnd] = useState(editing ? toTimeInput(editing.endsAt) : '16:00')
-  const [breakMinutes, setBreakMinutes] = useState(String(editing?.breakMinutes ?? 0))
+  const [breakMinutes, setBreakMinutes] = useState<number | null>(editing?.breakMinutes ?? 0)
   const [notes, setNotes] = useState(editing?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
 
   const range = start && end && day ? shiftRange(day, start, end) : null
-  const hours = range ? plannedHours({ startsAt: range.startsAt.toISOString(), endsAt: range.endsAt.toISOString(), breakMinutes: Number(breakMinutes) || 0 }) : 0
+  const hours = range ? plannedHours({ startsAt: range.startsAt.toISOString(), endsAt: range.endsAt.toISOString(), breakMinutes: breakMinutes ?? 0 }) : 0
 
   function choosePerson(next: string) {
     setUserId(next)
@@ -57,7 +58,7 @@ export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; me
       return
     }
     setError(null)
-    const input = { userId, roleId, startsAt: range.startsAt.toISOString(), endsAt: range.endsAt.toISOString(), breakMinutes: Number(breakMinutes) || 0, notes }
+    const input = { userId, roleId, startsAt: range.startsAt.toISOString(), endsAt: range.endsAt.toISOString(), breakMinutes: breakMinutes ?? 0, notes }
     try {
       if (editing) await update.mutateAsync({ id: editing.id, input })
       else await create.mutateAsync(input)
@@ -116,8 +117,8 @@ export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; me
           <FormField label="Sale" required hint={range && range.endsAt.getDate() !== range.startsAt.getDate() ? 'Termina al día siguiente.' : undefined}>
             {(a11y) => <Input {...a11y} type="time" value={end} onChange={(e) => setEnd(e.target.value)} />}
           </FormField>
-          <FormField label="Descanso (minutos)">
-            {(a11y) => <Input {...a11y} type="number" min={0} max={240} step={5} inputMode="numeric" value={breakMinutes} onChange={(e) => setBreakMinutes(e.target.value)} />}
+          <FormField label="Descanso" info="Se descuenta de las horas planificadas del turno.">
+            {(a11y) => <NumberInput {...a11y} value={breakMinutes} onValueChange={setBreakMinutes} min={0} max={240} unit="min" />}
           </FormField>
           <div className="flex items-end pb-2 text-sm text-neutral-400">{hours > 0 ? `${formatHours(hours)} de trabajo` : ''}</div>
           <FormField label="Nota" className="sm:col-span-2">

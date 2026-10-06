@@ -1,4 +1,5 @@
 import { Button } from '@/shared/ui/Button'
+import { formatPhone } from '@/shared/utils/phone'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Tooltip } from '@/shared/ui/Tooltip'
@@ -45,7 +46,7 @@ function DispatchCard({ order, now, onOpen, action }: { order: Order; now: numbe
         </p>
         {order.customerPhone && (
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">
-            <Phone size={12} aria-hidden /> {order.customerPhone}
+            <Phone size={12} aria-hidden /> {formatPhone(order.customerPhone)}
           </p>
         )}
         <p className="mt-1 truncate text-xs text-neutral-500">
