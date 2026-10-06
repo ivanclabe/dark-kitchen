@@ -1,11 +1,11 @@
 import { supabase } from '@/shared/lib/supabase'
-import type { FlowStatus, Order, OrderInput, OrderSearch, OrderStatus, OrderStatusHistoryEntry, PrepStatus } from '../types'
+import type { FlowStatus, Order, OrderInput, OrderSearch, OrderStatus, OrderStatusHistoryEntry } from '../types'
 
 /**
  * The one query of an order (ADR 0020). Every view (Pedidos, Cocina,
  * Despacho, Dashboard, Clientes) reads this shape; the database's RLS decides
  * what each role sees (a rider only their own deliveries, customer data only
- * with customers.view).
+ * with customers.view, the payments only with receivables.view — ADR 0031).
  */
 const SELECT = `
   id, order_number, customer_id, status, channel, subtotal, discount, delivery_fee, total, payment_method, notes,
@@ -13,7 +13,8 @@ const SELECT = `
   dk_customers ( full_name, address, phone ),
   dk_kitchen_tickets ( priority ),
   dk_deliveries ( status, rider_id, dispatched_at, delivered_at, dk_delivery_riders ( full_name ) ),
-  dk_order_items ( id, product_id, quantity, unit_price, line_total, observation, kitchen_status, created_at, dk_products ( name ) )
+  dk_order_items ( id, product_id, quantity, unit_price, line_total, observation, kitchen_status, created_at, dk_products ( name ) ),
+  dk_order_payments ( id, amount, method, note, created_at, voids_payment_id, dk_users!dk_order_payments_created_by_fkey ( full_name ) )
 `
 
 type One<T> = T | T[] | null
@@ -53,6 +54,15 @@ interface OrderRow {
     created_at: string
     dk_products: One<{ name: string }>
   }[]
+  dk_order_payments?: {
+    id: string
+    amount: number
+    method: string | null
+    note: string | null
+    created_at: string
+    voids_payment_id: string | null
+    dk_users: One<{ full_name: string }>
+  }[]
 }
 
 const first = <T,>(value: One<T>): T | null => (Array.isArray(value) ? (value[0] ?? null) : value)
@@ -91,6 +101,17 @@ export function mapOrder(row: OrderRow): Order {
         observation: item.observation,
         kitchenStatus: item.kitchen_status,
       })),
+    payments: [...(row.dk_order_payments ?? [])]
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))
+      .map((p) => ({
+        id: p.id,
+        amount: Number(p.amount),
+        method: p.method,
+        note: p.note,
+        createdAt: p.created_at,
+        createdBy: first(p.dk_users)?.full_name ?? null,
+        voidsPaymentId: p.voids_payment_id,
+      })),
     delivery: delivery
       ? {
           status: delivery.status,
@@ -106,7 +127,6 @@ export function mapOrder(row: OrderRow): Order {
 const mapRows = (data: unknown) => (data as OrderRow[]).map(mapOrder)
 
 export const FLOW_STATUSES: FlowStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO']
-export const PREP_STATUSES: PrepStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
 
 /**
  * Open orders in `statuses`, whenever they were created — a draft from days
@@ -147,6 +167,7 @@ export async function searchOrders(filters: OrderSearch): Promise<{ orders: Orde
     p_customer_id: filters.customerId ?? undefined,
     p_limit: limit + 1,
     p_offset: filters.offset ?? 0,
+    p_payment: filters.payment ?? undefined,
   })
   if (searchError) throw searchError
   const found = (ids ?? []) as string[]
@@ -164,16 +185,6 @@ export async function getOrder(id: string): Promise<Order> {
   return mapOrder(data as unknown as OrderRow)
 }
 
-/**
- * By its number in the active account. Numbers cycle (1000–9999) and are
- * unique only among open orders, so the most recent one with that number wins.
- */
-export async function getOrderByNumber(orderNumber: number): Promise<Order | null> {
-  const { data, error } = await supabase.from('dk_orders').select(SELECT).eq('order_number', orderNumber).order('created_at', { ascending: false }).limit(1).maybeSingle()
-  if (error) throw error
-  return data ? mapOrder(data as unknown as OrderRow) : null
-}
-
 export async function createOrder(input: OrderInput): Promise<Order> {
   const { data, error } = await supabase
     .from('dk_orders')
@@ -188,20 +199,6 @@ export async function createOrder(input: OrderInput): Promise<Order> {
     .single()
   if (error) throw error
   return mapOrder(data as unknown as OrderRow)
-}
-
-export async function updateOrder(id: string, input: OrderInput): Promise<void> {
-  const { error } = await supabase
-    .from('dk_orders')
-    .update({
-      customer_id: input.customerId,
-      notes: input.notes || null,
-      discount: input.discount ?? 0,
-      delivery_fee: input.deliveryFee ?? 0,
-      payment_method: input.paymentMethod || null,
-    })
-    .eq('id', id)
-  if (error) throw error
 }
 
 /** Confirming reserves the stock of every dish (the database refuses it if something is missing). */

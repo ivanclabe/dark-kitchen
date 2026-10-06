@@ -7,8 +7,8 @@ import { CatalogPage } from '@/modules/menuPlanner/pages/CatalogPage'
 import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
 import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
-import { KitchenPage } from '@/modules/kitchen/pages/KitchenPage'
-import { OrdersPage } from '@/modules/orders/pages/OrdersPage'
+import { OperationsRedirect } from '@/modules/operations/components/OperationsRedirect'
+import { OperationsPage } from '@/modules/operations/pages/OperationsPage'
 import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
 import { StaffPage } from '@/modules/staff/pages/StaffPage'
 import { RolesPage, UsersLayout, UsersPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
@@ -130,13 +130,15 @@ const routes: RouteObject[] = [
           // "/" = your start: each role lands on its own screen (ADR 0020, D3).
           { index: true, element: <RoleHome /> },
           { path: 'dashboard', element: <Suspense fallback={loading}><DashboardPage /></Suspense> },
-          // Pedidos — el centro operativo (ADR 0020): Tablero, Lista y Despacho
-          // del mismo pedido; /orders/:orderId abre su detalle.
-          { path: 'orders', element: <OrdersPage /> },
-          { path: 'orders/:orderId', element: <OrdersPage /> },
-          { path: 'delivery', element: <KitchenRedirect to="/orders?view=dispatch" /> },
-          // Cocina — una vista especializada de esos pedidos: la pantalla de preparación.
-          { path: 'kitchen', element: <KitchenPage /> },
+          // Centro de operaciones (ADR 0031): Tablero, Cocina, Despacho y Lista
+          // del mismo pedido; /operations/:orderId abre su detalle sobre la vista.
+          { path: 'operations', element: <OperationsPage /> },
+          { path: 'operations/:orderId', element: <OperationsPage /> },
+          // Las direcciones de antes (Pedidos y Cocina) llevan a la misma vista.
+          { path: 'orders', element: <OperationsRedirect /> },
+          { path: 'orders/:orderId', element: <OperationsRedirect /> },
+          { path: 'kitchen', element: <OperationsRedirect view="kitchen" /> },
+          { path: 'delivery', element: <OperationsRedirect view="dispatch" /> },
           // Catálogo — Planificador de Menús: platos, calendario y recetas; ?view=shared, los platos compartidos (ADR 0024).
           { path: 'menu-planner', element: <CatalogPage /> },
           { path: 'recipes/:productId', element: <RecipeEditorPage /> },

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   addPurchaseItem,
   confirmPurchase,
@@ -14,8 +14,17 @@ import {
 } from '../api/purchases'
 import type { PurchaseInput, PurchaseItemInput } from '../types'
 
-export function usePurchases() {
-  return useQuery({ queryKey: ['purchases'], queryFn: listPurchases })
+/** The page size of the purchases list (ADR 0030 D5). */
+export const PURCHASES_PAGE = 50
+
+/** The `limit` most recent purchases; «Cargar más» raises the limit and keeps the loaded ones on screen meanwhile. */
+export function usePurchases(limit = PURCHASES_PAGE) {
+  return useQuery({ queryKey: ['purchases', 'list', limit], queryFn: () => listPurchases({ limit }), placeholderData: keepPreviousData })
+}
+
+/** All the purchases of one supplier: its totals need every one, and they are few. */
+export function useSupplierPurchases(supplierId: string) {
+  return useQuery({ queryKey: ['purchases', 'supplier', supplierId], queryFn: async () => (await listPurchases({ supplierId })).rows, enabled: !!supplierId })
 }
 
 export function usePurchase(id: string) {

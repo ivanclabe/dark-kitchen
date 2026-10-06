@@ -17,7 +17,7 @@ import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BookOpen, Layers, Plus, Power } from 'lucide-react'
+import { BarChart3, BookOpen, Layers, Plus, Power } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
@@ -210,6 +210,11 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
               <Link to={`/recipes/${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
                 <BookOpen size={13} aria-hidden /> {shared ? 'Ver receta' : product.activeRecipeVersion ? `Receta v${product.activeRecipeVersion}` : 'Crear receta'}
               </Link>
+              {can('reports.view') && (
+                <Link to={`/insights?tab=products&product=${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
+                  <BarChart3 size={13} aria-hidden /> Ventas y rentabilidad
+                </Link>
+              )}
               {!shared && (
                 <Button variant="secondary" size="sm" icon={Power} onClick={() => setActive.mutate({ id: product.id, active: !product.active })}>
                   {product.active ? 'Desactivar' : 'Activar'}

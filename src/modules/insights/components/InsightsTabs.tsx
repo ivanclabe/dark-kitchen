@@ -4,6 +4,9 @@ import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Info } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useHere } from '@/shared/hooks/useBackTarget'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import type { InsightsData, ProductRow } from '../api'
 import { BarList } from './BarList'
 import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
@@ -285,6 +288,13 @@ export function ProductsTab({ data, onProduct, onCategory, compareLabel }: TabPr
 // Costos
 // ---------------------------------------------------------------------------
 export function CostsTab({ data, compareLabel }: TabProps) {
+  // ADR 0030: from a cost to its cause — the ingredient or the supplier in Abastecimiento.
+  const { can, path } = useActiveKitchen()
+  const navigate = useNavigate()
+  // «Volver» from Abastecimiento brings the person back to these figures (ADR 0031).
+  const here = useHere('Insights')
+  const openIngredient = can('inventory.view') ? (id: string) => navigate(path(`/supply/stock/${id}`), { state: { from: here } }) : null
+  const openSupplier = can('suppliers.view') ? (id: string) => navigate(path(`/supply/proveedores/${id}`), { state: { from: here } }) : null
   const unitCosts = data.products.filter((p) => p.unitCost != null)
   const trend = data.daily.map((d) => ({ label: dayLabel(d.date), cogs: d.cogs ?? 0, margin: d.netRevenue > 0 ? (d.netRevenue - (d.cogs ?? 0)) / d.netRevenue : null }))
   const ingredientColumns: DataTableColumn<InsightsData['purchases']['ingredients'][number]>[] = [
@@ -335,7 +345,14 @@ export function CostsTab({ data, compareLabel }: TabProps) {
           description={`${formatMoney(data.purchases.total)} en compras confirmadas${data.purchases.previousTotal != null && compareLabel ? ` (antes ${formatMoney(data.purchases.previousTotal)})` : ''}.`}
         >
           <BarList
-            items={data.purchases.bySupplier.map((s) => ({ id: s.id, label: s.name, value: s.total, valueLabel: formatMoney(s.total), detail: `${s.purchases} compra${s.purchases === 1 ? '' : 's'}` }))}
+            items={data.purchases.bySupplier.map((s) => ({
+              id: s.id,
+              label: s.name,
+              value: s.total,
+              valueLabel: formatMoney(s.total),
+              detail: `${s.purchases} compra${s.purchases === 1 ? '' : 's'}`,
+              onSelect: openSupplier ? () => openSupplier(s.id) : undefined,
+            }))}
             emptyText="Sin compras confirmadas en este periodo."
           />
         </Section>
@@ -344,13 +361,26 @@ export function CostsTab({ data, compareLabel }: TabProps) {
           description={`${formatMoney(data.waste.total)} perdido${data.waste.previousTotal != null && compareLabel ? ` (antes ${formatMoney(data.waste.previousTotal)})` : ''}.`}
         >
           <BarList
-            items={data.waste.byIngredient.map((w) => ({ id: w.id, label: w.name, value: w.value, valueLabel: formatMoney(w.value), detail: `${formatNumber(w.quantity)} ${w.unit ?? ''}` }))}
+            items={data.waste.byIngredient.map((w) => ({
+              id: w.id,
+              label: w.name,
+              value: w.value,
+              valueLabel: formatMoney(w.value),
+              detail: `${formatNumber(w.quantity)} ${w.unit ?? ''}`,
+              onSelect: openIngredient ? () => openIngredient(w.id) : undefined,
+            }))}
             emptyText="Sin mermas registradas en este periodo."
           />
         </Section>
       </div>
       <Section title="Precio de compra de insumos" description="Precio promedio pagado por unidad de compra.">
-        <DataTable columns={ingredientColumns} rows={data.purchases.ingredients} getRowId={(i) => `${i.id}-${i.unit}`} emptyState={<p className="p-4 text-sm text-neutral-500">Sin compras en este periodo.</p>} />
+        <DataTable
+          columns={ingredientColumns}
+          rows={data.purchases.ingredients}
+          getRowId={(i) => `${i.id}-${i.unit}`}
+          onRowClick={openIngredient ? (i) => openIngredient(i.id) : undefined}
+          emptyState={<p className="p-4 text-sm text-neutral-500">Sin compras en este periodo.</p>}
+        />
       </Section>
       <p className={typography.caption}>No incluye nómina, arriendo ni otros gastos operativos: Quanela todavía no los registra. Por eso se muestra la utilidad bruta y no la utilidad neta.</p>
     </>

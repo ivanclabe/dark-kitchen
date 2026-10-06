@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/shared/ui/Toast'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // ADR 0028: the customer detail renders and an order opens over it (regression: the order drawer needs a board).
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
@@ -38,24 +39,57 @@ vi.mock('@/modules/orders/components/OrderDetailDrawer', async () => {
   }
 })
 
+vi.mock('@/modules/orders/components/NewOrderDrawer', () => ({
+  NewOrderDrawer: ({ open, initialCustomer }: { open: boolean; initialCustomer?: { fullName: string } }) => (open ? <p>{`new order for ${initialCustomer?.fullName}`}</p> : null),
+}))
+
 const { CustomerDetailPage } = await import('./CustomerDetailPage')
+
+function renderAt(entry: string | { pathname: string; state: unknown }) {
+  return render(
+    <QueryClientProvider client={new QueryClient()}>
+      <ToastProvider>
+        <MemoryRouter initialEntries={[entry]}>
+          <Routes>
+            <Route path="/k/centro/customers/:id" element={<CustomerDetailPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
+    </QueryClientProvider>,
+  )
+}
 
 afterEach(cleanup)
 
 describe('customer detail (ADR 0028)', () => {
   it('renders with its tabs and opens an order over the page, without flow actions', () => {
-    render(
-      <ToastProvider>
-        <MemoryRouter initialEntries={['/k/centro/customers/c1']}>
-          <Routes>
-            <Route path="/k/centro/customers/:id" element={<CustomerDetailPage />} />
-          </Routes>
-        </MemoryRouter>
-      </ToastProvider>,
-    )
+    renderAt('/k/centro/customers/c1')
     expect(screen.getByRole('heading', { level: 1, name: 'Carlos' })).toBeTruthy()
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Pedidos', 'Cuenta', 'Información'])
     fireEvent.click(screen.getByRole('button', { name: /Pedido #1042/ }))
     expect(screen.getByText('drawer o1 · actions offered: 0')).toBeTruthy()
+  })
+
+  it('goes back to the customers list by default (ADR 0030)', () => {
+    renderAt('/k/centro/customers/c1')
+    expect(screen.getByRole('link', { name: /Clientes/ }).getAttribute('href')).toBe('/customers')
+  })
+
+  it('goes back to where the person came from, and keeps it across tabs (ADR 0030)', () => {
+    renderAt({ pathname: '/k/centro/customers/c1', state: { from: { to: '/k/centro/orders?view=list', label: 'Pedidos' } } })
+    expect(screen.getByRole('link', { name: /Pedidos/ }).getAttribute('href')).toBe('/orders?view=list')
+    fireEvent.click(screen.getByRole('tab', { name: 'Cuenta' }))
+    expect(screen.getByRole('link', { name: /Pedidos/ }).getAttribute('href')).toBe('/orders?view=list')
+  })
+
+  it('ignores an origin outside the app', () => {
+    renderAt({ pathname: '/k/centro/customers/c1', state: { from: { to: '//evil.example', label: 'Fuera' } } })
+    expect(screen.queryByRole('link', { name: /Fuera/ })).toBeNull()
+  })
+
+  it('starts a new order for this customer (ADR 0030)', () => {
+    renderAt('/k/centro/customers/c1')
+    fireEvent.click(screen.getByRole('button', { name: /Nuevo pedido/ }))
+    expect(screen.getByText('new order for Carlos')).toBeTruthy()
   })
 })

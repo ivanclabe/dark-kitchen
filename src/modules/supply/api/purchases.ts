@@ -35,14 +35,17 @@ const PURCHASE_SELECT = `
   dk_suppliers ( name )
 `
 
-export async function listPurchases(): Promise<Purchase[]> {
-  const { data, error } = await supabase
-    .from('dk_purchases')
-    .select(PURCHASE_SELECT)
-    .order('invoice_date', { ascending: false })
+/** Compras más recientes primero (ADR 0030 D5): de `limit` en `limit`, o todas las de un proveedor. */
+export async function listPurchases({ limit, supplierId }: { limit?: number; supplierId?: string } = {}): Promise<{ rows: Purchase[]; hasMore: boolean }> {
+  let query = supabase.from('dk_purchases').select(PURCHASE_SELECT).order('invoice_date', { ascending: false }).order('id', { ascending: false })
+  if (supplierId) query = query.eq('supplier_id', supplierId)
+  // Una fila de más dice si hay otra página sin contar toda la tabla.
+  if (limit) query = query.limit(limit + 1)
 
+  const { data, error } = await query
   if (error) throw error
-  return (data as unknown as PurchaseRow[]).map(mapPurchase)
+  const rows = (data as unknown as PurchaseRow[]).map(mapPurchase)
+  return limit && rows.length > limit ? { rows: rows.slice(0, limit), hasMore: true } : { rows, hasMore: false }
 }
 
 export async function getPurchase(id: string): Promise<Purchase> {

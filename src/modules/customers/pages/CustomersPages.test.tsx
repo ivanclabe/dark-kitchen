@@ -38,9 +38,9 @@ const row = (id: string, fullName: string, over: object = {}) => ({
   orders: 2, totalPurchased: 30000, lastOrderAt: new Date().toISOString(), active: true, balance: 25000, overdue: 0, ...over,
 })
 
-function renderPage() {
+function renderPage(url = '/k/centro/customers') {
   return render(
-    <MemoryRouter initialEntries={['/k/centro/customers']}>
+    <MemoryRouter initialEntries={[url]}>
       <Routes>
         <Route path="/k/centro/customers" element={<CustomersPage />} />
         <Route path="*" element={<p>other</p>} />
@@ -125,6 +125,20 @@ describe('Clientes (ADR 0028)', () => {
     renderPage()
     expect(screen.getByRole('button', { name: /Reintentar/ })).toBeTruthy()
     expect(screen.getByRole('heading', { level: 1, name: 'Clientes' })).toBeTruthy()
+  })
+})
+
+describe('Clientes connected (ADR 0030)', () => {
+  it('opens already filtered from the address (Inicio «Clientes con saldo vencido»)', () => {
+    renderPage('/k/centro/customers?status=overdue&q=ana')
+    expect(state.queries[0]).toMatchObject({ status: 'overdue', search: 'ana', page: 0 })
+    expect((screen.getByLabelText('Buscar clientes') as HTMLInputElement).value).toBe('ana')
+    expect(screen.getByRole('button', { name: 'Vencidos' }).getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('an unknown status in the address is ignored', () => {
+    renderPage('/k/centro/customers?status=nope')
+    expect(state.queries[0]?.status).toBe('all')
   })
 })
 

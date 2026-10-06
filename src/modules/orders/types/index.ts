@@ -50,8 +50,24 @@ export interface Order {
   createdAt: string
   updatedAt: string
   items: OrderItem[]
+  /**
+   * Its payments (ADR 0031): the ledger dk_order_payments, the one source of
+   * truth — empty for whoever cannot see the receivables. A void is a
+   * negative entry pointing to the payment it cancels.
+   */
+  payments: OrderPayment[]
   /** From dispatch on: who takes it and when. */
   delivery: { status: DeliveryStatus; riderId: string | null; riderName: string | null; dispatchedAt: string | null; deliveredAt: string | null } | null
+}
+
+export interface OrderPayment {
+  id: string
+  amount: number
+  method: string | null
+  note: string | null
+  createdAt: string
+  createdBy: string | null
+  voidsPaymentId: string | null
 }
 
 export interface OrderInput {
@@ -86,6 +102,8 @@ export interface OrderSearch {
   statuses?: OrderStatus[]
   channel?: OrderChannel | null
   customerId?: string | null
+  /** ADR 0031: paid or still to collect (ignored by the database without receivables.view). */
+  payment?: 'paid' | 'pending' | null
   limit?: number
   offset?: number
 }

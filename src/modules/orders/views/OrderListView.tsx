@@ -1,4 +1,5 @@
 import { Button } from '@/shared/ui/Button'
+import { Chip } from '@/shared/ui/Chip'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Input, Select } from '@/shared/ui/FormField'
@@ -6,9 +7,11 @@ import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import { ClipboardList, Search } from 'lucide-react'
 import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useOrderSearch } from '../hooks/useOrders'
+import { useOrderSearchPages } from '../hooks/useOrders'
 import { OrderStatusBadge } from '../lib/orderStatus'
-import { CHANNEL_CONFIG } from '../lib/orderVisuals'
+import { PaymentBadge } from '../components/PaymentCard'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { CHANNEL_CONFIG, ORDER_STATUS_CONFIG } from '../lib/orderVisuals'
 import type { Order, OrderChannel, OrderStatus } from '../types'
 
 type Range = 'today' | '7d' | '30d' | 'all'
@@ -20,11 +23,21 @@ const RANGES: { value: Range; label: string }[] = [
   { value: 'all', label: 'Todo' },
 ]
 
+const FLOW: OrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO']
+
+/** One tap per status, with the board's words (ADR 0031): also the target of the figures and of Inicio. */
 const STATUS_FILTERS: { value: string; label: string; statuses?: OrderStatus[] }[] = [
-  { value: '', label: 'Todos los estados' },
-  { value: 'open', label: 'Abiertos', statuses: ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO'] },
+  { value: '', label: 'Todos' },
+  { value: 'open', label: 'Abiertos', statuses: FLOW },
+  ...FLOW.map((status) => ({ value: status, label: ORDER_STATUS_CONFIG[status].label, statuses: [status] })),
   { value: 'delivered', label: 'Entregados', statuses: ['ENTREGADO'] },
   { value: 'cancelled', label: 'Cancelados', statuses: ['CANCELADO'] },
+]
+
+const PAYMENT_FILTERS: { value: '' | 'paid' | 'pending'; label: string }[] = [
+  { value: '', label: 'Todos los pagos' },
+  { value: 'paid', label: 'Pagados' },
+  { value: 'pending', label: 'Por cobrar' },
 ]
 
 const PAGE = 50
@@ -39,24 +52,26 @@ function rangeStart(range: Range): string | null {
 }
 
 /**
- * Pedidos → Lista (ADR 0020): every order, also delivered and cancelled,
- * searched in the database by number, customer, phone or dish. Replaces the
- * old "Historial" drawer of Cocina. Filters live in the URL.
+ * Operación → Lista (ADR 0020, ADR 0031): every order, also delivered and
+ * cancelled, searched in the database by number, customer, phone or dish.
+ * Filters live in the URL; «Cargar más» asks for the next page only.
  */
 export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Order) => void }>(function OrderListView({ onOpen }, searchRef) {
   const [params, setParams] = useSearchParams()
   const range = (RANGES.find((r) => r.value === params.get('range'))?.value ?? '7d') as Range
   const statusKey = params.get('status') ?? ''
   const channel = (params.get('channel') as OrderChannel | null) ?? null
+  // ADR 0031: the payment filter, only for whoever sees the receivables.
+  const { can } = useActiveKitchen()
+  const seesPayments = can('receivables.view')
+  const payment = seesPayments ? (PAYMENT_FILTERS.find((p) => p.value && p.value === params.get('payment'))?.value || null) : null
   const [typed, setTyped] = useState(params.get('q') ?? '')
   const [search, setSearch] = useState(typed)
-  const [pages, setPages] = useState(1)
 
   // Typing waits a moment before searching; the term is kept in the URL.
   useEffect(() => {
     const id = setTimeout(() => {
       setSearch(typed.trim())
-      setPages(1)
       setParams(
         (prev) => {
           const next = new URLSearchParams(prev)
@@ -71,7 +86,6 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
   }, [typed, setParams])
 
   function setFilter(key: string, value: string) {
-    setPages(1)
     setParams(
       (prev) => {
         const next = new URLSearchParams(prev)
@@ -89,11 +103,13 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
       from: rangeStart(range),
       statuses: STATUS_FILTERS.find((s) => s.value === statusKey)?.statuses,
       channel,
-      limit: PAGE * pages,
+      payment,
+      limit: PAGE,
     }),
-    [search, range, statusKey, channel, pages],
+    [search, range, statusKey, channel, payment],
   )
-  const { data, isLoading, isFetching, error, refetch } = useOrderSearch(filters)
+  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, error, refetch } = useOrderSearchPages(filters)
+  const orders = useMemo(() => data?.pages.flatMap((p) => p.orders), [data])
 
   const columns: DataTableColumn<Order>[] = [
     { key: 'number', header: '#', cell: (o) => <span className="font-semibold tabular-nums text-neutral-100">#{o.orderNumber}</span> },
@@ -108,6 +124,7 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
       ),
     },
     { key: 'status', header: 'Estado', cell: (o) => <OrderStatusBadge status={o.status} size="sm" /> },
+    ...(seesPayments ? ([{ key: 'payment', header: 'Pago', cell: (o) => <PaymentBadge order={o} size="sm" /> }] satisfies DataTableColumn<Order>[]) : []),
     {
       key: 'channel',
       header: 'Canal',
@@ -147,13 +164,6 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
             </option>
           ))}
         </Select>
-        <Select aria-label="Estado" value={statusKey} onChange={(e) => setFilter('status', e.target.value)} className="!mt-0 w-auto">
-          {STATUS_FILTERS.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </Select>
         <Select aria-label="Canal" value={channel ?? ''} onChange={(e) => setFilter('channel', e.target.value)} className="!mt-0 w-auto">
           <option value="">Todos los canales</option>
           {(Object.keys(CHANNEL_CONFIG) as OrderChannel[]).map((c) => (
@@ -163,11 +173,23 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
           ))}
         </Select>
       </div>
+      <div role="group" aria-label="Estado" className="flex flex-wrap gap-1.5">
+        {STATUS_FILTERS.map((f) => (
+          <Chip key={f.value} label={f.label} active={statusKey === f.value} onClick={() => setFilter('status', f.value)} />
+        ))}
+      </div>
+      {seesPayments && (
+        <div role="group" aria-label="Pago" className="flex flex-wrap gap-1.5">
+          {PAYMENT_FILTERS.map((f) => (
+            <Chip key={f.value} label={f.label} active={(payment ?? '') === f.value} onClick={() => setFilter('payment', f.value)} />
+          ))}
+        </div>
+      )}
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <DataTable
           columns={columns}
-          rows={data?.orders}
+          rows={orders}
           getRowId={(o) => o.id}
           onRowClick={onOpen}
           isLoading={isLoading}
@@ -175,9 +197,9 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
           onRetry={() => void refetch()}
           emptyState={<EmptyState icon={ClipboardList} title="Sin pedidos" description="Ningún pedido coincide con la búsqueda y los filtros." compact />}
         />
-        {data?.hasMore && (
+        {hasNextPage && (
           <div className="flex justify-center py-3">
-            <Button variant="secondary" size="sm" loading={isFetching} onClick={() => setPages((p) => p + 1)}>
+            <Button variant="secondary" size="sm" loading={isFetchingNextPage} onClick={() => void fetchNextPage()}>
               Cargar más
             </Button>
           </div>

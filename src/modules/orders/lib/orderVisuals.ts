@@ -19,7 +19,7 @@ export const ITEM_STATUS_BADGE: Record<KitchenItemStatus, string> = {
 
 export const ITEM_STATUS_LABEL: Record<KitchenItemStatus, string> = {
   PENDIENTE: 'Pendiente',
-  EN_PREPARACION: 'En preparación',
+  EN_PREPARACION: 'Preparando',
   LISTO: 'Listo',
 }
 

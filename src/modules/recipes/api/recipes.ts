@@ -38,6 +38,32 @@ export async function getActiveRecipe(productId: string): Promise<ActiveRecipe |
   }
 }
 
+export interface DishUsingIngredient {
+  productId: string
+  productName: string
+  active: boolean
+  /** How much of the ingredient the dish takes (base unit). */
+  quantity: number
+}
+
+/**
+ * The dishes whose ACTIVE recipe uses this ingredient (ADR 0031: from the
+ * stock back to the menu). Old recipe versions do not count.
+ */
+export async function listDishesUsingIngredient(ingredientId: string): Promise<DishUsingIngredient[]> {
+  const { data: items, error: itemsError } = await supabase.from('dk_recipe_items').select('recipe_id, quantity').eq('ingredient_id', ingredientId)
+  if (itemsError) throw itemsError
+  const quantityByRecipe = new Map((items ?? []).map((i) => [i.recipe_id as string, Number(i.quantity)]))
+  if (quantityByRecipe.size === 0) return []
+  const { data: products, error } = await supabase
+    .from('dk_products')
+    .select('id, name, active, active_recipe_id')
+    .in('active_recipe_id', [...quantityByRecipe.keys()])
+    .order('name')
+  if (error) throw error
+  return (products ?? []).map((p) => ({ productId: p.id, productName: p.name, active: p.active, quantity: quantityByRecipe.get(p.active_recipe_id as string) ?? 0 }))
+}
+
 export async function createRecipeVersion(productId: string, items: RecipeItemDraft[]): Promise<void> {
   const { error } = await supabase.rpc('dk_create_recipe_version', {
     p_product_id: productId,

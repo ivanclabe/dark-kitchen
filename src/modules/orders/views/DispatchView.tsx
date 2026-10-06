@@ -2,17 +2,17 @@ import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Tooltip } from '@/shared/ui/Tooltip'
-import { useToast } from '@/shared/ui/Toast'
-import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
-import { Bike, CheckCircle2, MapPin, PackageCheck, Phone } from 'lucide-react'
+import { Bike, CheckCircle2, MapPin, Phone } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useOnShiftNow } from '@/modules/staff/hooks/useStaff'
 import { allows, useBoardActions } from '../board/boardActions'
-import { useMarkDelivered } from '../hooks/useDispatch'
+import { useOrderActions } from '../board/useOrderActions'
 import { ACTION_DENIED_REASON } from '../lib/permissions'
 import { formatElapsed, minutesAgoSince } from '../lib/orderVisuals'
 import type { Order } from '../types'
+import { PaymentBadge } from '../components/PaymentCard'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 
 function Column({ title, icon: Icon, count, children }: { title: string; icon: typeof Bike; count: number; children: ReactNode }) {
   return (
@@ -27,6 +27,8 @@ function Column({ title, icon: Icon, count, children }: { title: string; icon: t
 }
 
 function DispatchCard({ order, now, onOpen, action }: { order: Order; now: number; onOpen: () => void; action: ReactNode }) {
+  // ADR 0031: whether it is paid, for whoever sees the receivables (not the rider).
+  const showPayment = useActiveKitchen().can('receivables.view')
   const since = order.status === 'DESPACHADO' ? (order.delivery?.dispatchedAt ?? order.updatedAt) : order.updatedAt
   return (
     <article className="rounded-lg border border-neutral-800 bg-neutral-900 p-3">
@@ -52,6 +54,11 @@ function DispatchCard({ order, now, onOpen, action }: { order: Order; now: numbe
           {formatMoney(order.total)}
           {order.paymentMethod ? ` · ${order.paymentMethod}` : ''}
         </p>
+        {showPayment && (
+          <p className="mt-1">
+            <PaymentBadge order={order} size="sm" />
+          </p>
+        )}
         {order.delivery?.riderName && (
           <p className="mt-1 flex items-center gap-1.5 text-xs text-violet-300">
             <Bike size={12} aria-hidden /> {order.delivery.riderName}
@@ -63,31 +70,35 @@ function DispatchCard({ order, now, onOpen, action }: { order: Order; now: numbe
   )
 }
 
+/** The card's one action — the same as on the board (ADR 0031): Despachar when ready, Entregar on the way. */
+function DispatchAction({ order }: { order: Order }) {
+  const board = useBoardActions()
+  const actions = useOrderActions(order)
+  const primary = actions.primaryAction
+  if (!primary) return null
+  const allowed = allows(board, primary.action)
+  return (
+    <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top">
+      <Button size="sm" variant={primary.action === 'dispatch' ? 'primary' : 'secondary'} icon={primary.icon} disabled={!allowed} loading={actions.busy} onClick={actions.primary}>
+        {primary.label}
+      </Button>
+    </Tooltip>
+  )
+}
+
 /**
- * Pedidos → Despacho (ADR 0020): ready to leave and on their way, from the
+ * Operación → Despacho (ADR 0020): ready to leave and on their way, from the
  * same live list as the board. A rider (dispatch.view without orders.view)
  * only receives their own deliveries — the database's RLS does it.
  */
 export function DispatchView({ orders, isLoading, now }: { orders: Order[] | undefined; isLoading: boolean; now: number }) {
   const board = useBoardActions()
-  const markDelivered = useMarkDelivered()
-  const { show } = useToast()
   const ready = (orders ?? []).filter((o) => o.status === 'LISTO')
   const onRoute = (orders ?? []).filter((o) => o.status === 'DESPACHADO')
   const canDispatch = allows(board, 'dispatch')
-  const canDeliver = allows(board, 'deliver')
   // Riders on shift now (Personal y Turnos), for whoever dispatches.
   const { data: onShift } = useOnShiftNow(canDispatch)
   const ridersOnShift = (onShift ?? []).filter((s) => s.riderId)
-
-  async function deliver(order: Order) {
-    try {
-      await markDelivered.mutateAsync(order.id)
-      show(`Pedido #${order.orderNumber} entregado.`)
-    } catch (err) {
-      show(getErrorMessage(err, `No se pudo marcar como entregado el pedido ${order.orderNumber}.`), 'error')
-    }
-  }
 
   if (isLoading) return <LoadingState variant="cards" rows={3} cols={2} />
   if (ready.length === 0 && onRoute.length === 0) {
@@ -110,13 +121,7 @@ export function DispatchView({ orders, isLoading, now }: { orders: Order[] | und
             order={o}
             now={now}
             onOpen={() => board.openDetail(o)}
-            action={
-              <Tooltip label={canDispatch ? 'Elegir domiciliario' : ACTION_DENIED_REASON.dispatch} side="top">
-                <Button size="sm" variant="primary" icon={Bike} disabled={!canDispatch} onClick={() => board.requestDispatch(o)}>
-                  Despachar
-                </Button>
-              </Tooltip>
-            }
+            action={<DispatchAction order={o} />}
           />
         ))}
         {ready.length === 0 && <p className="p-2 text-sm text-neutral-500">Ningún pedido listo.</p>}
@@ -128,13 +133,7 @@ export function DispatchView({ orders, isLoading, now }: { orders: Order[] | und
             order={o}
             now={now}
             onOpen={() => board.openDetail(o)}
-            action={
-              <Tooltip label={canDeliver ? 'Marcar como entregado' : ACTION_DENIED_REASON.deliver} side="top">
-                <Button size="sm" variant="secondary" icon={PackageCheck} disabled={!canDeliver} loading={markDelivered.isPending && markDelivered.variables === o.id} onClick={() => void deliver(o)}>
-                  Entregado
-                </Button>
-              </Tooltip>
-            }
+            action={<DispatchAction order={o} />}
           />
         ))}
         {onRoute.length === 0 && <p className="p-2 text-sm text-neutral-500">Nadie en ruta.</p>}

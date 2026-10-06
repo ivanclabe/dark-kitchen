@@ -20,6 +20,10 @@ interface ComboboxProps {
   /** Muestra una fila "+ Crear …" al final de la lista cuando hay texto escrito. */
   onCreateNew?: (query: string) => void
   createLabel?: (query: string) => string
+  /** The typed text, for options searched in the database (ADR 0030). */
+  onQueryChange?: (query: string) => void
+  /** false when the options already come filtered by the database (do not filter them again). */
+  filterLocally?: boolean
   /** Accesibilidad — FormField los inyecta vía render-prop; úsalos directo cuando no hay label visible. */
   id?: string
   'aria-label'?: string
@@ -41,6 +45,8 @@ export function Combobox({
   required,
   onCreateNew,
   createLabel = (q) => `Crear "${q}"`,
+  onQueryChange,
+  filterLocally = true,
   id,
   'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
@@ -64,9 +70,9 @@ export function Combobox({
 
   const filtered = useMemo(() => {
     const q = normalize(inputValue)
-    if (!q) return options
+    if (!q || !filterLocally) return options
     return options.filter((o) => normalize(o.label).includes(q) || (o.sublabel && normalize(o.sublabel).includes(q)))
-  }, [options, inputValue])
+  }, [options, inputValue, filterLocally])
 
   const showCreateRow = !!onCreateNew && inputValue.trim().length > 0
   const totalRows = filtered.length + (showCreateRow ? 1 : 0)
@@ -145,6 +151,7 @@ export function Combobox({
           }}
           onChange={(e) => {
             setInputValue(e.target.value)
+            onQueryChange?.(e.target.value)
             setHighlighted(0)
             setOpen(true)
           }}

@@ -63,6 +63,15 @@ export async function registerPayment(input: RegisterPaymentInput): Promise<void
   if (error) throw error
 }
 
+/**
+ * Anula un pago registrado por error (ADR 0031): la base inserta un
+ * movimiento negativo enlazado a ese pago, con el motivo. Nada se borra.
+ */
+export async function voidPayment(paymentId: string, reason: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_void_payment', { p_payment_id: paymentId, p_reason: reason })
+  if (error) throw error
+}
+
 interface PaymentRow {
   id: string
   order_id: string

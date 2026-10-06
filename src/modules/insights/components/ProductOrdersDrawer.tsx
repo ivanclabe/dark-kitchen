@@ -6,7 +6,9 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { typography } from '@/shared/ui/typography'
 import { formatDateTime } from '@/shared/utils/format'
-import { ClipboardList } from 'lucide-react'
+import { ArrowRight, ClipboardList } from 'lucide-react'
+import { useHere } from '@/shared/hooks/useBackTarget'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import type { ProductRow } from '../api'
 import { useProductOrders } from '../hooks'
 import { formatMoney } from '../lib/format'
@@ -15,7 +17,24 @@ import { CHANNEL_LABEL } from '../lib/labels'
 const COST_SOURCE: Record<string, string> = { real: 'Costo real', estimated: 'Costo estimado', none: 'Sin costo' }
 
 /** Drill-down (ADR 0027): the orders behind a product in the period, each one opens its detail. */
-export function ProductOrdersDrawer({ product, from, to, periodLabel, onClose }: { product: ProductRow; from: string; to: string; periodLabel: string; onClose: () => void }) {
+export function ProductOrdersDrawer({
+  product,
+  from,
+  to,
+  periodLabel,
+  onClose,
+  onOpenOrder,
+}: {
+  product: ProductRow
+  from: string
+  to: string
+  periodLabel: string
+  onClose: () => void
+  /** Opens the order over Insights (ADR 0030: the analysis is not lost). */
+  onOpenOrder: (orderId: string) => void
+}) {
+  const { can } = useActiveKitchen()
+  const here = useHere('Insights')
   const { data, isLoading, isError, error, refetch } = useProductOrders(product.id, from, to)
   return (
     <Drawer open onClose={onClose} title={product.name} subtitle={`Pedidos de ${periodLabel}`} size="md">
@@ -30,7 +49,7 @@ export function ProductOrdersDrawer({ product, from, to, periodLabel, onClose }:
           <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
             {data.map((o) => (
               <li key={`${o.orderId}-${o.createdAt}`}>
-                <Link to={`/orders/${o.orderId}`} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-sm hover:bg-neutral-800/40">
+                <button type="button" onClick={() => onOpenOrder(o.orderId)} className="-mx-2 flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-left text-sm hover:bg-neutral-800/40">
                   <span className="min-w-0">
                     <span className="font-medium text-neutral-100">#{o.orderNumber ?? '—'}</span>
                     <span className="ml-2 text-neutral-500">
@@ -47,11 +66,18 @@ export function ProductOrdersDrawer({ product, from, to, periodLabel, onClose }:
                       </Badge>
                     )}
                   </span>
-                </Link>
+                </button>
               </li>
             ))}
           </ul>
           <p className={typography.caption}>Muestra hasta 100 pedidos. Toca uno para abrir su detalle.</p>
+        </div>
+      )}
+      {can('recipes.view') && (
+        <div className="mt-5 border-t border-neutral-800/60 pt-4">
+          <Link to={`/recipes/${product.id}`} state={{ from: here }} className="inline-flex items-center gap-1.5 text-sm text-brasa-400 hover:underline">
+            Ver receta y costo <ArrowRight size={14} aria-hidden />
+          </Link>
         </div>
       )}
     </Drawer>

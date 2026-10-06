@@ -1,11 +1,13 @@
+import { useBackTarget, useHere } from '@/shared/hooks/useBackTarget'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { Page } from '@/shared/ui/Page'
 import { useIngredients } from '@/modules/supply/hooks/useIngredients'
 import type { Ingredient } from '@/modules/supply/types'
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import type { Product } from '@/modules/products/types'
 import { Badge } from '@/shared/ui/Badge'
-import { Button } from '@/shared/ui/Button'
+import { Button, buttonClass } from '@/shared/ui/Button'
 import { Combobox } from '@/shared/ui/Combobox'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -18,7 +20,7 @@ import { tdClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
-import { BookOpen, Plus, Save, Trash2 } from 'lucide-react'
+import { BarChart3, BookOpen, Plus, Save, Trash2, Warehouse } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useActiveRecipe, useCreateRecipeVersion } from '../hooks/useRecipes'
@@ -39,6 +41,8 @@ function RecipeForm({
 }) {
   const { can } = useActiveKitchen()
   const createVersion = useCreateRecipeVersion(product.id)
+  const back = useBackTarget({ to: '/menu-planner', label: 'Volver al planificador' })
+  const here = useHere('Receta')
   const { show } = useToast()
   // Consultar la receta (y su costo) no es lo mismo que cambiarla: recipes.edit. Un plato de menú maestro tampoco se edita aquí.
   const readOnly = Boolean(product.masterProductId) || !can('recipes.edit')
@@ -96,15 +100,31 @@ function RecipeForm({
       key: 'ingredient',
       header: 'Insumo',
       cell: (row) => (
-        <Combobox
-          aria-label="Insumo"
-          value={row.ingredientId}
-          onChange={(value) => updateRow(row.key, { ingredientId: value })}
-          options={ingredientOptions}
-          placeholder="Nombre o código…"
-          emptyMessage="Sin insumos con ese nombre o código"
-          disabled={readOnly}
-        />
+        <span className="flex items-center gap-2">
+          <span className="min-w-0 flex-1">
+            <Combobox
+              aria-label="Insumo"
+              value={row.ingredientId}
+              onChange={(value) => updateRow(row.key, { ingredientId: value })}
+              options={ingredientOptions}
+              placeholder="Nombre o código…"
+              emptyMessage="Sin insumos con ese nombre o código"
+              disabled={readOnly}
+            />
+          </span>
+          {/* ADR 0031: from the dish to the stock of what it takes. */}
+          {row.ingredientId && can('inventory.view') && (
+            <Link
+              to={`/supply/stock/${row.ingredientId}`}
+              state={{ from: here }}
+              aria-label={`Ver ${ingredients.find((i) => i.id === row.ingredientId)?.name ?? 'el insumo'} en Stock`}
+              title="Ver en Stock"
+              className="shrink-0 rounded-md p-1.5 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-100"
+            >
+              <Warehouse size={14} aria-hidden />
+            </Link>
+          )}
+        </span>
       ),
       className: 'min-w-56',
     },
@@ -157,21 +177,28 @@ function RecipeForm({
         description={`Precio de venta: ${formatMoney(product.price)}`}
         icon={BookOpen}
         meta={activeRecipe ? <Badge tone="success">v{activeRecipe.version}</Badge> : <Badge tone="neutral">Sin receta</Badge>}
-        backTo="/menu-planner"
-        backLabel="Volver al planificador"
+        backTo={back.to}
+        backLabel={back.label}
         actions={
-          can('recipes.edit') && (
-          <Button
-            variant="primary"
-            icon={Save}
-            onClick={handleSave}
-            loading={createVersion.isPending}
-            disabled={Boolean(product.masterProductId)}
-            title={product.masterProductId ? 'La receta de este plato la define su menú maestro' : undefined}
-          >
-            Guardar como nueva versión
-          </Button>
-          )
+          <>
+            {can('reports.view') && (
+              <Link to={`/insights?tab=products&product=${product.id}`} className={`${buttonClass({ variant: 'secondary' })} inline-flex items-center gap-1.5`}>
+                <BarChart3 size={14} aria-hidden /> Ventas y rentabilidad
+              </Link>
+            )}
+            {can('recipes.edit') && (
+              <Button
+                variant="primary"
+                icon={Save}
+                onClick={handleSave}
+                loading={createVersion.isPending}
+                disabled={Boolean(product.masterProductId)}
+                title={product.masterProductId ? 'La receta de este plato la define su menú maestro' : undefined}
+              >
+                Guardar como nueva versión
+              </Button>
+            )}
+          </>
         }
       />
 

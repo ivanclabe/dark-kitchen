@@ -9,8 +9,18 @@ import type { OrderStatus, PrepStatus } from '../types'
  */
 export const KANBAN_COLUMNS: OrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO']
 
-/** Tramo de cocina: dentro de él se avanza y retrocede libremente (corregir errores sin un "deshacer" especial). */
-const KITCHEN_SEQUENCE: OrderStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
+/**
+ * Tramo de cocina: dentro de él se avanza y retrocede libremente (corregir
+ * errores sin un "deshacer" especial). The one definition (ADR 0031): the
+ * Cocina view, the card, the detail and the actions read it from here.
+ */
+export const KITCHEN_STAGES: PrepStatus[] = ['CONFIRMADO', 'EN_PREPARACION', 'LISTO']
+const KITCHEN_SEQUENCE: OrderStatus[] = KITCHEN_STAGES
+
+/** Is the order in the kitchen stretch (En cola, Preparando, Listo)? */
+export function isKitchenStage(status: OrderStatus): status is PrepStatus {
+  return (KITCHEN_STAGES as OrderStatus[]).includes(status)
+}
 
 /** Orden lineal del flujo completo, para saber qué es "hacia adelante". */
 const FLOW_SEQUENCE: OrderStatus[] = ['NUEVO', ...KITCHEN_SEQUENCE, 'DESPACHADO']

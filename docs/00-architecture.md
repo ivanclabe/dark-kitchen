@@ -113,7 +113,7 @@ modules/inventory/
 - **Una sola fuente del pedido en la interfaz.** El pedido se lee con una única consulta y un único tipo (`orders/api/orders.ts` → `Order`), bajo una sola raíz de caché `['orders']`. Pedidos (Tablero, Lista, Despacho), Cocina, el Dashboard y Clientes la comparten: un cambio en una vista se ve en todas. Ninguna tiene su propia copia.
 - **Cocina reutiliza el tablero de Pedidos.** Usa el mismo componente (`orders/board`) con otras columnas y un **alcance** (`KITCHEN_SCOPE`): prepara, prioriza y cancela; no confirma ni despacha.
 - **Abastecimiento no cambia.** Pedidos solo refresca sus cachés de stock después de cambiar un pedido.
-- **`/` de la cuenta es «tu inicio».** Caja → Pedidos, cocina → Cocina, domiciliario → Despacho, administración → `/dashboard`.
+- **`/` de la cuenta es «tu inicio».** Caja → Pedidos, cocina → Cocina, domiciliario → Despacho, administración → `/dashboard`. Desde el ADR 0031 los tres primeros entran a Operación, cada uno en su vista.
 
 **Un subdominio por organización ([ADR 0021](./adr/0021-subdominios-por-organizacion.md) y [ADR 0022](./adr/0022-codigo-de-tenant.md)).**
 - **Dominios.** `{código}.quanela.com` es la organización (código de 6 caracteres que genera la base, p. ej. `a7k92p`; nunca el nombre); `quanela.com` es la landing, el registro y el login general. Un solo despliegue con el dominio comodín `*.quanela.com`; el dominio raíz sale de `VITE_TENANT_ROOT_DOMAIN`.
@@ -123,7 +123,41 @@ modules/inventory/
 - **Código inmutable.** El código lo genera la base al crear la organización y nadie lo cambia. El `slug` queda como dato interno.
 - **Autoridad de los datos.** Sigue siendo la RLS por cuenta y membresía.
 
-**Consistencia visual ([ADR 0029](./adr/0029-consistencia-visual.md)).** Toda pantalla de la app usa `PageHeader` (icono, título, descripción, acciones) dentro de `Page` (`board` a todo el ancho para tableros, `default` `max-w-6xl` centrado, `narrow` `max-w-3xl` centrado); el Dashboard conserva su portada. Las secciones de un módulo se navegan con `SubNav` (subrayado) y las vistas de los mismos datos con `Tabs` (pastillas). Los grupos de cifras van en `KpiStrip`. `src/shared/ui/pageContract.test.ts` hace cumplir la regla.
+**Consistencia visual ([ADR 0029](./adr/0029-consistencia-visual.md), [ADR 0032](./adr/0032-un-solo-layout.md)).** Toda pantalla tiene el layout de Abastecimiento: `PageHeader` (icono, título, descripción, acciones), Inicio incluido, dentro de `Page`, a todo el ancho y alineada a la izquierda. `board` ocupa toda la altura y el contenido se desplaza dentro; `default` se desplaza la página. Las secciones de un módulo se navegan con la barra subrayada bajo el encabezado: `SubNav` (pestañas) o `SubNavLinks` (una dirección por sección: Configuración y Usuarios, vía `SectionLayout`). Las vistas de los mismos datos van con `Tabs` (pastillas). Los grupos de cifras van en `KpiStrip`. `src/shared/ui/pageContract.test.ts` hace cumplir la regla.
+
+**Centro de operaciones ([ADR 0031](./adr/0031-centro-de-operaciones.md)).**
+- **Pedidos y Cocina son un solo lugar:** «Operación» en el rail, `/operations?view=board|kitchen|dispatch|list` (`modules/operations`).
+  - Las cuatro vistas comparten el marco (`OperationsShell`: encabezado, vistas, buscador, menú, «Nuevo pedido», cifras y pedido abierto) y el contexto (`useOperations`: pedidos en vivo, búsqueda y diálogos).
+  - Cada vista agrega solo lo suyo. Cocina (`kitchen/views/KitchenView`) trae la voz, los detenidos, los tiempos, el tamaño grande y su alcance.
+  - Cada rol ve las vistas de sus permisos de siempre (`operations/lib/views.ts`) y entra a la suya. Con una sola vista no hay pestañas.
+  - `/operations/:orderId` abre el pedido sobre cualquier vista. `/orders…`, `/kitchen…` y `/delivery` redirigen (`OperationsRedirect`) y conservan la vista, los filtros y el pedido abierto.
+- **Un solo vocabulario de estado** (`ORDER_STATUS_CONFIG`): Por confirmar · En cola · Preparando · Listo · En ruta · Entregado · Cancelado.
+- **Las «etapas de cocina» se definen una sola vez** (`KITCHEN_STAGES`, `isKitchenStage`).
+- **Confirmar, cancelar (con motivo) y entregar existen una sola vez:** los diálogos del tablero y `useOrderActions`.
+- **El pago es la otra dimensión del pedido y nunca se guarda en él.**
+  - La consulta del pedido trae sus filas de `dk_order_payments` (la RLS las da solo con `receivables.view`).
+  - `orders/lib/payment.ts` deriva el estado: pagado, parcial o pendiente.
+  - El detalle muestra las dos insignias y la sección «Pago»: «Registrar pago» en línea, con el mismo `dk_register_payment` de Clientes, y «Anular pago».
+  - La anulación es `dk_void_payment`: un movimiento negativo enlazado (`voids_payment_id`), con motivo, una sola vez.
+  - Cada pago y cada anulación quedan en la auditoría (`payment.registered`, `payment.voided`).
+  - La Lista filtra por pago (`dk_order_search(p_payment)`, que se ignora sin `receivables.view`).
+- **Contexto en las dos direcciones:** receta → insumo (Stock) e insumo → «Se usa en» (platos con receta activa). Abastecimiento muestra «Volver» cuando se llegó desde otra pantalla (`useCameFrom`).
+- **Rendimiento:**
+  - mover un pedido entre etapas refresca una sola vez al final;
+  - la Lista pagina con `offset` (`useOrderSearchPages`);
+  - el detalle arranca con el pedido en caché;
+  - los platos se cargan solo al editar un borrador.
+
+**Un solo flujo de negocio ([ADR 0030](./adr/0030-flujo-del-negocio-conectado.md)).**
+- **Inicio** (`/dashboard`) es la operación de hoy. Su bloque «Necesita atención» enlaza a las listas ya filtradas, y las tendencias viven en Insights.
+- Los filtros que sirven de destino viven en la URL:
+  - Clientes: `?status`, `?q`;
+  - Insights: `?tab`, `?category`, `?product`;
+  - Stock: `?filter=low`.
+- Las alertas de la cuenta enlazan a su causa (`dashboard/lib/attention.ts`).
+- Un pedido se consulta sobre la pantalla actual con `OrderPeekDrawer`, de solo lectura.
+- Los detalles vuelven al origen: el enlace pasa `state.from` con `useHere()` y la página lo lee con `useBackTarget()`.
+- Para crecer, el selector de cliente busca en la base y Compras se pagina de 50 en 50.
 
 **Clientes escalable ([ADR 0028](./adr/0028-clientes-escalable.md)).** La lista de clientes se busca, filtra, ordena y pagina en la base (`dk_customers_list`, 25 por página), con pedidos, total comprado, último pedido y saldo agregados una sola vez por llamada (sin N+1). Los saldos siguen exigiendo `receivables.view`. «Activo» = pedido en los últimos 90 días (no hay columna de estado). El detalle (`dk_customer_detail`) abre los pedidos en `OrderDetailDrawer` sin salir del cliente.
 
@@ -351,7 +385,7 @@ Ver carpeta [`docs/adr/`](./adr/):
 - [ADR 0009 — Iconos, avatares y funciones](./adr/0009-iconos-avatares-y-funciones.md) · [ADR 0010 — Planes, precios y onboarding](./adr/0010-planes-precios-y-onboarding.md)
 - [ADR 0011 — Consolidación y endurecimiento](./adr/0011-consolidacion-y-endurecimiento.md) · [ADR 0012 — Centro de administración, observabilidad y bitácora](./adr/0012-centro-de-administracion.md)
 - [ADR 0013 — Código y URL en inglés](./adr/0013-codigo-y-urls-en-ingles.md) (propuesta) · [ADR 0014 — IA administrada centralmente y voz de cocina](./adr/0014-ia-centralizada-y-voz-de-cocina.md) · [ADR 0015 — Comandos de voz sin internet con Vosk](./adr/0015-comandos-de-voz-con-vosk.md) · [ADR 0016 — «Oye Quanela»: palabra de activación](./adr/0016-oye-quanela-palabra-de-activacion.md)
-- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md) · [ADR 0023 — Menú de usuario, Apariencia y Ayuda](./adr/0023-menu-de-usuario.md) · [ADR 0024 — La Cuenta como único nivel visible](./adr/0024-cuenta-como-unico-nivel.md) · [ADR 0025 — Registro del dueño con Google, Instagram o teléfono](./adr/0025-registro-del-owner-con-google-instagram-y-telefono.md) · [ADR 0026 — Configuración de la cuenta consistente](./adr/0026-configuracion-consistente.md) · [ADR 0027 — De Reportes a Insights](./adr/0027-insights.md) · [ADR 0028 — Clientes escalable](./adr/0028-clientes-escalable.md) · [ADR 0029 — Consistencia visual](./adr/0029-consistencia-visual.md)
+- [ADR 0017 — Comandos de voz: flujo completo y platos](./adr/0017-comandos-de-voz-flujo-completo-y-platos.md) (en pausa) · [ADR 0018 — IA en la organización, menús e imágenes](./adr/0018-ia-en-la-organizacion-menus-e-imagenes.md) · [ADR 0019 — Portal Global Admin](./adr/0019-portal-global-admin.md) · [ADR 0020 — Pedidos como centro, Personal y Turnos, Quanela Copilot](./adr/0020-pedidos-como-centro-personal-y-copilot.md) · [ADR 0021 — Un subdominio por organización](./adr/0021-subdominios-por-organizacion.md) · [ADR 0022 — Código de tenant de 6 caracteres](./adr/0022-codigo-de-tenant.md) · [ADR 0023 — Menú de usuario, Apariencia y Ayuda](./adr/0023-menu-de-usuario.md) · [ADR 0024 — La Cuenta como único nivel visible](./adr/0024-cuenta-como-unico-nivel.md) · [ADR 0025 — Registro del dueño con Google, Instagram o teléfono](./adr/0025-registro-del-owner-con-google-instagram-y-telefono.md) · [ADR 0026 — Configuración de la cuenta consistente](./adr/0026-configuracion-consistente.md) · [ADR 0027 — De Reportes a Insights](./adr/0027-insights.md) · [ADR 0028 — Clientes escalable](./adr/0028-clientes-escalable.md) · [ADR 0029 — Consistencia visual](./adr/0029-consistencia-visual.md) · [ADR 0030 — Un solo flujo de negocio](./adr/0030-flujo-del-negocio-conectado.md) · [ADR 0031 — Centro de operaciones](./adr/0031-centro-de-operaciones.md) · [ADR 0032 — Un solo layout](./adr/0032-un-solo-layout.md)
 
 ---
 

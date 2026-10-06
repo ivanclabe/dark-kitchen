@@ -26,7 +26,7 @@ export function MyShiftsPage() {
   const day = (iso: string) => new Date(iso).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' })
 
   return (
-    <Page variant="narrow">
+    <Page>
       <PageHeader title="Mis turnos" icon={CalendarClock} description="Tus turnos en esta cuenta y tu entrada y salida." />
       <ClockCard />
       <Card title="Próximos turnos" icon={CalendarDays}>

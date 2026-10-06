@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 /**
  * ADR 0029 — the layout contract of the app. Every screen inside the app
  * uses the same header (PageHeader, or the shell SectionLayout of
- * Configuración/Usuarios with its SettingsPage sections) and the same
- * container (Page or that shell): no hand-made <h1>, no own max-width. If a
+ * Configuración/Usuarios with its SettingsPage sections, or the
+ * OperationsShell of the Centro de operaciones, built on Page and
+ * PageHeader) and the same container (Page or those shells): no hand-made <h1>, no own max-width. If a
  * new page breaks it, this test says which one.
  */
 /** Every page source of the app, read at build time (like the other catalog tests). */
@@ -12,8 +13,6 @@ const SOURCES = import.meta.glob<string>('../../modules/*/pages/*.tsx', { query:
 
 /** Screens outside the app (no AppLayout): they have their own design. */
 const OUTSIDE_APP = new Set(['auth', 'signup', 'landing', 'invitations', 'kitchens'])
-/** The Dashboard keeps its own cover (greeting and clock) inside a Page. */
-const COVER = new Set(['dashboard/pages/DashboardPage.tsx'])
 /** Pages that only choose another page (no UI of their own). */
 const ROUTERS = new Set(['menuPlanner/pages/CatalogPage.tsx'])
 
@@ -33,9 +32,10 @@ describe('layout contract (ADR 0029)', () => {
     expect(code).not.toMatch(/typography\.h1|<h1[\s>]/)
     // No own page width: widths live in Page / SectionLayout / SettingsPage.
     expect(code).not.toMatch(/className="[^"]*\bmx-auto\b[^"]*\bmax-w-(3xl|4xl|5xl|6xl|7xl)\b/)
-    const header = /<PageHeader\b|<SectionLayout\b|<SettingsPage\b/.test(code)
-    const container = /<Page\b|<SectionLayout\b|<SettingsPage\b/.test(code)
-    if (!COVER.has(page)) expect(header, 'PageHeader (or the Configuración/Usuarios shell)').toBe(true)
+    const header = /<PageHeader\b|<SectionLayout\b|<SettingsPage\b|<OperationsShell\b/.test(code)
+    const container = /<Page\b|<SectionLayout\b|<SettingsPage\b|<OperationsShell\b/.test(code)
+    // ADR 0032: every screen, Inicio included, has the header of Abastecimiento.
+    expect(header, 'PageHeader (or the Configuración/Usuarios shell)').toBe(true)
     expect(container, 'Page (or the Configuración/Usuarios shell)').toBe(true)
   })
 })

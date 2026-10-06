@@ -8,13 +8,50 @@ import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
-import { AlertTriangle, History, Package, Pencil, Power, SlidersHorizontal, Trash2, Truck } from 'lucide-react'
+import { AlertTriangle, BookOpen, History, Package, Pencil, Power, SlidersHorizontal, Trash2, Truck } from 'lucide-react'
+import { useDishesUsingIngredient } from '@/modules/recipes/hooks/useRecipes'
+import { useHere } from '@/shared/hooks/useBackTarget'
+import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { useSetIngredientActive } from '../hooks/useIngredients'
 import { isLowStock, suggestedRestock } from '../lib/stock'
 import type { Ingredient } from '../types'
 import { StockBar } from './IngredientPanel'
 import { MovementTimeline } from './MovementTimeline'
 import type { MovementMode } from './MovementFormDrawer'
+
+/** ADR 0031: from the stock back to the menu — the dishes whose recipe takes this ingredient. */
+function UsedIn({ ingredient }: { ingredient: Ingredient }) {
+  const { can } = useActiveKitchen()
+  const here = useHere()
+  const visible = can('recipes.view')
+  const { data: dishes, isLoading } = useDishesUsingIngredient(ingredient.id, visible)
+  if (!visible) return null
+  return (
+    <Card title="Se usa en" description="Platos cuya receta activa lleva este insumo" icon={BookOpen}>
+      {isLoading ? (
+        <p className={typography.caption}>Cargando…</p>
+      ) : !dishes?.length ? (
+        <p className={typography.caption}>Ningún plato lo usa en su receta activa.</p>
+      ) : (
+        <ul className="divide-y divide-neutral-800/60">
+          {dishes.map((d) => (
+            <li key={d.productId}>
+              <Link to={`/recipes/${d.productId}`} state={{ from: here }} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-sm hover:bg-neutral-800/40">
+                <span className={d.active ? 'text-neutral-100' : 'text-neutral-500'}>
+                  {d.productName}
+                  {!d.active && ' (inactivo)'}
+                </span>
+                <span className="tabular-nums text-neutral-400">
+                  {d.quantity} {ingredient.baseUnitCode}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  )
+}
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -137,6 +174,8 @@ export function IngredientDetail({
           />
         </dl>
       </Card>
+
+      <UsedIn ingredient={ingredient} />
 
       <Card title="Movimientos" description="Entradas, salidas y ajustes de este insumo" icon={History}>
         <MovementTimeline ingredientId={ingredient.id} />

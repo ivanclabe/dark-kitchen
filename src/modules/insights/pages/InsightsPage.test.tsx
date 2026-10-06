@@ -6,16 +6,19 @@ import type { InsightsData } from '../api'
 import { sortProducts } from '../lib/sort'
 
 // ADR 0027: Insights from real figures (mocked here), with and without the profitability permission.
-const state = vi.hoisted(() => ({ data: null as InsightsData | null }))
+const state = vi.hoisted(() => ({ data: null as InsightsData | null, filters: [] as { categoryId: string | null; productId: string | null }[] }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
-  useActiveKitchen: () => ({ kitchen: { id: 'k1', slug: 'centro', name: 'Centro' }, path: (to: string) => `/k/centro${to}` }),
+  useActiveKitchen: () => ({ kitchen: { id: 'k1', slug: 'centro', name: 'Centro' }, path: (to: string) => `/k/centro${to}`, can: () => true }),
 }))
 vi.mock('../hooks', () => ({
-  useInsights: () => ({ data: state.data, isError: false, isFetching: false, isPlaceholderData: false, refetch: vi.fn() }),
+  useInsights: (f: { categoryId: string | null; productId: string | null }) => (state.filters.push(f), { data: state.data, isError: false, isFetching: false, isPlaceholderData: false, refetch: vi.fn() }),
   useCatalogOptions: () => ({ data: { categories: [{ id: 'c1', name: 'Bebidas' }], products: [] } }),
-  useProductOrders: () => ({ data: [], isLoading: false }),
+  useProductOrders: () => ({ data: [{ orderId: 'o9', orderNumber: 1042, createdAt: '2026-10-05T15:00:00Z', channel: 'WHATSAPP', quantity: 2, revenue: 16000 }], isLoading: false }),
 }))
+vi.mock('@/shared/kitchen/KitchenLink', () => ({ KitchenLink: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a> }))
+// ADR 0030: the order opens over Insights, read-only (the real drawer is tested with the customer detail).
+vi.mock('@/modules/orders/components/OrderPeekDrawer', () => ({ OrderPeekDrawer: ({ orderId }: { orderId: string }) => <p>{`peek ${orderId}`}</p> }))
 // recharts needs a real layout engine; the chart itself is not under test here.
 vi.mock('../components/TrendChart', () => ({ TrendChart: () => <div data-testid="trend" /> }))
 
@@ -101,5 +104,23 @@ describe('Insights (ADR 0027)', () => {
     expect(screen.getByText(/Comparar/).textContent).toMatch(/con /)
     fireEvent.click(screen.getByRole('switch', { name: 'Comparar con el periodo anterior' }))
     expect(screen.getByText(/Comparar/).textContent).toBe('Comparar')
+  })
+})
+
+describe('Insights connected (ADR 0030)', () => {
+  it('the category and product filters live in the address', () => {
+    state.data = full
+    state.filters = []
+    renderAt('/k/centro/insights?tab=products&category=c1&product=p1')
+    expect(state.filters.at(-1)).toMatchObject({ categoryId: 'c1', productId: 'p1' })
+  })
+
+  it('a product opens its orders, an order opens over Insights, and the recipe is one tap away', () => {
+    state.data = full
+    renderAt('/k/centro/insights?tab=products')
+    fireEvent.click(screen.getByText('Sopa'))
+    expect(screen.getByRole('link', { name: /Ver receta y costo/ }).getAttribute('href')).toBe('/recipes/p1')
+    fireEvent.click(screen.getByRole('button', { name: /#1042/ }))
+    expect(screen.getByText('peek o9')).toBeTruthy()
   })
 })

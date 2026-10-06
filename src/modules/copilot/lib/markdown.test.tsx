@@ -15,7 +15,7 @@ const ID = '3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b'
 
 describe('Copilot markdown', () => {
   it('maps quanela:// links to Quanela screens only', () => {
-    expect(linkTarget(`quanela://order/${ID}`)).toBe(`/orders/${ID}`)
+    expect(linkTarget(`quanela://order/${ID}`)).toBe(`/operations/${ID}`)
     expect(linkTarget(`quanela://ingredient/${ID}`)).toBe(`/supply/stock/${ID}`)
     expect(linkTarget('https://evil.example')).toBeNull()
     expect(linkTarget('quanela://order/not-an-id')).toBeNull()
@@ -33,7 +33,7 @@ describe('Copilot markdown', () => {
         <CopilotMarkdown text={`Mira el [pedido #1015](quanela://order/${ID}) y [esto](https://evil.example) <img src=x onerror=alert(1)> **bien**`} />
       </MemoryRouter>,
     )
-    expect(screen.getByRole('link', { name: 'pedido #1015' }).getAttribute('href')).toBe(`/k/demo/orders/${ID}`)
+    expect(screen.getByRole('link', { name: 'pedido #1015' }).getAttribute('href')).toBe(`/k/demo/operations/${ID}`)
     expect(screen.queryByRole('link', { name: 'esto' })).toBeNull()
     expect(screen.getByText(/<img src=x/)).toBeTruthy()
     expect(document.querySelector('img')).toBeNull()

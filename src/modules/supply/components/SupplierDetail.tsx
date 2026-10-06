@@ -12,7 +12,7 @@ import { formatDate, formatMoney } from '@/shared/utils/format'
 import { Boxes, Mail, MapPin, Pencil, Phone, Power, ShoppingCart, Truck, User } from 'lucide-react'
 import { useMemo } from 'react'
 import { useIngredients } from '../hooks/useIngredients'
-import { usePurchases } from '../hooks/usePurchases'
+import { useSupplierPurchases } from '../hooks/usePurchases'
 import { useSetSupplierActive } from '../hooks/useSuppliers'
 import { PurchaseStatusBadge } from '../lib/purchaseStatus'
 import type { Purchase, Supplier } from '../types'
@@ -28,12 +28,11 @@ function ContactRow({ icon: Icon, value }: { icon: typeof Phone; value: string |
 
 export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplier: Supplier; onEdit: () => void; onSelectPurchase: (purchase: Purchase) => void }) {
   const { can } = useActiveKitchen()
-  const { data: purchases } = usePurchases()
+  const { data: supplierPurchases = [] } = useSupplierPurchases(supplier.id)
   const { data: ingredients } = useIngredients()
   const setActive = useSetSupplierActive()
   const { show } = useToast()
 
-  const supplierPurchases = useMemo(() => (purchases ?? []).filter((p) => p.supplierId === supplier.id), [purchases, supplier.id])
   const supplierIngredients = useMemo(() => (ingredients ?? []).filter((i) => i.primarySupplierId === supplier.id), [ingredients, supplier.id])
   const totalBought = supplierPurchases.filter((p) => p.status === 'CONFIRMADA').reduce((sum, p) => sum + p.total, 0)
 

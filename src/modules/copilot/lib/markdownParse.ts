@@ -4,7 +4,7 @@
  * ingredient or a customer; anything else is plain text.
  */
 const ROUTES: Record<string, (id: string) => string> = {
-  order: (id) => `/orders/${id}`,
+  order: (id) => `/operations/${id}`,
   product: (id) => `/recipes/${id}`,
   ingredient: (id) => `/supply/stock/${id}`,
   customer: (id) => `/customers/${id}`,

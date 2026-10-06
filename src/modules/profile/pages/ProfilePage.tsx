@@ -53,7 +53,7 @@ export function ProfilePage() {
   }
 
   return (
-    <Page variant="narrow">
+    <Page>
       <PageHeader title="Mi perfil" icon={UserRound} description="Tu nombre, tu avatar y tu contraseña. Se ven igual en todas tus cuentas." />
 
       <form onSubmit={onSubmit}>

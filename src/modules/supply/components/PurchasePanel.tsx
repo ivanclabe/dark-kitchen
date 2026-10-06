@@ -8,7 +8,7 @@ import { formatDate, formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { Plus, Search, ShoppingCart } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { usePurchases } from '../hooks/usePurchases'
+import { PURCHASES_PAGE, usePurchases } from '../hooks/usePurchases'
 import { PurchaseStatusBadge } from '../lib/purchaseStatus'
 import type { Purchase, PurchaseStatus } from '../types'
 
@@ -22,7 +22,10 @@ const FILTERS: { value: Filter; label: string }[] = [
 
 export function PurchasePanel({ selectedId, onSelect, onCreate }: { selectedId: string | null; onSelect: (purchase: Purchase) => void; onCreate: () => void }) {
   const { can } = useActiveKitchen()
-  const { data: purchases, isLoading, isError, error, refetch } = usePurchases()
+  const [limit, setLimit] = useState(PURCHASES_PAGE)
+  const { data, isLoading, isFetching, isError, error, refetch } = usePurchases(limit)
+  const purchases = data?.rows
+  const hasMore = data?.hasMore ?? false
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('TODAS')
 
@@ -67,7 +70,7 @@ export function PurchasePanel({ selectedId, onSelect, onCreate }: { selectedId: 
 
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
-          <Chip key={f.value} label={f.label} count={counts.get(f.value) ?? 0} active={filter === f.value} onClick={() => setFilter(f.value)} />
+          <Chip key={f.value} label={f.label} count={hasMore ? undefined : (counts.get(f.value) ?? 0)} active={filter === f.value} onClick={() => setFilter(f.value)} />
         ))}
       </div>
 
@@ -106,6 +109,16 @@ export function PurchasePanel({ selectedId, onSelect, onCreate }: { selectedId: 
               </p>
             </button>
           ))
+        )}
+        {hasMore && !isError && (
+          <div className="space-y-2 pt-1 text-center">
+            <p className="text-xs text-neutral-500">
+              Mostrando las {purchases?.length ?? 0} compras más recientes. La búsqueda y los filtros solo aplican a las cargadas.
+            </p>
+            <Button variant="secondary" size="sm" onClick={() => setLimit((l) => l + PURCHASES_PAGE)} loading={isFetching}>
+              Cargar más
+            </Button>
+          </div>
         )}
       </div>
     </div>

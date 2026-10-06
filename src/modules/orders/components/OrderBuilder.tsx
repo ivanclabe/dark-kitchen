@@ -1,6 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useProducts } from '@/modules/products/hooks/useProducts'
-import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
@@ -10,24 +9,15 @@ import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { FormField, FormGrid, Input } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { ConfirmDialog } from '@/shared/ui/Modal'
 import { NumberStepper } from '@/shared/ui/NumberStepper'
 import { cardClass, tdClass } from '@/shared/ui/formClasses'
-import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
-import { AlertTriangle, CheckCircle2, History, Plus, Trash2, UtensilsCrossed, XCircle } from 'lucide-react'
+import { CheckCircle2, History, Plus, Trash2, UtensilsCrossed, XCircle } from 'lucide-react'
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
-import {
-  useAddOrderItem,
-  useCancelOrder,
-  useConfirmOrder,
-  useOrder,
-  useOrderStatusHistory,
-  useRemoveOrderItem,
-} from '../hooks/useOrders'
-import { OrderStatusBadge, orderStatusLabel } from '../lib/orderStatus'
-import type { OrderItem } from '../types'
+import { useAddOrderItem, useOrder, useOrderStatusHistory, useRemoveOrderItem } from '../hooks/useOrders'
+import { orderStatusLabel } from '../lib/orderStatus'
+import type { Order, OrderItem } from '../types'
 
 const OBSERVATION_SUGGESTIONS = ['Sin cebolla', 'Sin tomate', 'Sin picante', 'Extra queso', 'Para llevar']
 
@@ -44,34 +34,36 @@ function TotalRow({ label, value, trailingCols, emphasis = false }: { label: str
   )
 }
 
-export function OrderBuilder({ orderId, statusActions = true }: { orderId: string; /** false cuando quien lo aloja ya ofrece confirmar/cancelar (tablero de Cocina). */ statusActions?: boolean }) {
+/**
+ * The dishes and totals of an order (and, while it is a draft, adding and
+ * removing them) plus its status timeline. Confirming and cancelling are the
+ * board's dialogs (ADR 0031: one confirm, one cancel with its reason); the
+ * host passes them when it offers them here.
+ */
+export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string; onConfirm?: (order: Order) => void; onCancel?: (order: Order) => void }) {
   const { can } = useActiveKitchen()
-  const { show } = useToast()
 
   const { data: order, isLoading } = useOrder(orderId)
   const items = order?.items
   const itemsLoading = isLoading
   const { data: history } = useOrderStatusHistory(orderId)
-  const { data: products } = useProducts()
 
   const addItem = useAddOrderItem(orderId)
   const removeItem = useRemoveOrderItem()
-  const confirmOrder = useConfirmOrder()
-  const cancelOrder = useCancelOrder()
 
   const [productId, setProductId] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [unitPrice, setUnitPrice] = useState('')
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [cancelOpen, setCancelOpen] = useState(false)
 
   const isNuevo = order?.status === 'NUEVO'
   // Permisos del rol activo (la base los exige igual): editar el borrador, confirmarlo y cancelarlo son acciones distintas.
   const canEditItems = isNuevo && can('orders.edit')
-  const canConfirm = isNuevo && can('orders.confirm')
-  const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status) && can('orders.cancel')
+  // The dish picker needs the products; only a draft being edited loads them (ADR 0031).
+  const { data: products } = useProducts(canEditItems)
+  const canConfirm = isNuevo && can('orders.confirm') && !!onConfirm
+  const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status) && can('orders.cancel') && !!onCancel
 
   const productOptions = useMemo(
     () =>
@@ -111,30 +103,6 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
     }
   }
 
-  async function handleConfirm() {
-    setError(null)
-    try {
-      await confirmOrder.mutateAsync(orderId)
-      setConfirmOpen(false)
-      show('Pedido confirmado — inventario reservado y comanda enviada a cocina.')
-    } catch (err) {
-      setError(getErrorMessage(err, 'Error al confirmar el pedido'))
-      show(getErrorMessage(err, 'Error al confirmar el pedido'), 'error')
-    }
-  }
-
-  async function handleCancel() {
-    setError(null)
-    try {
-      await cancelOrder.mutateAsync({ orderId })
-      setCancelOpen(false)
-      show('Pedido cancelado.', 'info')
-    } catch (err) {
-      setError(getErrorMessage(err, 'Error al cancelar el pedido'))
-      show(getErrorMessage(err, 'Error al cancelar el pedido'), 'error')
-    }
-  }
-
   if (isLoading || !order) return <LoadingState variant="block" />
 
   const columns: DataTableColumn<OrderItem>[] = [
@@ -163,15 +131,6 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <OrderStatusBadge status={order.status} />
-        {order.requiresReview && (
-          <Badge tone="warning" icon={AlertTriangle}>
-            revisar devolución
-          </Badge>
-        )}
-      </div>
-
       {error && (
         <p role="alert" className="text-sm text-red-400">
           {error}
@@ -243,15 +202,15 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
         }
       />
 
-      {statusActions && (canConfirm || canCancel) && (
+      {(canConfirm || canCancel) && (
         <div className="flex flex-wrap justify-end gap-2">
           {canCancel && (
-            <Button variant="danger" icon={XCircle} onClick={() => setCancelOpen(true)}>
+            <Button variant="danger" icon={XCircle} onClick={() => onCancel?.(order)}>
               Cancelar pedido
             </Button>
           )}
           {canConfirm && (
-            <Button variant="primary" icon={CheckCircle2} onClick={() => setConfirmOpen(true)} disabled={!items?.length}>
+            <Button variant="primary" icon={CheckCircle2} onClick={() => onConfirm?.(order)} disabled={!items?.length}>
               Confirmar pedido
             </Button>
           )}
@@ -276,36 +235,6 @@ export function OrderBuilder({ orderId, statusActions = true }: { orderId: strin
         </Card>
       )}
 
-      <ConfirmDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={handleConfirm}
-        title="Confirmar pedido"
-        confirmLabel="Sí, confirmar"
-        pending={confirmOrder.isPending}
-        description={
-          <p>
-            Esto reserva el inventario necesario para los {items?.length ?? 0} plato(s) del pedido y envía la comanda a
-            cocina. Si algún insumo no tiene stock suficiente, la confirmación se rechazará.
-          </p>
-        }
-      />
-
-      <ConfirmDialog
-        open={cancelOpen}
-        onClose={() => setCancelOpen(false)}
-        onConfirm={handleCancel}
-        title="Cancelar pedido"
-        confirmLabel="Sí, cancelar"
-        danger
-        pending={cancelOrder.isPending}
-        description={
-          <p>
-            Esta acción no se puede deshacer. Si el pedido ya reservó inventario, la reserva se libera; si algún plato ya
-            fue preparado (consumo registrado), se generará una devolución que quedará marcada para revisión.
-          </p>
-        }
-      />
     </div>
   )
 }

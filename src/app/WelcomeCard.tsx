@@ -21,7 +21,7 @@ export function WelcomeCard() {
 
   const shortcuts = [
     can('products.create') && { to: path('/menu-planner'), icon: Soup, title: 'Carga tu primer plato', text: 'Nombre, precio y su receta.' },
-    can('settings.manage') && { to: path('/kitchen'), icon: Clock, title: 'Configura tu horario', text: 'En Cocina → ⋯ → Configuración.' },
+    can('settings.manage') && { to: path('/operations?view=kitchen'), icon: Clock, title: 'Configura tu horario', text: 'En Operación → Cocina → ⋯ → Configuración de cocina.' },
     can('team.manage') && { to: path('/users'), icon: UserPlus, title: 'Suma a tu equipo', text: 'Crea sus usuarios y asígnales un rol.' },
   ].filter(Boolean) as { to: string; icon: typeof Soup; title: string; text: string }[]
 

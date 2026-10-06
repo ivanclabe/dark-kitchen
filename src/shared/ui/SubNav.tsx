@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { useRef, type KeyboardEvent } from 'react'
+import { NavLink } from 'react-router-dom'
 
 export interface SubNavItem<T extends string> {
   value: T
@@ -49,5 +50,39 @@ export function SubNav<T extends string>({ items, value, onChange, label }: { it
         )
       })}
     </div>
+  )
+}
+
+export interface SubNavLink {
+  /** Absolute path (already inside the account). */
+  to: string
+  label: string
+  /** Active only on this exact path (for the first section, whose path is the parent of the others). */
+  end?: boolean
+}
+
+/**
+ * The same underlined bar when each section is its own address
+ * (Configuración, Usuarios): links instead of tabs, the look of Abastecimiento (ADR 0032).
+ */
+export function SubNavLinks({ items, label }: { items: SubNavLink[]; label: string }) {
+  return (
+    <nav aria-label={label} className="flex gap-5 overflow-x-auto border-b border-neutral-800 [scrollbar-width:none]">
+      {items.map((item) => (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end={item.end}
+          className={({ isActive }) =>
+            clsx(
+              '-mb-px shrink-0 border-b-2 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+              isActive ? 'border-brasa-500 text-neutral-50' : 'border-transparent text-neutral-400 hover:text-neutral-200',
+            )
+          }
+        >
+          {item.label}
+        </NavLink>
+      ))}
+    </nav>
   )
 }

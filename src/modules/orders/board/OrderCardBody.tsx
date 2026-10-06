@@ -1,8 +1,12 @@
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { Bike, Flag, MapPin, Pause } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSlaSettings } from '../hooks/useSlaSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, formatElapsed, minutesAgoSince, TIME_TIER_STYLE, timeTier } from '../lib/orderVisuals'
+import { PAYMENT_STATE_LABEL, paymentSummary } from '../lib/payment'
+import { isKitchenStage } from '../lib/transitions'
 import type { KitchenItemStatus, Order } from '../types'
 
 function summarizeItems(items: Order['items']): string {
@@ -28,8 +32,6 @@ function ItemProgress({ items }: { items: Order['items'] }) {
   )
 }
 
-const KITCHEN_STAGES = new Set(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
-
 /**
  * Contenido de la tarjeta — solo lo que se necesita de un vistazo: qué
  * cocinar, lo que la cocina no puede pasar por alto (observaciones), a dónde
@@ -54,8 +56,11 @@ export function OrderCardBody({
   stalledNotes?: string[]
 }) {
   const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
+  const { can } = useActiveKitchen()
+  // ADR 0031: the payment dimension, only for whoever sees the receivables (the line and the riders do not).
+  const payment = can('receivables.view') ? paymentSummary(ticket) : null
   const big = density === 'grande'
-  const inKitchen = KITCHEN_STAGES.has(ticket.status)
+  const inKitchen = isKitchenStage(ticket.status)
   const isDispatched = ticket.status === 'DESPACHADO'
 
   const notes = [...ticket.items.filter((i) => i.observation).map((i) => `${i.productName}: ${i.observation}`), ...(ticket.notes ? [ticket.notes] : [])]
@@ -106,6 +111,14 @@ export function OrderCardBody({
           {ticket.requiresReview && (
             <span className="rounded bg-amber-500/15 px-1 text-[10px] font-medium text-amber-400" title="Tuvo devoluciones de inventario: revisar">
               Revisar
+            </span>
+          )}
+          {payment && (
+            <span
+              className={clsx('rounded px-1 text-[10px] font-medium', payment.state === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400')}
+              title={payment.state === 'paid' ? 'Pagado' : `${PAYMENT_STATE_LABEL[payment.state]}: ${formatMoney(payment.balance)} por cobrar`}
+            >
+              {payment.state === 'paid' ? 'Pagado' : 'Por cobrar'}
             </span>
           )}
           {inKitchen && <ItemProgress items={ticket.items} />}

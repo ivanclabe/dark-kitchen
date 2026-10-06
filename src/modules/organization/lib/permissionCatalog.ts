@@ -2,7 +2,7 @@ import type { PermissionDef } from '../api/organization'
 
 /** Nombre de cada módulo del catálogo (dk_permissions.module). */
 export const MODULE_LABEL: Record<string, string> = {
-  dashboard: 'Dashboard',
+  dashboard: 'Inicio',
   kitchen: 'Cocina',
   orders: 'Pedidos',
   dispatch: 'Despacho',

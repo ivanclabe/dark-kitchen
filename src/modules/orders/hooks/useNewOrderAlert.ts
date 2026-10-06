@@ -28,7 +28,7 @@ function playBeep() {
  * alerta por lo que ya estaba en cola al abrir la pantalla) y los mantiene
  * marcados como "nuevos" hasta que se reconocen explícitamente.
  */
-export function useNewOrderAlert(tickets: Order[] | undefined) {
+export function useNewOrderAlert(tickets: Order[] | undefined, { muted = false }: { muted?: boolean } = {}) {
   const knownIds = useRef<Set<string> | null>(null)
   const [newIds, setNewIds] = useState<Set<string>>(new Set())
   const [soundEnabled, setSoundEnabled] = useState(() => {
@@ -51,10 +51,10 @@ export function useNewOrderAlert(tickets: Order[] | undefined) {
     const arrived = [...currentIds].filter((id) => !knownIds.current?.has(id))
     if (arrived.length > 0) {
       setNewIds((prev) => new Set([...prev, ...arrived]))
-      if (soundEnabled) playBeep()
+      if (soundEnabled && !muted) playBeep()
     }
     knownIds.current = currentIds
-  }, [tickets, soundEnabled])
+  }, [tickets, soundEnabled, muted])
 
   function acknowledge(orderId: string) {
     setNewIds((prev) => {

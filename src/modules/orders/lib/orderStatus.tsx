@@ -1,34 +1,30 @@
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 import type { OrderStatus } from '../types'
+import { ORDER_STATUS_CONFIG } from './orderVisuals'
 
 /**
- * Única fuente de verdad del label y color de cada estado de pedido —
- * antes estaba duplicada verbatim en OrdersPage y OrderBuilder. Los tonos
- * siguen la misma semántica que Cocina (ticketVisuals): CONFIRMADO =
- * esperando (info), EN_PREPARACION = en marcha (warning), LISTO/entregado =
- * éxito, CANCELADO = peligro.
+ * The badge tone of each order status. The label is the one of the board
+ * (ADR 0031, D3: one vocabulary for the whole app): Por confirmar · En cola ·
+ * Preparando · Listo · En ruta · Entregado · Cancelado.
  */
-export const ORDER_STATUS: Record<OrderStatus, { label: string; tone: BadgeTone }> = {
-  NUEVO: { label: 'Nuevo', tone: 'neutral' },
-  CONFIRMADO: { label: 'Confirmado', tone: 'info' },
-  EN_PREPARACION: { label: 'En preparación', tone: 'warning' },
-  LISTO: { label: 'Listo', tone: 'success' },
-  DESPACHADO: { label: 'Despachado', tone: 'brand' },
-  ENTREGADO: { label: 'Entregado', tone: 'success' },
-  CANCELADO: { label: 'Cancelado', tone: 'danger' },
+const STATUS_TONE: Record<OrderStatus, BadgeTone> = {
+  NUEVO: 'neutral',
+  CONFIRMADO: 'info',
+  EN_PREPARACION: 'warning',
+  LISTO: 'success',
+  DESPACHADO: 'brand',
+  ENTREGADO: 'success',
+  CANCELADO: 'danger',
 }
 
-export const ORDER_STATUS_SEQUENCE: OrderStatus[] = ['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO', 'ENTREGADO', 'CANCELADO']
-
 export function orderStatusLabel(status: OrderStatus): string {
-  return ORDER_STATUS[status].label
+  return ORDER_STATUS_CONFIG[status].label
 }
 
 export function OrderStatusBadge({ status, size }: { status: OrderStatus; size?: 'sm' | 'md' }) {
-  const { label, tone } = ORDER_STATUS[status]
   return (
-    <Badge tone={tone} size={size} dot>
-      {label}
+    <Badge tone={STATUS_TONE[status]} size={size} dot>
+      {orderStatusLabel(status)}
     </Badge>
   )
 }

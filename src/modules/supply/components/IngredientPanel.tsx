@@ -8,6 +8,7 @@ import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { AlertTriangle, Boxes, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useCategories, useIngredients } from '../hooks/useIngredients'
 import { isLowStock, stockRatio } from '../lib/stock'
 import type { Ingredient } from '../types'
@@ -42,7 +43,9 @@ export function IngredientPanel({
   const { data: ingredients, isLoading, isError, error, refetch } = useIngredients()
   const { data: categories } = useCategories()
   const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<Filter>('TODOS')
+  // ?filter=low opens the list on what is below the minimum (ADR 0030: a link from Inicio or an alert).
+  const [params] = useSearchParams()
+  const [filter, setFilter] = useState<Filter>(() => (params.get('filter') === 'low' ? 'BAJO_MINIMO' : 'TODOS'))
 
   const categoryCounts = useMemo(() => {
     const map = new Map<string, number>()

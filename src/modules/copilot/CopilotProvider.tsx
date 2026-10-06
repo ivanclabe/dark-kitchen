@@ -18,9 +18,8 @@ interface Message {
 }
 
 const SCREEN_NAME: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/orders': 'Pedidos',
-  '/kitchen': 'Cocina',
+  '/dashboard': 'Inicio',
+  '/operations': 'Centro de operaciones',
   '/menu-planner': 'Catálogo',
   '/recipes': 'Recetas',
   '/supply': 'Abastecimiento',

@@ -1,5 +1,5 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { BarChart3, CalendarClock, ChefHat, ClipboardList, LayoutDashboard, Settings, Soup, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { Activity, BarChart3, CalendarClock, LayoutDashboard, Settings, Soup, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
@@ -18,21 +18,14 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', description: 'Resumen del negocio', modules: ['dashboard'], icon: LayoutDashboard },
+  { to: '/dashboard', label: 'Inicio', description: 'La operación de hoy y lo que necesita atención', modules: ['dashboard'], icon: LayoutDashboard },
   {
-    to: '/orders',
-    label: 'Pedidos',
-    description: 'El centro operativo: tablero, lista y despacho',
-    modules: ['orders'],
-    icon: ClipboardList,
-    matchPrefixes: ['/orders', '/delivery'],
-  },
-  {
-    to: '/kitchen',
-    label: 'Cocina',
-    description: 'La pantalla de preparación de los pedidos',
-    modules: ['kitchen'],
-    icon: ChefHat,
+    to: '/operations',
+    label: 'Operación',
+    description: 'Centro de operaciones: pedidos, cocina y despacho',
+    modules: ['orders', 'kitchen'],
+    icon: Activity,
+    matchPrefixes: ['/operations', '/orders', '/kitchen', '/delivery'],
   },
   {
     to: '/menu-planner',
@@ -114,22 +107,19 @@ export function isSectionAllowed(section: string, can: Can): boolean {
 }
 
 /**
- * Where each role starts (ADR 0020, D3), decided by permissions so custom
- * roles follow the same rule:
- *   - rider (delivers, does not see all orders)  → Pedidos (Despacho)
- *   - kitchen (prepares, does not create orders) → Cocina
- *   - cashier (creates orders, does not manage)  → Pedidos
- *   - everyone else → their first module (Dashboard for administration)
+ * Where each role starts (ADR 0020 D3, ADR 0031), decided by permissions so
+ * custom roles follow the same rule:
+ *   - rider (delivers, does not see all orders)  → Operación (Despacho)
+ *   - kitchen (prepares, does not create orders) → Operación (Cocina)
+ *   - cashier (creates orders, does not manage)  → Operación (Tablero)
+ *   - everyone else → their first module (Inicio for administration)
+ * Inside Operación, the view each one lands on is `defaultOperationsView`.
  */
 export function homeSection(can: Can): string {
   const preferred =
-    can('dispatch.deliver') && !can('orders.view')
-      ? '/orders'
-      : can('kitchen.prepare') && !can('orders.create')
-        ? '/kitchen'
-        : can('orders.create') && !can('settings.manage')
-          ? '/orders'
-          : null
+    (can('dispatch.deliver') && !can('orders.view')) || (can('kitchen.prepare') && !can('orders.create')) || (can('orders.create') && !can('settings.manage'))
+      ? '/operations'
+      : null
   if (preferred && isSectionAllowed(preferred, can)) return preferred
   return NAV_ITEMS.find((i) => canAccessAnyModule(can, i.modules))?.to ?? '/perfil'
 }

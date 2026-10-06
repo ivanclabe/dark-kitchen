@@ -13,8 +13,8 @@ export function useCustomersPage(query: CustomerListQuery) {
   return useQuery({ queryKey: [...CUSTOMERS_KEY, 'page', query], queryFn: () => listCustomersPage(query), placeholderData: keepPreviousData })
 }
 
-export function useCustomersSummary() {
-  return useQuery({ queryKey: [...CUSTOMERS_KEY, 'summary'], queryFn: fetchCustomersSummary })
+export function useCustomersSummary(enabled = true) {
+  return useQuery({ queryKey: [...CUSTOMERS_KEY, 'summary'], queryFn: fetchCustomersSummary, enabled })
 }
 
 export function useCustomerDetail(id: string | undefined) {

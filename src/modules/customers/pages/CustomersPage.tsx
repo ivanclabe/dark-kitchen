@@ -14,12 +14,14 @@ import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
 import { Plus, Search, SlidersHorizontal, Users, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
 import { CustomerTable } from '../components/CustomerTable'
 import { useCustomersPage, useCustomersSummary } from '../hooks/useCustomers'
 import type { CustomerListQuery, CustomerSort, CustomerStatusFilter } from '../types'
 
 const PAGE_SIZE = 25
+const STATUSES: CustomerStatusFilter[] = ['all', 'active', 'inactive', 'debt', 'no_debt', 'overdue']
 /** Wait after typing before searching (one query per pause, not per key). */
 const SEARCH_DELAY_MS = 300
 
@@ -51,9 +53,30 @@ export function CustomersPage() {
   const { can } = useActiveKitchen()
   const showDebt = can('receivables.view')
   const showOrders = can('orders.view') || showDebt
-  const [search, setSearch] = useState('')
+  // Status and search live in the URL (ADR 0030): Inicio, alerts and other screens link to a filtered list.
+  const [params, setParams] = useSearchParams()
+  const [search, setSearch] = useState(() => params.get('q') ?? '')
   const debouncedSearch = useDebounced(search, SEARCH_DELAY_MS)
-  const [status, setStatus] = useState<CustomerStatusFilter>('all')
+  const status: CustomerStatusFilter = STATUSES.includes(params.get('status') as CustomerStatusFilter) ? (params.get('status') as CustomerStatusFilter) : 'all'
+  const setStatus = (next: CustomerStatusFilter) => setUrl({ status: next === 'all' ? null : next })
+  function setUrl(patch: Record<string, string | null>) {
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+        for (const [k, v] of Object.entries(patch)) {
+          if (v) next.set(k, v)
+          else next.delete(k)
+        }
+        return next
+      },
+      { replace: true },
+    )
+  }
+  useEffect(() => {
+    if ((params.get('q') ?? '') !== debouncedSearch.trim()) setUrl({ q: debouncedSearch.trim() || null })
+    // Only when the (debounced) search changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch])
   const [sort, setSort] = useState<{ key: CustomerSort; dir: 'asc' | 'desc' } | null>(null)
   const [page, setPage] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
@@ -96,7 +119,7 @@ export function CustomersPage() {
   const filtered = debouncedSearch.trim() !== '' || status !== 'all' || moreCount > 0
   const clearAll = () => {
     setSearch('')
-    setStatus('all')
+    setUrl({ status: null, q: null })
     setMore(NO_MORE)
     setPage(0)
   }

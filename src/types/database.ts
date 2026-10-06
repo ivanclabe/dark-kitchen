@@ -1841,6 +1841,7 @@ export type Database = {
           method: string | null
           note: string | null
           order_id: string
+          voids_payment_id: string | null
         }
         Insert: {
           amount: number
@@ -1851,6 +1852,7 @@ export type Database = {
           method?: string | null
           note?: string | null
           order_id: string
+          voids_payment_id?: string | null
         }
         Update: {
           amount?: number
@@ -1861,6 +1863,7 @@ export type Database = {
           method?: string | null
           note?: string | null
           order_id?: string
+          voids_payment_id?: string | null
         }
         Relationships: [
           {
@@ -1883,6 +1886,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_orders"
             referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_order_payments_voids_payment_id_fkey"
+            columns: ["voids_payment_id"]
+            isOneToOne: false
+            referencedRelation: "dk_order_payments"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3961,6 +3971,7 @@ export type Database = {
           p_from?: string
           p_limit?: number
           p_offset?: number
+          p_payment?: string
           p_search?: string
           p_statuses?: Database["public"]["Enums"]["dk_order_status"][]
           p_to?: string
@@ -4322,6 +4333,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      dk_void_payment: {
+        Args: { p_payment_id: string; p_reason: string }
+        Returns: string
       }
     }
     Enums: {

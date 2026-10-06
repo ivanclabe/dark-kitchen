@@ -50,14 +50,14 @@ function renderAt(url: string) {
 afterEach(cleanup)
 
 describe('Configuración layout (ADR 0026)', () => {
-  it('one navigation with the sections of the role, marking the current one', () => {
+  it('one underlined bar with the sections of the role, marking the current one (ADR 0032: like Abastecimiento)', () => {
     state.perms = ['settings.manage', 'audit.view']
     state.shared = []
     renderAt('/k/centro/settings/general')
     const nav = screen.getByRole('navigation', { name: 'Secciones de configuración' })
-    const links = [...nav.querySelectorAll('ul.lg\\:block a')].map((a) => a.textContent)
+    const links = [...nav.querySelectorAll('a')].map((a) => a.textContent)
     expect(links).toEqual(['General', 'IA y voz', 'Integraciones', 'Actividad'])
-    expect(nav.querySelector('ul.lg\\:block a[aria-current="page"]')?.textContent).toBe('General')
+    expect(nav.querySelector('a[aria-current="page"]')?.textContent).toBe('General')
     expect(screen.getByText('general-page')).toBeTruthy()
   })
 

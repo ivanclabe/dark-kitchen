@@ -2,9 +2,12 @@ import { RegisterPaymentModal } from '@/modules/cartera/components/RegisterPayme
 import { Page } from '@/shared/ui/Page'
 import { useCustomerReceivables, usePaymentsByCustomer } from '@/modules/cartera/hooks/useReceivables'
 import { useOrderSearch } from '@/modules/orders/hooks/useOrders'
+import { NewOrderDrawer } from '@/modules/orders/components/NewOrderDrawer'
+import { OrderPeekDrawer } from '@/modules/orders/components/OrderPeekDrawer'
 import { OrderStatusBadge } from '@/modules/orders/lib/orderStatus'
 import { Section } from '@/shared/ui/Section'
 import { SubNav } from '@/shared/ui/SubNav'
+import { useBackTarget } from '@/shared/hooks/useBackTarget'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
@@ -14,11 +17,11 @@ import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { formatDate, formatDateTime, formatMoney } from '@/shared/utils/format'
-import { Banknote, ChevronLeft, ChevronRight, Pencil, Receipt, Users } from 'lucide-react'
+import { Banknote, ChevronLeft, ChevronRight, Pencil, Plus, Receipt, Users } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
-import { CustomerOrderDrawer } from '../components/CustomerOrderDrawer'
 import { ActivityBadge, BalanceCell } from '../components/CustomerTable'
 import { useCustomerDetail } from '../hooks/useCustomers'
 import { relativeDay } from '../lib/dates'
@@ -172,10 +175,14 @@ export function CustomerDetailPage() {
   const { can } = useActiveKitchen()
   const { id = '' } = useParams<{ id: string }>()
   const [params, setParams] = useSearchParams()
+  const location = useLocation()
   const { data: customer, isLoading, isError, error, refetch } = useCustomerDetail(id)
   const [editOpen, setEditOpen] = useState(false)
   const [payOpen, setPayOpen] = useState(false)
   const [openOrder, setOpenOrder] = useState<string | null>(null)
+  const [newOrderOpen, setNewOrderOpen] = useState(false)
+  const back = useBackTarget({ to: '/customers', label: 'Clientes' })
+  const queryClient = useQueryClient()
   const receivables = useCustomerReceivables(id, payOpen)
 
   const showDebt = customer?.balance !== undefined
@@ -191,7 +198,7 @@ export function CustomerDetailPage() {
   if (!customer) {
     return (
       <Page>
-        <PageHeader title="Cliente" icon={Users} backTo="/customers" backLabel="Clientes" />
+        <PageHeader title="Cliente" icon={Users} backTo={back.to} backLabel={back.label} />
         <EmptyState icon={Users} title="Cliente no encontrado" description="Puede que haya sido eliminado o el enlace esté mal." />
       </Page>
     )
@@ -213,7 +220,7 @@ export function CustomerDetailPage() {
             change: null,
             goodWhen: 'neutral',
             hint: customer.overdue ? `${formatMoney(customer.overdue)} vencido` : undefined,
-            onSelect: () => setParams({ tab: 'account' }, { replace: true }),
+            onSelect: () => setParams({ tab: 'account' }, { replace: true, state: location.state }),
           },
         ] satisfies Kpi[])
       : []),
@@ -227,8 +234,8 @@ export function CustomerDetailPage() {
       <PageHeader
         title={customer.fullName}
         icon={Users}
-        backTo="/customers"
-        backLabel="Clientes"
+        backTo={back.to}
+        backLabel={back.label}
         meta={
           <>
             {customer.active !== undefined && <ActivityBadge active={customer.active} />}
@@ -248,8 +255,13 @@ export function CustomerDetailPage() {
               </Button>
             )}
             {can('receivables.collect') && showDebt && (
-              <Button variant="primary" icon={Banknote} onClick={() => setPayOpen(true)} disabled={(customer.balance ?? 0) <= 0}>
+              <Button variant="secondary" icon={Banknote} onClick={() => setPayOpen(true)} disabled={(customer.balance ?? 0) <= 0}>
                 Registrar pago
+              </Button>
+            )}
+            {can('orders.create') && (
+              <Button variant="primary" icon={Plus} onClick={() => setNewOrderOpen(true)}>
+                Nuevo pedido
               </Button>
             )}
           </>
@@ -258,7 +270,7 @@ export function CustomerDetailPage() {
 
       {kpis.length > 0 && <KpiStrip items={kpis} columns={4} />}
 
-      <SubNav label="Secciones del cliente" items={tabs} value={tab} onChange={(t) => setParams(t === 'orders' ? {} : { tab: t }, { replace: true })} />
+      <SubNav label="Secciones del cliente" items={tabs} value={tab} onChange={(t) => setParams(t === 'orders' ? {} : { tab: t }, { replace: true, state: location.state })} />
 
       <div className="space-y-8">
         {tab === 'orders' ? (
@@ -276,7 +288,18 @@ export function CustomerDetailPage() {
         onClose={() => setEditOpen(false)}
       />
       <RegisterPaymentModal receivables={payOpen ? (receivables.data?.filter((r) => r.balance > 0) ?? null) : null} onClose={() => setPayOpen(false)} />
-      <CustomerOrderDrawer orderId={openOrder} onClose={() => setOpenOrder(null)} />
+      <OrderPeekDrawer orderId={openOrder} onClose={() => setOpenOrder(null)} />
+      {/* ADR 0030: a new order for THIS customer, without leaving it. */}
+      {newOrderOpen && (
+        <NewOrderDrawer
+          open
+          initialCustomer={{ id: customer.id, fullName: customer.fullName, phone: customer.phone }}
+          onClose={() => {
+            setNewOrderOpen(false)
+            void queryClient.invalidateQueries({ queryKey: ['customers'] })
+          }}
+        />
+      )}
     </Page>
   )
 }

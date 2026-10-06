@@ -6,6 +6,7 @@ import { ShoppingCart, Truck, Warehouse } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { useCameFrom } from '@/shared/hooks/useBackTarget'
 import { IngredientDetail } from '../components/IngredientDetail'
 import { IngredientFormDrawer } from '../components/IngredientFormDrawer'
 import { IngredientPanel } from '../components/IngredientPanel'
@@ -44,6 +45,8 @@ export function SupplyPage() {
   const { view: viewParam, id } = useParams<{ view?: string; id?: string }>()
   const navigate = useNavigate()
   const { path } = useActiveKitchen()
+  // ADR 0031: arriving from a recipe (or Insights), «Volver» takes the person back there.
+  const cameFrom = useCameFrom()
   const view: SupplyView = isView(viewParam) ? viewParam : 'stock'
   const selectedId = id ?? null
 
@@ -122,6 +125,8 @@ export function SupplyPage() {
         title="Abastecimiento"
         description="Stock, compras y proveedores en un solo lugar."
         icon={Warehouse}
+        backTo={cameFrom?.to}
+        backLabel={cameFrom?.label}
       />
       <SubNav label="Secciones de abastecimiento" items={VIEWS} value={view} onChange={(next) => go(next)} />
 

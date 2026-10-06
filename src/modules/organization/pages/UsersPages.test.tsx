@@ -51,14 +51,13 @@ function renderAt(url: string) {
 afterEach(cleanup)
 
 describe('Usuarios (ADR 0026)', () => {
-  it('same shell as Configuración: header, navigation with Usuarios and Roles y permisos, section header', () => {
+  it('the layout of Abastecimiento (ADR 0032): header, the underlined bar of sections, the section header', () => {
     state.perms = ['team.view', 'team.manage']
     renderAt('/k/centro/users')
     expect(screen.getByRole('heading', { level: 1, name: 'Usuarios' })).toBeTruthy()
     const nav = screen.getByRole('navigation', { name: 'Secciones de usuarios' })
-    const desktop = nav.querySelector('ul.lg\\:block')!
-    expect([...desktop.querySelectorAll('a')].map((a) => a.textContent)).toEqual(['Usuarios', 'Roles y permisos'])
-    expect(desktop.querySelector('a[aria-current="page"]')?.textContent).toBe('Usuarios')
+    expect([...nav.querySelectorAll('a')].map((a) => a.textContent)).toEqual(['Usuarios', 'Roles y permisos'])
+    expect(nav.querySelector('a[aria-current="page"]')?.textContent).toBe('Usuarios')
     expect(screen.getByText('1 persona trabaja en esta cuenta.')).toBeTruthy()
     // The main action sits in the section header.
     expect(screen.getByRole('button', { name: 'Crear usuario' })).toBeTruthy()
@@ -76,7 +75,7 @@ describe('Usuarios (ADR 0026)', () => {
     renderAt('/k/centro/users?tab=roles')
     expect(screen.getByRole('heading', { level: 2, name: 'Roles y permisos' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Plantillas del sistema' })).toBeTruthy()
-    const desktop = screen.getByRole('navigation', { name: 'Secciones de usuarios' }).querySelector('ul.lg\\:block')!
-    expect(desktop.querySelector('a[aria-current="page"]')?.textContent).toBe('Roles y permisos')
+    const nav = screen.getByRole('navigation', { name: 'Secciones de usuarios' })
+    expect(nav.querySelector('a[aria-current="page"]')?.textContent).toBe('Roles y permisos')
   })
 })

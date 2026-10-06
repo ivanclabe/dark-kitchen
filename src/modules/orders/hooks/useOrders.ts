@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addOrderItem, advanceKitchenItem, removeOrderItem, revertKitchenItem } from '../api/orderItems'
 import {
   cancelOrder,
@@ -12,9 +12,8 @@ import {
   listOrderStatusHistory,
   searchOrders,
   setOrderPriority,
-  updateOrder,
 } from '../api/orders'
-import type { KitchenItemStatus, OrderInput, OrderItem, OrderItemInput, OrderSearch } from '../types'
+import type { KitchenItemStatus, Order, OrderInput, OrderItem, OrderItemInput, OrderSearch } from '../types'
 
 /**
  * Every order query lives under ONE root key (ADR 0020). Pedidos, Cocina,
@@ -53,8 +52,33 @@ export function useOrderSearch(filters: OrderSearch, enabled = true) {
   return useQuery({ queryKey: [...ORDERS_KEY, 'search', filters], queryFn: () => searchOrders(filters), placeholderData: keepPreviousData, enabled })
 }
 
+/**
+ * Operación → Lista: the same search, a page at a time (ADR 0031). «Cargar
+ * más» asks only for the next page (offset), it does not fetch again what is
+ * already on screen.
+ */
+export function useOrderSearchPages(filters: Omit<OrderSearch, 'offset'> & { limit: number }) {
+  return useInfiniteQuery({
+    queryKey: [...ORDERS_KEY, 'search-pages', filters],
+    queryFn: ({ pageParam }) => searchOrders({ ...filters, offset: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (last, pages) => (last.hasMore ? pages.length * filters.limit : undefined),
+    placeholderData: keepPreviousData,
+  })
+}
+
+/**
+ * One order. While it loads, the copy already in the live list is shown at
+ * once (ADR 0031: opening an order from the board does not wait).
+ */
 export function useOrder(id: string | null | undefined) {
-  return useQuery({ queryKey: [...ORDERS_KEY, 'detail', id], queryFn: () => getOrder(id!), enabled: !!id })
+  const queryClient = useQueryClient()
+  return useQuery({
+    queryKey: [...ORDERS_KEY, 'detail', id],
+    queryFn: () => getOrder(id!),
+    enabled: !!id,
+    placeholderData: () => queryClient.getQueryData<Order[]>(LIVE_KEY)?.find((o) => o.id === id),
+  })
 }
 
 export function useOrderStatusHistory(orderId: string | null | undefined) {
@@ -69,11 +93,6 @@ export function useOrderReservations(orderId: string | null | undefined, enabled
 export function useCreateOrder() {
   const invalidate = useInvalidateOrders()
   return useMutation({ mutationFn: (input: OrderInput) => createOrder(input), onSuccess: () => invalidate() })
-}
-
-export function useUpdateOrder(orderId: string) {
-  const invalidate = useInvalidateOrders()
-  return useMutation({ mutationFn: (input: OrderInput) => updateOrder(orderId, input), onSuccess: () => invalidate() })
 }
 
 export function useAddOrderItem(orderId: string) {
@@ -118,49 +137,50 @@ export function useRevertKitchenItem() {
   return useMutation({ mutationFn: (orderItemId: string) => revertKitchenItem(orderItemId), onSuccess: () => invalidate({ stock: true }) })
 }
 
-/** Moves every item of an order forward to `target` (the order's status follows its items). */
+/**
+ * Moves every item of an order forward to `target` (the order's status
+ * follows its items). The same one-step RPC per item as before; what changes
+ * (ADR 0031) is that the screens refresh ONCE when the whole order has moved,
+ * not after each item — also if it stops halfway, to show where it stayed.
+ */
 export function useAdvanceOrderItems() {
-  const advance = useAdvanceKitchenItem()
-
-  async function advanceOrderItems(items: OrderItem[], target: Extract<KitchenItemStatus, 'EN_PREPARACION' | 'LISTO'>) {
-    if (target === 'EN_PREPARACION') {
-      for (const item of items) {
-        if (item.kitchenStatus === 'PENDIENTE') await advance.mutateAsync(item.id)
-      }
-    } else {
+  const invalidate = useInvalidateOrders()
+  const move = useMutation({
+    mutationFn: async ({ items, target }: { items: OrderItem[]; target: Extract<KitchenItemStatus, 'EN_PREPARACION' | 'LISTO'> }) => {
       for (const item of items) {
         if (item.kitchenStatus === 'LISTO') continue
-        if (item.kitchenStatus === 'PENDIENTE') await advance.mutateAsync(item.id)
-        await advance.mutateAsync(item.id)
+        if (target === 'EN_PREPARACION' && item.kitchenStatus !== 'PENDIENTE') continue
+        if (item.kitchenStatus === 'PENDIENTE') await advanceKitchenItem(item.id)
+        if (target === 'LISTO') await advanceKitchenItem(item.id)
       }
-    }
-  }
+    },
+    onSettled: () => invalidate({ stock: true }),
+  })
 
-  return { advanceOrderItems, isPending: advance.isPending }
+  const advanceOrderItems = (items: OrderItem[], target: Extract<KitchenItemStatus, 'EN_PREPARACION' | 'LISTO'>) => move.mutateAsync({ items, target })
+  return { advanceOrderItems, isPending: move.isPending }
 }
 
 /**
  * The mirror of useAdvanceOrderItems. target='EN_PREPARACION' takes back only
  * the LISTO items (one step); target='PENDIENTE' takes back everything that is
  * not PENDIENTE yet (up to two steps per item), so a LISTO order can be
- * dragged straight to CONFIRMADO.
+ * dragged straight to CONFIRMADO. One refresh at the end (ADR 0031).
  */
 export function useRevertOrderItems() {
-  const revert = useRevertKitchenItem()
-
-  async function revertOrderItems(items: OrderItem[], target: Extract<KitchenItemStatus, 'PENDIENTE' | 'EN_PREPARACION'>) {
-    if (target === 'EN_PREPARACION') {
-      for (const item of items) {
-        if (item.kitchenStatus === 'LISTO') await revert.mutateAsync(item.id)
-      }
-    } else {
+  const invalidate = useInvalidateOrders()
+  const move = useMutation({
+    mutationFn: async ({ items, target }: { items: OrderItem[]; target: Extract<KitchenItemStatus, 'PENDIENTE' | 'EN_PREPARACION'> }) => {
       for (const item of items) {
         if (item.kitchenStatus === 'PENDIENTE') continue
-        if (item.kitchenStatus === 'LISTO') await revert.mutateAsync(item.id)
-        await revert.mutateAsync(item.id)
+        if (target === 'EN_PREPARACION' && item.kitchenStatus !== 'LISTO') continue
+        if (item.kitchenStatus === 'LISTO') await revertKitchenItem(item.id)
+        if (target === 'PENDIENTE') await revertKitchenItem(item.id)
       }
-    }
-  }
+    },
+    onSettled: () => invalidate({ stock: true }),
+  })
 
-  return { revertOrderItems, isPending: revert.isPending }
+  const revertOrderItems = (items: OrderItem[], target: Extract<KitchenItemStatus, 'PENDIENTE' | 'EN_PREPARACION'>) => move.mutateAsync({ items, target })
+  return { revertOrderItems, isPending: move.isPending }
 }

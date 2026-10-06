@@ -1,3 +1,4 @@
+import { useHere } from '@/shared/hooks/useBackTarget'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { Button, type ButtonProps } from '@/shared/ui/Button'
@@ -7,18 +8,21 @@ import { LoadingState } from '@/shared/ui/LoadingState'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { formatDateTime } from '@/shared/utils/format'
+import { formatDateTime, formatMoney } from '@/shared/utils/format'
+import { Badge } from '@/shared/ui/Badge'
 import clsx from 'clsx'
 import { AlertTriangle, Bike, Boxes, ChefHat, ChevronLeft, ChevronRight, ExternalLink, Flag, MapPin, Phone, Play, UserRound, XCircle } from 'lucide-react'
 import { allows, inScope, useBoardActions } from '../board/boardActions'
 import { useOrderActions } from '../board/useOrderActions'
 import { useAdvanceKitchenItem, useOrder, useOrderReservations, useRevertKitchenItem } from '../hooks/useOrders'
 import { ACTION_DENIED_REASON, type FlowAction } from '../lib/permissions'
-import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL, ORDER_STATUS_CONFIG } from '../lib/orderVisuals'
+import { OrderStatusBadge } from '../lib/orderStatus'
+import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL } from '../lib/orderVisuals'
 import type { Order, OrderItem } from '../types'
+import { isKitchenStage } from '../lib/transitions'
 import { OrderBuilder } from './OrderBuilder'
+import { PaymentBadge, PaymentCard } from './PaymentCard'
 
-const KITCHEN_STAGES = new Set(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
 const OPEN = new Set(['NUEVO', 'CONFIRMADO', 'EN_PREPARACION', 'LISTO', 'DESPACHADO'])
 
 /** A button gated by the board's scope and the role: hidden if this board does not offer it, disabled (with the reason) if the role cannot. */
@@ -63,6 +67,7 @@ function ActionBar({ order }: { order: Order }) {
 }
 
 function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }) {
+  const here = useHere()
   const board = useBoardActions()
   const { can } = useActiveKitchen()
   const advance = useAdvanceKitchenItem()
@@ -88,7 +93,7 @@ function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }
         <p className="text-sm font-medium text-neutral-100">
           <span className="tabular-nums text-neutral-400">{item.quantity}×</span>{' '}
           {can('recipes.view') ? (
-            <KitchenLink to={`/recipes/${item.productId}`} className="hover:text-brasa-300 hover:underline" title="Ver la receta">
+            <KitchenLink to={`/recipes/${item.productId}`} state={{ from: here }} className="hover:text-brasa-300 hover:underline" title="Ver la receta">
               {item.productName}
             </KitchenLink>
           ) : (
@@ -134,6 +139,7 @@ function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }
 }
 
 function CustomerCard({ order }: { order: Order }) {
+  const here = useHere()
   const { can } = useActiveKitchen()
   return (
     <Card title="Cliente" icon={UserRound}>
@@ -141,7 +147,7 @@ function CustomerCard({ order }: { order: Order }) {
         <p className="flex items-center justify-between gap-3">
           <span className="font-medium text-neutral-100">{order.customerName}</span>
           {can('customers.view') && (
-            <KitchenLink to={`/customers/${order.customerId}`} className="inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline">
+            <KitchenLink to={`/customers/${order.customerId}`} state={{ from: here }} className="inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline">
               Saldo e historial <ExternalLink size={11} aria-hidden />
             </KitchenLink>
           )}
@@ -223,14 +229,14 @@ function StockCard({ order }: { order: Order }) {
  * It must live inside an order board (BoardActionsContext).
  */
 export function OrderDetailDrawer({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
-  const board = useBoardActions()
+  const { can } = useActiveKitchen()
   const { data: order, isLoading } = useOrder(orderId)
   if (!orderId) return null
 
   const isOpen = order ? OPEN.has(order.status) : false
-  const inKitchen = order ? KITCHEN_STAGES.has(order.status) : false
+  const inKitchen = order ? isKitchenStage(order.status) : false
   const title = `Pedido #${order?.orderNumber ?? '…'}`
-  const subtitle = order ? `${order.customerName} · ${ORDER_STATUS_CONFIG[order.status].label}` : undefined
+  const subtitle = order?.customerName
 
   return (
     <Drawer open onClose={onClose} title={title} subtitle={subtitle}>
@@ -238,7 +244,19 @@ export function OrderDetailDrawer({ orderId, onClose }: { orderId: string | null
         <LoadingState variant="block" />
       ) : (
         <div className="space-y-5">
-          {isOpen && order.status !== 'NUEVO' && <ActionBar order={order} />}
+          {/* ADR 0031: two dimensions, never mixed — where the order is, and whether it is paid. */}
+          <div className="flex flex-wrap items-center gap-2">
+            <OrderStatusBadge status={order.status} />
+            {can('receivables.view') && <PaymentBadge order={order} />}
+            {order.requiresReview && (
+              <Badge tone="warning" icon={AlertTriangle}>
+                revisar devolución
+              </Badge>
+            )}
+            <span className="ml-auto text-lg font-semibold tabular-nums text-neutral-50">{formatMoney(order.total)}</span>
+          </div>
+          {isOpen && <ActionBar order={order} />}
+          <PaymentCard order={order} />
           {inKitchen && order.items.length > 0 && (
             <Card title="Cocina" description="Avanza o corrige plato por plato" icon={ChefHat}>
               <ul className="divide-y divide-neutral-800/60">
@@ -252,8 +270,8 @@ export function OrderDetailDrawer({ orderId, onClose }: { orderId: string | null
             <CustomerCard order={order} />
             <DeliveryCard order={order} />
           </div>
-          {/* Draft orders are edited here; confirm/cancel of a draft too, if this board offers them. */}
-          <OrderBuilder orderId={order.id} statusActions={order.status === 'NUEVO' && inScope(board, 'confirm')} />
+          {/* A draft is edited here; confirming and cancelling it are the action bar's (ADR 0031: one place for each). */}
+          <OrderBuilder orderId={order.id} />
           <StockCard order={order} />
         </div>
       )}

@@ -20,8 +20,8 @@ import type { ProductInput } from '../types'
 const PRODUCTS_KEY = ['products'] as const
 const CATEGORIES_KEY = ['product-categories'] as const
 
-export function useProducts() {
-  return useQuery({ queryKey: PRODUCTS_KEY, queryFn: listProducts })
+export function useProducts(enabled = true) {
+  return useQuery({ queryKey: PRODUCTS_KEY, queryFn: listProducts, enabled })
 }
 
 export function useProductCategories() {

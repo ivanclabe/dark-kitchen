@@ -65,8 +65,8 @@ export function UsersLayout() {
       icon={UserCog}
       navLabel="Secciones de usuarios"
       sections={[
-        { to: path('/users'), label: 'Usuarios', icon: Users, end: true },
-        { to: path('/users/roles'), label: 'Roles y permisos', icon: ShieldCheck },
+        { to: path('/users'), label: 'Usuarios', end: true },
+        { to: path('/users/roles'), label: 'Roles y permisos' },
       ]}
     >
       <Outlet />

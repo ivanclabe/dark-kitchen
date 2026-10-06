@@ -14,6 +14,7 @@ import { BarChart3, Download, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ProductRow } from '../api'
+import { OrderPeekDrawer } from '@/modules/orders/components/OrderPeekDrawer'
 import { ProductOrdersDrawer } from '../components/ProductOrdersDrawer'
 import { useCatalogOptions, useInsights } from '../hooks'
 import { downloadCsv, toCsv } from '../lib/csv'
@@ -38,16 +39,32 @@ const TABS: { value: InsightsTab; label: string }[] = [
 export function InsightsPage() {
   const { kitchen } = useActiveKitchen()
   const [params, setParams] = useSearchParams()
+  // Tab, category and product live in the URL (ADR 0030): other screens link to "Insights of this product".
+  const setUrl = (patch: Record<string, string | null>) =>
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+        for (const [k, v] of Object.entries(patch)) {
+          if (v) next.set(k, v)
+          else next.delete(k)
+        }
+        return next
+      },
+      { replace: true },
+    )
   const tab: InsightsTab = TABS.find((t) => t.value === params.get('tab'))?.value ?? 'overview'
-  const setTab = (t: InsightsTab) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })
+  const setTab = (t: InsightsTab) => setUrl({ tab: t === 'overview' ? null : t })
+  const categoryId = params.get('category')
+  const productId = params.get('product')
+  const setCategoryId = (id: string | null) => setUrl({ category: id, product: null })
+  const setProductId = (id: string | null) => setUrl({ product: id })
 
   const today = todayStr()
   const [preset, setPreset] = useState<PeriodPreset>('month')
   const [custom, setCustom] = useState<DateRange>(() => presetRange('month', today))
   const [comparing, setComparing] = useState(true)
-  const [categoryId, setCategoryId] = useState<string | null>(null)
-  const [productId, setProductId] = useState<string | null>(null)
   const [openProduct, setOpenProduct] = useState<ProductRow | null>(null)
+  const [openOrder, setOpenOrder] = useState<string | null>(null)
 
   const range = preset === 'custom' ? custom : presetRange(preset, today)
   const validRange = range.from <= range.to
@@ -106,10 +123,7 @@ export function InsightsPage() {
         )}
         <Select
           value={categoryId ?? ''}
-          onChange={(e) => {
-            setCategoryId(e.target.value || null)
-            setProductId(null)
-          }}
+          onChange={(e) => setCategoryId(e.target.value || null)}
           aria-label="Categoría"
           className="!mt-0 w-auto min-w-[10rem]"
           disabled={!catalog.data?.categories.length}
@@ -134,10 +148,7 @@ export function InsightsPage() {
             variant="ghost"
             size="sm"
             icon={X}
-            onClick={() => {
-              setCategoryId(null)
-              setProductId(null)
-            }}
+            onClick={() => setUrl({ category: null, product: null })}
           >
             Quitar filtros
           </Button>
@@ -167,13 +178,20 @@ export function InsightsPage() {
       ) : (
         <div className={clsx('space-y-8 transition-opacity', insights.isPlaceholderData && 'opacity-60')} aria-busy={insights.isFetching}>
           {(() => {
-            const props = { data, compareLabel, summary, onTab: setTab, onCategory: (id: string | null) => { setCategoryId(id); setProductId(null) }, onProduct: setOpenProduct }
+            const props = { data, compareLabel, summary, onTab: setTab, onCategory: (id: string | null) => setCategoryId(id), onProduct: setOpenProduct }
             return tab === 'sales' ? <SalesTab {...props} /> : tab === 'products' ? <ProductsTab {...props} /> : tab === 'costs' ? <CostsTab {...props} /> : <OverviewTab {...props} />
           })()}
         </div>
       )}
 
-      {openProduct && <ProductOrdersDrawer product={openProduct} from={range.from} to={range.to} periodLabel={rangeLabel(range)} onClose={() => setOpenProduct(null)} />}
+      {/* An order opens in place of its product's list; closing it brings the list back. */}
+      {openOrder ? (
+        <OrderPeekDrawer orderId={openOrder} onClose={() => setOpenOrder(null)} />
+      ) : (
+        openProduct && (
+          <ProductOrdersDrawer product={openProduct} from={range.from} to={range.to} periodLabel={rangeLabel(range)} onClose={() => setOpenProduct(null)} onOpenOrder={setOpenOrder} />
+        )
+      )}
     </Page>
   )
 }

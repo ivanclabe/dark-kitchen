@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { listPaymentsByCustomer, listReceivables, listReceivablesByCustomer, listRecentPayments, registerPayment } from '../api/receivables'
+import { listPaymentsByCustomer, listReceivables, listReceivablesByCustomer, listRecentPayments, registerPayment, voidPayment } from '../api/receivables'
 import type { RegisterPaymentInput } from '../types'
 
 const RECEIVABLES_KEY = ['receivables'] as const
@@ -22,16 +22,25 @@ export function useRecentPayments(limit = 8) {
   return useQuery({ queryKey: [...PAYMENTS_KEY, 'recent', limit], queryFn: () => listRecentPayments(limit) })
 }
 
-export function useRegisterPayment() {
+/** A payment changes the order, the receivables, the customer's balance and Inicio's cartera: all of them refresh. */
+function useInvalidatePayments() {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (input: RegisterPaymentInput) => registerPayment(input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: RECEIVABLES_KEY })
-      queryClient.invalidateQueries({ queryKey: PAYMENTS_KEY })
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
-      // Balances of the customers list and detail (ADR 0028).
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-    },
-  })
+  return () => {
+    queryClient.invalidateQueries({ queryKey: RECEIVABLES_KEY })
+    queryClient.invalidateQueries({ queryKey: PAYMENTS_KEY })
+    queryClient.invalidateQueries({ queryKey: ['orders'] })
+    // Balances of the customers list and detail (ADR 0028).
+    queryClient.invalidateQueries({ queryKey: ['customers'] })
+  }
+}
+
+export function useRegisterPayment() {
+  const invalidate = useInvalidatePayments()
+  return useMutation({ mutationFn: (input: RegisterPaymentInput) => registerPayment(input), onSuccess: invalidate })
+}
+
+/** ADR 0031: void a payment registered by mistake (a negative entry with its reason). */
+export function useVoidPayment() {
+  const invalidate = useInvalidatePayments()
+  return useMutation({ mutationFn: ({ paymentId, reason }: { paymentId: string; reason: string }) => voidPayment(paymentId, reason), onSuccess: invalidate })
 }

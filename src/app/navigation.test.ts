@@ -11,9 +11,11 @@ describe('secciones permitidas según el rol activo', () => {
   it('Cocina no tiene Dashboard: su inicio es la pantalla de cocina', () => {
     const cocina = can('kitchen.view', 'kitchen.prepare', 'orders.view')
     expect(isSectionAllowed('/dashboard', cocina)).toBe(false)
-    expect(homeSection(cocina)).toBe('/kitchen')
+    // ADR 0031: Operación, que para la línea abre en la vista Cocina (defaultOperationsView).
+    expect(homeSection(cocina)).toBe('/operations')
+    expect(isSectionAllowed('/operations', cocina)).toBe(true)
+    // Las direcciones viejas siguen dentro de Operación (redirigen).
     expect(isSectionAllowed('/kitchen', cocina)).toBe(true)
-    // Ve los pedidos (para abrir su detalle) aunque no los crea.
     expect(isSectionAllowed('/orders', cocina)).toBe(true)
   })
 
@@ -21,15 +23,14 @@ describe('secciones permitidas según el rol activo', () => {
     expect(isSectionAllowed('/', can())).toBe(true)
   })
 
-  it('caja empieza en Pedidos aunque tenga Dashboard (ADR 0020, D3)', () => {
-    expect(homeSection(can('dashboard.view', 'orders.view', 'orders.create', 'kitchen.view'))).toBe('/orders')
+  it('caja empieza en Operación aunque tenga Inicio (ADR 0020, D3)', () => {
+    expect(homeSection(can('dashboard.view', 'orders.view', 'orders.create', 'kitchen.view'))).toBe('/operations')
   })
 
-  it('el domiciliario empieza en Pedidos (Despacho) sin ver todos los pedidos', () => {
+  it('el domiciliario empieza en Operación (Despacho) sin ver todos los pedidos', () => {
     const moto = can('dispatch.view', 'dispatch.deliver')
-    expect(homeSection(moto)).toBe('/orders')
-    expect(isSectionAllowed('/orders', moto)).toBe(true)
-    expect(isSectionAllowed('/kitchen', moto)).toBe(false)
+    expect(homeSection(moto)).toBe('/operations')
+    expect(isSectionAllowed('/operations', moto)).toBe(true)
   })
 
   it('un rol que prepara pero no ve Cocina no queda en un inicio cerrado', () => {

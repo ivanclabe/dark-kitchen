@@ -4,7 +4,7 @@ import { Bike, CheckCircle2, ChevronRight, PackageCheck, Play, type LucideIcon }
 import { useMarkDelivered } from '../hooks/useDispatch'
 import { useAdvanceOrderItems, useRevertOrderItems, useSetOrderPriority } from '../hooks/useOrders'
 import type { FlowAction } from '../lib/permissions'
-import { prevStatus } from '../lib/transitions'
+import { isKitchenStage, prevStatus } from '../lib/transitions'
 import type { Order, OrderStatus } from '../types'
 import { inScope, useBoardActions } from './boardActions'
 
@@ -21,8 +21,6 @@ export const REVERT_LABEL: Partial<Record<OrderStatus, string>> = {
   EN_PREPARACION: 'Retroceder a la cola',
   LISTO: 'Retroceder a preparación',
 }
-
-export const KITCHEN_STAGES = new Set<OrderStatus>(['CONFIRMADO', 'EN_PREPARACION', 'LISTO'])
 
 /**
  * Las acciones de un pedido del tablero, compartidas por la tarjeta (solo la
@@ -91,7 +89,7 @@ export function useOrderActions(ticket: Order) {
     primary,
     revertLabel: backTarget ? REVERT_LABEL[ticket.status] : undefined,
     revert,
-    canPrioritize: KITCHEN_STAGES.has(ticket.status),
+    canPrioritize: isKitchenStage(ticket.status),
     prioritized,
     togglePriority,
     priorityPending: setPriority.isPending,
