@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanComparison } from '@/shared/plans/PlanComparison'
 import { hasAnnualBilling, signupPath, type BillingPeriod, type Plan } from '@/shared/plans/plans'
@@ -24,7 +25,7 @@ function PlanCta({ plan }: { plan: Plan }) {
   // Una organización por persona (ADR 0008): quien ya entró va a su cuenta.
   if (session) {
     return (
-      <Link to="/" className={style}>
+      <Link to={APP_ENTRY} className={style}>
         Ir a mi cuenta
       </Link>
     )

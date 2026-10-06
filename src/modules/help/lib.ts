@@ -1,4 +1,5 @@
 import { KB } from '../../../supabase/functions/_shared/kb.ts'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { searchKb, type KbHit } from '../../../supabase/functions/_shared/kbSearch.ts'
 import { stripHelpPrefix } from '@/shared/help/helpUrl'
 import { currentHost, docsUrl, rootUrl } from '@/shared/tenant/host'
@@ -72,6 +73,6 @@ export function appHref(path: string): string {
 
 /** «Entrar» / «Volver a Quanela» of the help center's header. */
 export function appHomeHref(signedIn: boolean): string {
-  const path = signedIn ? '/' : '/login'
+  const path = signedIn ? APP_ENTRY : '/login'
   return currentHost().kind === 'docs' ? (rootUrl(path) ?? path) : path
 }

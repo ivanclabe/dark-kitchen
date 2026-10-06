@@ -18,6 +18,8 @@ order: 1
 
 ## 6 de octubre de 2026
 
+- **Notificaciones.** Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver [Notificaciones](help:notifications).
+- **`quanela.com` siempre muestra la página de Quanela**, aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en `doc.quanela.com`.
 - **Centro de ayuda.** Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver [Preguntarle a Copilot](help:ask-copilot).
 - **Centro de operaciones.** **Pedidos** y **Cocina** ahora son un solo módulo, **Operación**, con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver [El Centro de operaciones](help:operations-center).
 - **El pago dentro del pedido.** Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver [Registrar y anular pagos](help:register-payment).

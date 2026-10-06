@@ -140,15 +140,15 @@ describe('owner sign-up methods (ADR 0025)', () => {
     calls.owns.mockResolvedValueOnce(true)
     sessionStorage.setItem('dk-owner-sign-in', '1')
     renderAt('/registro?continuar=1')
-    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/|'))
+    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/app|'))
     expect(auth.signOut).not.toHaveBeenCalled()
   })
 
-  it('a signed-in user who used email (no mark) just goes home, as before', async () => {
+  it('a signed-in user who used email (no mark) just goes into the app, as before', async () => {
     auth.session = { user: { email: 'cajero@prueba.test', user_metadata: {} } }
     auth.profile = { id: 'u3' }
     renderAt('/registro')
-    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/|'))
+    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/app|'))
     expect(calls.owns).not.toHaveBeenCalled()
     expect(auth.signOut).not.toHaveBeenCalled()
   })

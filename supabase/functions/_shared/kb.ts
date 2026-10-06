@@ -518,7 +518,7 @@ export const KB: KbArticle[] = [
     "section": "intro",
     "url": "/help/intro/home-screen",
     "title": "Inicio: la operación de hoy",
-    "summary": "Inicio muestra las ventas de hoy, lo que necesita atención (pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido) y las alertas de la cuenta.",
+    "summary": "Inicio muestra las ventas de hoy y lo que necesita atención (pedidos atrasados o por confirmar, insumos bajo el mínimo, clientes con saldo vencido); los avisos de IA y del plan están en la campana.",
     "audience": [
       "owner",
       "admin",
@@ -545,14 +545,14 @@ export const KB: KbArticle[] = [
     ],
     "steps": [
       "Arriba, el saludo, la hora y Ventas de hoy con el número de pedidos. Toca el ojo para ocultar la cifra.",
-      "Alertas de la cuenta , solo cuando hay algo: pedidos atrasados, insumos bajo el mínimo, avisos del plan. Toca Ver para ir a la causa.",
-      "Necesita atención : «Pedidos por confirmar», «Preparando o listos para despachar», «Clientes con saldo vencido» e «Insumos bajo el mínimo». Las filas en cero no aparecen; si todo está bien dice «Todo al día: nada pendiente por ahora.»",
+      "Necesita atención : tarjetas con la cifra y lo que es — pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo y clientes con saldo vencido. Toca una para ir a la lista ya filtrada. Lo urgente tiene el borde ámbar. Si no hay nada, dice «Todo al día: nada pendiente por ahora.»",
+      "Si la IA tiene sugerencias nuevas, aparece ✨ N sugerencias de IA nuevas : tócala para abrirlas en la campana. Ver Notificaciones.",
       "Las tarjetas Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora ."
     ],
     "headings": [
       "Qué hay en Inicio"
     ],
-    "body": "Inicio responde una pregunta: ¿qué está pasando hoy y qué necesita atención? Qué hay en Inicio Arriba, el saludo, la hora y Ventas de hoy con el número de pedidos. Toca el ojo para ocultar la cifra. Alertas de la cuenta , solo cuando hay algo: pedidos atrasados, insumos bajo el mínimo, avisos del plan. Toca Ver para ir a la causa. Necesita atención : «Pedidos por confirmar», «Preparando o listos para despachar», «Clientes con saldo vencido» e «Insumos bajo el mínimo». Las filas en cero no aparecen; si todo está bien dice «Todo al día: nada pendiente por ahora.» Las tarjetas Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora . Bueno saber: las tendencias (semanas, meses, comparaciones) están en Insights. Inicio es solo para el día de hoy. Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla."
+    "body": "Inicio responde una pregunta: ¿qué está pasando hoy y qué necesita atención? Qué hay en Inicio Arriba, el saludo, la hora y Ventas de hoy con el número de pedidos. Toca el ojo para ocultar la cifra. Necesita atención : tarjetas con la cifra y lo que es — pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo y clientes con saldo vencido. Toca una para ir a la lista ya filtrada. Lo urgente tiene el borde ámbar. Si no hay nada, dice «Todo al día: nada pendiente por ahora.» Si la IA tiene sugerencias nuevas, aparece ✨ N sugerencias de IA nuevas : tócala para abrirlas en la campana. Ver Notificaciones. Las tarjetas Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora . Bueno saber: las tendencias (semanas, meses, comparaciones) están en Insights. Inicio es solo para el día de hoy. Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla."
   },
   {
     "id": "insights",
@@ -882,6 +882,46 @@ export const KB: KbArticle[] = [
       "Si algo no sale"
     ],
     "body": "En la vista Cocina puedes mover pedidos con la voz. Funciona con el botón del micrófono o diciendo «Oye Quanela» si tienes el manos libres encendido (ver Activar «Oye Quanela»). Toca el micrófono de la cocina (o di «Oye Quanela»). Di el número del pedido (4 dígitos) y la acción , por ejemplo: « pedido 1042 listo ». Haz una pausa: Quanela lo ejecuta y responde («Pedido 1042 listo.»). Qué puedes decir Para Di --- Empezar «pedido 1042 iniciar » o «en preparación» Terminar «pedido 1042 listo » o «terminado» Priorizar «pedido 1042 prioritario » o «urgente» Quitar prioridad «pedido 1042 quitar prioridad » Cancelar « cancelar pedido 1042» Si algo no sale « No entendí el comando. »: falta el número o la acción. Dilos los dos. « El pedido 1042 no existe. »: no está en la pantalla de cocina. « El pedido 1042 ya está listo. »: ya estaba en ese estado. Con el reconocimiento sin internet , los pedidos se cancelan desde la pantalla, no con la voz. Bueno saber: si dices una pregunta («¿cuánto vendimos hoy?»), no es un comando: la responde Copilot. Y un comando dicho fuera de la vista Cocina no se ejecuta. Para probar sin hablar: ⋯ → Probar comando de texto y escribe «pedido 2040 listo»."
+  },
+  {
+    "id": "notifications",
+    "section": "intro",
+    "url": "/help/intro/notifications",
+    "title": "Notificaciones (la campana)",
+    "summary": "La campana junto a tu avatar junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.",
+    "audience": [
+      "everyone"
+    ],
+    "permissions": [],
+    "appPath": "/dashboard",
+    "questions": [
+      "¿Dónde veo las notificaciones?",
+      "¿Qué significa el número de la campana?",
+      "¿Dónde veo las sugerencias de la IA?",
+      "¿Cómo marco las notificaciones como leídas?",
+      "¿Por qué me salió otra vez una notificación?"
+    ],
+    "keywords": [
+      "notificaciones",
+      "campana",
+      "avisos",
+      "alertas",
+      "sugerencias de IA",
+      "sin leer",
+      "leído",
+      "marcar todo"
+    ],
+    "steps": [
+      "Toca la campana (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones sin leer .",
+      "Elige Todas o IA .",
+      "Toca un aviso para ir a su pantalla: queda como leído.",
+      "Para limpiar la lista, toca Marcar todo como leído ."
+    ],
+    "headings": [
+      "Qué avisa",
+      "Bueno saber"
+    ],
+    "body": "Toca la campana (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones sin leer . Elige Todas o IA . Toca un aviso para ir a su pantalla: queda como leído. Para limpiar la lista, toca Marcar todo como leído . Qué avisa Grupo Avisos Quién los ve --- --- Operación Pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido Según tu rol: cada quien ve lo de sus pantallas IA ✨ Las sugerencias importantes del último análisis de cada función (por ejemplo, «Despachar pedido 1015»), con su porqué Quien puede usar esa función IA Análisis que fallaron y el cupo de análisis del plan Quien administra la IA Cuenta La prueba gratis por terminar y los límites del plan Quien ve la facturación Bueno saber Las notificaciones son de la cuenta activa y se actualizan cada minuto . Abrir la campana no gasta IA : muestra los análisis que ya se hicieron al usar sus pantallas. Lo que marcas como leído es solo tuyo y te sigue en cualquier equipo. Un aviso vuelve a salir como nuevo cuando cambia : por ejemplo, si pasan de 3 a 5 pedidos atrasados, o al día siguiente. Las preguntas a Copilot no aparecen aquí. Sus límites están en Límites de Copilot."
   },
   {
     "id": "operations-center",
@@ -1242,7 +1282,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver Clientes y saldos pendientes. Registro con Google, Instagram o teléfono , además del correo. Ver Crear tu negocio en Quanela. Configuración ordenada en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola forma de guardar. de octubre de 2026 La cuenta es lo que ves. Cada local es una cuenta ; cambias entre ellas desde arriba. Usuarios y roles se manejan por cuenta. Ver Entrar a Quanela y cambiar de cuenta o de rol. Menú de usuario nuevo con Apariencia (tema claro, oscuro o del sistema, y texto grande) y Ayuda y soporte . de octubre de 2026 Quanela Copilot : pregúntale a tu negocio en lenguaje natural. Personal y turnos : programa la semana, marca entrada y salida y revisa las horas. Ver Turnos y horas del equipo. Buscador de pedidos y despacho para domiciliarios. Dirección propia para tu negocio (por ejemplo fr3rk6.quanela.com ). Septiembre de 2026 Comandos de voz en cocina y el manos libres «Oye Quanela» . Ver Comandos de voz en cocina. Fotos de los platos y un planificador de menú más rápido."
+    "body": "de octubre de 2026 Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver Clientes y saldos pendientes. Registro con Google, Instagram o teléfono , además del correo. Ver Crear tu negocio en Quanela. Configuración ordenada en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola forma de guardar. de octubre de 2026 La cuenta es lo que ves. Cada local es una cuenta ; cambias entre ellas desde arriba. Usuarios y roles se manejan por cuenta. Ver Entrar a Quanela y cambiar de cuenta o de rol. Menú de usuario nuevo con Apariencia (tema claro, oscuro o del sistema, y texto grande) y Ayuda y soporte . de octubre de 2026 Quanela Copilot : pregúntale a tu negocio en lenguaje natural. Personal y turnos : programa la semana, marca entrada y salida y revisa las horas. Ver Turnos y horas del equipo. Buscador de pedidos y despacho para domiciliarios. Dirección propia para tu negocio (por ejemplo fr3rk6.quanela.com ). Sep"
   },
   {
     "id": "roles",

@@ -1,4 +1,5 @@
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
@@ -86,9 +87,21 @@ const routes: RouteObject[] = [
   { path: '/registro', element: <SignUpPage /> },
   { path: '/registro/confirmado', element: <SignUpConfirmedPage /> },
 
-  // "/": sin sesión, la landing; con sesión, directo a la Cocina por defecto o al selector.
+  // "/" (ADR 0036): en quanela.com, siempre la landing (con sesión, «Ir a mi cuenta»). En el subdominio
+  // de un negocio (y sin dominio raíz), la app: sin sesión, su login; con sesión, la Cuenta por defecto.
+  currentHost().kind === 'root'
+    ? { path: '/', element: <LandingPage /> }
+    : {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <KitchenEntryRedirect />
+          </ProtectedRoute>
+        ),
+      },
+  // «Ir a mi cuenta» desde cualquier host: la Cuenta por defecto, en su subdominio.
   {
-    path: '/',
+    path: APP_ENTRY,
     element: (
       <ProtectedRoute>
         <KitchenEntryRedirect />
@@ -108,7 +121,7 @@ const routes: RouteObject[] = [
   { path: '/cocinas', element: <Navigate to="/cuentas" replace /> },
 
   // La plataforma se administra en el portal Global Admin (admin.quanela.com, ADR 0019).
-  { path: '/admin/*', element: <Navigate to="/" replace /> },
+  { path: '/admin/*', element: <Navigate to={APP_ENTRY} replace /> },
 
   // The organization's administration center (ADR 0012) no longer exists (ADR 0024):
   // its old addresses go to their equivalent inside an account.

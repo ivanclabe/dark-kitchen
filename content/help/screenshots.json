@@ -7,6 +7,8 @@
       "annotate": [{ "text": "de 3", "n": 1 }, { "selector": "div.space-y-2\\.5:has(button:has-text('Continuar con Google'))", "n": 2 }] },
     { "id": "home", "path": "/dashboard", "waitFor": "Ventas de hoy",
       "annotate": [{ "text": "Ventas de hoy", "n": 1 }, { "selector": "a[href$='/supply/compras']:visible", "n": 2 }, { "text": "Necesita atención", "n": 3 }, { "text": "Cocina ahora", "n": 4 }] },
+    { "id": "notifications", "path": "/dashboard", "click": ["css=button[aria-label^='Notificaciones']:visible"], "waitFor": "Marcar todo como leído",
+      "annotate": [{ "selector": "button[aria-label^='Notificaciones']:visible", "n": 1 }, { "selector": "[role=tablist][aria-label='Filtrar notificaciones']", "n": 2 }, { "selector": "[role=dialog] [role=menuitem]", "n": 3 }, { "text": "Marcar todo como leído", "n": 4 }] },
     { "id": "create-user", "path": "/users", "click": ["Crear usuario"], "waitFor": "La persona recibe un enlace",
       "annotate": [{ "selector": "[role=dialog] input[type=email]", "n": 1 }, { "text": "Roles en esta cuenta", "n": 2 }, { "selector": "[role=dialog] button[type=submit]", "n": 3 }] },
     { "id": "operations-board", "path": "/operations", "waitFor": "Por confirmar",

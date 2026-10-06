@@ -1,6 +1,13 @@
 import { currentHost, tenantRootDomain, tenantUrl } from './host'
 
 /**
+ * «Ir a mi cuenta» (ADR 0036): the entry to the app — the person's default
+ * account, on its subdomain. On quanela.com «/» is always the landing, so
+ * nothing that means «into the app» points to «/».
+ */
+export const APP_ENTRY = '/app'
+
+/**
  * Where a page of the organization with code `orgCode` must live: on its own subdomain.
  * Returns the full URL to go to when THIS host is not that one (another
  * organization's subdomain, or the root domain); null when we are already

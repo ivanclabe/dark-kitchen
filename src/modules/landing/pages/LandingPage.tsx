@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
 import { CalendarDays, ChefHat, ChevronRight, Flame, Wallet, Warehouse, type LucideIcon } from 'lucide-react'
 import { useEffect, type CSSProperties } from 'react'
@@ -89,7 +90,7 @@ export function LandingPage() {
             </p>
             <div className="animate-landing-rise mt-9 sm:mt-11" style={delay(240)}>
               <Link
-                to={session ? '/' : '/registro'}
+                to={session ? APP_ENTRY : '/registro'}
                 className="group inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-brasa-500 px-10 text-base font-semibold text-white shadow-[0_12px_40px_-12px_var(--color-brasa-500)] transition-colors hover:bg-brasa-400 sm:w-96 sm:text-lg"
               >
                 {session ? 'Ir a mi cuenta' : 'Crear cuenta gratis'}
@@ -157,7 +158,7 @@ export function LandingPage() {
             <a href={helpHref()} className="transition-colors hover:text-neutral-200">
               Centro de ayuda
             </a>
-            <Link to={session ? '/' : '/login'} className="transition-colors hover:text-neutral-200">
+            <Link to={session ? APP_ENTRY : '/login'} className="transition-colors hover:text-neutral-200">
               {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
             </Link>
           </nav>

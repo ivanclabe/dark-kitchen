@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
 import { rootUrl, tenantHostLabel } from '@/shared/tenant/host'
 import { useTenant } from '@/shared/tenant/tenantContext'
@@ -45,7 +46,7 @@ export function LoginPage() {
   const [searchParams] = useSearchParams()
   // Solo rutas internas (p. ej. volver al enlace de invitación): nunca redirigir fuera de la app.
   const next = searchParams.get('next')
-  const target = next && next.startsWith('/') && !next.startsWith('//') ? next : '/'
+  const target = next && next.startsWith('/') && !next.startsWith('//') ? next : APP_ENTRY
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)

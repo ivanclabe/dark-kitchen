@@ -1,4 +1,5 @@
 import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/business'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { AccountIcon } from '@/shared/avatars/Avatar'
 import { suggestAccountIcon, type AccountIconKey } from '@/shared/avatars/catalog'
 import { AccountIconPicker } from '@/shared/avatars/GalleryPicker'
@@ -131,7 +132,7 @@ export function SignUpPage() {
       .catch(() => setLeaving('home'))
   }, [existingUser, signOut, navigate])
 
-  if (leaving === 'home') return <Navigate to="/" replace />
+  if (leaving === 'home') return <Navigate to={APP_ENTRY} replace />
   if (session && step !== 'sent' && (loading || profileLoading || existingUser)) return <FullScreenLoading />
 
   const salesUrl = pricing?.plans.find((p) => p.cta === 'contact_sales')?.contactUrl ?? null

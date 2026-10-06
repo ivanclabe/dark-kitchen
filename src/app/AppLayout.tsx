@@ -11,6 +11,7 @@ import { CopilotButton, CopilotProvider } from '@/modules/copilot/CopilotProvide
 import { VoiceMenu } from '@/modules/voice/components/VoiceMenu'
 import { VoiceProvider } from '@/modules/voice/VoiceProvider'
 import { ADMIN_NAV_ITEMS, homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS, type NavItem } from './navigation'
+import { NotificationBell } from '@/modules/notifications/components/NotificationBell'
 import { UserMenu } from './UserMenu'
 import { WelcomeCard } from './WelcomeCard'
 
@@ -111,7 +112,9 @@ export function AppLayout() {
           )}
         </nav>
 
-        <div className="mt-2 border-t border-neutral-800/60 pt-3">
+        {/* The bell (ADR 0037) right above the user menu. */}
+        <div className="mt-2 flex flex-col items-center gap-2 border-t border-neutral-800/60 pt-3">
+          <NotificationBell placement="right-end" />
           <UserMenu placement="right-end" />
         </div>
       </aside>
@@ -141,6 +144,7 @@ export function AppLayout() {
           </div>
           <VoiceMenu compact />
           <CopilotButton compact />
+          <NotificationBell placement="bottom-end" />
           <UserMenu placement="bottom-end" />
         </header>
 

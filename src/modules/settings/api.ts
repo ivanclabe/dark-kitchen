@@ -1,24 +1,10 @@
 import { supabase } from '@/shared/lib/supabase'
 
 /**
- * Configuración of the active account (ADR 0024): alerts, operation, activity
- * log, billing and AI usage. Everything is read for the ACTIVE account (the
+ * Configuración of the active account (ADR 0024): operation, activity log,
+ * billing and AI usage (the alerts are in the bell, ADR 0037). Everything is read for the ACTIVE account (the
  * x-dk-kitchen-id header) and the database checks every permission again.
  */
-
-export type AlertSeverity = 'info' | 'warning' | 'error'
-
-export interface AccountAlert {
-  severity: AlertSeverity
-  type: string
-  message: string
-}
-
-export async function fetchAccountAlerts(): Promise<AccountAlert[]> {
-  const { data, error } = await supabase.rpc('dk_account_alerts')
-  if (error) throw error
-  return (data as unknown as { alerts: AccountAlert[] }).alerts
-}
 
 export interface RecentEvent {
   id: string

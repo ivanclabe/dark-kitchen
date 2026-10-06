@@ -1769,6 +1769,42 @@ export type Database = {
           },
         ]
       }
+      dk_notification_reads: {
+        Row: {
+          key: string
+          kitchen_id: string
+          profile_id: string
+          read_at: string
+        }
+        Insert: {
+          key: string
+          kitchen_id: string
+          profile_id: string
+          read_at?: string
+        }
+        Update: {
+          key?: string
+          kitchen_id?: string
+          profile_id?: string
+          read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_notification_reads_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_notification_reads_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_order_items: {
         Row: {
           created_at: string
@@ -3985,6 +4021,10 @@ export type Database = {
       }
       dk_log_sign_in: { Args: never; Returns: undefined }
       dk_mark_delivered: { Args: { p_order_id: string }; Returns: undefined }
+      dk_mark_notifications_read: {
+        Args: { p_keys: string[] }
+        Returns: number
+      }
       dk_my_context: { Args: never; Returns: Json }
       dk_my_features: { Args: never; Returns: Json }
       dk_my_kitchens: {
@@ -4000,6 +4040,7 @@ export type Database = {
         }[]
       }
       dk_my_login_needs_password: { Args: never; Returns: boolean }
+      dk_my_notifications: { Args: never; Returns: Json }
       dk_my_subscription: { Args: { p_organization_id: string }; Returns: Json }
       dk_new_activation: {
         Args: { p_organization_id: string; p_user_id: string }

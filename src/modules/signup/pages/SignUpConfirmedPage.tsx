@@ -1,4 +1,5 @@
 import { FullScreenLoading } from '@/app/FullScreenLoading'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { kitchenPath, MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
 import { fetchMyContext } from '@/shared/kitchen/kitchensApi'
@@ -109,7 +110,7 @@ export function SignUpConfirmedPage() {
       </div>
     )
   }
-  if (!pending) return <Navigate to="/" replace />
+  if (!pending) return <Navigate to={APP_ENTRY} replace />
 
   if (planRejected) {
     return (

@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
 import clsx from 'clsx'
 import { Flame, Menu, X } from 'lucide-react'
@@ -44,7 +45,7 @@ export function LandingNav() {
 
         <div className="flex items-center gap-2">
           {session ? (
-            <Link to="/" className="rounded-lg bg-brasa-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brasa-400">
+            <Link to={APP_ENTRY} className="rounded-lg bg-brasa-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brasa-400">
               Ir a mi cuenta
             </Link>
           ) : (

@@ -1,4 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
@@ -47,7 +48,7 @@ export function SignUpAdminPage() {
       return
     }
 
-    navigate('/', { replace: true })
+    navigate(APP_ENTRY, { replace: true })
   }
 
   return (

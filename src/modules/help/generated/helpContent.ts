@@ -10,7 +10,8 @@ export const HELP_SECTIONS: HelpSection[] = [
       "what-is-quanela",
       "concepts",
       "roles",
-      "home-screen"
+      "home-screen",
+      "notifications"
     ]
   },
   {
@@ -772,7 +773,7 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
     "section": "intro",
     "url": "/help/intro/home-screen",
     "title": "Inicio: la operación de hoy",
-    "summary": "Inicio muestra las ventas de hoy, lo que necesita atención (pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido) y las alertas de la cuenta.",
+    "summary": "Inicio muestra las ventas de hoy y lo que necesita atención (pedidos atrasados o por confirmar, insumos bajo el mínimo, clientes con saldo vencido); los avisos de IA y del plan están en la campana.",
     "audience": [
       "owner",
       "admin",
@@ -785,13 +786,13 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
     ],
     "appPath": "/dashboard",
     "related": [
+      "notifications",
       "operations-center",
-      "insights",
-      "stock"
+      "insights"
     ],
     "updated": "2026-10-06",
     "order": 4,
-    "html": "<p>Inicio responde una pregunta: <strong>¿qué está pasando hoy y qué necesita atención?</strong></p>\n<figure class=\"help-shot\" id=\"captura-home\"><div class=\"help-shot-pending\" role=\"img\" aria-label=\"Pantalla de Inicio con las ventas de hoy, el bloque Necesita atención y las tarjetas de Cocina ahora y Cartera\"><span>Captura en preparación</span><small>Pantalla de Inicio con las ventas de hoy, el bloque Necesita atención y las tarjetas de Cocina ahora y Cartera</small></div><figcaption><ol class=\"help-shot-notes\"><li>«Ventas de hoy» y cuántos pedidos van. El ojo las oculta (por ejemplo, si hay clientes cerca).</li><li>Accesos rápidos a Compras, Clientes e Insights.</li><li>«Necesita atención»: cada fila abre la lista ya filtrada.</li><li>«Cocina ahora»: los pedidos por estado en este momento.</li></ol></figcaption></figure>\n<h2 id=\"que-hay-en-inicio\">Qué hay en Inicio</h2>\n<ol>\n<li>Arriba, el saludo, la hora y <strong>Ventas de hoy</strong> con el número de pedidos. Toca el ojo para ocultar la cifra.</li>\n<li><strong>Alertas de la cuenta</strong>, solo cuando hay algo: pedidos atrasados, insumos bajo el mínimo, avisos del plan. Toca <strong>Ver</strong> para ir a la causa.</li>\n<li><strong>Necesita atención</strong>: «Pedidos por confirmar», «Preparando o listos para despachar», «Clientes con saldo vencido» e «Insumos bajo el mínimo». Las filas en cero no aparecen; si todo está bien dice «Todo al día: nada pendiente por ahora.»</li>\n<li>Las tarjetas <strong>Pedidos recientes</strong>, <strong>Cocina ahora</strong>, <strong>Cartera y compras</strong> y <strong>En turno ahora</strong>.</li>\n</ol>\n<aside class=\"help-callout help-callout-note\"><p><strong>Bueno saber:</strong> las tendencias (semanas, meses, comparaciones) están en <a href=\"/help/reports/insights\" data-help-link>Insights</a>. Inicio es solo para el día de hoy.</p>\n</aside>\n<p>Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla.</p>\n",
+    "html": "<p>Inicio responde una pregunta: <strong>¿qué está pasando hoy y qué necesita atención?</strong></p>\n<figure class=\"help-shot\" id=\"captura-home\"><div class=\"help-shot-pending\" role=\"img\" aria-label=\"Pantalla de Inicio con las ventas de hoy, el bloque Necesita atención y las tarjetas de Cocina ahora y Cartera\"><span>Captura en preparación</span><small>Pantalla de Inicio con las ventas de hoy, el bloque Necesita atención y las tarjetas de Cocina ahora y Cartera</small></div><figcaption><ol class=\"help-shot-notes\"><li>«Ventas de hoy» y cuántos pedidos van. El ojo las oculta (por ejemplo, si hay clientes cerca).</li><li>Accesos rápidos a Compras, Clientes e Insights.</li><li>«Necesita atención»: cada tarjeta abre la lista ya filtrada.</li><li>«Cocina ahora»: los pedidos por estado en este momento.</li></ol></figcaption></figure>\n<h2 id=\"que-hay-en-inicio\">Qué hay en Inicio</h2>\n<ol>\n<li>Arriba, el saludo, la hora y <strong>Ventas de hoy</strong> con el número de pedidos. Toca el ojo para ocultar la cifra.</li>\n<li><strong>Necesita atención</strong>: tarjetas con la cifra y lo que es — pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo y clientes con saldo vencido. Toca una para ir a la lista ya filtrada. Lo urgente tiene el borde ámbar. Si no hay nada, dice «Todo al día: nada pendiente por ahora.»</li>\n<li>Si la IA tiene sugerencias nuevas, aparece <strong>✨ N sugerencias de IA nuevas</strong>: tócala para abrirlas en la campana. Ver <a href=\"/help/intro/notifications\" data-help-link>Notificaciones</a>.</li>\n<li>Las tarjetas <strong>Pedidos recientes</strong>, <strong>Cocina ahora</strong>, <strong>Cartera y compras</strong> y <strong>En turno ahora</strong>.</li>\n</ol>\n<aside class=\"help-callout help-callout-note\"><p><strong>Bueno saber:</strong> las tendencias (semanas, meses, comparaciones) están en <a href=\"/help/reports/insights\" data-help-link>Insights</a>. Inicio es solo para el día de hoy.</p>\n</aside>\n<p>Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla.</p>\n",
     "headings": [
       {
         "id": "que-hay-en-inicio",
@@ -806,8 +807,54 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
         "notes": [
           "«Ventas de hoy» y cuántos pedidos van. El ojo las oculta (por ejemplo, si hay clientes cerca).",
           "Accesos rápidos a Compras, Clientes e Insights.",
-          "«Necesita atención»: cada fila abre la lista ya filtrada.",
+          "«Necesita atención»: cada tarjeta abre la lista ya filtrada.",
           "«Cocina ahora»: los pedidos por estado en este momento."
+        ],
+        "ready": false
+      }
+    ]
+  },
+  "notifications": {
+    "id": "notifications",
+    "section": "intro",
+    "url": "/help/intro/notifications",
+    "title": "Notificaciones (la campana)",
+    "summary": "La campana junto a tu avatar junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.",
+    "audience": [
+      "everyone"
+    ],
+    "permissions": [],
+    "appPath": "/dashboard",
+    "related": [
+      "home-screen",
+      "kitchen-view",
+      "stock",
+      "copilot-limits"
+    ],
+    "updated": "2026-10-06",
+    "order": 5,
+    "html": "<figure class=\"help-shot\" id=\"captura-notifications\"><div class=\"help-shot-pending\" role=\"img\" aria-label=\"Panel de notificaciones abierto desde la campana, con las pestañas Todas e IA y la lista de avisos\"><span>Captura en preparación</span><small>Panel de notificaciones abierto desde la campana, con las pestañas Todas e IA y la lista de avisos</small></div><figcaption><ol class=\"help-shot-notes\"><li>La campana; el número son las no leídas.</li><li>Todas o solo las de IA.</li><li>Cada aviso con su acción. El punto naranja indica que no lo has leído.</li><li>«Marcar todo como leído».</li></ol></figcaption></figure>\n<ol>\n<li>Toca la <strong>campana</strong> (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones <strong>sin leer</strong>.</li>\n<li>Elige <strong>Todas</strong> o <strong>IA</strong>.</li>\n<li>Toca un aviso para ir a su pantalla: queda como leído.</li>\n<li>Para limpiar la lista, toca <strong>Marcar todo como leído</strong>.</li>\n</ol>\n<h2 id=\"que-avisa\">Qué avisa</h2>\n<table>\n<thead>\n<tr>\n<th>Grupo</th>\n<th>Avisos</th>\n<th>Quién los ve</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><strong>Operación</strong></td>\n<td>Pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido</td>\n<td>Según tu rol: cada quien ve lo de sus pantallas</td>\n</tr>\n<tr>\n<td><strong>IA</strong> ✨</td>\n<td>Las sugerencias importantes del último análisis de cada función (por ejemplo, «Despachar pedido 1015»), con su porqué</td>\n<td>Quien puede usar esa función</td>\n</tr>\n<tr>\n<td><strong>IA</strong></td>\n<td>Análisis que fallaron y el cupo de análisis del plan</td>\n<td>Quien administra la IA</td>\n</tr>\n<tr>\n<td><strong>Cuenta</strong></td>\n<td>La prueba gratis por terminar y los límites del plan</td>\n<td>Quien ve la facturación</td>\n</tr>\n</tbody></table>\n<h2 id=\"bueno-saber\">Bueno saber</h2>\n<ul>\n<li>Las notificaciones son de <strong>la cuenta activa</strong> y se actualizan <strong>cada minuto</strong>.</li>\n<li>Abrir la campana <strong>no gasta IA</strong>: muestra los análisis que ya se hicieron al usar sus pantallas.</li>\n<li>Lo que marcas como leído es <strong>solo tuyo</strong> y te sigue en cualquier equipo.</li>\n<li>Un aviso vuelve a salir como nuevo cuando <strong>cambia</strong>: por ejemplo, si pasan de 3 a 5 pedidos atrasados, o al día siguiente.</li>\n<li>Las preguntas a Copilot no aparecen aquí. Sus límites están en <a href=\"/help/assistant/copilot-limits\" data-help-link>Límites de Copilot</a>.</li>\n</ul>\n",
+    "headings": [
+      {
+        "id": "que-avisa",
+        "text": "Qué avisa",
+        "level": 2
+      },
+      {
+        "id": "bueno-saber",
+        "text": "Bueno saber",
+        "level": 2
+      }
+    ],
+    "shots": [
+      {
+        "id": "notifications",
+        "alt": "Panel de notificaciones abierto desde la campana, con las pestañas Todas e IA y la lista de avisos",
+        "notes": [
+          "La campana; el número son las no leídas.",
+          "Todas o solo las de IA.",
+          "Cada aviso con su acción. El punto naranja indica que no lo has leído.",
+          "«Marcar todo como leído»."
         ],
         "ready": false
       }
@@ -1587,7 +1634,7 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
     ],
     "updated": "2026-10-06",
     "order": 1,
-    "html": "<h2 id=\"6-de-octubre-de-2026\">6 de octubre de 2026</h2>\n<ul>\n<li><strong>Centro de ayuda.</strong> Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver <a href=\"/help/assistant/ask-copilot\" data-help-link>Preguntarle a Copilot</a>.</li>\n<li><strong>Centro de operaciones.</strong> <strong>Pedidos</strong> y <strong>Cocina</strong> ahora son un solo módulo, <strong>Operación</strong>, con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver <a href=\"/help/orders/operations-center\" data-help-link>El Centro de operaciones</a>.</li>\n<li><strong>El pago dentro del pedido.</strong> Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver <a href=\"/help/orders/register-payment\" data-help-link>Registrar y anular pagos</a>.</li>\n<li><strong>«Oye Quanela» en toda la app.</strong> La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver <a href=\"/help/assistant/oye-quanela\" data-help-link>«Oye Quanela»</a>.</li>\n<li><strong>Copilot conversacional.</strong> Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver <a href=\"/help/assistant/copilot-limits\" data-help-link>Límites de Copilot</a>.</li>\n<li><strong>Un solo diseño.</strong> Todos los módulos se ven y se recorren igual.</li>\n</ul>\n<h2 id=\"5-de-octubre-de-2026\">5 de octubre de 2026</h2>\n<ul>\n<li><strong>Insights</strong> reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver <a href=\"/help/reports/insights\" data-help-link>Insights</a>.</li>\n<li><strong>Clientes renovado</strong>: cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver <a href=\"/help/customers/customers\" data-help-link>Clientes y saldos pendientes</a>.</li>\n<li><strong>Registro con Google, Instagram o teléfono</strong>, además del correo. Ver <a href=\"/help/getting-started/create-business\" data-help-link>Crear tu negocio en Quanela</a>.</li>\n<li><strong>Configuración ordenada</strong> en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola forma de guardar.</li>\n</ul>\n<h2 id=\"2-de-octubre-de-2026\">2 de octubre de 2026</h2>\n<ul>\n<li><strong>La cuenta es lo que ves.</strong> Cada local es una <em>cuenta</em>; cambias entre ellas desde arriba. Usuarios y roles se manejan por cuenta. Ver <a href=\"/help/getting-started/switch-account\" data-help-link>Entrar a Quanela y cambiar de cuenta o de rol</a>.</li>\n<li><strong>Menú de usuario nuevo</strong> con <strong>Apariencia</strong> (tema claro, oscuro o del sistema, y texto grande) y <strong>Ayuda y soporte</strong>.</li>\n</ul>\n<h2 id=\"1-de-octubre-de-2026\">1 de octubre de 2026</h2>\n<ul>\n<li><strong>Quanela Copilot</strong>: pregúntale a tu negocio en lenguaje natural.</li>\n<li><strong>Personal y turnos</strong>: programa la semana, marca entrada y salida y revisa las horas. Ver <a href=\"/help/team/shifts\" data-help-link>Turnos y horas del equipo</a>.</li>\n<li><strong>Buscador de pedidos</strong> y <strong>despacho</strong> para domiciliarios.</li>\n<li><strong>Dirección propia</strong> para tu negocio (por ejemplo <code>fr3rk6.quanela.com</code>).</li>\n</ul>\n<h2 id=\"septiembre-de-2026\">Septiembre de 2026</h2>\n<ul>\n<li><strong>Comandos de voz en cocina</strong> y el manos libres <strong>«Oye Quanela»</strong>. Ver <a href=\"/help/kitchen/kitchen-voice\" data-help-link>Comandos de voz en cocina</a>.</li>\n<li><strong>Fotos de los platos</strong> y un planificador de menú más rápido.</li>\n</ul>\n",
+    "html": "<h2 id=\"6-de-octubre-de-2026\">6 de octubre de 2026</h2>\n<ul>\n<li><strong>Notificaciones.</strong> Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver <a href=\"/help/intro/notifications\" data-help-link>Notificaciones</a>.</li>\n<li><strong><code>quanela.com</code> siempre muestra la página de Quanela</strong>, aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en <code>doc.quanela.com</code>.</li>\n<li><strong>Centro de ayuda.</strong> Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver <a href=\"/help/assistant/ask-copilot\" data-help-link>Preguntarle a Copilot</a>.</li>\n<li><strong>Centro de operaciones.</strong> <strong>Pedidos</strong> y <strong>Cocina</strong> ahora son un solo módulo, <strong>Operación</strong>, con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver <a href=\"/help/orders/operations-center\" data-help-link>El Centro de operaciones</a>.</li>\n<li><strong>El pago dentro del pedido.</strong> Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver <a href=\"/help/orders/register-payment\" data-help-link>Registrar y anular pagos</a>.</li>\n<li><strong>«Oye Quanela» en toda la app.</strong> La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver <a href=\"/help/assistant/oye-quanela\" data-help-link>«Oye Quanela»</a>.</li>\n<li><strong>Copilot conversacional.</strong> Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver <a href=\"/help/assistant/copilot-limits\" data-help-link>Límites de Copilot</a>.</li>\n<li><strong>Un solo diseño.</strong> Todos los módulos se ven y se recorren igual.</li>\n</ul>\n<h2 id=\"5-de-octubre-de-2026\">5 de octubre de 2026</h2>\n<ul>\n<li><strong>Insights</strong> reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver <a href=\"/help/reports/insights\" data-help-link>Insights</a>.</li>\n<li><strong>Clientes renovado</strong>: cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver <a href=\"/help/customers/customers\" data-help-link>Clientes y saldos pendientes</a>.</li>\n<li><strong>Registro con Google, Instagram o teléfono</strong>, además del correo. Ver <a href=\"/help/getting-started/create-business\" data-help-link>Crear tu negocio en Quanela</a>.</li>\n<li><strong>Configuración ordenada</strong> en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola forma de guardar.</li>\n</ul>\n<h2 id=\"2-de-octubre-de-2026\">2 de octubre de 2026</h2>\n<ul>\n<li><strong>La cuenta es lo que ves.</strong> Cada local es una <em>cuenta</em>; cambias entre ellas desde arriba. Usuarios y roles se manejan por cuenta. Ver <a href=\"/help/getting-started/switch-account\" data-help-link>Entrar a Quanela y cambiar de cuenta o de rol</a>.</li>\n<li><strong>Menú de usuario nuevo</strong> con <strong>Apariencia</strong> (tema claro, oscuro o del sistema, y texto grande) y <strong>Ayuda y soporte</strong>.</li>\n</ul>\n<h2 id=\"1-de-octubre-de-2026\">1 de octubre de 2026</h2>\n<ul>\n<li><strong>Quanela Copilot</strong>: pregúntale a tu negocio en lenguaje natural.</li>\n<li><strong>Personal y turnos</strong>: programa la semana, marca entrada y salida y revisa las horas. Ver <a href=\"/help/team/shifts\" data-help-link>Turnos y horas del equipo</a>.</li>\n<li><strong>Buscador de pedidos</strong> y <strong>despacho</strong> para domiciliarios.</li>\n<li><strong>Dirección propia</strong> para tu negocio (por ejemplo <code>fr3rk6.quanela.com</code>).</li>\n</ul>\n<h2 id=\"septiembre-de-2026\">Septiembre de 2026</h2>\n<ul>\n<li><strong>Comandos de voz en cocina</strong> y el manos libres <strong>«Oye Quanela»</strong>. Ver <a href=\"/help/kitchen/kitchen-voice\" data-help-link>Comandos de voz en cocina</a>.</li>\n<li><strong>Fotos de los platos</strong> y un planificador de menú más rápido.</li>\n</ul>\n",
     "headings": [
       {
         "id": "6-de-octubre-de-2026",

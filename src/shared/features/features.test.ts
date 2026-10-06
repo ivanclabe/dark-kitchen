@@ -3,7 +3,8 @@ import { FEATURE_KEYS, featureLookup, unavailableReason, type FeatureState } fro
 
 // Every migration as text (Vite ?raw): features are seeded by the catalog and by later ones (e.g. ADR 0016).
 const migrations = import.meta.glob<string>('../../../supabase/migrations/*.sql', { query: '?raw', import: 'default', eager: true })
-const catalogSql = Object.values(migrations).join('\n')
+// Only the migrations that seed the catalog (others may mention 'ai' in other ways, ADR 0037).
+const catalogSql = Object.values(migrations).filter((sql) => /insert into dk_features\b/i.test(sql)).join('\n')
 
 const state = (over: Partial<FeatureState>): FeatureState => ({
   key: 'voice_commands',

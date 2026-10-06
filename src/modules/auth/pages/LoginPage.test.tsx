@@ -78,7 +78,7 @@ describe('login (ADR 0025)', () => {
     expect(screen.getByRole('status').textContent).toContain('Entra con tu correo y tu contraseña.')
   })
 
-  it('back from an owner method, the sign-up decides; otherwise home as before', () => {
+  it('back from an owner method, the sign-up decides; otherwise into the app (ADR 0036: /app, «/» is the landing)', () => {
     state.session = {}
     sessionStorage.setItem('dk-owner-sign-in', '1')
     renderLogin()
@@ -86,6 +86,6 @@ describe('login (ADR 0025)', () => {
     cleanup()
     sessionStorage.clear()
     renderLogin()
-    expect(screen.getByTestId('where').textContent).toBe('/')
+    expect(screen.getByTestId('where').textContent).toBe('/app')
   })
 })

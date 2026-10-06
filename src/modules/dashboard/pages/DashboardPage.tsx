@@ -1,8 +1,8 @@
 import { useCustomersSummary } from '@/modules/customers/hooks/useCustomers'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { fetchAccountAlerts } from '@/modules/settings/api'
-import { AlertList } from '@/modules/settings/components/AlertList'
+import { useNotifications } from '@/modules/notifications/hooks'
+import { OPEN_NOTIFICATIONS_EVENT, operationNotices, splitCount, unreadAiAdvice } from '@/modules/notifications/lib'
 import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/orders/lib/orderVisuals'
 import { useLiveOrders, useOrderSearch } from '@/modules/orders/hooks/useOrders'
@@ -17,10 +17,15 @@ import { Tooltip } from '@/shared/ui/Tooltip'
 import { iconButtonClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { formatDateLong, formatDateTime, formatMoney, todayStr } from '@/shared/utils/format'
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import {
+  AlarmClock,
+  AlertTriangle,
   ArrowRight,
+  CheckCircle2,
+  ChevronRight,
+  Package,
+  Sparkles,
   BarChart3,
   CalendarClock,
   ChefHat,
@@ -37,7 +42,6 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useDashboardSummary } from '../hooks/useDashboard'
-import { alertLink, attentionRows } from '../lib/attention'
 import type { DashboardSummary } from '../types'
 
 /** Lista compacta label → valor con divisores — el mismo patrón de "Cierre anterior / Precio máximo / …" de una ficha de mercado. */
@@ -307,58 +311,73 @@ function CarteraCard({ summary, liveOps }: { summary: DashboardSummary | undefin
 
 // ---------------------------------------------------------------------------
 
+const NOTICE_ICON: Record<string, LucideIcon> = { late_orders: AlarmClock, to_confirm: ClipboardList, low_stock: Package, overdue_customers: Wallet }
+
 /**
- * «Necesita atención» (ADR 0030): what to do now, from figures that already
- * exist, each opening its destination already filtered. Rows at zero hide;
- * with nothing pending it says so. Analysis lives in Insights.
+ * «Necesita atención» (ADR 0030, ADR 0037): what to do now, as cards — the
+ * figure, what it is and where it leads. The same notices as the bell
+ * (dk_my_notifications, operation group), so nothing appears twice; the AI
+ * advice and the plan live in the bell, with one quiet line here.
  */
-function NeedsAttention({ summary }: { summary: DashboardSummary | undefined }) {
-  const { can } = useActiveKitchen()
-  const customers = useCustomersSummary(can('customers.view') && can('receivables.view'))
-  if (!summary) return null
-  const overdue = can('customers.view') && can('receivables.view') ? (customers.data?.withOverdue ?? 0) : null
-  const visible = attentionRows(summary, overdue, can)
-  if (visible.length === 0) return null
-  const pending = visible.filter((r) => r.value > 0)
+function NeedsAttention() {
+  const { data, isLoading } = useNotifications()
+  if (isLoading || !data) return null
+  const notices = operationNotices(data.items)
+  const ai = unreadAiAdvice(data.items)
   return (
-    <section aria-label="Necesita atención" className="space-y-3">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <h2 className={typography.h3}>Necesita atención</h2>
-        {can('reports.view') && (
-          <Link to="/insights" className="inline-flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-100">
-            Tendencias y rentabilidad en Insights <ArrowRight size={13} aria-hidden />
-          </Link>
-        )}
-      </div>
-      {pending.length === 0 ? (
-        <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-300">Todo al día: nada pendiente por ahora.</p>
+    <section aria-labelledby="necesita-atencion" className="space-y-3">
+      <h2 id="necesita-atencion" className={typography.h3}>
+        Necesita atención
+      </h2>
+      {notices.length === 0 ? (
+        <p className="flex items-center gap-2.5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-200">
+          <CheckCircle2 size={17} className="shrink-0 text-emerald-400" aria-hidden /> Todo al día: nada pendiente por ahora.
+        </p>
       ) : (
-        <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {pending.map((r) => (
-            <li key={r.id}>
-              <Link to={r.to} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 bg-neutral-900/60 px-4 py-3 transition-colors hover:border-neutral-700 hover:bg-neutral-900">
-                <span className="min-w-0 text-sm text-neutral-300">{r.label}</span>
-                <span className="flex items-center gap-1.5 text-lg font-semibold tabular-nums text-neutral-50">
-                  {r.value}
-                  <ArrowRight size={14} className="text-neutral-500" aria-hidden />
-                </span>
-              </Link>
-            </li>
-          ))}
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {notices.map((n) => {
+            const Icon = NOTICE_ICON[n.type] ?? AlertTriangle
+            const { count, label } = splitCount(n.title)
+            const urgent = n.severity === 'warning' || n.severity === 'error'
+            return (
+              <li key={n.key}>
+                <Link
+                  to={n.to}
+                  className={clsx(
+                    'group flex h-full items-center gap-3.5 rounded-2xl border bg-neutral-900/50 p-4 transition-colors hover:bg-neutral-900',
+                    urgent ? 'border-amber-500/30 hover:border-amber-500/50' : 'border-neutral-800/70 hover:border-neutral-700',
+                  )}
+                >
+                  <span
+                    className={clsx(
+                      'flex size-10 shrink-0 items-center justify-center rounded-xl ring-1',
+                      urgent ? 'bg-amber-500/10 text-amber-300 ring-amber-500/25' : 'bg-neutral-800/80 text-neutral-300 ring-neutral-700/60',
+                    )}
+                  >
+                    <Icon size={18} aria-hidden />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    {count !== null && <span className="block text-2xl leading-tight font-semibold tabular-nums text-neutral-50">{count}</span>}
+                    <span className="block text-sm text-neutral-400 first-letter:uppercase group-hover:text-neutral-200">{label}</span>
+                  </span>
+                  <ChevronRight size={16} className="shrink-0 text-neutral-600 transition-transform group-hover:translate-x-0.5 group-hover:text-neutral-300" aria-hidden />
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       )}
-    </section>
-  )
-}
-
-/** Alerts of this account (ADR 0024, D5: they come from the old organization summary). Nothing when all is fine. */
-function AccountAlerts() {
-  const { kitchen, can, canShared } = useActiveKitchen()
-  const { data } = useQuery({ queryKey: ['account', kitchen.id, 'alerts'], queryFn: fetchAccountAlerts, refetchInterval: 60_000 })
-  if (!data?.length) return null
-  return (
-    <section aria-label="Alertas de la cuenta">
-      <AlertList alerts={data} linkFor={(alert) => alertLink(alert, { can, canShared })} />
+      {ai > 0 && (
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event(OPEN_NOTIFICATIONS_EVENT))}
+          className="inline-flex items-center gap-2 rounded-full border border-brasa-500/25 bg-brasa-500/5 px-3.5 py-1.5 text-sm text-brasa-200 transition-colors hover:bg-brasa-500/10"
+        >
+          <Sparkles size={14} className="text-brasa-300" aria-hidden />
+          {ai === 1 ? '1 sugerencia de IA nueva' : `${ai} sugerencias de IA nuevas`}
+          <span className="text-brasa-300/80">· Ver en notificaciones</span>
+        </button>
+      )}
     </section>
   )
 }
@@ -375,9 +394,7 @@ export function DashboardPage() {
     <Page>
       <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
 
-      <AccountAlerts />
-
-      <NeedsAttention summary={data} />
+      <NeedsAttention />
 
       {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
 

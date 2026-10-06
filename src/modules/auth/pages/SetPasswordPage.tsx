@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { supabase } from '@/shared/lib/supabase'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
@@ -96,7 +97,7 @@ export function SetPasswordPage() {
           <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> Contraseña guardada
         </p>
         <p className={typography.small}>Desde ahora entras a Quanela con tu correo y esta contraseña.</p>
-        <Button variant="primary" size="lg" className="w-full" onClick={() => navigate('/', { replace: true })}>
+        <Button variant="primary" size="lg" className="w-full" onClick={() => navigate(APP_ENTRY, { replace: true })}>
           Entrar a Quanela
         </Button>
       </Shell>
