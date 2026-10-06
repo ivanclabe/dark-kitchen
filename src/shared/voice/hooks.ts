@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { fetchVoiceProfiles, toVoiceSettings, VOICE_PROFILES_KEY, type KitchenVoiceSettings, type VoiceProfile, type VoiceVerbosity } from './catalog'
 import { effectiveVoice, type EffectiveVoice } from './resolveVoice'
-import { kitchenSpeech, type SpeechPriority } from './speechQueue'
+import { readVoicePref, writeVoicePref } from './devicePrefs'
+import { deviceSpeech, type SpeechPriority } from './speechQueue'
 
 export function useVoiceProfiles() {
   return useQuery({ queryKey: VOICE_PROFILES_KEY, queryFn: fetchVoiceProfiles, staleTime: 10 * 60_000 })
@@ -28,15 +29,10 @@ export function useDeviceVoices(): SpeechSynthesisVoice[] {
 // ---------------------------------------------------------------------------
 // Voice pinned on this device (localStorage, per device like mute and sound)
 // ---------------------------------------------------------------------------
-const PIN_KEY = 'dk-kitchen-voice-device'
 const PIN_EVENT = 'dk-voice-pin'
 
 function readPin(): string | null {
-  try {
-    return localStorage.getItem(PIN_KEY)
-  } catch {
-    return null
-  }
+  return readVoicePref('devicePin')
 }
 
 function subscribePin(callback: () => void) {
@@ -51,12 +47,7 @@ function subscribePin(callback: () => void) {
 export function useDeviceVoicePin(): [string | null, (voiceURI: string | null) => void] {
   const pin = useSyncExternalStore(subscribePin, readPin, () => null)
   const setPin = useCallback((voiceURI: string | null) => {
-    try {
-      if (voiceURI) localStorage.setItem(PIN_KEY, voiceURI)
-      else localStorage.removeItem(PIN_KEY)
-    } catch {
-      // Private mode or blocked storage: the pin simply does not persist.
-    }
+    writeVoicePref('devicePin', voiceURI)
     window.dispatchEvent(new Event(PIN_EVENT))
   }, [])
   return [pin, setPin]
@@ -71,19 +62,20 @@ export function useEffectiveVoice(settings: KitchenVoiceSettings, profiles: read
 
 /** Speaks a sample with exactly these settings (clears anything pending first). */
 export function previewVoice(text: string, voice: EffectiveVoice<SpeechSynthesisVoice>): boolean {
-  kitchenSpeech.clear()
-  return kitchenSpeech.enqueue(text, 'command', voice.params)
+  deviceSpeech.clear()
+  return deviceSpeech.enqueue(text, 'command', voice.params)
 }
 
 export type SpokenText = string | ((verbosity: VoiceVerbosity) => string | null)
 
 /**
- * The only way the kitchen speaks (ADR 0014). Gate: the voice_speech feature
- * (platform ∧ plan ∧ organization ∧ account ∧ permission, decided by the
- * database). Callers add their own switches (device preference, `voice`
- * parameter of an AI feature), which can only turn it off.
+ * The only way Quanela speaks (ADR 0014, ADR 0033: the whole app, not only
+ * the kitchen). Gate: the voice_speech feature (platform ∧ plan ∧
+ * organization ∧ account ∧ permission voice.use, decided by the database).
+ * Callers add their own switches (device preference, `voice` parameter of an
+ * AI feature), which can only turn it off.
  */
-export function useKitchenVoice() {
+export function useQuanelaVoice() {
   const { canUseFeature, feature } = useActiveKitchen()
   const allowed = canUseFeature('voice_speech')
   const rawSettings = feature('voice_speech')?.settings
@@ -95,7 +87,7 @@ export function useKitchenVoice() {
     (text: SpokenText, priority: SpeechPriority = 'command') => {
       if (!allowed) return false
       const spoken = typeof text === 'function' ? text(voice.verbosity) : text
-      return spoken ? kitchenSpeech.enqueue(spoken, priority, voice.params) : false
+      return spoken ? deviceSpeech.enqueue(spoken, priority, voice.params) : false
     },
     [allowed, voice],
   )

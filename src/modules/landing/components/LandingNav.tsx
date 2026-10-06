@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { helpHref } from '@/shared/help/helpUrl'
 import clsx from 'clsx'
 import { Flame, Menu, X } from 'lucide-react'
 import { useState } from 'react'
@@ -13,7 +14,7 @@ const LANDING_SECTIONS = [
 
 /**
  * Navegación de la landing (ADR 0010, 3.5): Producto · Funcionalidades ·
- * Precios · FAQ · Iniciar sesión · Crear cuenta. Fija arriba; en el celular,
+ * Precios · FAQ · Ayuda (doc.quanela.com, ADR 0035) · Iniciar sesión · Crear cuenta. Fija arriba; en el celular,
  * las secciones van en un menú desplegable.
  */
 export function LandingNav() {
@@ -36,6 +37,9 @@ export function LandingNav() {
               {s.label}
             </a>
           ))}
+          <a href={helpHref()} className="rounded-lg px-3 py-2 text-sm text-neutral-400 transition-colors hover:text-neutral-100">
+            Ayuda
+          </a>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -72,6 +76,9 @@ export function LandingNav() {
             {s.label}
           </a>
         ))}
+        <a href={helpHref()} onClick={() => setOpen(false)} className="block rounded-lg px-2 py-3 text-base text-neutral-200 hover:bg-neutral-900">
+          Ayuda
+        </a>
         {!session && (
           <Link to="/login" className="block rounded-lg px-2 py-3 text-base text-neutral-200 hover:bg-neutral-900">
             Iniciar sesión

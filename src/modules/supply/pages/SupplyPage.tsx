@@ -24,6 +24,8 @@ import type { Ingredient } from '../types'
 
 type SupplyView = 'stock' | 'compras' | 'proveedores'
 
+/** The help center article of each section (ADR 0034). */
+const SUPPLY_HELP: Record<SupplyView, string> = { stock: 'stock', compras: 'purchases', proveedores: 'suppliers' }
 const VIEWS: SubNavItem<SupplyView>[] = [
   { value: 'stock', label: 'Stock' },
   { value: 'compras', label: 'Compras' },
@@ -122,6 +124,7 @@ export function SupplyPage() {
   return (
     <Page variant="board">
       <PageHeader
+        help={SUPPLY_HELP[view]}
         title="Abastecimiento"
         description="Stock, compras y proveedores en un solo lugar."
         icon={Warehouse}

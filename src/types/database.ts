@@ -20,48 +20,60 @@ export type Database = {
           created_by: string | null
           error: string | null
           feature_key: string
+          feedback: number | null
           id: string
           input: Json
           input_tokens: number | null
+          intent: string | null
           kitchen_id: string
           latency_ms: number | null
           model: string | null
           organization_id: string | null
           output: Json | null
           output_tokens: number | null
+          scope: string | null
           status: string
+          timings: Json | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           error?: string | null
           feature_key: string
+          feedback?: number | null
           id?: string
           input: Json
           input_tokens?: number | null
+          intent?: string | null
           kitchen_id?: string
           latency_ms?: number | null
           model?: string | null
           organization_id?: string | null
           output?: Json | null
           output_tokens?: number | null
+          scope?: string | null
           status: string
+          timings?: Json | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
           error?: string | null
           feature_key?: string
+          feedback?: number | null
           id?: string
           input?: Json
           input_tokens?: number | null
+          intent?: string | null
           kitchen_id?: string
           latency_ms?: number | null
           model?: string | null
           organization_id?: string | null
           output?: Json | null
           output_tokens?: number | null
+          scope?: string | null
           status?: string
+          timings?: Json | null
         }
         Relationships: [
           {
@@ -3448,6 +3460,30 @@ export type Database = {
         Returns: undefined
       }
       dk_ai_run_allowed: { Args: { p_feature_key: string }; Returns: Json }
+      dk_ai_run_feedback: {
+        Args: { p_run_id: string; p_value: number }
+        Returns: undefined
+      }
+      dk_ai_run_finish: {
+        Args: {
+          p_error?: string
+          p_input?: Json
+          p_input_tokens?: number
+          p_intent?: string
+          p_latency_ms?: number
+          p_output?: Json
+          p_output_tokens?: number
+          p_run_id: string
+          p_scope?: string
+          p_status: string
+          p_timings?: Json
+        }
+        Returns: undefined
+      }
+      dk_ai_run_reserve: {
+        Args: { p_feature_key: string; p_input?: Json }
+        Returns: Json
+      }
       dk_assert_in_active_kitchen: {
         Args: { p_id: string; p_table: string }
         Returns: undefined
@@ -3510,6 +3546,7 @@ export type Database = {
       dk_copilot_customers: {
         Args: {
           p_from?: string
+          p_include_contact?: boolean
           p_limit?: number
           p_order_by?: string
           p_search?: string
@@ -3541,6 +3578,10 @@ export type Database = {
         }
         Returns: Json
       }
+      dk_copilot_payments: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
       dk_copilot_products: {
         Args: { p_ingredient?: string; p_limit?: number; p_search?: string }
         Returns: Json
@@ -3562,7 +3603,10 @@ export type Database = {
         }
         Returns: Json
       }
-      dk_copilot_staff: { Args: { p_day?: string }; Returns: Json }
+      dk_copilot_staff: {
+        Args: { p_day?: string; p_to?: string }
+        Returns: Json
+      }
       dk_copy_menu_plan_range: {
         Args: { p_days?: number; p_from_date: string; p_to_date: string }
         Returns: undefined

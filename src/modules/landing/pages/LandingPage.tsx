@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { helpHref } from '@/shared/help/helpUrl'
 import { CalendarDays, ChefHat, ChevronRight, Flame, Wallet, Warehouse, type LucideIcon } from 'lucide-react'
 import { useEffect, type CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -152,6 +153,9 @@ export function LandingPage() {
             </a>
             <a href="#faq" className="transition-colors hover:text-neutral-200">
               FAQ
+            </a>
+            <a href={helpHref()} className="transition-colors hover:text-neutral-200">
+              Centro de ayuda
             </a>
             <Link to={session ? '/' : '/login'} className="transition-colors hover:text-neutral-200">
               {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}

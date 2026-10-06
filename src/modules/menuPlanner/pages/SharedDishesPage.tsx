@@ -15,7 +15,7 @@ export function SharedDishesPage() {
   const { kitchen } = useActiveKitchen()
   return (
     <Page>
-      <PageHeader
+      <PageHeader help="dishes-and-menu"
         title="Platos compartidos"
         icon={Layers}
         description="Menús con receta que mantienes en un solo lugar y puedes usar en tus cuentas."

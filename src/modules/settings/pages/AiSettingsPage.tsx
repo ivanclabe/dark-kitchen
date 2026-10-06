@@ -1,5 +1,4 @@
-import { CommandRecognitionPanel } from '@/modules/kitchen/voice/CommandRecognitionPanel'
-import { WakeWordPanel } from '@/modules/kitchen/voice/WakeWordPanel'
+import { VoiceDeviceSettings } from '@/modules/voice/components/VoiceDeviceSettings'
 import { FeaturesPanel } from '@/modules/organization/components/FeaturesPanel'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Accordion } from '@/shared/ui/Accordion'
@@ -7,13 +6,10 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { KpiStrip } from '@/shared/ui/KpiStrip'
 import { typography } from '@/shared/ui/typography'
-import { toVoiceSettings } from '@/shared/voice/catalog'
-import { DeviceVoicePanel } from '@/shared/voice/DeviceVoicePanel'
-import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
 import { useQuery } from '@tanstack/react-query'
 import { Volume2 } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
-import { fetchAccountAiUsage } from '../api'
+import { fetchAccountAiUsage, type AccountAiUsage } from '../api'
 import { AiStatusPanel } from '../components/AiStatusPanel'
 import { FeatureStatusCard } from '../components/FeatureStatus'
 import { KitchenVoicePanel } from '../components/KitchenVoicePanel'
@@ -26,31 +22,13 @@ type Tab = 'features' | 'device' | 'usage'
 /** Old tabs (ADR 0024) → where they live now (ADR 0026). */
 const OLD_TABS: Record<string, Tab> = { voice: 'features', status: 'usage' }
 
-/** What depends on each tablet (ADR 0018): the voice it speaks with, the recognizer and hands-free. */
+/** «Oye Quanela» on this device (ADR 0018, ADR 0033): how it listens and speaks here. */
 function ThisDevice({ showStatus }: { showStatus: boolean }) {
-  const { feature, features } = useActiveKitchen()
-  const speech = feature('voice_speech')
-  const commands = feature('voice_commands')
-  const wakeWord = feature('voice_wake_word')
+  const { features } = useActiveKitchen()
 
   return (
     <>
-      {speech?.usable && (
-        <Section title="Voz de cocina" description="Con qué voz habla este equipo." card>
-          <DeviceVoicePanel lang={toVoiceSettings(speech.settings).lang} />
-        </Section>
-      )}
-      {commands?.usable && (
-        <Section title="Comandos de voz" description="Qué reconocedor usa este equipo y si escucha manos libres." card>
-          <CommandRecognitionPanel />
-          {wakeWord?.usable && (
-            <div className="mt-5 border-t border-neutral-800/60 pt-5">
-              <WakeWordPanel tuning={wakeWordTuning(wakeWord)} />
-            </div>
-          )}
-        </Section>
-      )}
-      {!speech?.usable && !commands?.usable && <p className={typography.small}>La voz no está activa en esta cuenta: no hay nada que ajustar en este equipo.</p>}
+      <VoiceDeviceSettings />
       {showStatus && (
         <Section title="Funciones de IA y voz en esta cuenta" description="Las activa quien administra las funciones.">
           <div className="space-y-3">
@@ -61,6 +39,61 @@ function ThisDevice({ showStatus }: { showStatus: boolean }) {
         </Section>
       )}
     </>
+  )
+}
+
+const SCOPE_LABEL: Record<string, string> = {
+  answered: 'Respondidas',
+  partial: 'Parciales',
+  no_data: 'Sin datos',
+  not_allowed: 'Sin permiso',
+  unsupported: 'Dato que Quanela no guarda',
+  out_of_scope: 'Fuera del negocio',
+  action: 'Pedían una acción',
+  clarify: 'Pidieron precisar',
+}
+
+const seconds = (ms: number | null) => (ms == null ? '—' : `${(ms / 1000).toFixed(1).replace('.', ',')} s`)
+
+/** ADR 0033, phase 4: precision (scopes and 👍/👎) and response time of Copilot, aggregated. */
+function CopilotQuality({ copilot }: { copilot: NonNullable<AccountAiUsage['copilot']> }) {
+  const rated = copilot.thumbsUp + copilot.thumbsDown
+  return (
+    <div className="space-y-3">
+      <h3 className="text-sm font-medium text-neutral-200">Copilot</h3>
+      <KpiStrip
+        columns={3}
+        items={[
+          { id: 'questions', label: 'Preguntas', value: String(copilot.questions), change: null, goodWhen: 'neutral', hint: `${copilot.byVoice} por voz · tope ${copilot.dailyLimit} al día` },
+          { id: 'time', label: 'Tiempo de respuesta (mediana)', value: seconds(copilot.p50Ms), change: null, goodWhen: 'neutral', hint: `9 de cada 10 en ${seconds(copilot.p90Ms)} o menos` },
+          {
+            id: 'useful',
+            label: 'Útiles',
+            value: rated > 0 ? `${Math.round((copilot.thumbsUp / rated) * 100)} %` : '—',
+            change: null,
+            goodWhen: 'neutral',
+            hint: rated > 0 ? `${copilot.thumbsUp} 👍 · ${copilot.thumbsDown} 👎` : 'Nadie ha calificado todavía',
+          },
+        ]}
+      />
+      {Object.keys(copilot.byScope).length > 0 && (
+        <ul className="divide-y divide-neutral-800/60 rounded-2xl border border-neutral-800/60 px-4">
+          {Object.entries(copilot.byScope)
+            .sort(([, a], [, b]) => (b ?? 0) - (a ?? 0))
+            .map(([scope, n]) => (
+              <li key={scope} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <span className="text-neutral-200">{SCOPE_LABEL[scope] ?? scope}</span>
+                <span className="tabular-nums text-neutral-400">{n}</span>
+              </li>
+            ))}
+        </ul>
+      )}
+      {(copilot.errors > 0 || copilot.cancelled > 0) && (
+        <p className={typography.caption}>
+          {copilot.errors} con error · {copilot.cancelled} canceladas
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -107,7 +140,8 @@ function UsageAndState() {
             ) : (
               <p className={typography.caption}>Todavía no hay análisis de IA en esta cuenta.</p>
             )}
-            <p className={typography.caption}>La voz de cocina usa la voz de cada equipo: no genera llamadas ni costo, por eso no aparece aquí.</p>
+            {data.copilot && data.copilot.questions > 0 && <CopilotQuality copilot={data.copilot} />}
+            <p className={typography.caption}>«Oye Quanela» usa la voz de cada equipo: hablar no genera llamadas ni costo; cada pregunta a Copilot cuenta como una consulta de IA.</p>
           </div>
         )}
       </Section>
@@ -128,7 +162,7 @@ export function AiSettingsPage() {
   const manage = canShared('features.manage') && organization !== null
   const tabs: SubNavItem<Tab>[] = [
     ...(manage ? [{ value: 'features' as const, label: 'Funciones' }] : []),
-    ...(can('settings.manage') || can('ai.manage') ? [{ value: 'device' as const, label: 'Este dispositivo' }] : []),
+    ...(can('settings.manage') || can('ai.manage') || can('voice.use') ? [{ value: 'device' as const, label: 'Este dispositivo' }] : []),
     ...(manage || canShared('observability.view') ? [{ value: 'usage' as const, label: 'Uso y estado' }] : []),
   ]
   const raw = params.get('tab') ?? ''

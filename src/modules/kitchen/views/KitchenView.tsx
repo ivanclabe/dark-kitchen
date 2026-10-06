@@ -11,10 +11,7 @@ import type { PrepStatus } from '@/modules/orders/types'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import type { MenuItem } from '@/shared/ui/Menu'
 import { typography } from '@/shared/ui/typography'
-import { kitchenSpeech } from '@/shared/voice/speechQueue'
-import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
-import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
-import { useWakeWord } from '@/shared/voice/wakeWord/useWakeWord'
+import { deviceSpeech } from '@/shared/voice/speechQueue'
 import clsx from 'clsx'
 import { Bell, ChefHat, Gauge, Kanban, Keyboard, Settings, Volume2, ZoomIn } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -22,9 +19,9 @@ import { KitchenConfigDrawer, type KitchenConfigTab } from '../components/Kitche
 import { KitchenInsightLine } from '../components/KitchenInsightLine'
 import { KitchenStatusLine } from '../components/KitchenStatusLine'
 import { useStallAlerts } from '../hooks/useStallAlerts'
-import { useVoiceCommandEngine } from '../voice/useVoiceCommandEngine'
+import { useKitchenVoiceCommands } from '../voice/useKitchenVoiceCommands'
 import { VoiceCommandBar } from '../voice/VoiceCommandBar'
-import { WakeWordIndicator } from '../voice/WakeWordIndicator'
+import { useVoice } from '@/modules/voice/voiceContext'
 import { SlaView } from './SlaView'
 
 type KitchenMode = 'tablero' | 'sla'
@@ -59,7 +56,7 @@ function writePref(key: string, value: string) {
  * dispatching are not offered here (KITCHEN_SCOPE).
  */
 export function KitchenView() {
-  const { can, canUseFeature, feature } = useActiveKitchen()
+  const { can } = useActiveKitchen()
   const ops = useOperations()
   const canConfigure = can('settings.manage')
   const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
@@ -72,13 +69,15 @@ export function KitchenView() {
   const prepOrders = useMemo(() => ops.live?.filter((o) => isKitchenStage(o.status)), [ops.live])
 
   const { newIds, acknowledge, soundEnabled, toggleSound } = useNewOrderAlert(prepOrders)
-  const voice = useVoiceCommandEngine(prepOrders)
+  // ADR 0033: the order commands are registered with «Oye Quanela», the app's voice.
+  const { enabled: voiceCommands } = useKitchenVoiceCommands(prepOrders)
+  const voice = useVoice()
   // While the microphone listens, spoken alerts wait (otherwise they would be transcribed).
-  const voiceBusy = voice.phase === 'listening' || voice.phase === 'processing'
+  const voiceBusy = voice.state === 'listening' || voice.state === 'processing'
   const { stalledByOrder } = useStallAlerts({ active: true, paused: voiceBusy, muted: !soundEnabled })
   // Muting sounds and spoken alerts also empties the speech queue at once (ADR 0014).
   useEffect(() => {
-    if (!soundEnabled) kitchenSpeech.clear()
+    if (!soundEnabled) deviceSpeech.clear()
   }, [soundEnabled])
 
   const kpis = useMemo(() => {
@@ -100,18 +99,8 @@ export function KitchenView() {
   }
 
   // Voice commands: feature of the account (organization ∧ account ∧ permission) + browser support.
-  const voiceCommands = canUseFeature('voice_commands')
+  // Hands-free («Oye Quanela») is the app's now: its indicator lives in the top bar (ADR 0033).
   const voiceAvailable = voiceCommands && voice.supported
-  // Hands-free (ADR 0016): feature of the account + switched on in this device; one tap pauses it.
-  const [handsFree] = useWakeWordPreference()
-  const [wakePaused, setWakePaused] = useState(false)
-  const wakeWordOn = voiceAvailable && canUseFeature('voice_wake_word') && handsFree
-  const wakeWord = useWakeWord({
-    active: wakeWordOn && !wakePaused,
-    suspended: voiceBusy,
-    tuning: wakeWordTuning(feature('voice_wake_word')),
-    onDetect: () => void voice.startHandsFree(),
-  })
 
   const menuItems: MenuItem[] = [
     mode === 'tablero'
@@ -121,7 +110,7 @@ export function KitchenView() {
     { label: 'Sonidos y avisos de voz', icon: Bell, checked: soundEnabled, onSelect: toggleSound },
     ...(voiceAvailable
       ? [
-          ...(voice.speechAllowed ? [{ label: 'Respuesta hablada', icon: Volume2, checked: voice.ttsEnabled, onSelect: voice.toggleTts }] : []),
+          ...(voice.speechAllowed ? [{ label: 'Respuesta hablada', icon: Volume2, checked: voice.replies, onSelect: () => voice.setReplies(!voice.replies) }] : []),
           { label: 'Probar comando de texto', icon: Keyboard, onSelect: () => setVoiceTestOpen(true) },
         ]
       : []),
@@ -137,8 +126,7 @@ export function KitchenView() {
         description={<KitchenStatusLine lateCount={kpis.late} canConfigure={canConfigure} onConfigure={() => setConfigTab('semanal')} />}
         actions={
           <>
-            {wakeWordOn && <WakeWordIndicator state={wakeWord.state} error={wakeWord.error} paused={wakePaused} onToggle={() => setWakePaused((p) => !p)} />}
-            {voiceCommands && <VoiceCommandBar engine={voice} enabled testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
+            {voiceCommands && <VoiceCommandBar testOpen={voiceTestOpen} onCloseTest={() => setVoiceTestOpen(false)} />}
           </>
         }
         menuItems={menuItems}

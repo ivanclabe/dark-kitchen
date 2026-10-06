@@ -172,7 +172,7 @@ function RecipeForm({
 
   return (
     <Page>
-      <PageHeader
+      <PageHeader help="recipes-and-cost"
         title={`Receta — ${product.name}`}
         description={`Precio de venta: ${formatMoney(product.price)}`}
         icon={BookOpen}

@@ -1,10 +1,11 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { helpHref } from '@/shared/help/helpUrl'
 import { rootUrl, tenantHostLabel } from '@/shared/tenant/host'
 import { useTenant } from '@/shared/tenant/tenantContext'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
-import { ArrowLeft, Eye, EyeOff, Flame, LogIn } from 'lucide-react'
+import { ArrowLeft, CircleHelp, Eye, EyeOff, Flame, LogIn } from 'lucide-react'
 import { useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { OwnerMethodButtons, PhoneSignIn } from '@/modules/signup/components/OwnerMethods'
@@ -185,7 +186,7 @@ export function LoginPage() {
           <p className="mt-8 text-center text-sm text-neutral-500">
             ¿Eres nuevo en el equipo o no tienes contraseña? Pide a tu administrador una <span className="text-neutral-300">invitación</span>.
           </p>
-          <div className="mt-3 flex justify-center">
+          <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-2">
             {/* On a subdomain "/" is this same login: the start is quanela.com (ADR 0021). */}
             {orgName && rootUrl('/') ? (
               <a href={rootUrl('/')!} className={backLinkClass}>
@@ -196,6 +197,9 @@ export function LoginPage() {
                 <ArrowLeft size={14} aria-hidden /> Volver al inicio
               </Link>
             )}
+            <a href={helpHref()} className={backLinkClass}>
+              <CircleHelp size={14} aria-hidden /> Centro de ayuda
+            </a>
           </div>
         </div>
       </main>

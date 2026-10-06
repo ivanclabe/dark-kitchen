@@ -4,7 +4,7 @@ import { ACTION_LABEL } from '@/modules/ai/lib/catalog'
 import clsx from 'clsx'
 import { ChevronDown, Sparkles, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useKitchenVoice } from '@/shared/voice/hooks'
+import { useQuanelaVoice } from '@/shared/voice/hooks'
 import { kitchenPhrases } from '@/shared/voice/kitchenPhrases'
 
 const DISMISSED_KEY = 'dk-kitchen-insight-dismissed'
@@ -37,7 +37,7 @@ export function KitchenInsightLine({
   onOpenOrder: (orderId: string) => void
 }) {
   const feature = useAiFeature('kitchen_insights')
-  const { say } = useKitchenVoice()
+  const { say } = useQuanelaVoice()
   const enabled = active && feature.enabled
   const { data: result } = useAiInsight('kitchen_insights', enabled, { live: true })
   const [dismissedId, setDismissedId] = useState<string | null>(readDismissed)

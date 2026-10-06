@@ -91,7 +91,7 @@ export function StaffPage() {
 
   return (
     <Page variant="board">
-      <PageHeader
+      <PageHeader help="shifts"
         title="Personal"
         icon={CalendarClock}
         description="Turnos del equipo de esta cuenta: quién trabaja, cuándo y cuántas horas."

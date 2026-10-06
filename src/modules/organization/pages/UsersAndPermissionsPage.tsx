@@ -60,6 +60,7 @@ export function UsersLayout() {
   if (params.get('tab') === 'roles') return <Navigate to={path('/users/roles')} replace />
   return (
     <SectionLayout
+      help="users-and-roles"
       title="Usuarios"
       description={`Personas de ${kitchen.name} y lo que puede hacer cada una.`}
       icon={UserCog}

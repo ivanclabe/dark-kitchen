@@ -8,6 +8,8 @@ import { useState } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ContextIndicator } from './AccountSwitcher'
 import { CopilotButton, CopilotProvider } from '@/modules/copilot/CopilotProvider'
+import { VoiceMenu } from '@/modules/voice/components/VoiceMenu'
+import { VoiceProvider } from '@/modules/voice/VoiceProvider'
 import { ADMIN_NAV_ITEMS, homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS, type NavItem } from './navigation'
 import { UserMenu } from './UserMenu'
 import { WelcomeCard } from './WelcomeCard'
@@ -80,7 +82,9 @@ export function AppLayout() {
     // fuera de vista, y para que <main> tenga una altura acotada real — sin
     // eso, ninguna vista puede "llenar la pantalla" de forma confiable (solo
     // puede crecer con su contenido y dejar que la página entera scrollee).
+    // «Oye Quanela» (ADR 0033): the voice of the whole app, one per account; Copilot answers through it.
     // Copilot (ADR 0020): one conversation per account — a new account starts a new one.
+    <VoiceProvider key={kitchen.id}>
     <CopilotProvider key={kitchen.id}>
     <div className="flex h-screen overflow-hidden bg-neutral-950 text-neutral-100">
       {/* Rail de escritorio compacto: solo íconos. El nombre de cada módulo
@@ -116,7 +120,8 @@ export function AppLayout() {
         {/* Contexto actual (escritorio): Cuenta · rol, con cambio de Cuenta. */}
         <header className="hidden h-12 shrink-0 items-center border-b border-neutral-800/60 px-4 md:flex lg:px-6">
           <ContextIndicator />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <VoiceMenu />
             <CopilotButton />
           </div>
         </header>
@@ -134,6 +139,7 @@ export function AppLayout() {
           <div className="min-w-0 flex-1">
             <ContextIndicator compact />
           </div>
+          <VoiceMenu compact />
           <CopilotButton compact />
           <UserMenu placement="bottom-end" />
         </header>
@@ -163,5 +169,6 @@ export function AppLayout() {
       </Drawer>
     </div>
     </CopilotProvider>
+    </VoiceProvider>
   )
 }

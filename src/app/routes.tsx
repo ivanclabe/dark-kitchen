@@ -24,6 +24,9 @@ import { IntegrationsSettingsPage } from '@/modules/settings/pages/IntegrationsS
 import { KitchenGeneralPage } from '@/modules/settings/pages/KitchenGeneralPage'
 import { SettingsLayout } from '@/modules/settings/pages/SettingsLayout'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { HelpElsewhere } from '@/modules/help/redirects'
+import { DOCS_ROUTES, helpCenterRoutes } from '@/modules/help/routes'
+import { currentHost } from '@/shared/tenant/host'
 import { TenantGate } from '@/shared/tenant/TenantProvider'
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, useParams, type RouteObject } from 'react-router-dom'
@@ -76,6 +79,9 @@ const routes: RouteObject[] = [
   { path: '/invitacion/:token', element: <Navigate to="/login" replace /> },
   // Activación de un usuario creado por un administrador (ADR 0008, sección 10).
   { path: '/activar/:token', element: <ActivationPage /> },
+  // Centro de ayuda público (ADR 0034): vive en doc.quanela.com (ADR 0035). Aquí /help lleva allá;
+  // sin dominio raíz (vistas previas) sigue dentro de la app.
+  currentHost().kind === 'path' ? helpCenterRoutes('/help') : { path: '/help/*', Component: HelpElsewhere },
   // Registro público de un negocio (ADR 0008, Fase F) y la vuelta del enlace de confirmación.
   { path: '/registro', element: <SignUpPage /> },
   { path: '/registro/confirmado', element: <SignUpConfirmedPage /> },
@@ -204,5 +210,6 @@ const routes: RouteObject[] = [
   },
 ]
 
-// Every route goes through the gate of the subdomain's organization (ADR 0021).
-export const router = createBrowserRouter([{ element: <TenantGate />, children: routes }])
+// Every route goes through the gate of the subdomain's organization (ADR 0021);
+// doc.quanela.com is only the help center (ADR 0035).
+export const router = createBrowserRouter(currentHost().kind === 'docs' ? DOCS_ROUTES : [{ element: <TenantGate />, children: routes }])

@@ -1,15 +1,15 @@
 import { useCallback, useSyncExternalStore } from 'react'
+import { readVoicePref, writeVoicePref } from '../devicePrefs'
 
 /**
  * "Manos libres" on this device (ADR 0016). Off by default: the microphone
  * stays open only on the tablets where someone switched it on.
  */
-const KEY = 'dk-kitchen-wake-word'
 const EVENT = 'dk-wake-word-pref'
 
 export function readWakeWordPreference(): boolean {
   try {
-    return localStorage.getItem(KEY) === 'on'
+    return readVoicePref('handsFree') === 'on'
   } catch {
     return false
   }
@@ -27,12 +27,7 @@ function subscribe(callback: () => void) {
 export function useWakeWordPreference(): [boolean, (on: boolean) => void] {
   const value = useSyncExternalStore(subscribe, readWakeWordPreference, () => false)
   const set = useCallback((on: boolean) => {
-    try {
-      if (on) localStorage.setItem(KEY, 'on')
-      else localStorage.removeItem(KEY)
-    } catch {
-      // Blocked storage: the choice lasts until the page reloads.
-    }
+    writeVoicePref('handsFree', on ? 'on' : null)
     window.dispatchEvent(new Event(EVENT))
   }, [])
   return [value, set]

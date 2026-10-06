@@ -90,10 +90,11 @@ describe('UserMenu (ADR 0023)', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Claro (beta)' }).getAttribute('aria-checked')).toBe('true')
   })
 
-  it('Ayuda: shortcuts window; support contact hidden while not configured', () => {
+  it('Ayuda: shortcuts window and the help center always; support contact hidden while not configured', () => {
     openMenu([])
     fireEvent.click(screen.getByRole('menuitem', { name: 'Ayuda y soporte' }))
-    expect(screen.queryByRole('menuitem', { name: /Escribir a soporte|WhatsApp|Centro de ayuda/ })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: /Escribir a soporte|WhatsApp/ })).toBeNull()
+    expect(screen.getByRole('menuitem', { name: /Centro de ayuda/ })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: /Preguntar a Copilot/ })).toBeTruthy()
     fireEvent.click(screen.getByRole('menuitem', { name: 'Atajos de teclado' }))
     expect(screen.getByRole('dialog', { name: 'Atajos de teclado' })).toBeTruthy()

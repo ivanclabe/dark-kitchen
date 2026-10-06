@@ -198,7 +198,7 @@ export function CustomerDetailPage() {
   if (!customer) {
     return (
       <Page>
-        <PageHeader title="Cliente" icon={Users} backTo={back.to} backLabel={back.label} />
+        <PageHeader help="customers" title="Cliente" icon={Users} backTo={back.to} backLabel={back.label} />
         <EmptyState icon={Users} title="Cliente no encontrado" description="Puede que haya sido eliminado o el enlace esté mal." />
       </Page>
     )
@@ -231,7 +231,7 @@ export function CustomerDetailPage() {
 
   return (
     <Page>
-      <PageHeader
+      <PageHeader help="customers"
         title={customer.fullName}
         icon={Users}
         backTo={back.to}

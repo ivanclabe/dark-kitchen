@@ -94,6 +94,7 @@ insert into _app_keys values
   ('staff.view'),
   ('staff.manage'),
   ('copilot.use'),
+  ('voice.use'),
   ('audit.view'),
   ('organization.view'),
   ('organization.manage'),
@@ -111,14 +112,14 @@ insert into _app_keys values
 
 -- 1. Catálogo y plantillas (como dueño de la base)
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catálogo', 'Permisos: total · Cuenta · organización', '62 · 50 · 12',
+  insert into _t (area, test, expected, got) values ('Catálogo', 'Permisos: total · Cuenta · organización', '63 · 51 · 12',
     (select count(*) || ' · ' || count(*) filter (where scope = 'account') || ' · ' || count(*) filter (where scope = 'organization') from dk_permissions));
   insert into _t (area, test, expected, got) values ('Catálogo', 'La base y la app tienen las mismas claves (faltan en la app · faltan en la base)', '0 · 0',
     (select count(*) from dk_permissions p where not exists (select 1 from _app_keys a where a.key = p.key))::text || ' · ' ||
     (select count(*) from _app_keys a where not exists (select 1 from dk_permissions p where p.key = a.key))::text);
   insert into _t (area, test, expected, got) values ('Catálogo', 'Claves con formato módulo.acción', '0',
     (select count(*)::text from dk_permissions where key <> module || '.' || action));
-  insert into _t (area, test, expected, got) values ('Plantillas', 'ADMIN tiene todos los permisos de Cuenta', '50',
+  insert into _t (area, test, expected, got) values ('Plantillas', 'ADMIN tiene todos los permisos de Cuenta', '51',
     (select count(*)::text from dk_role_permissions rp join dk_roles r on r.id = rp.role_id where r.is_system and r.key = 'ADMIN'));
   insert into _t (area, test, expected, got) values ('Plantillas', 'Ningún rol tiene permisos de organización', '0',
     (select count(*)::text from dk_role_permissions rp join dk_permissions p on p.key = rp.permission_key where p.scope = 'organization'));

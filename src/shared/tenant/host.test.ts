@@ -14,6 +14,11 @@ describe('parseHost (ADR 0021/0022)', () => {
   it('the root and www are the platform', () => {
     expect(parseHost('quanela.com', 'quanela.com')).toEqual({ kind: 'root' })
     expect(parseHost('www.quanela.com', 'quanela.com')).toEqual({ kind: 'root' })
+    // ADR 0035: the help center has its own subdomain; a 6-character code is still an organization.
+    expect(parseHost('doc.quanela.com', 'quanela.com')).toEqual({ kind: 'docs' })
+    expect(parseHost('DOC.Quanela.com.', 'quanela.com')).toEqual({ kind: 'docs' })
+    expect(parseHost('doc.localhost', 'localhost')).toEqual({ kind: 'docs' })
+    expect(parseHost('docabc.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', code: 'DOCABC' })
   })
 
   it('other hosts work by path (Vercel previews, IP, deeper levels, no root configured)', () => {

@@ -27,7 +27,7 @@ export function MyShiftsPage() {
 
   return (
     <Page>
-      <PageHeader title="Mis turnos" icon={CalendarClock} description="Tus turnos en esta cuenta y tu entrada y salida." />
+      <PageHeader help="shifts" title="Mis turnos" icon={CalendarClock} description="Tus turnos en esta cuenta y tu entrada y salida." />
       <ClockCard />
       <Card title="Próximos turnos" icon={CalendarDays}>
         {upcoming.length === 0 ? (

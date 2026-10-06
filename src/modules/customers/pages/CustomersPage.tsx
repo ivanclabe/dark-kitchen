@@ -186,7 +186,7 @@ export function CustomersPage() {
 
   return (
     <Page>
-      <PageHeader
+      <PageHeader help="customers"
         title="Clientes"
         icon={Users}
         description="Gestiona y consulta los clientes de tu negocio."

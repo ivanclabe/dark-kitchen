@@ -54,7 +54,7 @@ export function ProfilePage() {
 
   return (
     <Page>
-      <PageHeader title="Mi perfil" icon={UserRound} description="Tu nombre, tu avatar y tu contraseña. Se ven igual en todas tus cuentas." />
+      <PageHeader help="switch-account" title="Mi perfil" icon={UserRound} description="Tu nombre, tu avatar y tu contraseña. Se ven igual en todas tus cuentas." />
 
       <form onSubmit={onSubmit}>
         <Card title="Tu perfil" icon={UserRound}>

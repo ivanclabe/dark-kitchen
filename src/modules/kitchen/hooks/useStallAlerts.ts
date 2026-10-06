@@ -2,7 +2,7 @@ import { useAiFeature, useKitchenSignals } from '@/modules/ai/hooks/useAi'
 import { numberSetting } from '@/modules/ai/lib/catalog'
 import { currentStalls, dueStallAnnouncement, type StallAlert } from '@/modules/ai/lib/stallAlerts'
 import { useEffect, useMemo, useRef } from 'react'
-import { useKitchenVoice } from '@/shared/voice/hooks'
+import { useQuanelaVoice } from '@/shared/voice/hooks'
 
 /**
  * Alertas de pedidos y platos detenidos (Configuración → Funciones → Alertas
@@ -18,7 +18,7 @@ export function useStallAlerts({ active, paused, muted }: { active: boolean; pau
   const enabled = active && feature.enabled
   const dishStallMin = numberSetting(feature.settings, 'dish_stall_min', 12)
   const repeatMin = numberSetting(feature.settings, 'repeat_min', 5)
-  const { allowed: speechAllowed, say, verbosity } = useKitchenVoice()
+  const { allowed: speechAllowed, say, verbosity } = useQuanelaVoice()
   const voice = feature.settings.voice === true && speechAllowed
 
   const { data: signals } = useKitchenSignals(enabled, dishStallMin)

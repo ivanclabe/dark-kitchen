@@ -1,14 +1,14 @@
 /**
  * Intérprete de comandos de voz para Cocina. Función pura — sin React, sin
  * Supabase — para poder probarla de forma aislada y para que el motor de
- * voz (useVoiceCommandEngine) nunca ejecute una acción sin pasar primero
+ * voz (decideKitchenCommand) nunca ejecute una acción sin pasar primero
  * por aquí.
  *
  * "CONFIRM" se reconoce como acción válida del lenguaje (para no fallar en
  * silencio si alguien lo dice) aunque no exista ninguna transición legal
  * para ella dentro de Cocina — un pedido visible en el KDS ya está
  * confirmado por definición. Esa validación de negocio vive en
- * useVoiceCommandEngine, no aquí.
+ * kitchenCommands.ts (decideKitchenCommand), no aquí.
  */
 
 export type VoiceAction = 'CONFIRM' | 'START_PREPARATION' | 'MARK_READY' | 'CANCEL' | 'SET_PRIORITY' | 'UNSET_PRIORITY'

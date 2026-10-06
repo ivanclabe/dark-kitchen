@@ -3,7 +3,8 @@ import type { UtteranceParams } from './resolveVoice'
 /**
  * One speech queue for the whole app (ADR 0014, 9.5):
  *   - never overlaps and never cuts what is being said,
- *   - priorities: command (someone just asked) > alert > insight; a higher
+ *   - priorities: command (someone just asked) > alert > answer (Copilot,
+ *     ADR 0033) > insight; a higher
  *     priority jumps ahead in the queue, without interrupting,
  *   - no repeats of a text already queued, drops stale messages (default
  *     20 s) and keeps at most `maxPending` waiting (the lowest priority goes),
@@ -11,9 +12,10 @@ import type { UtteranceParams } from './resolveVoice'
  *   - measures the device latency: handed to the engine → it starts speaking
  *     (waiting behind another message is by design and not counted).
  */
-export type SpeechPriority = 'command' | 'alert' | 'insight'
+export type SpeechPriority = 'command' | 'alert' | 'answer' | 'insight'
 
-const RANK: Record<SpeechPriority, number> = { command: 0, alert: 1, insight: 2 }
+/** ADR 0033: a Copilot answer goes after the kitchen's alerts, never on top of them. */
+const RANK: Record<SpeechPriority, number> = { command: 0, alert: 1, answer: 2, insight: 3 }
 
 export interface SpeechEngine {
   available(): boolean
@@ -164,4 +166,4 @@ export const deviceSpeechEngine: SpeechEngine = {
 }
 
 /** The app-wide queue. */
-export const kitchenSpeech = new SpeechQueue(deviceSpeechEngine)
+export const deviceSpeech = new SpeechQueue(deviceSpeechEngine)

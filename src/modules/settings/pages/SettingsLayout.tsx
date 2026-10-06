@@ -25,7 +25,7 @@ export function SettingsLayout() {
   if (!sections.some((s) => current === s.to || current.startsWith(`${s.to}/`))) return <Navigate to={sections[0].to} replace />
 
   return (
-    <SectionLayout title="Configuración" description={`Ajustes de ${kitchen.name}.`} icon={Settings} navLabel="Secciones de configuración" sections={sections}>
+    <SectionLayout help="settings" title="Configuración" description={`Ajustes de ${kitchen.name}.`} icon={Settings} navLabel="Secciones de configuración" sections={sections}>
       <Outlet />
     </SectionLayout>
   )

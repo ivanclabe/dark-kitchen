@@ -33,7 +33,7 @@ delete from dk_kitchen_features where kitchen_id = (select id from _ctx where ke
 delete from dk_organization_features where organization_id = (select id from _ctx where key = 'orgA') and feature_key in ('voice_wake_word', 'voice_commands');
 
 -- 1. Catalog and plans
-insert into _t (area, test, expected, got) values ('Catalog', 'Voice feature that depends on voice commands', 'voice · {voice_commands} · false',
+insert into _t (area, test, expected, got) values ('Catalog', 'Voice feature for the whole app (ADR 0033: no longer depends on the kitchen commands)', 'voice · {} · false',
   (select concat_ws(' · ', category, depends_on::text, uses_model::text) from dk_features where key = 'voice_wake_word'));
 insert into _t (area, test, expected, got) values ('Catalog', 'Platform defaults are valid', 'true',
   (select (dk_feature_settings_error(key, default_settings) is null)::text from dk_features where key = 'voice_wake_word'));
@@ -74,7 +74,7 @@ begin
   perform dk_platform_set_feature('voice_wake_word', p_default_settings => '{"threshold": 0.7, "confirm_frames": 2}');
   insert into _t (area, test, expected, got) values ('Validation', 'Valid tuning reaches the account', '0.7 · 2',
     (pg_temp.feat('voice_wake_word', 'settings')::jsonb ->> 'threshold') || ' · ' || (pg_temp.feat('voice_wake_word', 'settings')::jsonb ->> 'confirm_frames'));
-  insert into _t (area, test, expected, got) values ('Platform', 'Overview shows the dependency', '["voice_commands"]',
+  insert into _t (area, test, expected, got) values ('Platform', 'Overview: no dependency since ADR 0033', '[]',
     (select f -> 'dependsOn' from jsonb_array_elements(dk_platform_ai_overview() -> 'features') f where f ->> 'key' = 'voice_wake_word')::text);
 
   -- 4. Organization switches it off for one account; then offers it to nobody

@@ -18,6 +18,7 @@ export function SectionLayout({
   icon,
   navLabel,
   sections,
+  help,
   children,
 }: {
   title: string
@@ -26,6 +27,8 @@ export function SectionLayout({
   icon: LucideIcon
   navLabel: string
   sections: SectionLink[]
+  /** The help center article of this area (ADR 0034). */
+  help?: string
   children: ReactNode
 }) {
   const { pathname, search } = useLocation()
@@ -38,7 +41,7 @@ export function SectionLayout({
   return (
     <div ref={root}>
       <Page>
-        <PageHeader title={title} description={description} icon={icon} />
+        <PageHeader title={title} description={description} icon={icon} help={help} />
         {sections.length > 1 && <SubNavLinks label={navLabel} items={sections} />}
         <div className="min-w-0">{children}</div>
       </Page>

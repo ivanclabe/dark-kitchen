@@ -23,9 +23,10 @@ const ACTION_LABEL: Record<VoiceAction, string> = {
 const mb = (bytes: number) => Math.round(bytes / 1_048_576)
 
 /**
- * "Command recognition" on this device (ADR 0015): browser engine or
- * offline Vosk (beta). "Probar" listens once and shows what was understood
- * and which command it would be — it never touches an order.
+ * Speech recognition on this device (ADR 0015, ADR 0033: it serves «Oye
+ * Quanela» in the whole app): browser engine or offline Vosk (beta, kitchen
+ * commands only). "Probar" listens once and shows what was understood and
+ * which command it would be — it never touches an order.
  */
 export function CommandRecognitionPanel() {
   const [engineId, setEngineId] = useRecognizerPreference()
@@ -95,7 +96,7 @@ export function CommandRecognitionPanel() {
     <div className="space-y-3">
       <div className="max-w-md">
         <label htmlFor="recognizer" className="text-xs text-neutral-400">
-          Reconocimiento de comandos
+          Reconocimiento de voz
         </label>
         <Select id="recognizer" value={engineId} onChange={(e) => choose(e.target.value as RecognizerId)} className="!mt-1">
           <option value="browser">Navegador (necesita internet)</option>
@@ -106,7 +107,7 @@ export function CommandRecognitionPanel() {
         <p className={typography.caption}>
           {engineId === 'browser'
             ? 'Usa el reconocimiento del navegador. En Chrome el audio se procesa en servidores de Google.'
-            : 'Reconoce los comandos en este equipo, sin internet y sin enviar el audio. Solo entiende números de pedido y acciones; cancelar se hace desde la pantalla.'}
+            : 'Reconoce los comandos de Cocina en este equipo, sin internet y sin enviar el audio. Solo entiende números de pedido y acciones (cancelar se hace desde la pantalla); para hacerle preguntas a Copilot, usa el navegador.'}
         </p>
       </div>
 

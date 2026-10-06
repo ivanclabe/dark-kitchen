@@ -171,6 +171,19 @@ export interface AccountAiUsage {
   dailyLimit: number
   totals: { runs: number; errors: number; runs24h: number }
   byFeature: { key: string; label: string | null; runs: number; errors: number }[]
+  /** ADR 0033: how Copilot is doing (aggregated; the questions are each person's own). */
+  copilot?: {
+    dailyLimit: number
+    questions: number
+    byVoice: number
+    errors: number
+    cancelled: number
+    p50Ms: number | null
+    p90Ms: number | null
+    thumbsUp: number
+    thumbsDown: number
+    byScope: Partial<Record<string, number>>
+  }
 }
 
 export async function fetchAccountAiUsage(days = 30): Promise<AccountAiUsage> {

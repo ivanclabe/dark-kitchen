@@ -13,7 +13,7 @@ import { useRef, useState } from 'react'
 const mb = (bytes: number) => (bytes / 1_048_576).toFixed(1)
 
 /**
- * "Manos libres (Oye Quanela)" on this device (ADR 0016): off by default.
+ * "Manos libres (Oye Quanela)" on this device (ADR 0016, ADR 0033: the whole app): off by default.
  * "Probar" listens for the phrase and shows the live probability; it never
  * opens a command.
  */
@@ -55,8 +55,8 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
         <div>
           <p className="text-sm text-neutral-200">Manos libres (Oye Quanela)</p>
           <p className={typography.caption}>
-            Di «Oye Quanela» y luego el comando, sin tocar la pantalla. El micrófono queda abierto en este equipo; el audio se procesa aquí y no se guarda ni se envía. En tabletas, deja la
-            pantalla encendida.
+            Di «Oye Quanela» en cualquier pantalla y luego tu pregunta (o, en Cocina, el comando), sin tocar la pantalla. La frase se detecta en este equipo y ese audio no se guarda ni se
+            envía; lo que dices después lo reconoce el servicio de voz del navegador. Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
           </p>
         </div>
         <Switch checked={on} onChange={setOn} label="Manos libres (Oye Quanela)" disabled={!supported} />

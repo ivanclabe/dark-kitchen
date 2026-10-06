@@ -3,12 +3,16 @@
  * the organization's 6-character code (never its name):
  *   {code}.{root}  → an organization (a7k92p.quanela.com → A7K92P)
  *   {root}, www.{root} → the platform root (landing, sign-up, general login)
+ *   doc.{root}         → the public help center (ADR 0035), nothing else
  *   anything else (Vercel previews, an IP, root domain not configured) →
  *   "path" mode: the app works by path as before, without a tenant.
  * The root domain comes from VITE_TENANT_ROOT_DOMAIN (quanela.com in
  * production, localhost in development); nothing is hard-coded.
  */
-export type HostKind = { kind: 'root' } | { kind: 'tenant'; code: string } | { kind: 'path' }
+export type HostKind = { kind: 'root' } | { kind: 'docs' } | { kind: 'tenant'; code: string } | { kind: 'path' }
+
+/** The help center's subdomain (ADR 0035). Organization codes have 6 characters (ADR 0022): it can never be one. */
+export const DOCS_LABEL = 'doc'
 
 /** Any DNS label; whether it is a real organization code is decided by the database (dk_tenant_public). */
 const LABEL = /^[a-z0-9]+(-[a-z0-9]+)*$/
@@ -25,6 +29,7 @@ export function parseHost(hostname: string, root: string = tenantRootDomain()): 
   const label = host.slice(0, -(root.length + 1))
   // Only one level ({code}.root); a.b.root is not a tenant.
   if (label.includes('.') || !LABEL.test(label) || label.length > 63) return { kind: 'path' }
+  if (label === DOCS_LABEL) return { kind: 'docs' }
   // Codes are shown in uppercase (A7K92P); DNS is case-insensitive.
   return { kind: 'tenant', code: label.toUpperCase() }
 }
@@ -50,6 +55,12 @@ export function tenantUrl(code: string, path = '/'): string | null {
 export function rootUrl(path = '/'): string | null {
   const root = tenantRootDomain()
   return root ? `${origin(root)}${path}` : null
+}
+
+/** https://doc.quanela.com{path} — or null without a root domain. */
+export function docsUrl(path = '/'): string | null {
+  const root = tenantRootDomain()
+  return root ? `${origin(`${DOCS_LABEL}.${root}`)}${path}` : null
 }
 
 /** "a7k92p.quanela.com", to show. */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { kitchenSpeech } from '../speechQueue'
+import { deviceSpeech } from '../speechQueue'
 import { startCapture, type Capture } from './capture'
 import { loadWakeWordModels } from './wakeWordModel'
 import { WakeWordStream, type WakeWordTuning } from './wakeWordStream'
@@ -73,7 +73,7 @@ export function useWakeWord({
         draining = true
         while (pending.length > 0 && !cancelled) {
           const chunk = pending.shift()!
-          if (kitchenSpeech.isSpeaking(SPEECH_TAIL_MS)) {
+          if (deviceSpeech.isSpeaking(SPEECH_TAIL_MS)) {
             heardSpeech = true
             continue
           }

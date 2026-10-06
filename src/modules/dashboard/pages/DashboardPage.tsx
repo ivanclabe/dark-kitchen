@@ -105,7 +105,7 @@ function DashboardHeader({
   const clock = new Date(now).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
   return (
-    <PageHeader
+    <PageHeader help="home-screen"
       title="Inicio"
       icon={LayoutDashboard}
       description={

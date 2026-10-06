@@ -165,7 +165,7 @@ export function MenuPlannerPage() {
   return (
     <DndContext sensors={can('menus.edit') ? sensors : []} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
       <Page variant="board">
-        <PageHeader
+        <PageHeader help="dishes-and-menu"
           title="Planificador de Menús"
           description="Platos, calendario y disponibilidad en un solo lugar."
           icon={Soup}

@@ -1,3 +1,5 @@
+import { helpHref } from '@/shared/help/helpUrl'
+
 /**
  * Ayuda y soporte (ADR 0023). Contacto y centro de ayuda vienen de variables
  * de entorno (D3, D4): sin ellas, la opción no aparece. Nada fijo en el código.
@@ -12,9 +14,10 @@ export function supportWhatsAppUrl(): string | null {
   return digits ? `https://wa.me/${digits}` : null
 }
 
-export function helpCenterUrl(): string | null {
+/** The public help center: doc.quanela.com (ADR 0035), unless VITE_HELP_URL points somewhere else. */
+export function helpCenterUrl(): string {
   const url = (import.meta.env.VITE_HELP_URL ?? '').trim()
-  return /^https:\/\//.test(url) ? url : null
+  return /^https:\/\//.test(url) ? url : helpHref()
 }
 
 /** Version of this build: the deploy's commit (Vercel) or "dev". */

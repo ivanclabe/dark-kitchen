@@ -1,4 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
+import { readVoicePref, writeVoicePref } from '../devicePrefs'
 
 /**
  * Speech-recognition engine chosen on this device (ADR 0015). Per device,
@@ -6,12 +7,11 @@ import { useCallback, useSyncExternalStore } from 'react'
  */
 export type RecognizerId = 'browser' | 'vosk'
 
-const KEY = 'dk-kitchen-recognizer'
 const EVENT = 'dk-recognizer-pref'
 
 export function readRecognizerPreference(): RecognizerId {
   try {
-    return localStorage.getItem(KEY) === 'vosk' ? 'vosk' : 'browser'
+    return readVoicePref('recognizer') === 'vosk' ? 'vosk' : 'browser'
   } catch {
     return 'browser'
   }
@@ -29,12 +29,7 @@ function subscribe(callback: () => void) {
 export function useRecognizerPreference(): [RecognizerId, (id: RecognizerId) => void] {
   const value = useSyncExternalStore(subscribe, readRecognizerPreference, () => 'browser' as const)
   const set = useCallback((id: RecognizerId) => {
-    try {
-      if (id === 'browser') localStorage.removeItem(KEY)
-      else localStorage.setItem(KEY, id)
-    } catch {
-      // Blocked storage: the choice lasts until the page reloads.
-    }
+    writeVoicePref('recognizer', id === 'browser' ? null : id)
     window.dispatchEvent(new Event(EVENT))
   }, [])
   return [value, set]

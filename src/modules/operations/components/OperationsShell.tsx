@@ -15,6 +15,8 @@ import { useMemo, type ReactNode } from 'react'
 import { useOperations } from '../lib/operationsContext'
 import { OPERATIONS_VIEW_LABEL, type OperationsView } from '../lib/views'
 
+/** The help center article of each view (ADR 0034). */
+const OPERATIONS_HELP: Record<OperationsView, string> = { board: 'operations-center', kitchen: 'kitchen-view', dispatch: 'dispatch-deliver', list: 'search-orders' }
 const VIEW_ICON: Record<OperationsView, TabItem<OperationsView>['icon']> = { board: Kanban, kitchen: ChefHat, dispatch: Bike, list: List }
 
 /**
@@ -81,6 +83,7 @@ export function OperationsShell({
       <Page variant="board">
         <div className="shrink-0 space-y-4">
           <PageHeader
+            help={OPERATIONS_HELP[ops.view]}
             title="Centro de operaciones"
             icon={Activity}
             description={description}

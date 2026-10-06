@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
+import { HelpButton } from './HelpButton'
 import { typography } from './typography'
 
 /**
@@ -16,6 +17,7 @@ export function PageHeader({
   meta,
   backTo,
   backLabel = 'Volver',
+  help,
 }: {
   title: ReactNode
   description?: ReactNode
@@ -26,6 +28,8 @@ export function PageHeader({
   meta?: ReactNode
   backTo?: string
   backLabel?: string
+  /** The help center article of this screen (ADR 0034): a «?» that opens it apart. */
+  help?: string
 }) {
   return (
     <header className="flex flex-col gap-3">
@@ -45,6 +49,7 @@ export function PageHeader({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className={typography.h1}>{title}</h1>
               {meta}
+              {help && <HelpButton article={help} />}
             </div>
             {description && <div className={`mt-0.5 ${typography.small}`}>{description}</div>}
           </div>

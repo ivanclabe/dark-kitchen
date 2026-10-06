@@ -3,7 +3,7 @@ import { typography } from '@/shared/ui/typography'
 import { useEffect, useState } from 'react'
 import { useDeviceVoicePin, useDeviceVoices } from './hooks'
 import { voicesForLang } from './resolveVoice'
-import { kitchenSpeech } from './speechQueue'
+import { deviceSpeech } from './speechQueue'
 
 function median(values: readonly number[]): number | null {
   if (values.length === 0) return null
@@ -22,7 +22,7 @@ export function DeviceVoicePanel({ lang }: { lang: string }) {
   const spanish = voicesForLang(voices, lang)
 
   useEffect(() => {
-    const read = () => setLatency({ median: median(kitchenSpeech.latencySamples), count: kitchenSpeech.latencySamples.length })
+    const read = () => setLatency({ median: median(deviceSpeech.latencySamples), count: deviceSpeech.latencySamples.length })
     read()
     const timer = setInterval(read, 1_000)
     return () => clearInterval(timer)

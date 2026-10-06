@@ -2,7 +2,7 @@ import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
 import { AlertTriangle, CheckCircle2, Loader2, Mic, MicOff } from 'lucide-react'
 import type { ComponentType } from 'react'
-import type { VoicePhase } from './useVoiceCommandEngine'
+import type { VoiceState as VoicePhase } from '../types'
 
 const PHASE_CONTENT: Record<VoicePhase, { icon: ComponentType<{ size?: number; className?: string }>; label: string; className: string; iconClassName?: string }> = {
   idle: { icon: Mic, label: 'Dar un comando por voz', className: 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800' },

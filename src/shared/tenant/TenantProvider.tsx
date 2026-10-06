@@ -49,7 +49,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 }
 
 /** Pages anyone can open on a subdomain, before deciding membership. */
-const OPEN_PATHS = ['/login', '/activar/', '/set-password', '/registro', '/landing', '/precios']
+const OPEN_PATHS = ['/login', '/activar/', '/set-password', '/registro', '/landing', '/precios', '/help']
 
 function Screen({ icon: Icon, title, children }: { icon: typeof Flame; title: string; children: ReactNode }) {
   return (
