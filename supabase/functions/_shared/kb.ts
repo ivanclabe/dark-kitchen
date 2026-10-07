@@ -285,7 +285,7 @@ export const KB: KbArticle[] = [
     "section": "customers",
     "url": "/help/customers/customers",
     "title": "Clientes y saldos pendientes",
-    "summary": "En Clientes buscas y creas clientes, ves sus pedidos, lo que han comprado y cuánto deben; desde su ficha registras un abono o creas un pedido nuevo.",
+    "summary": "En Clientes buscas por nombre, teléfono o correo y abres la ficha 360° del cliente — pedidos, preferencias, direcciones, quejas, recomendaciones y saldo — para atenderlo sin cambiar de pantalla.",
     "audience": [
       "owner",
       "admin",
@@ -303,10 +303,16 @@ export const KB: KbArticle[] = [
       "¿Quién me debe?",
       "¿Cuánto me debe un cliente?",
       "¿Cómo registro un abono de un cliente?",
-      "¿Cómo veo los pedidos de un cliente?"
+      "¿Cómo veo los pedidos de un cliente?",
+      "¿Cómo registro una queja de un cliente?",
+      "¿Dónde anoto lo que no le gusta a un cliente?",
+      "¿Cómo cambio la dirección de un cliente?",
+      "¿Qué es lo que más pide un cliente?"
     ],
     "keywords": [
       "cliente",
+      "ficha",
+      "360",
       "deuda",
       "saldo",
       "cartera",
@@ -315,20 +321,32 @@ export const KB: KbArticle[] = [
       "abono",
       "vencido",
       "teléfono",
-      "WhatsApp"
+      "correo",
+      "WhatsApp",
+      "queja",
+      "reclamo",
+      "incidencia",
+      "preferencias",
+      "favoritos",
+      "alergia",
+      "dirección",
+      "recomendación"
     ],
     "steps": [
       "Abre Clientes y toca Nuevo cliente .",
-      "Escribe el Nombre (obligatorio). Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número.",
+      "Escribe el Nombre (obligatorio). Opcional: Correo , Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número.",
       "Toca Crear cliente ."
     ],
     "headings": [
       "Crear un cliente",
       "Encontrar un cliente",
-      "La ficha del cliente",
+      "La ficha del cliente (360°)",
+      "Direcciones",
+      "Quejas",
+      "Preferencias y recomendaciones",
       "Registrar un abono"
     ],
-    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Escribe el Nombre (obligatorio). Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos. Encontrar un cliente Escribe en el buscador o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). Toca el encabezado de una columna para ordenar. La ficha del cliente Toca un cliente. Arriba ves sus Pedidos , el Total comprado , el Saldo pendiente y su Último pedido . Las pestañas: Pedidos : todos sus pedidos. Cuenta : los Pedidos con saldo y los Pagos recibidos . Información : sus datos. Desde la ficha: Editar , Registrar pago y Nuevo pedido (ya con el cliente elegido). Registrar un abono En la ficha, toca Registrar pago (o en la lista, en el menú ⋯ del cliente). Elige el Pedido , escribe el Monto a abonar , el Método de pago y, si quieres, una Nota . Confirma. El saldo del pedido y del cliente bajan de inmediato. Bueno saber: las deudas solo las ve quien tiene permiso de cartera. Para el pago completo de un pedido, ver Registrar y anular pagos."
+    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Escribe el Nombre (obligatorio). Opcional: Correo , Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos. Encontrar un cliente Escribe en el buscador (nombre, teléfono en cualquier formato, correo o dirección) o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). Toca el encabezado de una columna para ordenar. La ficha del cliente (360°) Toca un cliente. Arriba: su estado (activo si pidió en los últimos 90 días, saldo vencido, quejas abiertas), su teléfono y su correo, y los botones Editar , Registrar queja , Registrar pago y Nuevo pedido . Las pestañas: Pestaña Qué ves --- Resumen Lo más importante junto: cuántos pedidos, total comprado, cada cuánto pide, su último pedido y lo que más pide ; lo que le gusta y lo que no ; qué recomendarle; su contacto; la última dirección de envío; las quejas abiertas y la nota general Pedidos Todos sus pedidos Preferencias Platos favoritos, ingredientes que le gustan y que no, y preferencias alimentarias. Los platos e ingredientes se eligen del catálogo Direcciones La última dirección de envío (la que usan los pedidos y el despacho), las frecuentes y las anteriores Quejas Su historial de quejas e incidencias Cuenta Los pedidos con saldo y los pagos recibidos Todo sale de los datos reales: si algo no se ha registrado, la ficha lo dice en vez de suponerlo. Direcciones En Direcciones , toca Nueva dirección . Escribe la Dirección ; opcional: Referencia , Quién recibe e Indicaciones para la entrega . Deja marcado Usar como última dirección de envío si es a donde va el próximo pedido. Nada se borra: una dirección nueva queda además de las anteriores. Con Usar como última cambias a otra; Archivar la saca de la lista sin perderla. Quejas Toca Registrar queja , elige el Motivo , el Pedido (opcional) y escribe Qué pasó . Para el seguimiento, en Quejas toca Dar seguimiento : cambia el Estado (Pendiente, En revisión, Resuelta), escribe la Respuesta o solución y, si quieres, Notas internas . Lo que el cliente reportó no se edita ni se borra: cada queja queda en el historial con su fecha "
   },
   {
     "id": "dishes-and-menu",
@@ -1292,7 +1310,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve. Conversar con «Oye Quanela». Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver «Oye Quanela». Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda y vencidos, ficha con pedidos, cuenta y abonos. Ver Clientes y saldos pendientes. Registro con Google, Instagram o teléfono , además del correo. Ver Crear tu negocio en Quanela. Configuración ordenada en secciones (General, Facturación, IA y voz, Integraciones, Actividad) con una sola fo"
+    "body": "de octubre de 2026 Ficha 360° del cliente. En una sola pantalla: lo que más pide y cada cuánto, sus preferencias (lo que le gusta y lo que no), sus direcciones con historial, sus quejas con seguimiento, qué recomendarle y su saldo. Ahora el cliente tiene correo y se busca también por correo. Ver Clientes. Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve. Conversar con «Oye Quanela». Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver «Oye Quanela». Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta y tiene su propio cupo diario. Ver Límites de Copilot. Un solo diseño. Todos los módulos se ven y se recorren igual. de octubre de 2026 Insights reemplaza a Reportes: ventas, costos y margen con comparación contra el periodo anterior, un resumen automático y exportación a CSV. Ver Insights. Clientes renovado : cifras de arriba, filtros por deuda "
   },
   {
     "id": "roles",

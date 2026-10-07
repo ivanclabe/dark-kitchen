@@ -18,17 +18,23 @@ import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { formatDate, formatDateTime, formatMoney } from '@/shared/utils/format'
-import { Banknote, ChevronLeft, ChevronRight, Pencil, Plus, Receipt, Users } from 'lucide-react'
+import { Banknote, ChevronLeft, ChevronRight, MessageSquareWarning, Pencil, Plus, Receipt, Users } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
 import { ActivityBadge, BalanceCell } from '../components/CustomerTable'
 import { useCustomerDetail } from '../hooks/useCustomers'
+import { useCustomerProfile } from '../hooks/useCustomerProfile'
+import { openComplaints } from '../lib/profile'
+import { CustomerAddresses } from '../components/profile/CustomerAddresses'
+import { CustomerComplaints, NewComplaintDrawer } from '../components/profile/CustomerComplaints'
+import { CustomerPreferences } from '../components/profile/CustomerPreferences'
+import { CustomerProfile } from '../components/profile/CustomerProfile'
 import { relativeDay } from '../lib/dates'
 import type { CustomerDetail } from '../types'
 
-type Tab = 'orders' | 'account' | 'info'
+type Tab = 'summary' | 'orders' | 'preferences' | 'addresses' | 'complaints' | 'account'
 const ORDERS_PAGE = 20
 
 /** Pedidos: the customer's orders, 20 per page; one opens in a drawer over this page (the context stays). */
@@ -144,33 +150,11 @@ function CustomerAccount({ customer, onOpen }: { customer: CustomerDetail; onOpe
   )
 }
 
-function CustomerInfo({ customer }: { customer: CustomerDetail }) {
-  const rows: [string, string][] = [
-    ['Nombre', customer.fullName],
-    ['Teléfono', customer.phone ? formatPhone(customer.phone) : '—'],
-    ['Dirección', customer.address ?? '—'],
-    ['WhatsApp', customer.hasWhatsapp ? 'Vinculado: sus pedidos pueden llegar por WhatsApp' : 'No vinculado'],
-    ['Cliente desde', formatDate(customer.createdAt)],
-    ['Notas', customer.notes?.trim() || '—'],
-  ]
-  return (
-    <Section title="Información" card>
-      <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-        {rows.map(([label, value]) => (
-          <div key={label} className={label === 'Notas' ? 'sm:col-span-2' : undefined}>
-            <dt className="text-xs font-medium tracking-wide text-neutral-500 uppercase">{label}</dt>
-            <dd className="mt-1 text-sm whitespace-pre-line text-neutral-200">{value}</dd>
-          </div>
-        ))}
-      </dl>
-    </Section>
-  )
-}
-
 /**
- * One customer (ADR 0028): who they are, their figures and three tabs —
- * Pedidos, Cuenta, Información. Everything is read for this customer only
- * (never the whole list), and an order opens over this page.
+ * One customer, 360° (ADR 0028, ADR 0040): who they are, their figures and
+ * the tabs — Resumen (the most important first), Pedidos, Preferencias,
+ * Direcciones, Quejas and Cuenta. Everything is read for this customer only,
+ * and an order opens over this page.
  */
 export function CustomerDetailPage() {
   const { can } = useActiveKitchen()
@@ -178,7 +162,9 @@ export function CustomerDetailPage() {
   const [params, setParams] = useSearchParams()
   const location = useLocation()
   const { data: customer, isLoading, isError, error, refetch } = useCustomerDetail(id)
+  const profile = useCustomerProfile(id)
   const [editOpen, setEditOpen] = useState(false)
+  const [complaintOpen, setComplaintOpen] = useState(false)
   const [payOpen, setPayOpen] = useState(false)
   const [openOrder, setOpenOrder] = useState<string | null>(null)
   const [newOrderOpen, setNewOrderOpen] = useState(false)
@@ -187,12 +173,18 @@ export function CustomerDetailPage() {
   const receivables = useCustomerReceivables(id, payOpen)
 
   const showDebt = customer?.balance !== undefined
+  const canEdit = can('customers.edit')
+  const open = profile.data ? openComplaints(profile.data.complaints).length : 0
   const tabs: { value: Tab; label: string }[] = [
+    { value: 'summary', label: 'Resumen' },
     { value: 'orders', label: 'Pedidos' },
+    { value: 'preferences', label: 'Preferencias' },
+    { value: 'addresses', label: 'Direcciones' },
+    { value: 'complaints', label: open ? `Quejas (${open})` : 'Quejas' },
     ...(showDebt ? [{ value: 'account' as const, label: 'Cuenta' }] : []),
-    { value: 'info', label: 'Información' },
   ]
-  const tab: Tab = tabs.find((t) => t.value === params.get('tab'))?.value ?? 'orders'
+  const tab: Tab = tabs.find((t) => t.value === params.get('tab'))?.value ?? 'summary'
+  const goTo = (t: Tab) => setParams(t === 'summary' ? {} : { tab: t }, { replace: true, state: location.state })
 
   if (isLoading) return <LoadingState variant="block" />
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />
@@ -221,7 +213,7 @@ export function CustomerDetailPage() {
             change: null,
             goodWhen: 'neutral',
             hint: customer.overdue ? `${formatMoney(customer.overdue)} vencido` : undefined,
-            onSelect: () => setParams({ tab: 'account' }, { replace: true, state: location.state }),
+            onSelect: () => goTo('account'),
           },
         ] satisfies Kpi[])
       : []),
@@ -245,14 +237,26 @@ export function CustomerDetailPage() {
                 Saldo vencido
               </Badge>
             )}
+            {open > 0 && (
+              <button type="button" onClick={() => goTo('complaints')} className="rounded-full focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none">
+                <Badge size="sm" tone="danger" icon={MessageSquareWarning}>
+                  {open === 1 ? '1 queja abierta' : `${open} quejas abiertas`}
+                </Badge>
+              </button>
+            )}
           </>
         }
-        description={[formatPhone(customer.phone), customer.address, `Cliente desde ${formatDate(customer.createdAt)}`].filter(Boolean).join(' · ')}
+        description={[formatPhone(customer.phone), customer.email, `Cliente desde ${formatDate(customer.createdAt)}`].filter(Boolean).join(' · ')}
         actions={
           <>
             {can('customers.edit') && (
               <Button variant="secondary" icon={Pencil} onClick={() => setEditOpen(true)}>
                 Editar
+              </Button>
+            )}
+            {canEdit && (
+              <Button variant="secondary" icon={MessageSquareWarning} onClick={() => setComplaintOpen(true)}>
+                Registrar queja
               </Button>
             )}
             {can('receivables.collect') && showDebt && (
@@ -271,23 +275,34 @@ export function CustomerDetailPage() {
 
       {kpis.length > 0 && <KpiStrip items={kpis} columns={4} />}
 
-      <SubNav label="Secciones del cliente" items={tabs} value={tab} onChange={(t) => setParams(t === 'orders' ? {} : { tab: t }, { replace: true, state: location.state })} />
+      <SubNav label="Secciones del cliente" items={tabs} value={tab} onChange={goTo} />
 
       <div className="space-y-8">
         {tab === 'orders' ? (
           <CustomerOrders customerId={customer.id} onOpen={setOpenOrder} />
         ) : tab === 'account' ? (
           <CustomerAccount customer={customer} onOpen={setOpenOrder} />
+        ) : profile.isError ? (
+          <ErrorState error={profile.error} onRetry={() => void profile.refetch()} />
+        ) : !profile.data ? (
+          <LoadingState variant="block" />
+        ) : tab === 'preferences' ? (
+          <CustomerPreferences customerId={customer.id} preferences={profile.data.preferences} canEdit={canEdit} />
+        ) : tab === 'addresses' ? (
+          <CustomerAddresses customerId={customer.id} addresses={profile.data.addresses} canEdit={canEdit} />
+        ) : tab === 'complaints' ? (
+          <CustomerComplaints customerId={customer.id} complaints={profile.data.complaints} canEdit={canEdit} onOpenOrder={setOpenOrder} onNew={() => setComplaintOpen(true)} />
         ) : (
-          <CustomerInfo customer={customer} />
+          <CustomerProfile customer={customer} profile={profile.data} canEdit={canEdit} onEdit={canEdit ? () => setEditOpen(true) : undefined} onOpenOrder={setOpenOrder} />
         )}
       </div>
 
       <CustomerFormModal
         open={editOpen}
-        customer={{ id: customer.id, fullName: customer.fullName, phone: customer.phone, address: customer.address, notes: customer.notes }}
+        customer={{ id: customer.id, fullName: customer.fullName, phone: customer.phone, email: customer.email ?? null, address: customer.address, notes: customer.notes }}
         onClose={() => setEditOpen(false)}
       />
+      {complaintOpen && <NewComplaintDrawer customerId={customer.id} onClose={() => setComplaintOpen(false)} />}
       <RegisterPaymentModal receivables={payOpen ? (receivables.data?.filter((r) => r.balance > 0) ?? null) : null} onClose={() => setPayOpen(false)} />
       <OrderPeekDrawer orderId={openOrder} onClose={() => setOpenOrder(null)} />
       {/* ADR 0030: a new order for THIS customer, without leaving it. */}

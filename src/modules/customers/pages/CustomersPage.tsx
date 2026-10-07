@@ -176,7 +176,7 @@ export function CustomersPage() {
     <EmptyState
       icon={Search}
       title="No encontramos clientes que coincidan con tu búsqueda"
-      description="Prueba con otro nombre, teléfono o dirección, o quita los filtros."
+      description="Prueba con otro nombre, teléfono, correo o dirección, o quita los filtros."
       action={
         <Button variant="secondary" size="sm" icon={X} onClick={clearAll}>
           Quitar filtros
@@ -214,7 +214,7 @@ export function CustomersPage() {
                 setSearch(e.target.value)
                 setPage(0)
               }}
-              placeholder="Buscar por nombre, teléfono o dirección…"
+              placeholder="Buscar por nombre, teléfono, correo o dirección…"
               aria-label="Buscar clientes"
               className="!mt-0 pl-10"
             />

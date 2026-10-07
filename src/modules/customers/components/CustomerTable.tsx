@@ -86,6 +86,7 @@ export function CustomerTable({
             {c.phone ? formatPhone(c.phone) : <span className="text-neutral-600">Sin teléfono</span>}
             {c.hasWhatsapp && <MessageCircle size={13} className="text-emerald-400" aria-label="Vinculado a WhatsApp" />}
           </span>
+          {c.email && <span className="block max-w-[14rem] truncate text-xs text-neutral-400">{c.email}</span>}
           {c.address && <span className="block max-w-[14rem] truncate text-xs text-neutral-500">{c.address}</span>}
         </span>
       ),

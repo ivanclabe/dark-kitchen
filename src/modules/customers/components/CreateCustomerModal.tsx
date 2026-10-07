@@ -1,4 +1,6 @@
 import { Button } from '@/shared/ui/Button'
+import { emailError, normalizeEmail } from '@/shared/utils/email'
+import { EmailInput } from '@/shared/ui/EmailInput'
 import { toE164 } from '@/shared/utils/phone'
 import { PhoneInput } from '@/shared/ui/PhoneInput'
 import { phoneError } from '@/shared/utils/phone'
@@ -34,6 +36,8 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
   const [fullName, setFullName] = useState(() => customer?.fullName ?? (looksLikePhone(initialQuery) ? '' : initialQuery))
   const [phone, setPhone] = useState(() => customer?.phone ?? (looksLikePhone(initialQuery) ? (toE164('CO', initialQuery) ?? initialQuery) : ''))
   const phoneProblem = phoneError(phone, { original: customer?.phone })
+  const [email, setEmail] = useState(customer?.email ?? '')
+  const emailProblem = emailError(email)
   const [address, setAddress] = useState(customer?.address ?? '')
   const [notes, setNotes] = useState(customer?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
@@ -42,8 +46,8 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-    if (phoneProblem) return
-    const input = { fullName: fullName.trim(), phone: phone.trim() || null, address: address.trim() || null, notes: notes.trim() || null }
+    if (phoneProblem || emailProblem) return
+    const input = { fullName: fullName.trim(), phone: phone.trim() || null, email: normalizeEmail(email) || null, address: address.trim() || null, notes: notes.trim() || null }
     try {
       if (customer) {
         await updateCustomer.mutateAsync({ id: customer.id, input })
@@ -68,7 +72,10 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
       <FormField label="Teléfono" error={phoneProblem} info="Con este número reconocemos al cliente cuando pide por WhatsApp, y no se repite en la cuenta.">
         {(a11y) => <PhoneInput {...a11y} value={phone} onValueChange={setPhone} />}
       </FormField>
-      <FormField label="Dirección">{(a11y) => <Input {...a11y} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />}</FormField>
+      <FormField label="Correo" error={email ? emailProblem : null}>
+        {(a11y) => <EmailInput {...a11y} value={email} onValueChange={setEmail} placeholder="cliente@correo.com" autoComplete="off" />}
+      </FormField>
+      <FormField label="Dirección de envío" info="Queda como su última dirección de envío. Las anteriores se guardan en su ficha, en Direcciones.">{(a11y) => <Input {...a11y} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />}</FormField>
       <FormField label="Notas">{(a11y) => <Textarea {...a11y} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />}</FormField>
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="ghost" onClick={onClose} disabled={pending}>

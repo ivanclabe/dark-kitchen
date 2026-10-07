@@ -279,10 +279,348 @@ export type Database = {
           },
         ]
       }
+      dk_customer_addresses: {
+        Row: {
+          address: string
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          delivery_notes: string | null
+          id: string
+          is_frequent: boolean
+          kitchen_id: string
+          last_used_at: string
+          recipient_name: string | null
+          reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          delivery_notes?: string | null
+          id?: string
+          is_frequent?: boolean
+          kitchen_id?: string
+          last_used_at?: string
+          recipient_name?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          delivery_notes?: string | null
+          id?: string
+          is_frequent?: boolean
+          kitchen_id?: string
+          last_used_at?: string
+          recipient_name?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_customer_addresses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_addresses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_addresses_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_customer_complaints: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string
+          id: string
+          internal_notes: string | null
+          kitchen_id: string
+          order_id: string | null
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          description: string
+          id?: string
+          internal_notes?: string | null
+          kitchen_id?: string
+          order_id?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          description?: string
+          id?: string
+          internal_notes?: string | null
+          kitchen_id?: string
+          order_id?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_customer_complaints_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_complaints_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_complaints_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_complaints_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_complaints_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "dk_customer_complaints_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_customer_preferences: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          ingredient_id: string | null
+          kind: string
+          kitchen_id: string
+          label: string | null
+          note: string | null
+          product_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          ingredient_id?: string | null
+          kind: string
+          kitchen_id?: string
+          label?: string | null
+          note?: string | null
+          product_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          ingredient_id?: string | null
+          kind?: string
+          kitchen_id?: string
+          label?: string | null
+          note?: string | null
+          product_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_customer_preferences_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_supply_suggestions"
+            referencedColumns: ["ingredient_id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_preferences_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      dk_customer_recommendations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          dismissed_at: string | null
+          id: string
+          kitchen_id: string
+          product_id: string | null
+          reason: string | null
+          score: number | null
+          source: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          dismissed_at?: string | null
+          id?: string
+          kitchen_id?: string
+          product_id?: string | null
+          reason?: string | null
+          score?: number | null
+          source?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          dismissed_at?: string | null
+          id?: string
+          kitchen_id?: string
+          product_id?: string | null
+          reason?: string | null
+          score?: number | null
+          source?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_customer_recommendations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_recommendations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_recommendations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_recommendations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_customer_recommendations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_today_menu"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       dk_customers: {
         Row: {
           address: string | null
           created_at: string
+          email: string | null
           full_name: string
           id: string
           kitchen_id: string
@@ -294,6 +632,7 @@ export type Database = {
         Insert: {
           address?: string | null
           created_at?: string
+          email?: string | null
           full_name: string
           id?: string
           kitchen_id?: string
@@ -305,6 +644,7 @@ export type Database = {
         Update: {
           address?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
           kitchen_id?: string
@@ -3475,6 +3815,7 @@ export type Database = {
         }[]
       }
       dk_active_role: { Args: never; Returns: string }
+      dk_address_key: { Args: { p: string }; Returns: string }
       dk_admin_kitchens: {
         Args: never
         Returns: {
@@ -3570,6 +3911,10 @@ export type Database = {
       dk_cancel_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: undefined
+      }
+      dk_catalog_item_in_account: {
+        Args: { p_ingredient_id: string; p_product_id: string }
+        Returns: boolean
       }
       dk_clock_in: { Args: never; Returns: string }
       dk_clock_out: { Args: never; Returns: string }
@@ -3713,7 +4058,31 @@ export type Database = {
       }
       dk_current_kitchen_id: { Args: never; Returns: string }
       dk_current_profile_id: { Args: never; Returns: string }
+      dk_customer_address_archive: {
+        Args: { p_archived?: boolean; p_id: string }
+        Returns: undefined
+      }
+      dk_customer_address_save: {
+        Args: {
+          p_address?: string
+          p_customer_id: string
+          p_delivery_notes?: string
+          p_id?: string
+          p_is_frequent?: boolean
+          p_make_current?: boolean
+          p_recipient_name?: string
+          p_reference?: string
+        }
+        Returns: string
+      }
       dk_customer_detail: { Args: { p_id: string }; Returns: Json }
+      dk_customer_in_account: {
+        Args: { p_customer_id: string }
+        Returns: boolean
+      }
+      dk_customer_order_stats: { Args: { p_id: string }; Returns: Json }
+      dk_customer_preference_options: { Args: never; Returns: Json }
+      dk_customer_profile: { Args: { p_id: string }; Returns: Json }
       dk_customers_list: {
         Args: {
           p_created_from?: string

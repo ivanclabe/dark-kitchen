@@ -18,6 +18,7 @@ order: 1
 
 ## 6 de octubre de 2026
 
+- **Ficha 360° del cliente.** En una sola pantalla: lo que más pide y cada cuánto, sus preferencias (lo que le gusta y lo que no), sus direcciones con historial, sus quejas con seguimiento, qué recomendarle y su saldo. Ahora el cliente tiene correo y se busca también por correo. Ver [Clientes](help:customers).
 - **Pesos, teléfonos y correos más claros.** Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve.
 - **Conversar con «Oye Quanela».** Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver [«Oye Quanela»](help:oye-quanela).
 - **Notificaciones.** Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver [Notificaciones](help:notifications).
