@@ -21,8 +21,7 @@ screenshots:
     notes:
       - El plato, la cantidad y el precio (viene el del catálogo).
       - Observaciones rápidas, como «Sin cebolla».
-      - Los platos agregados y el total.
-      - «Confirmar pedido» lo envía a cocina.
+      - "«Agregar plato» lo suma al pedido; con platos aparecen el total y «Confirmar pedido», que lo envía a cocina."
 ---
 
 1. En **Operación**, toca **Nuevo pedido** o presiona la tecla **N**.

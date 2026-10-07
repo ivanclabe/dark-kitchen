@@ -20,7 +20,7 @@ screenshots:
   - id: purchase
     alt: Detalle de una compra en borrador con el formulario Agregar línea y las líneas de la factura
     notes:
-      - El último precio que pagaste por ese insumo.
+      - Elige el insumo; aparece el último precio que pagaste por él.
       - Cantidad, unidad de compra y costo unitario.
       - Las líneas de la factura.
       - «Confirmar compra» suma el inventario.

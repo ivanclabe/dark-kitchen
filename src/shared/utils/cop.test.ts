@@ -65,7 +65,7 @@ describe('phones (ADR 0039)', () => {
     expect(splitE164('wa-abc')).toEqual({ country: 'CO', national: 'wa-abc' })
     expect(groupNational('CO', '3001234567')).toBe('300 123 4567')
     expect(formatPhone('+573001234567')).toBe('+57 300 123 4567')
-    expect(formatPhone('e9f1aa22')).toBe('e9f1aa22')
+    expect(formatPhone('e9f1aa22')).toBe('Vía WhatsApp')
     expect(formatPhone(null)).toBe('')
     expect(phoneHref('+573001234567')).toBe('tel:+573001234567')
     expect(phoneHref('e9f1aa22')).toBeNull()

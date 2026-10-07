@@ -76,9 +76,13 @@ export function groupNational(country: string, digits: string): string {
   return d.replace(/(\d{2,4})(?=(\d{3,4})+$)/g, '$1 ').trim()
 }
 
-/** How a stored phone is shown: «+57 300 123 4567». Something that is not a phone (a WhatsApp id) as it is. */
+/**
+ * How a stored phone is shown: «+57 300 123 4567». A WhatsApp identifier that
+ * is not a number (letters) is never shown as if it were a phone: «Vía WhatsApp».
+ */
 export function formatPhone(value: string | null | undefined): string {
   const v = (value ?? '').trim()
+  if (/[a-z]/i.test(v)) return 'Vía WhatsApp'
   if (!v.startsWith('+')) return v
   const { country, national } = splitE164(v)
   const c = countryOf(country)

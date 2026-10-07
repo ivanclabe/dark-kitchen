@@ -14,6 +14,8 @@
 //   click and type, wait, draw numbered markers on its parts, save public/help/img/<id>.png.
 // * Privacy: a scene is NOT saved if the screen shows a phone or an e-mail that
 //   is not one of the demo's (QUANELA_HELP_ALLOW, comma separated).
+// * QUANELA_HELP_REPLACE="Ivan Clavijo=Laura Gómez;Ivan=Laura": texts replaced on
+//   screen before each capture (the signed-in person's name never goes public).
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -35,6 +37,8 @@ interface Scene {
   viewport?: 'desktop' | 'mobile'
   /** Clicks before the capture (visible text, or a CSS selector as «css=…»). */
   click?: string[]
+  /** An option chosen in a list (e.g. the period of Insights): «css=…» or a visible text, and the option's value. */
+  select?: { target: string; value: string }[]
   /** Text typed after the clicks (e.g. a question to Copilot), optionally followed by a key. */
   fill?: { target: string; text: string; press?: string }[]
   /** Text that must be on screen before the capture. */
@@ -47,6 +51,11 @@ interface Scene {
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const BASE = (process.env.QUANELA_HELP_URL ?? 'http://localhost:5173').replace(/\/$/, '')
 const ALLOW = new Set((process.env.QUANELA_HELP_ALLOW ?? '').split(',').map((s) => s.trim()).filter(Boolean))
+const REPLACE = (process.env.QUANELA_HELP_REPLACE ?? '')
+  .split(';')
+  .map((pair) => pair.split('='))
+  .filter((p): p is [string, string] => p.length === 2 && p[0].trim() !== '')
+  .map(([from, to]) => [from.trim(), to.trim()] as [string, string])
 const CHROME = process.env.QUANELA_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const args = process.argv.slice(2)
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1]?.split(',') : null
@@ -70,18 +79,62 @@ async function annotate(page: Page, targets: Target[]) {
     boxes.push({ ...box, n: t.n })
   }
   await page.evaluate((items) => {
+    // No focus ring left on screen (it would look like one more marker).
+    ;(document.activeElement as HTMLElement | null)?.blur?.()
+    const SIZE = 24
+    const placed: { x: number; y: number }[] = []
+    const inBox = (x: number, y: number, b: { x: number; y: number; width: number; height: number }, pad = 0) =>
+      x >= b.x - pad && x <= b.x + b.width + pad && y >= b.y - pad && y <= b.y + b.height + pad
+    /** Is something worth reading under this point (text, a control, an icon), outside the marked part? */
+    const busy = (x: number, y: number, own: (typeof items)[number]) => {
+      if (x < 2 || y < 2 || x > innerWidth - 2 || y > innerHeight - 2) return true
+      if (inBox(x, y, own)) return false
+      if (items.some((o) => o !== own && inBox(x, y, o, 6))) return true
+      if (placed.some((p) => Math.abs(p.x - x) < SIZE + 4 && Math.abs(p.y - y) < SIZE + 4)) return true
+      const el = document.elementFromPoint(x, y)
+      if (!el) return false
+      if (el.closest('button, a, input, select, textarea, label, svg, img, [role=button], [role=tab]')) return true
+      return [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim() !== '')
+    }
+    const free = (cx: number, cy: number, own: (typeof items)[number]) =>
+      [[0, 0], [-10, -10], [10, -10], [-10, 10], [10, 10]].every(([dx, dy]) => !busy(cx + dx, cy + dy, own))
     for (const b of items) {
+      const midY = b.y + Math.min(b.height, 40) / 2
+      // Left of the part, above it, right of it, below it, then over its top-left corner.
+      const candidates = [
+        [b.x - 26, midY],
+        [b.x + 12, b.y - 22],
+        [b.x + b.width + 26, midY],
+        [b.x + 12, b.y + b.height + 22],
+        [b.x - 2, b.y - 2],
+      ]
+      const [cx, cy] = candidates.find(([x, y]) => free(x, y, b)) ?? candidates[0]
+      placed.push({ x: cx, y: cy })
       const ring = document.createElement('div')
       ring.style.cssText = `position:fixed;left:${b.x - 4}px;top:${b.y - 4}px;width:${b.width + 8}px;height:${b.height + 8}px;border:2px solid #f97316;border-radius:10px;z-index:2147483646;pointer-events:none;box-shadow:0 0 0 4px rgba(249,115,22,.18)`
       const badge = document.createElement('div')
       badge.textContent = String(b.n)
-      // Outside the ring, on its left, so it never covers the text it points to (above it when there is no room).
-      const left = b.x >= 40 ? b.x - 38 : Math.max(4, b.x)
-      const top = b.x >= 40 ? b.y + Math.min(b.height, 40) / 2 - 12 : Math.max(4, b.y - 34)
-      badge.style.cssText = `position:fixed;left:${left}px;top:${top}px;width:24px;height:24px;border-radius:999px;background:#f97316;color:#fff;font:700 13px/24px system-ui;text-align:center;z-index:2147483647;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.4)`
+      badge.style.cssText = `position:fixed;left:${cx - SIZE / 2}px;top:${cy - SIZE / 2}px;width:${SIZE}px;height:${SIZE}px;border-radius:999px;background:#f97316;color:#fff;font:700 13px/24px system-ui;text-align:center;z-index:2147483647;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.4)`
       document.body.append(ring, badge)
     }
   }, boxes)
+}
+
+/** The configured texts replaced in every text node and attribute shown (longest first). */
+async function replaceTexts(page: Page) {
+  if (REPLACE.length === 0) return
+  await page.evaluate((pairs) => {
+    const sorted = [...pairs].sort((a, b) => b[0].length - a[0].length)
+    const swap = (text: string) => sorted.reduce((t, [from, to]) => t.split(from).join(to), text)
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue) n.nodeValue = swap(n.nodeValue)
+    for (const el of document.querySelectorAll('[aria-label],[title],[alt]')) {
+      for (const attr of ['aria-label', 'title', 'alt']) {
+        const v = el.getAttribute(attr)
+        if (v) el.setAttribute(attr, swap(v))
+      }
+    }
+  }, REPLACE)
 }
 
 /** Phones and e-mails on screen that are not the demo's: the capture would expose real data. */
@@ -136,6 +189,10 @@ async function main() {
         await (await locate(page, c)).click()
         await page.waitForTimeout(500)
       }
+      for (const o of scene.select ?? []) {
+        await (await locate(page, o.target)).selectOption(o.value)
+        await page.waitForTimeout(1500)
+      }
       for (const f of scene.fill ?? []) {
         const field = await locate(page, f.target)
         await field.fill(f.text)
@@ -143,6 +200,7 @@ async function main() {
       }
       if (scene.waitFor) await page.getByText(scene.waitFor, { exact: false }).first().waitFor({ timeout: 45_000 })
       await page.waitForTimeout(800)
+      await replaceTexts(page)
       const issues = await privacyIssues(page)
       if (issues.length) throw new Error(`hay datos que parecen reales en pantalla (${issues.join(', ')}): usa la cuenta demo o agrégalos a QUANELA_HELP_ALLOW`)
       await annotate(page, scene.annotate)

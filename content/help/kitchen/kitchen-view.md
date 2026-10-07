@@ -23,7 +23,7 @@ screenshots:
     notes:
       - Las cifras de la línea, con los atrasados en rojo.
       - Columnas En cola, Preparando y Listo.
-      - El botón de la tarjeta avanza el pedido.
+      - "Cada tarjeta: sus platos, las observaciones y cuánto lleva (en rojo si está atrasado)."
       - El menú ⋯ (tiempos, tamaño grande, sonidos, configuración).
 ---
 

@@ -268,11 +268,11 @@ order: 1
 | 5 · Base de conocimiento | `npm run help` valida y genera el sitio, `helpPaths.ts` y `kb.ts` (un módulo TS en lugar de `kb.json`: lo importan igual la app y la función). Valida id, sección, resumen ≤ 220, audiencias, permisos, `appPath`, relacionados, enlaces `help:`, capturas y elementos de listas mal escritos en YAML. `appHelp.ts` eliminado |
 | 6 · Búsqueda | `kbSearch.ts` compartido. Prueba con 40 preguntas parafraseadas: **92,5 % acierta en el primer resultado y 100 % entre los tres primeros** (meta: 85 % y 95 %) |
 | 7 · «Oye Quanela» | Herramienta `help`, `links` en el contrato, tarjetas «Centro de ayuda» en Copilot y «Abrir guía» en la burbuja de voz. `dk-copilot` **desplegada** (responde 401 sin sesión, como debe). `copilot-eval` suma 10 preguntas con la guía esperada y mide «Enlaza la guía correcta» |
-| Capturas | Script repetible con números fuera del texto, recorte opcional (`crop`), escenas con ids de la demo por variable (no crea datos) y modo `--login` (inicias sesión tú, la sesión queda en `.help-session.local`). **Listas: `login` y `signup-methods`** (públicas, sin datos de ningún negocio). Pendientes: 14 (muestran «Captura en preparación») |
+| Capturas | Script repetible con números fuera del texto, recorte opcional (`crop`), escenas con ids de la demo por variable (no crea datos) y modo `--login` (inicias sesión tú, la sesión queda en `.help-session.local`). **Las 17 capturas listas** (ver «Capturas con sesión») |
 
 ### Validación
 - `tsc` sin errores; `oxlint` con los 14 avisos de siempre.
-- Vitest: **499 pruebas** (84 archivos). Nuevas: sincronía y búsqueda (`scripts/help/help.test.ts`) y páginas (`src/modules/help/HelpPages.test.tsx`).
+- Vitest: **499 pruebas** (84 archivos) al cerrar la ADR; **554** (91 archivos) después de las capturas. Nuevas: sincronía y búsqueda (`scripts/help/help.test.ts`) y páginas (`src/modules/help/HelpPages.test.tsx`).
 - `npm run build` y `npm run build:admin` correctos. El contenido de la ayuda va en su propio fragmento: el paquete principal no lo carga.
 - Navegador: `/help` sin sesión en un subdominio, buscador y artículo con captura.
 - SQL: sin cambios en la base en esta ADR.
@@ -281,7 +281,22 @@ order: 1
 - No existe «¿Olvidaste tu contraseña?»: la guía dice que el soporte envía un enlace para crear una nueva.
 - El cupo de Copilot es de toda la cuenta, en una ventana de 24 horas, y los intentos fallidos sí cuentan (solo no hacen esperar).
 
+### Capturas con sesión (2026-10-06)
+- **Datos:** en lugar de una cuenta demo nueva, se usó la cuenta de prueba «Dark Kitchen» (en pantalla, «Sopa donde Carmen»). Tú confirmaste que sus datos son ficticios. **No se escribió nada en la base.**
+- **Privacidad:**
+  - `QUANELA_HELP_REPLACE` cambia, antes de capturar, tu nombre por «Laura Gómez» y tu correo por `laura@negocio.co`. Lo hace en el texto y en `aria-label`, `title` y `alt`.
+  - El control de privacidad sigue bloqueando cualquier teléfono o correo que no esté en `QUANELA_HELP_ALLOW`. Esa lista solo tiene los teléfonos ficticios de los clientes de prueba.
+- **Mejoras al script:**
+  - `select` elige una opción de una lista. Así Insights muestra «Mes anterior» y no el mes en curso, que estaba vacío.
+  - `fill` llena campos.
+  - `crop` recorta la imagen a un selector.
+  - Los marcadores numerados se ubican en el primer lugar libre (izquierda, arriba, derecha, abajo) y no tapan texto, controles ni otros marcadores.
+  - Antes de capturar se quita el foco, para que no salga el anillo de foco.
+- **Notas ajustadas a la pantalla real:** `create-order` (el total y «Confirmar pedido» aparecen al agregar platos), `kitchen-view` (qué muestra cada tarjeta) y `purchases` («Último precio» aparece al elegir el insumo).
+- **Error de producto corregido:** un cliente que llegó por WhatsApp mostraba un identificador interno como teléfono. Ahora `formatPhone` muestra «Vía WhatsApp» cuando el valor tiene letras.
+- **Peso:** 17 PNG, 5,3 MB en total; la más pesada es `login.png` (1,27 MB). No hay compresor instalado (`pngquant`/`oxipng`). Las imágenes cargan con `loading="lazy"`, solo al abrir cada artículo.
+- **Dato de prueba raro (sin cambiar):** en la receta de la Hamburguesa Clásica, la Carne de res figura con 150 en una unidad base de kg; parece que quisieron decir gramos.
+
 ### Pendiente
-1. Las 14 capturas con sesión: crear la cuenta demo, autorizar los datos ficticios, `--login` y las variables `QUANELA_HELP_ORDER_PENDING`, `QUANELA_HELP_ORDER_UNPAID`, `QUANELA_HELP_PURCHASE_DRAFT` y `QUANELA_HELP_PRODUCT_WITH_RECIPE`.
-2. Correr `copilot-eval` con las 10 preguntas nuevas.
-3. Posible error de producto (no corregido): si un plato vuelve de **Listo** a un estado anterior y luego vuelve a **Listo**, su stock no se descuenta de nuevo.
+1. Correr `copilot-eval` con las 10 preguntas nuevas.
+2. Posible error de producto (no corregido): si un plato vuelve de **Listo** a un estado anterior y luego vuelve a **Listo**, su stock no se descuenta de nuevo.
