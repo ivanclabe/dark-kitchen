@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { UtteranceParams } from './resolveVoice'
-import { SpeechQueue, type SpeechEngine } from './speechQueue'
+import { SpeechQueue, whenSpoken, type SpeechEngine } from './speechQueue'
 
 const params: UtteranceParams = { lang: 'es-CO', rate: 1, pitch: 1, volume: 1, voice: null }
 
@@ -139,5 +139,43 @@ describe('SpeechQueue (ADR 0014, 9.5)', () => {
     expect(q.isSpeaking(700)).toBe(true)
     now += 701
     expect(q.isSpeaking(700)).toBe(false)
+  })
+})
+
+// ADR 0041 (D1): when Quanela actually starts speaking a sentence.
+describe('when a sentence starts sounding', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('tells the listeners, with the text, when the engine starts it', () => {
+    const f = fakeEngine()
+    const q = new SpeechQueue(f.engine)
+    const heard: string[] = []
+    const off = q.onStart((t) => heard.push(t))
+    q.enqueue('Pedido 1042 listo.', 'command', params)
+    expect(heard).toEqual([])
+    f.start()
+    expect(heard).toEqual(['Pedido 1042 listo.'])
+    off()
+    f.end()
+    q.enqueue('Otro.', 'command', params)
+    f.start()
+    expect(heard).toEqual(['Pedido 1042 listo.'])
+  })
+
+  it('whenSpoken waits for that sentence (behind others), or gives up', async () => {
+    const f = fakeEngine()
+    const q = new SpeechQueue(f.engine)
+    q.enqueue('Alerta de cocina.', 'alert', params)
+    const answer = whenSpoken('  Vendiste veinte mil pesos. ', q, 5_000)
+    q.enqueue('Vendiste veinte mil pesos.', 'answer', params)
+    f.start()
+    vi.advanceTimersByTime(800)
+    f.end()
+    f.start()
+    await expect(answer).resolves.toEqual(expect.any(Number))
+    const never = whenSpoken('Nunca.', q, 5_000)
+    vi.advanceTimersByTime(5_001)
+    await expect(never).resolves.toBeNull()
   })
 })

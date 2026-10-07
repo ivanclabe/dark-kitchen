@@ -12,7 +12,7 @@ import { formatDateTime } from '@/shared/utils/format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
-import { PLATFORM_AI_KEY, setPlatformFeature, type PlatformFeature, type PlatformModel } from './api'
+import { PLATFORM_AI_KEY, setPlatformFeature, setPlatformVoiceModel, type PlatformFeature, type PlatformModel } from './api'
 
 function fieldMeta(featureKey: string, settingKey: string): { label: string; unit?: string } {
   const field = AI_FEATURES.find((f) => f.key === featureKey)?.fields.find((f) => f.key === settingKey)
@@ -41,6 +41,16 @@ export function FeatureDrawer({
   const [intervalText, setIntervalText] = useState(feature.minIntervalSeconds === null ? '' : String(feature.minIntervalSeconds))
   const [defaults, setDefaults] = useState<FeatureSettings>(feature.defaultSettings)
   const editableDefaults = feature.key !== 'voice_speech' ? Object.entries(feature.settingsSchema) : []
+
+  const [voiceModelKey, setVoiceModelKey] = useState(feature.voiceModelKey ?? '')
+  const saveVoiceModel = useMutation({
+    mutationFn: (key: string) => setPlatformVoiceModel(feature.key, key || null),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: PLATFORM_AI_KEY })
+      show(`${feature.label}: modelo para voz guardado.`)
+    },
+    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
+  })
 
   const save = useMutation({
     mutationFn: (change: Parameters<typeof setPlatformFeature>[1]) => setPlatformFeature(feature.key, change),
@@ -134,6 +144,31 @@ export function FeatureDrawer({
                 Guardar modelo y frecuencia
               </Button>
             </div>
+            {feature.key === 'copilot' && (
+              <div className="space-y-2 border-t border-neutral-800/60 pt-4">
+                <label htmlFor="feature-voice-model" className="text-xs text-neutral-400">
+                  Modelo para preguntas por voz
+                </label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select id="feature-voice-model" value={voiceModelKey} onChange={(e) => setVoiceModelKey(e.target.value)} className="!mt-0 min-w-0 flex-1">
+                    <option value="">El mismo modelo</option>
+                    {models
+                      .filter((m) => m.active || m.key === feature.voiceModelKey)
+                      .map((m) => (
+                        <option key={m.key} value={m.key}>
+                          {m.label} ({m.key})
+                        </option>
+                      ))}
+                  </Select>
+                  <Button size="sm" loading={saveVoiceModel.isPending} disabled={voiceModelKey === (feature.voiceModelKey ?? '')} onClick={() => saveVoiceModel.mutate(voiceModelKey)}>
+                    Guardar
+                  </Button>
+                </div>
+                <p className={typography.caption}>
+                  Solo para lo que se le pregunta a «Oye Quanela»: un modelo más rápido responde antes en voz alta. Mídelo antes con copilot-eval --channel voice.
+                </p>
+              </div>
+            )}
           </section>
         )}
 

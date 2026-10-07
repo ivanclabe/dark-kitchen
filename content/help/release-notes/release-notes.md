@@ -12,9 +12,13 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-06
+updated: 2026-10-07
 order: 1
 ---
+
+## 7 de octubre de 2026
+
+- **«Oye Quanela» responde más rápido.** Cierra tu pregunta apenas terminas de hablar, te escucha desde el tono y empieza a decir la respuesta mientras el detalle sigue llegando. Además, puedes volver a decir «Oye Quanela» justo después de una respuesta. En **Voz en este equipo** ves si la voz es instalada o en línea. Ver [«Oye Quanela»](help:oye-quanela).
 
 ## 6 de octubre de 2026
 

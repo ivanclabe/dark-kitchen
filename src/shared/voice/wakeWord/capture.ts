@@ -10,6 +10,25 @@ export interface Capture {
   stop: () => void
 }
 
+/**
+ * Can the detector keep its microphone while the recognizer opens its own
+ * (ADR 0041, D6)? Chromium and Firefox handle two captures at once; Safari
+ * (macOS and every iOS browser, which are Safari underneath) is not reliable
+ * with it, so there the detector releases the microphone as before.
+ */
+export function canShareMicrophone(userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent, touchPoints = typeof navigator === 'undefined' ? 0 : navigator.maxTouchPoints): boolean {
+  const ios = /iP(hone|ad|od)/.test(userAgent) || (/Macintosh/.test(userAgent) && touchPoints > 1)
+  const safari = /Safari\//.test(userAgent) && !/(Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android)\//.test(userAgent)
+  return !ios && !safari
+}
+
+/** One chunk of near silence (a little noise, not exact zeros, so the log-mel stays in range). */
+export function silentChunk(samples: number): Int16Array {
+  const chunk = new Int16Array(samples)
+  for (let i = 0; i < samples; i++) chunk[i] = Math.round((Math.random() - 0.5) * 4)
+  return chunk
+}
+
 export async function startCapture(onChunk: (chunk: Int16Array) => void): Promise<Capture> {
   let stream: MediaStream
   try {

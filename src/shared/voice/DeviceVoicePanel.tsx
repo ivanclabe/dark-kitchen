@@ -2,7 +2,7 @@ import { Select } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
 import { useEffect, useState } from 'react'
 import { useDeviceVoicePin, useDeviceVoices } from './hooks'
-import { voicesForLang } from './resolveVoice'
+import { voicesForLang, type DeviceVoice } from './resolveVoice'
 import { deviceSpeech } from './speechQueue'
 
 function median(values: readonly number[]): number | null {
@@ -13,9 +13,11 @@ function median(values: readonly number[]): number | null {
 
 /**
  * "On this device": pin one installed voice (tablets differ) and see the real
- * latency measured here, from "message ready" to "starts speaking".
+ * latency measured here, from "message ready" to "starts speaking". ADR 0041
+ * (D9): which voice speaks now, and whether it is an online one (slower to
+ * start) or installed on the device.
  */
-export function DeviceVoicePanel({ lang }: { lang: string }) {
+export function DeviceVoicePanel({ lang, current }: { lang: string; current?: DeviceVoice | null }) {
   const voices = useDeviceVoices()
   const [pin, setPin] = useDeviceVoicePin()
   const [latency, setLatency] = useState<{ median: number | null; count: number }>({ median: null, count: 0 })
@@ -48,6 +50,12 @@ export function DeviceVoicePanel({ lang }: { lang: string }) {
             ? 'Este equipo no tiene voces en español instaladas; se usará la voz predeterminada del navegador.'
             : `Solo afecta a este equipo. ${spanish.length} ${spanish.length === 1 ? 'voz disponible' : 'voces disponibles'}.`}
         </p>
+        {current && (
+          <p className="mt-2 text-xs text-neutral-400">
+            Habla con: <span className="text-neutral-200">{current.name}</span> · {current.localService === false ? 'en línea' : 'instalada'}
+            {current.localService === false && <span className="block text-amber-300/90">Las voces instaladas en el equipo empiezan a hablar antes.</span>}
+          </p>
+        )}
       </div>
       <p className="text-xs text-neutral-400">
         Latencia de la voz en este equipo:{' '}

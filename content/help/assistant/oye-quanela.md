@@ -15,9 +15,10 @@ questions:
   - ¿Por qué no veo «Oye Quanela»?
   - ¿Tengo que decir «Oye Quanela» en cada pregunta?
   - ¿Cómo termino la conversación con Quanela?
-keywords: [oye quanela, voz, manos libres, micrófono, hablar, escuchar, respuestas habladas, dictar, palabra clave, conversación, seguir escuchando, gracias, terminar]
+  - ¿Por qué Quanela tarda en responder?
+keywords: [oye quanela, voz, manos libres, micrófono, hablar, escuchar, respuestas habladas, dictar, palabra clave, conversación, seguir escuchando, gracias, terminar, lento, tarda, rápido, voz instalada]
 related: [ask-copilot, kitchen-voice, copilot-limits]
-updated: 2026-10-06
+updated: 2026-10-07
 order: 2
 ---
 
@@ -33,7 +34,7 @@ El chat de Copilot **no se abre solo**: la respuesta queda guardada y el botón 
 ## Manos libres
 
 1. Toca el **micrófono** de arriba → **Manos libres en este equipo**.
-2. Di **«Oye Quanela»** y, sin pausa larga, tu pregunta. En la vista Cocina, también tus comandos (ver [Comandos de voz en cocina](help:kitchen-voice)).
+2. Di **«Oye Quanela»** y, sin pausa larga, tu pregunta. Ya te escucha mientras suena el tono: no hace falta esperar a que termine. En la vista Cocina, también tus comandos (ver [Comandos de voz en cocina](help:kitchen-voice)).
 3. Para dejar de escuchar un rato, **Pausar**; luego **Reanudar**.
 
 Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
@@ -57,13 +58,21 @@ Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos.
 
 > **Bueno saber:** la frase «Oye Quanela» se detecta **en tu equipo**: ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador.
 
+## Que responda más rápido
+
+Quanela empieza a hablar en cuanto tiene la frase de respuesta, mientras el detalle sigue llegando al chat de Copilot. Para que tarde menos:
+
+- Termina la pregunta y **haz una pausa corta**: cuando el navegador entiende la frase completa, Quanela la envía enseguida.
+- En **Voz en este equipo → Hablar**, mira con qué voz habla: si dice **en línea**, elige una voz **instalada**, que empieza a hablar antes.
+- En Chrome y Edge, justo después de una respuesta ya puedes volver a decir «Oye Quanela».
+
 ## Ajustar la voz
 
 En el **micrófono** → **Voz en este equipo**:
 
 - **Escuchar**: cómo te oye Quanela y la prueba del manos libres.
 - **Escuchar**: también **Seguir escuchando después de responder** (encendido de fábrica; apágalo y cada pregunta vuelve a necesitar «Oye Quanela»).
-- **Hablar**: la voz con que responde, **Respuestas habladas** y **Leer también lo que escribes a Copilot**.
+- **Hablar**: la voz con que responde (y si es **instalada** o **en línea**), **Respuestas habladas** y **Leer también lo que escribes a Copilot**.
 
 Estos ajustes son de **este equipo**: cada computador o tableta tiene los suyos.
 

@@ -14,7 +14,7 @@ questions:
   - ¿Cómo cambio mi contraseña?
 keywords: [login, iniciar sesión, entrar, contraseña, cuenta, rol, cambiar, perfil, avatar]
 related: [concepts, roles, create-business]
-updated: 2026-10-06
+updated: 2026-10-07
 order: 2
 screenshots:
   - id: login
@@ -48,6 +48,6 @@ También lo tienes en el menú de tu avatar: **Cambiar de rol** y **Cuenta → T
 
 ## Tu perfil y tu contraseña
 
-En el menú de tu avatar → **Mi perfil** cambias tu nombre, tu avatar y tu contraseña (primero confirmas la actual). Ahí también ves **Dónde tengo acceso**: tus cuentas y tu rol en cada una.
+En el menú de tu avatar → **Mi perfil** cambias tu nombre y tu avatar. Para la contraseña, en **Seguridad** toca **Cambiar contraseña**: escribe la actual, la nueva (mínimo 8 caracteres) y repítela. Si entras con Google o con tu teléfono, no tienes contraseña de Quanela. Ahí también ves **Dónde tengo acceso**: tus cuentas y tu rol en cada una.
 
 El menú del avatar tiene además **Apariencia** (tema oscuro, claro o según el sistema, y texto grande) y **Ayuda y soporte** (atajos de teclado, preguntar a Copilot, reportar un problema).

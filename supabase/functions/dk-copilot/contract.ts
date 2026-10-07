@@ -165,3 +165,146 @@ export function stepContext(tool: string, input: unknown): string {
   }
   return `${tool}${args}`.slice(0, 120);
 }
+
+/**
+ * ADR 0041 (D7): the spoken sentence, as soon as it is complete inside the
+ * `answer` tool's JSON that is still arriving («{"intent":"sales","spoken":"Hoy
+ * vendiste…","answer":"…» cut anywhere). Null until its closing quote arrives.
+ * A quote inside a JSON string is escaped (\"), so the key cannot be faked by
+ * the text of another field.
+ */
+export function extractSpoken(partialJson: string): string | null {
+  const m = /"spoken"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(partialJson);
+  if (!m) return null;
+  try {
+    const value = JSON.parse(`"${m[1]}"`) as string;
+    return value.trim() ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+/** What the app measured of a voice question (ADR 0041, D1). */
+export type ClientTimings = Partial<Record<(typeof CLIENT_TIMING_NUMBERS)[number], number> & Record<(typeof CLIENT_TIMING_FLAGS)[number], boolean>>;
+
+export const CLIENT_TIMING_NUMBERS = ["listenMs", "endpointMs", "requestMs", "speechMs", "totalMs"] as const;
+export const CLIENT_TIMING_FLAGS = ["wake", "followUp", "streamed"] as const;
+
+/** Only known keys: whole milliseconds between 0 and 60 000, or true/false. Null when nothing is left. */
+export function readClientTimings(raw: unknown): ClientTimings | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const input = raw as Json;
+  const out: Record<string, number | boolean> = {};
+  for (const key of CLIENT_TIMING_NUMBERS) {
+    const v = input[key];
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 60_000) out[key] = Math.round(v);
+  }
+  for (const key of CLIENT_TIMING_FLAGS) {
+    if (typeof input[key] === "boolean") out[key] = input[key] as boolean;
+  }
+  return Object.keys(out).length ? (out as ClientTimings) : null;
+}
+
+export interface ModelBlock {
+  type: string;
+  text?: string;
+  id?: string;
+  name?: string;
+  input?: Json;
+  /** Reasoning blocks go back to the model exactly as they came (with their signature). */
+  thinking?: string;
+  signature?: string;
+}
+
+export interface ModelResponse {
+  content: ModelBlock[];
+  stop_reason?: string;
+  usage?: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number };
+}
+
+/**
+ * Reads Anthropic's streamed message (server-sent events) into the same shape
+ * as a plain response. While the `answer` tool arrives, `onSpoken` gets its
+ * spoken sentence once it is complete (ADR 0041, D7).
+ */
+export async function readModelStream(body: ReadableStream<Uint8Array>, onSpoken: (spoken: string) => void): Promise<ModelResponse> {
+  const out: ModelResponse = { content: [], usage: {} };
+  const partial = new Map<number, string>();
+  let spokenSent = false;
+  const decoder = new TextDecoder();
+  const reader = body.getReader();
+  let buffer = "";
+  const handle = (event: Json) => {
+    switch (event.type) {
+      case "message_start": {
+        const usage = (event.message as Json | undefined)?.usage as ModelResponse["usage"];
+        out.usage = { ...out.usage, ...usage };
+        break;
+      }
+      case "content_block_start": {
+        // Each block keeps its own shape (text, tool_use, thinking…): it goes back to the model as is.
+        const block = event.content_block as ModelBlock;
+        out.content[event.index as number] = block.type === "tool_use" ? { ...block, input: {} } : { ...block };
+        partial.set(event.index as number, "");
+        break;
+      }
+      case "content_block_delta": {
+        const index = event.index as number;
+        const block = out.content[index];
+        const delta = event.delta as { type: string; text?: string; partial_json?: string; thinking?: string; signature?: string };
+        if (!block) break;
+        if (delta.type === "text_delta") block.text = (block.text ?? "") + (delta.text ?? "");
+        if (delta.type === "thinking_delta") block.thinking = (block.thinking ?? "") + (delta.thinking ?? "");
+        if (delta.type === "signature_delta") block.signature = (block.signature ?? "") + (delta.signature ?? "");
+        if (delta.type === "input_json_delta") {
+          const soFar = (partial.get(index) ?? "") + (delta.partial_json ?? "");
+          partial.set(index, soFar);
+          if (!spokenSent && block.name === "answer") {
+            const spoken = extractSpoken(soFar);
+            if (spoken) {
+              spokenSent = true;
+              onSpoken(cleanSpoken(spoken));
+            }
+          }
+        }
+        break;
+      }
+      case "content_block_stop": {
+        const index = event.index as number;
+        const block = out.content[index];
+        if (block?.type === "tool_use") {
+          const raw = partial.get(index) ?? "";
+          try {
+            block.input = raw ? JSON.parse(raw) : {};
+          } catch {
+            block.input = {};
+          }
+        }
+        break;
+      }
+      case "message_delta": {
+        const delta = event.delta as { stop_reason?: string };
+        if (delta?.stop_reason) out.stop_reason = delta.stop_reason;
+        const usage = event.usage as ModelResponse["usage"];
+        if (usage) out.usage = { ...out.usage, ...usage };
+        break;
+      }
+      case "error":
+        throw new Error(`Anthropic stream: ${JSON.stringify(event.error).slice(0, 300)}`);
+    }
+  };
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (value) buffer += decoder.decode(value, { stream: true });
+    let cut: number;
+    while ((cut = buffer.indexOf("\n\n")) >= 0) {
+      const frame = buffer.slice(0, cut);
+      buffer = buffer.slice(cut + 2);
+      const data = frame.split("\n").filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim()).join("");
+      if (data) handle(JSON.parse(data) as Json);
+    }
+    if (done) break;
+  }
+  out.content = out.content.filter(Boolean);
+  return out;
+}

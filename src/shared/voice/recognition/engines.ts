@@ -7,8 +7,12 @@ import { isVoskSupported, loadVoskModel } from './voskModel'
  * kitchen decides what a transcript means.
  */
 export interface RecognitionCallbacks {
-  /** Full transcript so far (final + partial), every time it changes. */
-  onTranscript: (text: string) => void
+  /**
+   * Full transcript so far (final + partial), every time it changes.
+   * `final`: the engine considers everything heard so far settled (ADR 0041):
+   * the phrase can close sooner than after a plain pause.
+   */
+  onTranscript: (text: string, final: boolean) => void
   onStart: () => void
   onEnd: () => void
   onError: (code: string) => void
@@ -41,7 +45,7 @@ export const browserEngine: RecognitionEngine = {
     recognition.onresult = (e) => {
       let text = ''
       for (let i = 0; i < e.results.length; i++) text += e.results[i]?.[0]?.transcript ?? ''
-      onTranscript(text.trim())
+      onTranscript(text.trim(), e.results[e.results.length - 1]?.isFinal === true)
     }
     recognition.onerror = (e) => onError(e.error)
     recognition.onend = onEnd
@@ -69,7 +73,7 @@ export const voskEngine: RecognitionEngine = {
     const recognizer = new model.KaldiRecognizer(context.sampleRate, grammar)
     let finalText = ''
     let partial = ''
-    const emit = () => onTranscript(clean(`${finalText} ${partial}`))
+    const emit = () => onTranscript(clean(`${finalText} ${partial}`), !clean(partial))
     recognizer.on('result', (message) => {
       if (message.event !== 'result') return
       finalText = clean(`${finalText} ${message.result.text}`)

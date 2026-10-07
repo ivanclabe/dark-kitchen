@@ -22,6 +22,8 @@ export interface PlatformFeature {
   active: boolean
   usesModel: boolean
   modelKey: string | null
+  /** ADR 0041: model for questions asked by voice (only Copilot); null = modelKey. */
+  voiceModelKey: string | null
   minIntervalSeconds: number | null
   dependsOn: FeatureKey[]
   defaultSettings: FeatureSettings
@@ -79,6 +81,12 @@ export async function setPlatformFeature(
     ...(change.minIntervalSeconds !== undefined ? { p_min_interval_seconds: change.minIntervalSeconds ?? 0 } : {}),
     ...(change.defaultSettings !== undefined ? { p_default_settings: change.defaultSettings as Json } : {}),
   })
+  if (error) throw error
+}
+
+/** ADR 0041: the model for Copilot questions asked by voice; null = the feature's model. */
+export async function setPlatformVoiceModel(key: FeatureKey, modelKey: string | null): Promise<void> {
+  const { error } = await supabase.rpc('dk_platform_set_voice_model', { p_key: key, ...(modelKey ? { p_model_key: modelKey } : {}) })
   if (error) throw error
 }
 

@@ -14,6 +14,7 @@ vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
     canShared: (p: string) => state.shared.includes(p),
     path: (to: string) => `/k/centro${to}`,
     feature: () => null,
+    canUseFeature: () => false,
     features: [],
   }),
 }))

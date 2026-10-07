@@ -5,6 +5,7 @@ import { Switch } from '@/shared/ui/Switch'
 import { typography } from '@/shared/ui/typography'
 import { toVoiceSettings } from '@/shared/voice/catalog'
 import { DeviceVoicePanel } from '@/shared/voice/DeviceVoicePanel'
+import { useQuanelaVoice } from '@/shared/voice/hooks'
 import { wakeWordTuning } from '@/shared/voice/wakeWord/tuning'
 import { useVoiceFlag } from '../prefs'
 import { WakeWordPanel } from './WakeWordPanel'
@@ -31,6 +32,7 @@ export function VoiceDeviceSettings() {
   const [replies, setReplies] = useVoiceFlag('replies', true)
   const [readTyped, setReadTyped] = useVoiceFlag('readTyped', false)
   const [followUp, setFollowUp] = useVoiceFlag('followUp', true)
+  const { voice } = useQuanelaVoice()
   const speech = feature('voice_speech')
   const commands = feature('voice_commands')
   const wakeWord = feature('voice_wake_word')
@@ -62,7 +64,7 @@ export function VoiceDeviceSettings() {
       {speech?.usable && (
         <Section title="Hablar" description="Con qué voz te responde Quanela en este equipo." card>
           <div className="space-y-5">
-            <DeviceVoicePanel lang={toVoiceSettings(speech.settings).lang} />
+            <DeviceVoicePanel lang={toVoiceSettings(speech.settings).lang} current={voice.params.voice} />
             <div className="space-y-4 border-t border-neutral-800/60 pt-5">
               <Toggle
                 label="Respuestas habladas"

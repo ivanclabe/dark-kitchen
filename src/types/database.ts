@@ -851,6 +851,7 @@ export type Database = {
           sort_order: number
           use_permission: string
           uses_model: boolean
+          voice_model_key: string | null
         }
         Insert: {
           active?: boolean
@@ -869,6 +870,7 @@ export type Database = {
           sort_order: number
           use_permission: string
           uses_model?: boolean
+          voice_model_key?: string | null
         }
         Update: {
           active?: boolean
@@ -887,6 +889,7 @@ export type Database = {
           sort_order?: number
           use_permission?: string
           uses_model?: boolean
+          voice_model_key?: string | null
         }
         Relationships: [
           {
@@ -908,6 +911,13 @@ export type Database = {
             columns: ["use_permission"]
             isOneToOne: false
             referencedRelation: "dk_permissions"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "dk_features_voice_model_key_fkey"
+            columns: ["voice_model_key"]
+            isOneToOne: false
+            referencedRelation: "dk_ai_models"
             referencedColumns: ["key"]
           },
         ]
@@ -3837,6 +3847,10 @@ export type Database = {
         Returns: undefined
       }
       dk_ai_run_allowed: { Args: { p_feature_key: string }; Returns: Json }
+      dk_ai_run_client_timings: {
+        Args: { p_run_id: string; p_timings: Json }
+        Returns: undefined
+      }
       dk_ai_run_feedback: {
         Args: { p_run_id: string; p_value: number }
         Returns: undefined
@@ -4498,6 +4512,10 @@ export type Database = {
           p_ai_runs_per_day: number
           p_plan_key: string
         }
+        Returns: undefined
+      }
+      dk_platform_set_voice_model: {
+        Args: { p_key: string; p_model_key?: string }
         Returns: undefined
       }
       dk_platform_set_voice_profile: {

@@ -12,12 +12,15 @@ export function SettingsPage({
   description,
   actions,
   subNav,
+  narrow = false,
   children,
 }: {
   title: string
   description: ReactNode
   actions?: ReactNode
   subNav?: ReactNode
+  /** A form of short fields: the content keeps a reading width instead of stretching every field across the screen. */
+  narrow?: boolean
   children: ReactNode
 }) {
   return (
@@ -32,7 +35,7 @@ export function SettingsPage({
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </header>
       {subNav && <div className="mb-6">{subNav}</div>}
-      <div className="space-y-8">{children}</div>
+      <div className={clsx('space-y-8', narrow && 'max-w-3xl')}>{children}</div>
     </div>
   )
 }

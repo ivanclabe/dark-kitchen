@@ -5,9 +5,16 @@ import type { WakeWordState } from '@/shared/voice/wakeWord/useWakeWord'
 import { createContext, use, useEffect, useRef } from 'react'
 import type { VoiceHandler, VoiceReply, VoiceState } from './types'
 
-/** Silence that closes a phrase said to Quanela (as the kitchen commands always had). */
-export const VOICE_PHRASE_DELAY_MS = 1800
-/** Silence that sends a dictated question in Copilot (ADR 0033). */
+/**
+ * When a phrase said to Quanela is complete (ADR 0041, D2): the recognizer
+ * says whether what it heard is settled. Settled: a short pause closes it.
+ * Still provisional: a longer one (it was 1.8 s for everything). Every new
+ * word starts the count again, so a short pause never cuts the phrase.
+ */
+export const VOICE_FINAL_DELAY_MS = 500
+export const VOICE_PHRASE_DELAY_MS = 1200
+/** The same for a dictated question in Copilot (ADR 0033), a little more patient. */
+export const DICTATION_FINAL_DELAY_MS = 700
 export const DICTATION_DELAY_MS = 1500
 /** After «Oye Quanela»: how long to wait for the phrase to start (ADR 0016, D6). */
 export const HANDS_FREE_WINDOW_MS = 5000
@@ -95,6 +102,7 @@ export function useVoiceHandler(handler: VoiceHandler | null) {
       grammar,
       fallback,
       matches: (text) => ref.current?.matches?.(text) ?? false,
+      prepare: () => ref.current?.prepare?.(),
       handle: (text, ctx) => ref.current?.handle(text, ctx) ?? Promise.resolve(null),
     })
   }, [id, grammar, fallback, registerHandler])

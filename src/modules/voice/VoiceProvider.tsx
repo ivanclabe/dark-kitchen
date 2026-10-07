@@ -13,14 +13,16 @@ import { isWakeWordSupported } from '@/shared/voice/wakeWord/wakeWordModel'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useVoiceFlag } from './prefs'
 import { routeUtterance, stripWakePhrase } from './router'
-import type { VoiceHandler, VoiceReply, VoiceState } from './types'
+import type { VoiceHandler, VoiceReply, VoiceState, VoiceTurn } from './types'
 import {
   CONVERSATION_MAX_MS,
   CONVERSATION_MAX_TURNS,
   DICTATION_DELAY_MS,
+  DICTATION_FINAL_DELAY_MS,
   ECHO_TAIL_MS,
   FOLLOW_UP_WINDOW_MS,
   HANDS_FREE_WINDOW_MS,
+  VOICE_FINAL_DELAY_MS,
   VOICE_PHRASE_DELAY_MS,
   VoiceContext,
   type Dictation,
@@ -101,6 +103,15 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   /** The conversation in course (null: none), and whether this listening turn is one of its follow-ups. */
   const conversationRef = useRef<{ turns: number; startedAt: number } | null>(null)
   const followUpTurnRef = useRef(false)
+  /** ADR 0041 (D1): the moments of this listening turn, to measure where the time goes. */
+  const turnRef = useRef<{ startedAt: number; wake: boolean; listeningAt: number | null; lastWordAt: number | null; lastText: string; lastFinal: boolean }>({
+    startedAt: 0,
+    wake: false,
+    listeningAt: null,
+    lastWordAt: null,
+    lastText: '',
+    lastFinal: false,
+  })
   const followUpPrefRef = useRef(followUp)
   const dictationRef = useRef<Dictation | null>(null)
   const processingRef = useRef(false)
@@ -170,11 +181,14 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   }, [endConversation])
 
   // Defined below; the recognizer calls them through refs (it outlives renders).
-  const onTranscriptRef = useRef<(text: string) => void>(() => undefined)
+  const onTranscriptRef = useRef<(text: string, final?: boolean) => void>(() => undefined)
   const onSpeechErrorRef = useRef<(code: string) => void>(() => undefined)
   const speech = useSpeechRecognition({
-    onTranscriptChange: (t) => onTranscriptRef.current(t),
+    onTranscriptChange: (t, final) => onTranscriptRef.current(t, final),
     onError: (c) => onSpeechErrorRef.current(c),
+    onStart: () => {
+      if (turnRef.current.listeningAt === null) turnRef.current.listeningAt = Date.now()
+    },
     lang: 'es-CO',
     grammar,
   })
@@ -184,7 +198,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   })
 
   const process = useCallback(
-    async (text: string) => {
+    async (text: string, turn: VoiceTurn) => {
       setState('processing')
       setLastTranscript(text)
       const route = routeUtterance(text, handlersListRef.current, engineId)
@@ -226,7 +240,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       const abort = new AbortController()
       abortRef.current = abort
       try {
-        const reply = await route.handler.handle(text, { engine: engineId, signal: abort.signal })
+        const reply = await route.handler.handle(text, { engine: engineId, signal: abort.signal, turn: { ...turn, followUp: followUpTurn } })
         if (abort.signal.aborted) {
           endConversation()
           return setState('idle')
@@ -252,6 +266,15 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
   const finalize = useCallback(
     (heard: string) => {
+      const t = turnRef.current
+      const now = Date.now()
+      const turn: VoiceTurn = {
+        wake: t.wake,
+        followUp: false,
+        listenMs: t.listeningAt === null || !t.startedAt ? null : Math.max(0, t.listeningAt - t.startedAt),
+        endpointMs: t.lastWordAt === null ? null : now - t.lastWordAt,
+        lastWordAt: t.lastWordAt,
+      }
       const text = stripWakePhrase(heard)
       processingRef.current = true
       speechRef.current.stop()
@@ -264,22 +287,31 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         d?.onDone(text)
         return
       }
-      void process(text)
+      void process(text, turn)
     },
     [process],
   )
 
   useEffect(() => {
-    onTranscriptRef.current = (text: string) => {
+    onTranscriptRef.current = (text: string, final = false) => {
       // A late result while stop() is being applied is ignored: something is already running.
       if (processingRef.current) return
+      const t = turnRef.current
+      // The same thing again (some engines repeat it): the pause already running keeps counting.
+      if (text && text === t.lastText && final === t.lastFinal && timers.current.debounce) return
+      if (text !== t.lastText) t.lastWordAt = Date.now()
+      t.lastText = text
+      t.lastFinal = final
       setLiveTranscript(text)
       setState('listening')
       if (modeRef.current === 'dictate') dictationRef.current?.onTranscript(text)
       clearTimer('debounce')
       if (!text) return
       clearTimer('noSpeech')
-      timers.current.debounce = setTimeout(() => finalize(text), modeRef.current === 'dictate' ? DICTATION_DELAY_MS : VOICE_PHRASE_DELAY_MS)
+      // ADR 0041 (D2): settled text closes after a short pause; provisional text waits longer.
+      const dictating = modeRef.current === 'dictate'
+      const delay = final ? (dictating ? DICTATION_FINAL_DELAY_MS : VOICE_FINAL_DELAY_MS) : dictating ? DICTATION_DELAY_MS : VOICE_PHRASE_DELAY_MS
+      timers.current.debounce = setTimeout(() => finalize(text), delay)
     }
     onSpeechErrorRef.current = (code: string) => {
       setDictating(false)
@@ -291,6 +323,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
   const startSession = useCallback(
     async (mode: 'route' | 'dictate', handsFree: boolean, followUpTurn = false) => {
+      turnRef.current = { startedAt: Date.now(), wake: handsFree && !followUpTurn, listeningAt: null, lastWordAt: null, lastText: '', lastFinal: false }
       processingRef.current = false
       clearTimer('noSpeech')
       clearTimer('debounce')
@@ -301,7 +334,8 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       setDictating(mode === 'dictate')
       setLiveTranscript('')
       setState('listening')
-      if (handsFree) await (followUpTurn ? playFollowUpTone() : playWakeTone())
+      // ADR 0041 (D3): it listens while the tone sounds, so nothing said right after it is lost.
+      if (handsFree) void (followUpTurn ? playFollowUpTone() : playWakeTone())
       void speechRef.current.start()
       if (handsFree) {
         // Nobody spoke after «Oye Quanela» (or after the answer): back to waiting, quietly; the conversation ends.
@@ -354,6 +388,8 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
   const submitText = useCallback((text: string) => {
     modeRef.current = 'route'
+    // Typed, not heard: nothing to measure.
+    turnRef.current = { startedAt: 0, wake: false, listeningAt: null, lastWordAt: null, lastText: '', lastFinal: false }
     onTranscriptRef.current(text)
   }, [])
 
@@ -365,6 +401,8 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     suspended: busy || conversing,
     tuning: wakeWordTuning(feature('voice_wake_word')),
     onDetect: () => {
+      // ADR 0041 (D4): whoever may answer gets ready while the person is still speaking.
+      if (engineId !== 'vosk') for (const h of handlersListRef.current) h.prepare?.()
       // «Oye Quanela» starts a conversation (when this device keeps listening after answering).
       if (followUpPrefRef.current) {
         conversationRef.current = { turns: 0, startedAt: Date.now() }

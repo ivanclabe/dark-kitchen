@@ -22,7 +22,7 @@ function GalleryPicker<K extends string>({
   onChange: (key: K) => void
   render: (key: K) => ReactNode
   label?: string
-  /** Siempre 5 columnas (para espacios angostos como un diálogo). */
+  /** Siempre 5 columnas que llenan el ancho (para espacios angostos como un diálogo). */
   compact?: boolean
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
@@ -40,7 +40,13 @@ function GalleryPicker<K extends string>({
   }
 
   return (
-    <div role="radiogroup" aria-label={label ?? gallery.label} onKeyDown={onKeyDown} className={clsx('grid grid-cols-5 gap-2.5', !compact && 'sm:grid-cols-10')}>
+    <div
+      role="radiogroup"
+      aria-label={label ?? gallery.label}
+      onKeyDown={onKeyDown}
+      // Fuera de un diálogo, cada imagen tiene un tamaño fijo (56 px): no crece con el ancho de la pantalla.
+      className={clsx('grid gap-2.5', compact ? 'grid-cols-5' : 'w-fit grid-cols-[repeat(5,minmax(0,3.5rem))] sm:grid-cols-[repeat(10,3.5rem)]')}
+    >
       {keys.map((key, i) => {
         const selected = key === value
         return (

@@ -45,6 +45,7 @@ export class SpeechQueue {
   private nextId = 1
   private watchdog: ReturnType<typeof setTimeout> | null = null
   private readonly samples: number[] = []
+  private readonly startListeners = new Set<(text: string) => void>()
   private lastActiveAt = Number.NEGATIVE_INFINITY
   private readonly maxPending: number
   private readonly staleMs: number
@@ -101,6 +102,14 @@ export class SpeechQueue {
     return this.pending.length + (this.current ? 1 : 0)
   }
 
+  /** Called with the text each time a message starts sounding (ADR 0041: when Quanela actually speaks). */
+  onStart(listener: (text: string) => void): () => void {
+    this.startListeners.add(listener)
+    return () => {
+      this.startListeners.delete(listener)
+    }
+  }
+
   /** Device latency in ms (engine call → start of speech), most recent last (max 20). */
   get latencySamples(): readonly number[] {
     return this.samples
@@ -135,6 +144,7 @@ export class SpeechQueue {
           started = true
           this.samples.push(this.now() - handedAt)
           if (this.samples.length > 20) this.samples.shift()
+          for (const listener of [...this.startListeners]) listener(item.text)
         },
         onEnd: finish,
       })
@@ -167,3 +177,24 @@ export const deviceSpeechEngine: SpeechEngine = {
 
 /** The app-wide queue. */
 export const deviceSpeech = new SpeechQueue(deviceSpeechEngine)
+
+/**
+ * When `text` starts sounding on this device (Date.now()), or null if it does
+ * not within `timeoutMs` (muted, dropped, never queued).
+ */
+export function whenSpoken(text: string, queue: SpeechQueue = deviceSpeech, timeoutMs = 30_000): Promise<number | null> {
+  const target = text.trim()
+  return new Promise((resolve) => {
+    let off = () => {}
+    const timer = setTimeout(() => {
+      off()
+      resolve(null)
+    }, timeoutMs)
+    off = queue.onStart((spoken) => {
+      if (spoken !== target) return
+      clearTimeout(timer)
+      off()
+      resolve(Date.now())
+    })
+  })
+}

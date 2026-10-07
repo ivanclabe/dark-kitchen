@@ -44,7 +44,7 @@ const TIMEZONES: { value: string; label: string }[] = [
 export function KitchenGeneralPage() {
   const { can, canShared, organization } = useActiveKitchen()
   return (
-    <SettingsPage title="General" description="Nombre, identificador y datos de esta cuenta.">
+    <SettingsPage title="General" description="Nombre, identificador y datos de esta cuenta." narrow>
       {can('settings.manage') && <AccountDetailsForm />}
       {organization && canShared('organization.manage') && <BusinessSection organizationId={organization.id} />}
       {canShared('accounts.manage') && (

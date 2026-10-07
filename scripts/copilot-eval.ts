@@ -2,8 +2,12 @@
 // figures), clarity and response time — over supabase/tests/copilot_eval/questions.json.
 //
 //   QUANELA_EVAL_TOKEN=<access token> QUANELA_EVAL_KITCHEN=<account id> node scripts/copilot-eval.ts
-//     [--only s1,s2] [--limit 10] [--dry]
+//     [--only s1,s2] [--limit 10] [--dry] [--channel voice]
 //
+// * --channel voice asks every question as if said to «Oye Quanela» (ADR 0041):
+//   it measures the model chosen for voice in the platform («Modelo para
+//   preguntas por voz»). Run it once with that model empty and once with the
+//   candidate, and compare the two reports.
 // * Runs as YOU (your session token, from the browser: Application → Local
 //   storage → sb-…-auth-token → access_token) in the account you pass, so it
 //   uses the real data and RLS. Roles: as the account's owner you can act as a
@@ -78,6 +82,12 @@ const option = (name: string) => {
   const i = args.indexOf(name)
   return i >= 0 ? args[i + 1] : undefined
 }
+const CHANNEL = option('--channel')
+if (CHANNEL !== undefined && CHANNEL !== 'voice' && CHANNEL !== 'text') {
+  console.error('--channel acepta voice o text.')
+  process.exit(1)
+}
+const models = new Set<string>()
 
 if (!URL_ || !KEY || !TOKEN || !KITCHEN) {
   console.error('Faltan VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY (en .env.local), QUANELA_EVAL_TOKEN o QUANELA_EVAL_KITCHEN.')
@@ -141,6 +151,7 @@ async function ask(question: string, roleId: string | null, channel: 'voice' | '
     })
     const ms = Date.now() - t0
     const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
+    if (typeof body.model === 'string') models.add(body.model)
     // The 5 s between questions of one person: wait and ask again.
     if (res.status === 429 && body.reason === 'interval') {
       await sleep(((body.retryAfterSeconds as number) ?? 5) * 1000 + 300)
@@ -196,7 +207,7 @@ async function main() {
   for (const q of questions) {
     const question = fill(q.q, map)
     const roleId = q.role === 'self' ? null : (roles.get(q.role) ?? null)
-    const { ms, status, body } = await ask(question, roleId, q.channel ?? 'text')
+    const { ms, status, body } = await ask(question, roleId, (CHANNEL as 'voice' | 'text' | undefined) ?? q.channel ?? 'text')
     const base = { id: q.id, role: q.role, question, ms }
     if (status !== 200) {
       results.push({ ...base, status: 'error', error: String(body.message ?? body.error ?? status), intentOk: null, scopeOk: false, figureOk: null, invented: false, mentionOk: null, linkOk: null, clarity: null, judge: null })
@@ -252,13 +263,17 @@ function writeReport(results: Result[]) {
     clarityBy: ok.some((r) => r.judge !== null) ? 'juez + heurística' : 'heurística',
     p50Ms: percentile(times, 50),
     p90Ms: percentile(times, 90),
+    channel: CHANNEL ?? 'según cada pregunta',
+    models: [...models],
   }
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+  const stamp = `${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}${CHANNEL ? `-${CHANNEL}` : ''}`
   const dir = join(ROOT, 'supabase/tests/copilot_eval/results')
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, `${stamp}.json`), JSON.stringify({ summary, results }, null, 2))
   const md = [
     `# Evaluación de Copilot — ${stamp}`,
+    '',
+    `Canal: ${summary.channel} · Modelo: ${summary.models.join(', ') || '—'}`,
     '',
     '| Métrica | Resultado | Meta (ADR 0033) |',
     '|---|---|---|',

@@ -19,12 +19,15 @@ import { useEffect, useRef, useState } from 'react'
 export function useSpeechRecognition({
   onTranscriptChange,
   onError,
+  onStart,
   lang = 'es-CO',
   grammar,
   maxDurationMs = 20_000,
 }: {
-  onTranscriptChange: (transcript: string) => void
+  onTranscriptChange: (transcript: string, final: boolean) => void
   onError?: (code: string) => void
+  /** The engine is actually listening (ADR 0041: measured from «Oye Quanela»). */
+  onStart?: () => void
   lang?: string
   /** Allowed vocabulary for engines that support it (Vosk). */
   grammar?: string
@@ -40,10 +43,12 @@ export function useSpeechRecognition({
   const [error, setError] = useState<string | null>(null)
   const onTranscriptChangeRef = useRef(onTranscriptChange)
   const onErrorRef = useRef(onError)
+  const onStartRef = useRef(onStart)
 
   useEffect(() => {
     onTranscriptChangeRef.current = onTranscriptChange
     onErrorRef.current = onError
+    onStartRef.current = onStart
   })
 
   // Offline engine: load the model in the background so the microphone answers at once.
@@ -72,8 +77,11 @@ export function useSpeechRecognition({
       const session = await engine.start({
         lang,
         grammar,
-        onTranscript: (text) => onTranscriptChangeRef.current(text),
-        onStart: () => setListening(true),
+        onTranscript: (text, final) => onTranscriptChangeRef.current(text, final),
+        onStart: () => {
+          setListening(true)
+          onStartRef.current?.()
+        },
         onEnd: () => {
           setListening(false)
           sessionRef.current = null

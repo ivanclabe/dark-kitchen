@@ -8,7 +8,19 @@ import clsx from 'clsx'
 import { ArrowUp, BookOpen, Check, Copy, ExternalLink, Loader2, Mic, RotateCcw, Sparkles, Square, ThumbsDown, ThumbsUp, Volume2, VolumeX } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
-import { askCopilot, cancelCopilot, CopilotError, rateCopilotAnswer, type CopilotAnswer, type CopilotScope, type CopilotTurn } from './api'
+import { whenSpoken } from '@/shared/voice/speechQueue'
+import {
+  askCopilot,
+  cancelCopilot,
+  CopilotError,
+  rateCopilotAnswer,
+  reportCopilotTimings,
+  warmCopilot,
+  type CopilotAnswer,
+  type CopilotClientTimings,
+  type CopilotScope,
+  type CopilotTurn,
+} from './api'
 import { CopilotContext, useCopilot } from './copilotContext'
 import { historyFor, loadConversation, saveConversation, type CopilotMessage } from './lib/conversation'
 import { CopilotMarkdown } from './lib/markdown'
@@ -97,7 +109,12 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
 
   /** Asks one question; null if it was cancelled. Errors come back as a message (and are thrown for the voice). */
   const ask = useCallback(
-    async (text: string, channel: 'voice' | 'text', signal?: AbortSignal): Promise<CopilotAnswer | null> => {
+    async (
+      text: string,
+      channel: 'voice' | 'text',
+      signal?: AbortSignal,
+      voiceOptions?: { client: CopilotClientTimings; onSpoken: (spoken: string) => void },
+    ): Promise<CopilotAnswer | null> => {
       const question = text.trim()
       if (!question) return null
       inFlight.current?.abort.abort()
@@ -109,7 +126,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
       setMessages((prev) => [...prev, { role: 'user', content: question, channel }])
       setPending(true)
       try {
-        const result = await askCopilot({ question, history, screen, channel, requestId, signal: abort.signal })
+        const result = await askCopilot({ question, history, screen, channel, requestId, signal: abort.signal, ...voiceOptions })
         setMessages((prev) => [
           ...prev,
           {
@@ -173,16 +190,55 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
       ? {
           id: 'copilot',
           fallback: true,
-          handle: async (text, { signal }) => {
+          // ADR 0041 (D4): wake the function while the person is still speaking.
+          prepare: () => warmCopilot(),
+          handle: async (text, { signal, turn }) => {
             // ADR 0038: the voice does not open the panel; the answer is heard and ✦ shows it is there.
+            const askedAt = Date.now()
+            let spokenAt: number | null = null
+            let early: string | null = null
+            let speechStart: Promise<number | null> | null = null
             try {
-              const result = await ask(text, 'voice', signal)
+              const result = await ask(text, 'voice', signal, {
+                client: {
+                  wake: turn.wake,
+                  followUp: turn.followUp,
+                  ...(turn.listenMs !== null ? { listenMs: turn.listenMs } : {}),
+                  ...(turn.endpointMs !== null ? { endpointMs: turn.endpointMs } : {}),
+                },
+                // ADR 0041 (D7): the sentence to say arrives before the whole answer: say it now.
+                onSpoken: (spoken) => {
+                  if (early !== null || signal.aborted) return
+                  early = spoken
+                  spokenAt = Date.now()
+                  if (voice.replies) {
+                    speechStart = whenSpoken(spoken)
+                    voice.say(spoken, 'answer')
+                  }
+                },
+              })
               if (!result) return null
+              if (early === null) {
+                spokenAt = Date.now()
+                if (voice.replies) speechStart = whenSpoken(result.spoken)
+              }
+              // ADR 0041 (D1): until Quanela actually speaks, on the person's own run.
+              const measured = speechStart as Promise<number | null> | null
+              void (async () => {
+                const startedSpeaking = measured ? await measured : null
+                await reportCopilotTimings(result.runId, {
+                  streamed: early !== null,
+                  requestMs: (spokenAt ?? askedAt) - askedAt,
+                  ...(startedSpeaking !== null ? { speechMs: startedSpeaking - (spokenAt ?? askedAt) } : {}),
+                  ...(startedSpeaking !== null && turn.lastWordAt !== null ? { totalMs: startedSpeaking - turn.lastWordAt } : {}),
+                }).catch(() => undefined)
+              })()
               const article = result.links?.[0]
               return {
                 tone: result.scope === 'answered' ? 'success' : 'info',
                 message: result.spoken,
-                spoken: result.spoken,
+                // Already said as it arrived: not again.
+                spoken: early === null ? result.spoken : null,
                 priority: 'answer',
                 link: article ? { href: helpHref(article.url), label: article.title } : undefined,
               }

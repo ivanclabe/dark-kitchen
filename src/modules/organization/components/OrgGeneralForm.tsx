@@ -108,7 +108,9 @@ export function OrgGeneralForm({ org }: { org: OrganizationDetails }) {
             {(a11y) => <PhoneInput {...a11y} value={form.phone ?? ''} onValueChange={(v) => set({ phone: v || null })} />}
           </FormField>
           <FormField label="Moneda" hint="Para las cuentas nuevas">
-            {(a11y) => <Input {...a11y} value={form.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase().slice(0, 3) })} maxLength={3} />}
+            {(a11y) => (
+              <Input {...a11y} value={form.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase().slice(0, 3) })} maxLength={3} className="max-w-28 uppercase tracking-wide" />
+            )}
           </FormField>
         </FormGrid>
       </div>

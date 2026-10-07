@@ -3,8 +3,8 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/shared/ui/Toast'
-import type { VoiceHandler } from '@/modules/voice/types'
-import type { CopilotAnswer } from './api'
+import type { VoiceHandler, VoiceTurn } from '@/modules/voice/types'
+import type { CopilotAnswer, CopilotClientTimings } from './api'
 
 // ADR 0033: Copilot through «Oye Quanela» — scopes, 👍/👎, retry, questions by voice, reading answers.
 const state = vi.hoisted(() => ({
@@ -15,6 +15,11 @@ const state = vi.hoisted(() => ({
   histories: [] as unknown[][],
   rated: [] as unknown[],
   next: [] as (CopilotAnswer | Error)[],
+  clients: [] as (CopilotClientTimings | undefined)[],
+  /** ADR 0041: the function sends the spoken sentence before the whole answer. */
+  spokenFirst: null as string | null,
+  reported: [] as [string, CopilotClientTimings][],
+  warmed: 0,
 }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
@@ -35,21 +40,30 @@ vi.mock('@/modules/voice/voiceContext', () => ({
   },
 }))
 vi.mock('@/modules/voice/prefs', () => ({ useVoiceFlag: () => [state.readTyped, vi.fn()] }))
+// Quanela starts speaking 300 ms after the sentence is queued.
+vi.mock('@/shared/voice/speechQueue', () => ({ whenSpoken: async () => Date.now() + 300 }))
 vi.mock('./api', async (original) => ({
   ...(await original<typeof import('./api')>()),
-  askCopilot: async ({ question, channel, history }: { question: string; channel: string; history: unknown[] }) => {
+  askCopilot: async ({ question, channel, history, client, onSpoken }: { question: string; channel: string; history: unknown[]; client?: CopilotClientTimings; onSpoken?: (s: string) => void }) => {
     state.asked.push({ question, channel })
     state.histories.push(history)
+    state.clients.push(client)
+    if (state.spokenFirst && onSpoken) onSpoken(state.spokenFirst)
     const next = state.next.shift()
     if (next instanceof Error) throw next
     return next
   },
   cancelCopilot: vi.fn(),
+  warmCopilot: () => void state.warmed++,
+  reportCopilotTimings: async (runId: string, t: CopilotClientTimings) => void state.reported.push([runId, t]),
   rateCopilotAnswer: async (runId: string, value: number) => void state.rated.push([runId, value]),
 }))
 
 const { CopilotProvider, CopilotButton } = await import('./CopilotProvider')
 const { CopilotError } = await import('./api')
+
+const TURN: VoiceTurn = { wake: true, followUp: false, listenMs: 320, endpointMs: 510, lastWordAt: Date.now() - 600 }
+const heard = () => ({ engine: 'browser' as const, signal: new AbortController().signal, turn: TURN })
 
 const answer = (over: Partial<CopilotAnswer> = {}): CopilotAnswer => ({
   answer: 'Hoy vendiste **$20.000**.',
@@ -89,6 +103,10 @@ beforeEach(() => {
   state.handler = null
   state.said = []
   state.asked = []
+  state.clients = []
+  state.spokenFirst = null
+  state.reported = []
+  state.warmed = 0
   state.histories = []
   state.rated = []
   state.next = []
@@ -148,7 +166,7 @@ describe('Copilot (ADR 0033)', () => {
     expect(state.handler).toMatchObject({ id: 'copilot', fallback: true })
     let reply: unknown
     await act(async () => {
-      reply = await state.handler!.handle('cuánto vendimos hoy', { engine: 'browser', signal: new AbortController().signal })
+      reply = await state.handler!.handle('cuánto vendimos hoy', heard())
     })
     expect(state.asked).toEqual([{ question: 'cuánto vendimos hoy', channel: 'voice' }])
     expect(reply).toMatchObject({ spoken: 'Hoy vendiste veinte mil pesos.', priority: 'answer' })
@@ -158,14 +176,51 @@ describe('Copilot (ADR 0033)', () => {
     expect(screen.getByRole('button', { name: 'Abrir Quanela Copilot' })).toBeTruthy()
   })
 
+  it('ADR 0041: says the sentence as soon as it arrives, not again at the end, and reports how long it took', async () => {
+    state.next = [answer()]
+    state.spokenFirst = 'Hoy vendiste veinte mil pesos.'
+    renderCopilot()
+    let reply: unknown
+    await act(async () => {
+      reply = await state.handler!.handle('cuánto vendimos hoy', heard())
+    })
+    expect(state.said).toEqual([{ text: 'Hoy vendiste veinte mil pesos.', priority: 'answer' }])
+    expect(reply).toMatchObject({ message: 'Hoy vendiste veinte mil pesos.', spoken: null })
+    expect(state.clients[0]).toEqual({ wake: true, followUp: false, listenMs: 320, endpointMs: 510 })
+    await waitFor(() => expect(state.reported).toHaveLength(1))
+    const [runId, t] = state.reported[0]
+    expect(runId).toBe('run-1')
+    expect(t).toMatchObject({ streamed: true, speechMs: 300 })
+    expect(t.totalMs).toBeGreaterThanOrEqual(900)
+    expect(t.requestMs).toBeGreaterThanOrEqual(0)
+  })
+
+  it('ADR 0041: without the early sentence it is said at the end, as before', async () => {
+    state.next = [answer()]
+    renderCopilot()
+    let reply: unknown
+    await act(async () => {
+      reply = await state.handler!.handle('cuánto vendimos hoy', heard())
+    })
+    expect(state.said).toEqual([])
+    expect(reply).toMatchObject({ spoken: 'Hoy vendiste veinte mil pesos.' })
+    await waitFor(() => expect(state.reported[0]?.[1]).toMatchObject({ streamed: false }))
+  })
+
+  it('ADR 0041: hearing «Oye Quanela» wakes the function', () => {
+    renderCopilot()
+    state.handler!.prepare!()
+    expect(state.warmed).toBe(1)
+  })
+
   it('the next question carries the recent conversation, with what the last answer consulted (ADR 0038)', async () => {
     state.next = [answer(), answer()]
     renderCopilot()
     await act(async () => {
-      await state.handler!.handle('cuánto vendimos hoy', { engine: 'browser', signal: new AbortController().signal })
+      await state.handler!.handle('cuánto vendimos hoy', heard())
     })
     await act(async () => {
-      await state.handler!.handle('y ayer', { engine: 'browser', signal: new AbortController().signal })
+      await state.handler!.handle('y ayer', heard())
     })
     expect(state.histories[1]).toEqual([
       { role: 'user', content: 'cuánto vendimos hoy' },
@@ -177,7 +232,7 @@ describe('Copilot (ADR 0033)', () => {
     state.next = [answer()]
     renderCopilot()
     await act(async () => {
-      await state.handler!.handle('cuánto vendimos hoy', { engine: 'browser', signal: new AbortController().signal })
+      await state.handler!.handle('cuánto vendimos hoy', heard())
     })
     cleanup()
     renderCopilot()
