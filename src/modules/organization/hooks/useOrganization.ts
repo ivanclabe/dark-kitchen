@@ -26,7 +26,7 @@ export function useOrgAccounts(organizationId: string) {
 }
 
 export function useOrganizationDetails(organizationId: string) {
-  return useQuery({ queryKey: [...orgKey(organizationId), 'details'], queryFn: () => getOrganization(organizationId) })
+  return useQuery({ queryKey: [...orgKey(organizationId), 'details'], queryFn: () => getOrganization(organizationId), enabled: Boolean(organizationId) })
 }
 
 export function usePermissionCatalog() {

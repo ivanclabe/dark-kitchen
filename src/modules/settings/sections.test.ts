@@ -17,6 +17,10 @@ describe('Configuración sections', () => {
     expect(labels(['settings.manage'], ['billing.view'])).toContain('Facturación')
   })
 
+  it('Quanela Consumer is no longer here: it is its own module (ADR 0046)', () => {
+    expect(labels(['settings.manage', 'storefront.manage'])).toEqual(['General', 'IA y voz', 'Integraciones'])
+  })
+
   it('nothing for a kitchen role', () => {
     expect(labels(['kitchen.view', 'kitchen.prepare'])).toEqual([])
   })

@@ -48,7 +48,7 @@ delete from dk_organization_features where organization_id = (select id from _ct
 -- 0. Data migration: every stored setting is still valid against the new schemas
 insert into _t (area, test, expected, got) values ('Migration', 'Existing account settings are valid', '0',
   (select count(*)::text from dk_kitchen_features where dk_feature_settings_error(feature_key, settings) is not null));
-insert into _t (area, test, expected, got) values ('Migration', 'Platform voice default (today''s behaviour)', 'karen · natural · 1 · 1 · es-CO',
+insert into _t (area, test, expected, got) values ('Migration', 'Platform voice default (today''s behaviour)', 'karen · natural · 1 · 1 · es-US',
   (select concat_ws(' · ', default_settings ->> 'profile', default_settings ->> 'style', default_settings ->> 'rate', default_settings ->> 'volume', default_settings ->> 'lang')
    from dk_features where key = 'voice_speech'));
 
@@ -63,7 +63,7 @@ set local role authenticated;
 do $$ begin
   insert into _t (area, test, expected, got) values ('Catalog', 'The team reads the active voices', 'belen · dago · daniel · ivan · karen',
     (select string_agg(key, ' · ' order by key) from dk_voice_profiles));
-  insert into _t (area, test, expected, got) values ('Defaults', 'Account without settings uses the platform default', 'karen · 1 · es-CO',
+  insert into _t (area, test, expected, got) values ('Defaults', 'Account without settings uses the platform default', 'karen · 1 · es-US',
     pg_temp.voice('profile') || ' · ' || pg_temp.voice('rate') || ' · ' || pg_temp.voice('lang'));
   insert into _t (area, test, expected, got) values ('Permissions', 'The kitchen team uses the voice but cannot configure it', 'true · false',
     pg_temp.feat('voice_speech', 'usable') || ' · ' || pg_temp.feat('voice_speech', 'canConfigure'));

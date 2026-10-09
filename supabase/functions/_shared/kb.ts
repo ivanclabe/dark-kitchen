@@ -285,7 +285,7 @@ export const KB: KbArticle[] = [
     "section": "customers",
     "url": "/help/customers/customers",
     "title": "Clientes y saldos pendientes",
-    "summary": "En Clientes buscas por nombre, teléfono o correo y abres la ficha 360° del cliente — pedidos, preferencias, direcciones, quejas, recomendaciones y saldo — para atenderlo sin cambiar de pantalla.",
+    "summary": "En Clientes registras personas y empresas, marcas a los preferenciales y abres la ficha 360° — pedidos, preferencias, recomendaciones, direcciones, quejas y saldo — para atenderlos sin cambiar de pantalla.",
     "audience": [
       "owner",
       "admin",
@@ -307,7 +307,10 @@ export const KB: KbArticle[] = [
       "¿Cómo registro una queja de un cliente?",
       "¿Dónde anoto lo que no le gusta a un cliente?",
       "¿Cómo cambio la dirección de un cliente?",
-      "¿Qué es lo que más pide un cliente?"
+      "¿Qué es lo que más pide un cliente?",
+      "¿Cómo registro una empresa como cliente?",
+      "¿Cómo marco un cliente preferencial?",
+      "¿Dónde veo lo que no le gusta a un cliente al tomar el pedido?"
     ],
     "keywords": [
       "cliente",
@@ -330,11 +333,20 @@ export const KB: KbArticle[] = [
       "favoritos",
       "alergia",
       "dirección",
-      "recomendación"
+      "recomendación",
+      "empresa",
+      "NIT",
+      "razón social",
+      "corporativo",
+      "preferencial",
+      "VIP",
+      "estrella"
     ],
     "steps": [
       "Abre Clientes y toca Nuevo cliente .",
-      "Escribe el Nombre (obligatorio). Opcional: Correo , Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número.",
+      "Arriba elige Persona o Empresa . Persona: el Nombre (obligatorio) y, si quieres, su Documento (por ejemplo, para facturar). Empresa: el Nombre comercial (obligatorio: es el que se ve en pedidos, despacho y cartera), la Razón social , el NIT y la Persona de contacto .",
+      "Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Correo , Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Tampoco con el mismo NIT o documento, aunque se escriba con o sin puntos y guion.",
+      "Si es un Cliente preferencial , actívalo y escribe el Motivo si quieres (por ejemplo, «Convenio corporativo»). Lo marca quien puede editar clientes.",
       "Toca Crear cliente ."
     ],
     "headings": [
@@ -346,7 +358,7 @@ export const KB: KbArticle[] = [
       "Preferencias y recomendaciones",
       "Registrar un abono"
     ],
-    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Escribe el Nombre (obligatorio). Opcional: Correo , Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos. Encontrar un cliente Escribe en el buscador (nombre, teléfono en cualquier formato, correo o dirección) o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). Toca el encabezado de una columna para ordenar. La ficha del cliente (360°) Toca un cliente. Arriba: su estado (activo si pidió en los últimos 90 días, saldo vencido, quejas abiertas), su teléfono y su correo, y los botones Editar , Registrar queja , Registrar pago y Nuevo pedido . Las pestañas: Pestaña Qué ves --- Resumen Lo más importante junto: cuántos pedidos, total comprado, cada cuánto pide, su último pedido y lo que más pide ; lo que le gusta y lo que no ; qué recomendarle; su contacto; la última dirección de envío; las quejas abiertas y la nota general Pedidos Todos sus pedidos Preferencias Platos favoritos, ingredientes que le gustan y que no, y preferencias alimentarias. Los platos e ingredientes se eligen del catálogo Direcciones La última dirección de envío (la que usan los pedidos y el despacho), las frecuentes y las anteriores Quejas Su historial de quejas e incidencias Cuenta Los pedidos con saldo y los pagos recibidos Todo sale de los datos reales: si algo no se ha registrado, la ficha lo dice en vez de suponerlo. Direcciones En Direcciones , toca Nueva dirección . Escribe la Dirección ; opcional: Referencia , Quién recibe e Indicaciones para la entrega . Deja marcado Usar como última dirección de envío si es a donde va el próximo pedido. Nada se borra: una dirección nueva queda además de las anteriores. Con Usar como última cambias a otra; Archivar la saca de la lista sin perderla. Quejas Toca Registrar queja , elige el Motivo , el Pedido (opcional) y escribe Qué pasó . Para el seguimiento, en Quejas toca Dar seguimiento : cambia el Estado (Pendiente, En revisión, Resuelta), escribe la Respuesta o solución y, si quieres, Notas internas . Lo que el cliente reportó no se edita ni se borra: cada queja queda en el historial con su fecha "
+    "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Arriba elige Persona o Empresa . Persona: el Nombre (obligatorio) y, si quieres, su Documento (por ejemplo, para facturar). Empresa: el Nombre comercial (obligatorio: es el que se ve en pedidos, despacho y cartera), la Razón social , el NIT y la Persona de contacto . Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Correo , Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Tampoco con el mismo NIT o documento, aunque se escriba con o sin puntos y guion. Si es un Cliente preferencial , actívalo y escribe el Motivo si quieres (por ejemplo, «Convenio corporativo»). Lo marca quien puede editar clientes. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos (como persona). Bueno saber: «Preferencial» es una marca para que todo el equipo lo reconozca (una ⭐ en la lista, en su ficha y al tomarle un pedido). No cambia precios ni aplica descuentos solo. Encontrar un cliente Escribe en el buscador (nombre, NIT, razón social, persona de contacto, teléfono en cualquier formato, correo o dirección) o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). En Más filtros eliges Solo personas o Solo empresas y Solo preferenciales ; también tocando la cifra Preferenciales . Toca el encabezado de una columna para ordenar. En la lista, las empresas llevan un 🏢 y su NIT, y los preferenciales una ⭐. La ficha del cliente (360°) Toca un cliente. Arriba: si es Empresa o Preferencial , su estado (activo si pidió en los últimos 90 días, saldo vencido, quejas abiertas), su teléfono y su correo, y los botones Editar , Registrar queja , Registrar pago y Nuevo pedido . Las pestañas: Pestaña Qué ves --- Resumen Lo más importante junto: cuántos pedidos, total comprado, cada cuánto pide, su último pedido y lo que más pide ; lo que le gusta y lo que no ; qué recomendarle; su contacto (en empresas, razón social, NIT y persona de contacto; y el motivo si es preferencial); la última dirección de envío; las quejas abiertas y la nota general Pedidos Todos sus pedidos Preferencias y recomendaciones Platos favoritos, ingredientes que le gustan y que no, y preferencias alimentarias (los platos e ingredientes se eligen del catálogo); y qué r"
   },
   {
     "id": "dishes-and-menu",
@@ -1184,6 +1196,56 @@ export const KB: KbArticle[] = [
     "body": "Abre Abastecimiento → Compras y toca Nueva . Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra → Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
   },
   {
+    "id": "quanela-consumer",
+    "section": "catalog",
+    "url": "/help/catalog/quanela-consumer",
+    "title": "Publicar tu negocio en Quanela Consumer",
+    "summary": "En el módulo Consumer eliges qué ven los clientes en Quanela Consumer (tu perfil y tus platos), revisas qué te falta y publicas o pausas cuando quieras.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "storefront.manage"
+    ],
+    "appPath": "/consumer",
+    "questions": [
+      "¿Qué es Quanela Consumer?",
+      "¿Cómo publico mi negocio en Quanela Consumer?",
+      "¿Qué platos ven los clientes?",
+      "¿Cómo dejo de aparecer en Quanela Consumer?",
+      "¿Qué me falta para publicar?"
+    ],
+    "keywords": [
+      "consumer",
+      "quanela consumer",
+      "publicar",
+      "vitrina",
+      "clientes",
+      "app",
+      "platos publicados",
+      "perfil",
+      "ocultar",
+      "pausar",
+      "etiquetas",
+      "vegetariano",
+      "sin gluten"
+    ],
+    "steps": [
+      "Identidad: es la de tu cuenta. El nombre , la dirección pública (el «Identificador (URL)» de la cuenta) y el tipo de cocina se cambian en Configuración → General → Esta cuenta ; aquí solo se ven, con Cambiar en General . Lo único propio de Quanela Consumer es la frase corta .",
+      "Contacto y ubicación: el WhatsApp para pedidos (opcional) y tu ubicación ( Usar mi ubicación actual ; Ver en el mapa para revisarla).",
+      "Datos que compartes: Compartir tiempos y cumplimiento muestra las medianas reales de tus pedidos de los últimos 30 días (preparación, confirmación, domicilio y pedidos cumplidos). Nunca ventas, costos ni datos de tus clientes. Abajo ves qué se compartiría hoy.",
+      "Toca Guardar . Guardar el perfil no publica ni despublica nada."
+    ],
+    "headings": [
+      "Resumen",
+      "Perfil del negocio",
+      "Platos"
+    ],
+    "body": "Quanela Consumer es la app donde los clientes dicen qué quieren comer y Quanela les recomienda dónde pedir. En el módulo Consumer del menú lateral decides qué ven de tu negocio. Mientras no publiques, nadie lo ve. Bueno saber: la app para clientes todavía no está disponible. Lo que prepares aquí quedará listo para el lanzamiento. Resumen Estado: «Publicado» (desde cuándo y cuántos platos ven los clientes) o «No publicado». Lista para publicar: lo que tienes y lo que falta. Lo obligatorio es al menos un plato publicado (el nombre y la dirección ya vienen de tu cuenta). Lo demás (tipo de cocina, frase corta, ubicación, horario, WhatsApp, fotos y descripciones) ayuda a que Quanela te recomiende. Cada punto tiene Completar o Configurar , que te lleva donde se arregla. Cómo te ven los clientes: una vista previa de tu tarjeta y de un plato, con tus datos reales. Para publicar, toca Publicar y confirma: el aviso dice cuántos platos verán. Pausar publicación te quita de la app de inmediato. Perfil del negocio Identidad: es la de tu cuenta. El nombre , la dirección pública (el «Identificador (URL)» de la cuenta) y el tipo de cocina se cambian en Configuración → General → Esta cuenta ; aquí solo se ven, con Cambiar en General . Lo único propio de Quanela Consumer es la frase corta . Contacto y ubicación: el WhatsApp para pedidos (opcional) y tu ubicación ( Usar mi ubicación actual ; Ver en el mapa para revisarla). Datos que compartes: Compartir tiempos y cumplimiento muestra las medianas reales de tus pedidos de los últimos 30 días (preparación, confirmación, domicilio y pedidos cumplidos). Nunca ventas, costos ni datos de tus clientes. Abajo ves qué se compartiría hoy. Toca Guardar . Guardar el perfil no publica ni despublica nada. Platos No necesitas guardar el perfil antes: la primera vez que guardas platos, la publicación se crea sin publicar . Busca por nombre o categoría y filtra: Todos , Publicados , Sin publicar , Sin foto o Sin descripción . Activa el interruptor de cada plato, o marca varios y toca Publicar u Ocultar . En los publicados, marca sus etiquetas (vegetariano, vegano, sin gluten, picante, saludable) y, si tiene receta, Mostrar ingredientes (solo nombres) . Toca Guardar . «sin foto» y «sin descripción» te llevan al plato en Catálogo para completarlo. El precio y si el plato está disponible hoy salen del menú del día: no se escriben aquí. Cuidado: solo se ven los platos activos que publiques. Nada privado (costos, recetas completas, clientes o mon"
+  },
+  {
     "id": "recipes-and-cost",
     "section": "catalog",
     "url": "/help/catalog/recipes-and-cost",
@@ -1310,6 +1372,8 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "9 de octubre de 2026",
+      "8 de octubre de 2026",
       "7 de octubre de 2026",
       "6 de octubre de 2026",
       "5 de octubre de 2026",
@@ -1317,7 +1381,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 «Oye Quanela» responde más rápido. Cierra tu pregunta apenas terminas de hablar, te escucha desde el tono y empieza a decir la respuesta mientras el detalle sigue llegando. Además, puedes volver a decir «Oye Quanela» justo después de una respuesta. En Voz en este equipo ves si la voz es instalada o en línea. Ver «Oye Quanela». de octubre de 2026 Ficha 360° del cliente. En una sola pantalla: lo que más pide y cada cuánto, sus preferencias (lo que le gusta y lo que no), sus direcciones con historial, sus quejas con seguimiento, qué recomendarle y su saldo. Ahora el cliente tiene correo y se busca también por correo. Ver Clientes. Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada campo importante tiene un ⓘ que explica para qué sirve. Conversar con «Oye Quanela». Después de la frase, Quanela sigue escuchando: pregunta «¿y ayer?» sin repetir «Oye Quanela». Termina con silencio o «gracias». Copilot recuerda la conversación, y lo que preguntas por voz ya no abre el chat: el botón ✦ muestra las respuestas sin ver. Ver «Oye Quanela». Notificaciones. Una campana junto a tu avatar junta los avisos de la cuenta: pedidos atrasados, stock bajo, sugerencias de la IA y avisos del plan. Inicio ahora muestra «Necesita atención» en tarjetas más claras. Ver Notificaciones. quanela.com siempre muestra la página de Quanela , aun con la sesión abierta; «Ir a mi cuenta» te lleva a tu negocio. La ayuda vive en doc.quanela.com . Centro de ayuda. Estas guías, públicas y sin iniciar sesión, con buscador. Copilot y «Oye Quanela» responden con ellas y te dan el enlace a la guía exacta. Ver Preguntarle a Copilot. Centro de operaciones. Pedidos y Cocina ahora son un solo módulo, Operación , con cuatro vistas: Tablero, Cocina, Despacho y Lista. Las direcciones viejas te traen aquí solas. Ver El Centro de operaciones. El pago dentro del pedido. Cada pedido muestra cuánto se ha pagado y cuánto falta, y ahí mismo registras o anulas un pago. Ver Registrar y anular pagos. «Oye Quanela» en toda la app. La voz ya no es solo de la cocina: pregúntale desde cualquier pantalla, con el micrófono de arriba o con el manos libres. Ver «Oye Quanela». Copilot conversacional. Responde más corto y claro, sigue la conversación, te deja calificar cada respuesta "
+    "body": "de octubre de 2026 Quanela Consumer usa los datos de tu cuenta. El nombre, la dirección pública y el tipo de cocina que ven los clientes son los de la cuenta: se cambian en un solo lugar. Tipo de cocina ahora está en Configuración → General → Esta cuenta (si no eliges, usa la categoría del negocio). Quanela Consumer es un módulo. Consumer , en el menú lateral, reúne lo que ven los clientes en la app de Quanela Consumer: un Resumen (estado, qué te falta para publicar y cómo te ven), el Perfil del negocio y los Platos , con buscador, filtros y publicar varios a la vez. Antes estaba en Configuración. Ver Publicar tu negocio en Quanela Consumer. Centro de operaciones más estable. Las vistas (Tablero, Cocina, Despacho y Lista) están en su propia barra, y nada salta al cambiar de una a otra. Clientes empresa y preferenciales. Registra empresas con nombre comercial, razón social, NIT y persona de contacto (y un documento opcional para personas). Marca a tus clientes preferenciales con una ⭐ y su motivo. Al tomar un pedido ves lo que no le gusta al cliente, su dieta, sus favoritos y qué recomendarle. En la lista, busca por NIT y filtra empresas o preferenciales. Ver Clientes y saldos pendientes. Movimientos de inventario con unidad. En Abastecimiento, cada movimiento dice su unidad («+2.000 g») y el costo por unidad. de octubre de 2026 Eliges la cuenta al entrar. Si tienes varias cuentas, después de iniciar sesión ves Tus cuentas para elegir con cuál trabajar; la última que usaste va primera. Ver Entrar a Quanela y cambiar de cuenta o de rol. de octubre de 2026 «Oye Quanela» responde más rápido. Cierra tu pregunta apenas terminas de hablar, te escucha desde el tono y empieza a decir la respuesta mientras el detalle sigue llegando. Además, puedes volver a decir «Oye Quanela» justo después de una respuesta. En Voz en este equipo ves si la voz es instalada o en línea. Ver «Oye Quanela». de octubre de 2026 Ficha 360° del cliente. En una sola pantalla: lo que más pide y cada cuánto, sus preferencias (lo que le gusta y lo que no), sus direcciones con historial, sus quejas con seguimiento, qué recomendarle y su saldo. Ahora el cliente tiene correo y se busca también por correo. Ver Clientes. Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada ca"
   },
   {
     "id": "roles",
@@ -1469,7 +1533,7 @@ export const KB: KbArticle[] = [
     "headings": [
       "Cambiar el nombre o la zona horaria"
     ],
-    "body": "Abre Configuración en el menú de la izquierda (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) y Zona horaria . Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
+    "body": "Abre Configuración en el menú de la izquierda (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) , Zona horaria y Tipo de cocina (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
   },
   {
     "id": "setup-account",
@@ -1659,7 +1723,8 @@ export const KB: KbArticle[] = [
       "¿Cómo cambio de cuenta?",
       "¿Cómo cambio de rol?",
       "Olvidé mi contraseña",
-      "¿Cómo cambio mi contraseña?"
+      "¿Cómo cambio mi contraseña?",
+      "¿Cómo elijo la cuenta al entrar?"
     ],
     "keywords": [
       "login",
@@ -1670,13 +1735,16 @@ export const KB: KbArticle[] = [
       "rol",
       "cambiar",
       "perfil",
-      "avatar"
+      "avatar",
+      "varias cuentas",
+      "elegir cuenta",
+      "tus cuentas"
     ],
     "steps": [
       "Abre la dirección de tu negocio (la que termina en .quanela.com ).",
       "Escribe tu correo y tu contraseña y toca Iniciar sesión .",
       "Si creaste el negocio con Google, Instagram o tu teléfono, usa esos botones debajo de «¿Creaste tu negocio con Google, Instagram o tu teléfono?».",
-      "Entras directo a tu cuenta. Si tienes varias y Quanela no sabe cuál usaste la última vez, verás Tus cuentas para elegir."
+      "Si tienes una sola cuenta , entras directo. Si tienes varias , ves Tus cuentas : elige con cuál vas a trabajar. La que usaste la última vez va primera y dice Última que usaste ."
     ],
     "headings": [
       "Entrar",
@@ -1684,7 +1752,7 @@ export const KB: KbArticle[] = [
       "Cambiar de cuenta o de rol",
       "Tu perfil y tu contraseña"
     ],
-    "body": "Entrar Abre la dirección de tu negocio (la que termina en .quanela.com ). Escribe tu correo y tu contraseña y toca Iniciar sesión . Si creaste el negocio con Google, Instagram o tu teléfono, usa esos botones debajo de «¿Creaste tu negocio con Google, Instagram o tu teléfono?». Entras directo a tu cuenta. Si tienes varias y Quanela no sabe cuál usaste la última vez, verás Tus cuentas para elegir. Bueno saber: si eres nuevo en el equipo y no tienes contraseña, pide a tu administrador una invitación. Ver Invitar a tu equipo. Si olvidaste tu contraseña Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace para crear una contraseña nueva (tú la eliges; nadie más la ve). Si ya estás dentro en otro equipo, puedes cambiarla en Mi perfil . Cambiar de cuenta o de rol Arriba, toca el indicador «Cuenta · ROL ▾» . En Trabajar como elige el rol; en Cambiar de cuenta , la cuenta. Al cambiar de cuenta te quedas en la misma sección. También lo tienes en el menú de tu avatar: Cambiar de rol y Cuenta → Tus cuentas . Tu perfil y tu contraseña En el menú de tu avatar → Mi perfil cambias tu nombre y tu avatar. Para la contraseña, en Seguridad toca Cambiar contraseña : escribe la actual, la nueva (mínimo 8 caracteres) y repítela. Si entras con Google o con tu teléfono, no tienes contraseña de Quanela. Ahí también ves Dónde tengo acceso : tus cuentas y tu rol en cada una. El menú del avatar tiene además Apariencia (tema oscuro, claro o según el sistema, y texto grande) y Ayuda y soporte (atajos de teclado, preguntar a Copilot, reportar un problema)."
+    "body": "Entrar Abre la dirección de tu negocio (la que termina en .quanela.com ). Escribe tu correo y tu contraseña y toca Iniciar sesión . Si creaste el negocio con Google, Instagram o tu teléfono, usa esos botones debajo de «¿Creaste tu negocio con Google, Instagram o tu teléfono?». Si tienes una sola cuenta , entras directo. Si tienes varias , ves Tus cuentas : elige con cuál vas a trabajar. La que usaste la última vez va primera y dice Última que usaste . Solo te pregunta al iniciar sesión: si recargas la página o vuelves con la sesión abierta, sigues en la misma cuenta. Si entraste por un enlace a una página concreta, te lleva a esa página. Bueno saber: si eres nuevo en el equipo y no tienes contraseña, pide a tu administrador una invitación. Ver Invitar a tu equipo. Si olvidaste tu contraseña Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace para crear una contraseña nueva (tú la eliges; nadie más la ve). Si ya estás dentro en otro equipo, puedes cambiarla en Mi perfil . Cambiar de cuenta o de rol Arriba, toca el indicador «Cuenta · ROL ▾» . En Trabajar como elige el rol; en Cambiar de cuenta , la cuenta. Al cambiar de cuenta te quedas en la misma sección. También lo tienes en el menú de tu avatar: Cambiar de rol y Cuenta → Tus cuentas . Tu perfil y tu contraseña En el menú de tu avatar → Mi perfil cambias tu nombre y tu avatar. Para la contraseña, en Seguridad toca Cambiar contraseña : escribe la actual, la nueva (mínimo 8 caracteres) y repítela. Si entras con Google o con tu teléfono, no tienes contraseña de Quanela. Ahí también ves Dónde tengo acceso : tus cuentas y tu rol en cada una. El menú del avatar tiene además Apariencia (tema oscuro, claro o según el sistema, y texto grande) y Ayuda y soporte (atajos de teclado, preguntar a Copilot, reportar un problema)."
   },
   {
     "id": "users-and-roles",

@@ -26,5 +26,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "admin/src"]
+  "include": ["src", "admin/src", "supabase/functions/_consumer"]
 }

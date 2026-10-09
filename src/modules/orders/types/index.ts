@@ -36,6 +36,10 @@ export interface Order {
   /** Where it goes — the rider needs it (only with customers.view, or for the rider's own deliveries). */
   customerAddress: string | null
   customerPhone: string | null
+  /** ADR 0044: a company, and whether the customer is preferred (with the business's reason). */
+  customerType?: 'person' | 'company'
+  customerPreferred?: boolean
+  customerPreferredNote?: string | null
   status: OrderStatus
   channel: OrderChannel
   subtotal: number

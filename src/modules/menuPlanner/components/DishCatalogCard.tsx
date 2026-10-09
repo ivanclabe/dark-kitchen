@@ -106,7 +106,7 @@ export function DishCatalogCard({
       </div>
       <span className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100">
         {canEdit && (
-          <Tooltip label="Editar plato" side="top">
+          <Tooltip label="Editar plato" side="top-end">
             <IconButton
               icon={Pencil}
               variant="ghost"
@@ -121,7 +121,7 @@ export function DishCatalogCard({
           </Tooltip>
         )}
         {canPlan && (
-          <Tooltip label={onSelectedDate ? 'Ya está en el día seleccionado' : 'Agregar al día seleccionado'} side="top">
+          <Tooltip label={onSelectedDate ? 'Ya está en el día seleccionado' : 'Agregar al día seleccionado'} side="top-end">
             <IconButton
               icon={onSelectedDate ? Check : Plus}
               variant="ghost"

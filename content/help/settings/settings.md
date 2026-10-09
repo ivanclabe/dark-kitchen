@@ -15,7 +15,7 @@ questions:
   - ¿Dónde está el ID de la cuenta para WhatsApp?
 keywords: [configuración, ajustes, zona horaria, nombre, plan, facturación, IA, voz, integraciones, WhatsApp, n8n, bitácora, auditoría, actividad]
 related: [copilot-limits, oye-quanela, kitchen-hours, users-and-roles]
-updated: 2026-10-06
+updated: 2026-10-09
 order: 1
 ---
 
@@ -23,7 +23,7 @@ Abre **Configuración** en el menú de la izquierda (o en el menú de tu avatar 
 
 | Sección | Para qué |
 |---|---|
-| **General** | **Tu negocio** (aplica a todas tus cuentas) y **Esta cuenta**: **Nombre**, **Identificador (URL)** y **Zona horaria**. Además, **Datos fiscales y de contacto** (opcionales) |
+| **General** | **Tu negocio** (aplica a todas tus cuentas) y **Esta cuenta**: **Nombre**, **Identificador (URL)**, **Zona horaria** y **Tipo de cocina** (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, **Datos fiscales y de contacto** (opcionales) |
 | **Facturación** | Tu **Plan**, cuánto usas de él (cuentas, usuarios, IA) y tus facturas |
 | **IA y voz** | **Funciones**: activa Copilot, la voz y las sugerencias de IA en esta cuenta. **Este dispositivo**: la voz de este equipo. **Uso y estado**: cuánto se ha usado y cómo responde Copilot |
 | **Integraciones** | El **ID de la cuenta** para conectar sistemas externos, por ejemplo pedidos por WhatsApp |

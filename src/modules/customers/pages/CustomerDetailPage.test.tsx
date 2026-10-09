@@ -98,7 +98,7 @@ describe('customer detail (ADR 0028)', () => {
   it('renders with its tabs and opens an order over the page, without flow actions', () => {
     renderAt('/k/centro/customers/c1')
     expect(screen.getByRole('heading', { level: 1, name: 'Carlos' })).toBeTruthy()
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Resumen', 'Pedidos', 'Preferencias', 'Direcciones', 'Quejas (1)', 'Cuenta'])
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Resumen', 'Pedidos', 'Preferencias y recomendaciones', 'Direcciones', 'Quejas (1)', 'Cuenta'])
     fireEvent.click(screen.getByRole('tab', { name: 'Pedidos' }))
     fireEvent.click(screen.getByRole('button', { name: /Pedido #1042/ }))
     expect(screen.getByText('drawer o1 · actions offered: 0')).toBeTruthy()

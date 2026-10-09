@@ -23,6 +23,8 @@ import { shortDateLabel, useMenuPlannerDrag } from '../hooks/useMenuPlannerDrag'
 import type { PlanDragInfo } from '../lib/dragRules'
 import { addDays, startOfWeek, todayStr } from '../lib/week'
 import type { MenuPlanItem } from '../types'
+import { useProducts } from '@/modules/products/hooks/useProducts'
+import { useSearchParams } from 'react-router-dom'
 
 type ViewMode = 'week' | 'month'
 
@@ -36,6 +38,32 @@ export function MenuPlannerPage() {
   const [dishDrawerOpen, setDishDrawerOpen] = useState(false)
   const [rulesItem, setRulesItem] = useState<MenuPlanItem | null>(null)
   const [copyOpen, setCopyOpen] = useState(false)
+
+  // ADR 0046: ?plato=<id> opens that dish to edit (from Quanela Consumer: «sin foto», «sin descripción»).
+  const [params, setParams] = useSearchParams()
+  const linkedDishId = params.get('plato')
+  const { data: allProducts } = useProducts(Boolean(linkedDishId))
+  const [openedLink, setOpenedLink] = useState<string | null>(null)
+  if (linkedDishId && allProducts && openedLink !== linkedDishId) {
+    setOpenedLink(linkedDishId)
+    const dish = allProducts.find((p) => p.id === linkedDishId)
+    if (dish) {
+      setEditingProduct(dish)
+      setDishDrawerOpen(true)
+    }
+  }
+  // Once opened, the address goes back to the plain catalog (a reload does not reopen it).
+  useEffect(() => {
+    if (!openedLink) return
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+        next.delete('plato')
+        return next
+      },
+      { replace: true },
+    )
+  }, [openedLink, setParams])
 
   // El mes trae 35 días de margen antes/después para que las celdas del mes
   // vecino que asoman en la grilla de 6 semanas también muestren sus platos.

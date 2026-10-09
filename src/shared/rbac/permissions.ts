@@ -51,6 +51,7 @@ export const ACCOUNT_PERMISSION_KEYS = [
   'ai.manage',
   'settings.view',
   'settings.manage',
+  'storefront.manage',
   'team.view',
   'team.manage',
   'staff.view',

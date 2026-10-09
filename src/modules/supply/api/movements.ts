@@ -10,14 +10,14 @@ interface MovementRow {
   reason: WasteReason | null
   observation: string | null
   created_at: string
-  dk_ingredients: { name: string } | null
+  dk_ingredients: { name: string; dk_units: { code: string } | null } | null
 }
 
 export async function listMovements(ingredientId?: string): Promise<InventoryMovement[]> {
   let query = supabase
     .from('dk_inventory_movements')
     .select(
-      'id, ingredient_id, movement_type, quantity_base_unit, unit_cost, reason, observation, created_at, dk_ingredients ( name )',
+      'id, ingredient_id, movement_type, quantity_base_unit, unit_cost, reason, observation, created_at, dk_ingredients ( name, dk_units ( code ) )',
     )
     .order('created_at', { ascending: false })
     .limit(200)
@@ -33,6 +33,7 @@ export async function listMovements(ingredientId?: string): Promise<InventoryMov
     ingredientName: row.dk_ingredients?.name ?? '—',
     movementType: row.movement_type,
     quantityBaseUnit: Number(row.quantity_base_unit),
+    unitCode: row.dk_ingredients?.dk_units?.code ?? '',
     unitCost: row.unit_cost === null ? null : Number(row.unit_cost),
     reason: row.reason,
     observation: row.observation,

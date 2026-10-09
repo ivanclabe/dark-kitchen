@@ -6,6 +6,7 @@ import { ArrowLeft, Mail, MessageSquareText, Smartphone } from 'lucide-react'
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { TURNSTILE_SITE_KEY } from '../api'
 import { continueWithProvider, ownerAuthErrorMessage, requestPhoneCode, verifyPhoneCode, type OwnerMethod } from '../ownerAuth'
+import { clearAccountChoice, markAccountChoice } from '@/shared/kitchen/accountChoice'
 import { markOwnerSignIn } from '../ownerSession'
 import { TurnstileWidget } from './TurnstileWidget'
 
@@ -67,9 +68,12 @@ export function OwnerMethodButtons({
   async function oauth(method: 'google' | 'instagram') {
     setLeaving(method)
     markOwnerSignIn()
+    // ADR 0043: back from Google or Instagram, someone with several accounts chooses one.
+    markAccountChoice()
     try {
       await continueWithProvider(method, returnPath)
     } catch (err) {
+      clearAccountChoice()
       setLeaving(null)
       onError(ownerAuthErrorMessage(err))
     }
@@ -141,9 +145,11 @@ export function PhoneSignIn({ create, onBack, onSignedIn }: { create: boolean; o
     setError(null)
     try {
       markOwnerSignIn()
+      markAccountChoice()
       await verifyPhoneCode(phone, code)
       onSignedIn()
     } catch (err) {
+      clearAccountChoice()
       setError(ownerAuthErrorMessage(err))
       setBusy(false)
     }

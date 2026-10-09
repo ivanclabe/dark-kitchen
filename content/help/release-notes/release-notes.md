@@ -12,9 +12,22 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-07
+updated: 2026-10-09
 order: 1
 ---
+
+## 9 de octubre de 2026
+
+- **Quanela Consumer usa los datos de tu cuenta.** El nombre, la dirección pública y el tipo de cocina que ven los clientes son los de la cuenta: se cambian en un solo lugar. **Tipo de cocina** ahora está en **Configuración → General → Esta cuenta** (si no eliges, usa la categoría del negocio).
+- **Quanela Consumer es un módulo.** **Consumer**, en el menú lateral, reúne lo que ven los clientes en la app de Quanela Consumer: un **Resumen** (estado, qué te falta para publicar y cómo te ven), el **Perfil del negocio** y los **Platos**, con buscador, filtros y publicar varios a la vez. Antes estaba en Configuración. Ver [Publicar tu negocio en Quanela Consumer](help:quanela-consumer).
+- **Centro de operaciones más estable.** Las vistas (Tablero, Cocina, Despacho y Lista) están en su propia barra, y nada salta al cambiar de una a otra.
+
+- **Clientes empresa y preferenciales.** Registra empresas con nombre comercial, razón social, NIT y persona de contacto (y un documento opcional para personas). Marca a tus **clientes preferenciales** con una ⭐ y su motivo. Al tomar un pedido ves lo que no le gusta al cliente, su dieta, sus favoritos y qué recomendarle. En la lista, busca por NIT y filtra empresas o preferenciales. Ver [Clientes y saldos pendientes](help:customers).
+- **Movimientos de inventario con unidad.** En Abastecimiento, cada movimiento dice su unidad («+2.000 g») y el costo por unidad.
+
+## 8 de octubre de 2026
+
+- **Eliges la cuenta al entrar.** Si tienes varias cuentas, después de iniciar sesión ves **Tus cuentas** para elegir con cuál trabajar; la última que usaste va primera. Ver [Entrar a Quanela y cambiar de cuenta o de rol](help:switch-account).
 
 ## 7 de octubre de 2026
 

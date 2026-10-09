@@ -89,3 +89,31 @@ describe('login (ADR 0025)', () => {
     expect(screen.getByTestId('where').textContent).toBe('/app')
   })
 })
+
+// ADR 0043: a plain sign-in lets someone with several accounts choose; a link to a page does not.
+describe('choosing the account after signing in', async () => {
+  const { pendingAccountChoice } = await import('@/shared/kitchen/accountChoice')
+  async function signInWith(entry = '/login') {
+    const user = userEvent.setup()
+    renderLogin(entry)
+    await user.type(screen.getByLabelText(/Correo electrónico/), 'laura@negocio.co')
+    await user.type(screen.getByLabelText(/^Contraseña/), 'clave-segura')
+    await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+  }
+
+  it('a plain sign-in leaves the mark for the entry', async () => {
+    await signInWith()
+    expect(pendingAccountChoice()).toBe(true)
+  })
+
+  it('a sign-in that came from a link (?next=) goes to that page, without the mark', async () => {
+    await signInWith('/login?next=/k/centro/operations')
+    expect(pendingAccountChoice()).toBe(false)
+  })
+
+  it('a wrong password leaves no mark behind', async () => {
+    calls.signIn.mockResolvedValueOnce({ error: 'Correo o contraseña incorrectos.' } as never)
+    await signInWith()
+    expect(pendingAccountChoice()).toBe(false)
+  })
+})

@@ -1,32 +1,19 @@
-import { readLastKitchenSlug, setActiveKitchenId, setActiveRoleId } from '@/shared/kitchen/activeKitchen'
-import { kitchenPath, kitchensOf, useMyContext } from '@/shared/kitchen/activeKitchenContext'
-import type { MyContext, MyKitchen } from '@/shared/kitchen/kitchensApi'
+import { clearAccountChoice, pendingAccountChoice } from '@/shared/kitchen/accountChoice'
+import { setActiveKitchenId, setActiveRoleId } from '@/shared/kitchen/activeKitchen'
+import { kitchenPath, useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import { hostRedirectFor } from '@/shared/tenant/navigation'
 import { useTenant } from '@/shared/tenant/tenantContext'
 import { useEffect } from 'react'
 import { Navigate, useLocation, useParams } from 'react-router-dom'
 import { FullScreenLoading } from './FullScreenLoading'
+import { defaultKitchen, usableKitchens } from './accountEntry'
 import { accountPathForOrgSection } from './legacyOrgRoutes'
 
 /**
- * A qué Cuenta entrar sin que el usuario elija (ADR 0008, sección 8): la
- * última que usó (guardada en su perfil, sirve en cualquier equipo; si no,
- * la de este equipo) mientras siga teniendo acceso, o su única Cuenta
- * activa. Con varias y ninguna recordada, null → "Tus cuentas".
- */
-export function defaultKitchen(ctx: MyContext, organizationId?: string | null): MyKitchen | null {
-  // On an organization's subdomain, only its accounts (ADR 0021).
-  const usable = kitchensOf(ctx).filter((k) => (k.active || k.isPlatformAdmin) && (!organizationId || k.organizationId === organizationId))
-  const lastSlug = readLastKitchenSlug()
-  return (
-    usable.find((k) => k.id === ctx.profile.lastAccountId) ??
-    usable.find((k) => k.slug === lastSlug) ??
-    (usable.length === 1 ? usable[0] : null)
-  )
-}
-
-/**
  * "/" con sesión: directo a la Cuenta por defecto o al selector.
+ *   - Recién iniciada la sesión y con varias Cuentas: "Tus cuentas", para
+ *     elegir con cuál trabajar (ADR 0043). Al recargar o volver con la sesión
+ *     abierta, la de siempre.
  *   - En el subdominio de una organización: su Cuenta de esa organización
  *     (sin Cuentas, "Tus cuentas", donde puede crear la primera).
  *   - En la raíz (quanela.com): al subdominio de la organización de su
@@ -35,14 +22,21 @@ export function defaultKitchen(ctx: MyContext, organizationId?: string | null): 
 export function KitchenEntryRedirect() {
   const { data: ctx, isLoading } = useMyContext()
   const tenant = useTenant()
-  const kitchen = ctx ? defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null) : null
+  const organizationId = tenant.mode === 'tenant' ? tenant.organization?.id : null
+  // ADR 0043: just signed in with several accounts → choose. The mark is used once.
+  const choose = Boolean(ctx) && pendingAccountChoice() && usableKitchens(ctx!, organizationId).length >= 2
+  const kitchen = ctx && !choose ? defaultKitchen(ctx, organizationId) : null
   const orgCode = kitchen ? ctx?.organizations.find((o) => o.id === kitchen.organizationId)?.tenantCode : null
   const crossHost = kitchen ? hostRedirectFor(orgCode, kitchenPath(kitchen.slug, '/')) : null
   useEffect(() => {
     if (crossHost) window.location.replace(crossHost)
   }, [crossHost])
+  useEffect(() => {
+    if (ctx) clearAccountChoice()
+  }, [ctx])
 
   if (isLoading || !ctx || crossHost) return <FullScreenLoading />
+  if (choose) return <Navigate to="/cuentas" replace />
   if (kitchen) return <Navigate to={kitchenPath(kitchen.slug, '/')} replace />
   return <Navigate to="/cuentas" replace />
 }

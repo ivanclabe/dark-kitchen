@@ -18,7 +18,7 @@ import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { formatDate, formatDateTime, formatMoney } from '@/shared/utils/format'
-import { Banknote, ChevronLeft, ChevronRight, MessageSquareWarning, Pencil, Plus, Receipt, Users } from 'lucide-react'
+import { Banknote, Building2, ChevronLeft, ChevronRight, MessageSquareWarning, Pencil, Plus, Receipt, Users } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
@@ -29,7 +29,9 @@ import { useCustomerProfile } from '../hooks/useCustomerProfile'
 import { openComplaints } from '../lib/profile'
 import { CustomerAddresses } from '../components/profile/CustomerAddresses'
 import { CustomerComplaints, NewComplaintDrawer } from '../components/profile/CustomerComplaints'
+import { PreferredBadge } from '../components/CustomerIdentity'
 import { CustomerPreferences } from '../components/profile/CustomerPreferences'
+import { CustomerRecommendations } from '../components/profile/CustomerRecommendations'
 import { CustomerProfile } from '../components/profile/CustomerProfile'
 import { relativeDay } from '../lib/dates'
 import type { CustomerDetail } from '../types'
@@ -178,7 +180,8 @@ export function CustomerDetailPage() {
   const tabs: { value: Tab; label: string }[] = [
     { value: 'summary', label: 'Resumen' },
     { value: 'orders', label: 'Pedidos' },
-    { value: 'preferences', label: 'Preferencias' },
+    // ADR 0044: preferences and recommendations together (recommendations used to live only in Resumen).
+    { value: 'preferences', label: 'Preferencias y recomendaciones' },
     { value: 'addresses', label: 'Direcciones' },
     { value: 'complaints', label: open ? `Quejas (${open})` : 'Quejas' },
     ...(showDebt ? [{ value: 'account' as const, label: 'Cuenta' }] : []),
@@ -231,6 +234,12 @@ export function CustomerDetailPage() {
         backLabel={back.label}
         meta={
           <>
+            {customer.type === 'company' && (
+              <Badge size="sm" tone="neutral" icon={Building2}>
+                Empresa
+              </Badge>
+            )}
+            {customer.preferred && <PreferredBadge note={customer.preferredNote} />}
             {customer.active !== undefined && <ActivityBadge active={customer.active} />}
             {(customer.overdue ?? 0) > 0 && (
               <Badge size="sm" tone="warning">
@@ -287,7 +296,10 @@ export function CustomerDetailPage() {
         ) : !profile.data ? (
           <LoadingState variant="block" />
         ) : tab === 'preferences' ? (
-          <CustomerPreferences customerId={customer.id} preferences={profile.data.preferences} canEdit={canEdit} />
+          <div className="space-y-6">
+            <CustomerPreferences customerId={customer.id} preferences={profile.data.preferences} canEdit={canEdit} />
+            <CustomerRecommendations customerId={customer.id} recommendations={profile.data.recommendations} canEdit={canEdit} />
+          </div>
         ) : tab === 'addresses' ? (
           <CustomerAddresses customerId={customer.id} addresses={profile.data.addresses} canEdit={canEdit} />
         ) : tab === 'complaints' ? (
@@ -299,7 +311,7 @@ export function CustomerDetailPage() {
 
       <CustomerFormModal
         open={editOpen}
-        customer={{ id: customer.id, fullName: customer.fullName, phone: customer.phone, email: customer.email ?? null, address: customer.address, notes: customer.notes }}
+        customer={customer}
         onClose={() => setEditOpen(false)}
       />
       {complaintOpen && <NewComplaintDrawer customerId={customer.id} onClose={() => setComplaintOpen(false)} />}

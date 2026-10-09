@@ -110,6 +110,13 @@ describe('Centro de operaciones (ADR 0031)', () => {
     expect(screen.getByRole('tab', { name: 'Cocina' }).getAttribute('aria-selected')).toBe('true')
   })
 
+  it('the views are their own bar, outside the header buttons (they change per view: the bar must not move)', () => {
+    state.perms = new Set(['kitchen.view', 'kitchen.prepare', 'orders.view'])
+    renderAt()
+    const bar = screen.getByRole('tablist', { name: 'Vistas del Centro de operaciones' })
+    expect(bar.closest('header')).toBeNull()
+  })
+
   it('/operations/:id opens the order on top of the view', () => {
     renderAt('/k/centro/operations/o2?view=dispatch')
     expect(screen.getByText('detail o2')).toBeTruthy()

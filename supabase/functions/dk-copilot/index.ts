@@ -182,7 +182,7 @@ const TOOLS: ToolDef[] = [
     label: "Revisando clientes",
     permission: "customers.view",
     fn: "dk_copilot_customers",
-    description: "Clientes con pedidos, gasto y último pedido (opcionalmente en un periodo); el saldo pendiente solo si el rol ve la cartera. Orden: spend, orders, recent o balance. include_contact=true SOLO si la pregunta pide el teléfono o cómo contactarlo.",
+    description: "Clientes con pedidos, gasto y último pedido (opcionalmente en un periodo); el saldo pendiente solo si el rol ve la cartera. Cada cliente dice si es persona o empresa (type: person/company, con razón social) y si es preferencial (preferred, con su motivo). Busca por nombre, teléfono, razón social o NIT. preferred=true: solo los preferenciales; type=company: solo empresas. Orden: spend, orders, recent o balance. include_contact=true SOLO si la pregunta pide el teléfono, el NIT, la persona de contacto o cómo contactarlo.",
     input_schema: {
       type: "object",
       properties: {
@@ -192,6 +192,8 @@ const TOOLS: ToolDef[] = [
         to: date,
         limit: { type: "integer" },
         include_contact: { type: "boolean" },
+        preferred: { type: "boolean" },
+        type: { type: "string", enum: ["person", "company"] },
       },
     },
     args: (i) => ({
@@ -201,6 +203,8 @@ const TOOLS: ToolDef[] = [
       p_to: str(i.to),
       p_limit: int(i.limit) ?? 10,
       p_include_contact: bool(i.include_contact),
+      p_preferred: i.preferred === true ? true : null,
+      p_type: i.type === "person" || i.type === "company" ? i.type : null,
     }),
   },
   {

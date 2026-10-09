@@ -44,13 +44,13 @@ function formatChange(ratio: number): string {
  * period and a tiny trend — not a wall of separate cards. A figure with no
  * previous value says so instead of showing a made-up percentage.
  */
-export function KpiStrip({ items, compareLabel = null, columns = 6 }: { items: Kpi[]; compareLabel?: string | null; columns?: 3 | 4 | 6 }) {
+export function KpiStrip({ items, compareLabel = null, columns = 6 }: { items: Kpi[]; compareLabel?: string | null; columns?: 3 | 4 | 5 | 6 }) {
   return (
     // gap-px over the line color draws the dividers between tiles at every breakpoint.
     <div
       className={clsx(
         'grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-neutral-800/60 bg-neutral-800/60',
-        columns === 6 ? 'sm:grid-cols-3 xl:grid-cols-6' : columns === 4 ? 'lg:grid-cols-4' : 'sm:grid-cols-3',
+        columns === 6 ? 'sm:grid-cols-3 xl:grid-cols-6' : columns === 5 ? 'sm:grid-cols-3 lg:grid-cols-5' : columns === 4 ? 'lg:grid-cols-4' : 'sm:grid-cols-3',
       )}
     >
       {items.map((k) => {

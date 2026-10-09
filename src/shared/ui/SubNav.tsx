@@ -1,10 +1,12 @@
 import clsx from 'clsx'
-import { useRef, type KeyboardEvent } from 'react'
+import { useRef, type ComponentType, type KeyboardEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 
 export interface SubNavItem<T extends string> {
   value: T
   label: string
+  /** Optional icon before the label (Operación: each view, recognised at a glance on a kitchen tablet). */
+  icon?: ComponentType<{ size?: number; className?: string; 'aria-hidden'?: boolean }>
 }
 
 /**
@@ -45,7 +47,14 @@ export function SubNav<T extends string>({ items, value, onChange, label }: { it
               active ? 'border-brasa-500 text-neutral-50' : 'border-transparent text-neutral-400 hover:text-neutral-200',
             )}
           >
-            {item.label}
+            {item.icon ? (
+              <span className="inline-flex items-center gap-1.5">
+                <item.icon size={14} className={active ? 'text-brasa-400' : 'text-neutral-500'} aria-hidden />
+                {item.label}
+              </span>
+            ) : (
+              item.label
+            )}
           </button>
         )
       })}

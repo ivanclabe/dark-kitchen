@@ -16,6 +16,7 @@ export type ModuleKey =
   | 'reports'
   | 'settings'
   | 'staff'
+  | 'consumer'
 
 /** ¿Tiene el usuario este permiso (clave del catálogo, p. ej. 'orders.confirm') en la Cuenta activa? */
 export type Can = (permission: AccountPermission) => boolean
@@ -40,10 +41,12 @@ const MODULE_PERMISSIONS: Record<ModuleKey, readonly AccountPermission[]> = {
   kitchen: ['kitchen.view'],
   customers: ['customers.view'],
   reports: ['reports.view'],
-  // Configuración de la Cuenta (datos generales, IA y voz, integraciones; Actividad con audit.view, ADR 0024).
+  // Configuración de la Cuenta (datos generales, IA y voz, integraciones; Actividad con audit.view, ADR 0024;
   settings: ['settings.manage', 'ai.manage', 'audit.view'],
   // Personal y Turnos (ADR 0020). Los turnos propios no exigen permiso: viven en el menú de usuario.
   staff: ['staff.view', 'staff.manage'],
+  // Quanela Consumer (ADR 0042), its own module since ADR 0046: what the account publishes for end customers.
+  consumer: ['storefront.manage'],
 }
 
 export function canAccessModule(can: Can, module: ModuleKey): boolean {

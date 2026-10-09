@@ -49,7 +49,7 @@ export interface HelpBuild {
 
 const AUDIENCES = new Set(['owner', 'admin', 'manager', 'cashier', 'kitchen', 'inventory', 'delivery', 'everyone'])
 /** The first segment of every screen of the app (src/app/routes.tsx). */
-const APP_ROOTS = new Set(['dashboard', 'operations', 'menu-planner', 'recipes', 'supply', 'customers', 'insights', 'staff', 'my-shifts', 'users', 'settings', 'perfil', 'cuentas', 'registro', 'login'])
+const APP_ROOTS = new Set(['dashboard', 'operations', 'menu-planner', 'recipes', 'supply', 'customers', 'consumer', 'insights', 'staff', 'my-shifts', 'users', 'settings', 'perfil', 'cuentas', 'registro', 'login'])
 
 const slug = (text: string) =>
   text

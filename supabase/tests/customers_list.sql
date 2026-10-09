@@ -134,7 +134,7 @@ set local role authenticated;
 select pg_temp.list('no-receivables');
 select pg_temp.list('no-receivables-sort', null, 'all', 'balance', 'desc');
 insert into _t (area, test, expected, got) values
-  ('Permissions', 'No balance nor orders in the rows; summary only the total', 'false · false · {"total": 4}',
+  ('Permissions', 'No balance nor orders in the rows; summary only the total', 'false · false · {"total": 4, "companies": 0, "preferred": 0}',
     (pg_temp.r('no-receivables') -> 'rows' -> 0 ? 'balance')::text || ' · ' || (pg_temp.r('no-receivables') -> 'rows' -> 0 ? 'orders')::text || ' · ' || dk_customers_summary()::text),
   ('Permissions', 'Sorting by balance falls back to the name', 'name', pg_temp.r('no-receivables-sort') ->> 'sort'),
   ('Permissions', 'Filtering by debt is refused', 'blocked', pg_temp.blocked($q$select dk_customers_list(null, 'debt')$q$));

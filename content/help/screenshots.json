@@ -119,8 +119,8 @@
           "n": 2
         },
         {
-          "text": "Por confirmar",
-          "n": 3
+          "n": 3,
+          "selector": "p.uppercase:has-text('Por confirmar')"
         },
         {
           "text": "Nuevo pedido",

@@ -129,7 +129,7 @@ export function ReorderPanel({
                 <div key={group.supplierId ?? 'SIN_PROVEEDOR'}>
                   <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
                     <p className={typography.overline}>{group.supplierName}</p>
-                    <Tooltip label={orderable.length === 0 ? 'Configura mín./máx. o registra consumo para poder sugerir cantidades' : 'Crea un borrador con las cantidades sugeridas'} side="top">
+                    <Tooltip label={orderable.length === 0 ? 'Configura mín./máx. o registra consumo para poder sugerir cantidades' : 'Crea un borrador con las cantidades sugeridas'} side="top-end">
                       <span>
                         <Button
                           variant="secondary"

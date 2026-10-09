@@ -1,4 +1,21 @@
-export interface Customer {
+/** ADR 0044: a natural person (default) or a business. */
+export type CustomerType = 'person' | 'company'
+
+/**
+ * Who the customer is (ADR 0044). A company's trade name is `fullName` (what
+ * orders, dispatch and receivables show); `taxId` is its NIT, or a person's
+ * optional ID document. `preferred` is informative: no price rule.
+ */
+export interface CustomerIdentity {
+  type?: CustomerType
+  legalName?: string | null
+  taxId?: string | null
+  contactName?: string | null
+  preferred?: boolean
+  preferredNote?: string | null
+}
+
+export interface Customer extends CustomerIdentity {
   id: string
   fullName: string
   phone: string | null
@@ -7,7 +24,7 @@ export interface Customer {
   notes: string | null
 }
 
-export interface CustomerInput {
+export interface CustomerInput extends CustomerIdentity {
   fullName: string
   phone?: string | null
   email?: string | null
@@ -21,7 +38,7 @@ export interface CustomerInput {
  * order/active need orders.view or receivables.view; balance/overdue need
  * receivables.view.
  */
-export interface CustomerListRow {
+export interface CustomerListRow extends CustomerIdentity {
   id: string
   fullName: string
   phone: string | null
@@ -56,6 +73,10 @@ export interface CustomerListQuery {
   minOrders: number | null
   minBalance: number | null
   maxBalance: number | null
+  /** ADR 0044: only persons or only companies (null: both). */
+  type?: CustomerType | null
+  /** ADR 0044: only preferred customers. */
+  preferredOnly?: boolean
 }
 
 export interface CustomerPage {
@@ -70,6 +91,9 @@ export interface CustomerPage {
 
 export interface CustomersSummary {
   total: number
+  /** ADR 0044. */
+  preferred?: number
+  companies?: number
   active?: number
   withDebt?: number
   pendingBalance?: number

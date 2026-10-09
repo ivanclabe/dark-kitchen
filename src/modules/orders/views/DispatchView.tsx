@@ -79,7 +79,7 @@ function DispatchAction({ order }: { order: Order }) {
   if (!primary) return null
   const allowed = allows(board, primary.action)
   return (
-    <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top">
+    <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top-end">
       <Button size="sm" variant={primary.action === 'dispatch' ? 'primary' : 'secondary'} icon={primary.icon} disabled={!allowed} loading={actions.busy} onClick={actions.primary}>
         {primary.label}
       </Button>

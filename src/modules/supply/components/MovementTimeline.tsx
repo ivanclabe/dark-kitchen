@@ -6,6 +6,13 @@ import { History } from 'lucide-react'
 import { useMovements } from '../hooks/useMovements'
 import { movementMeta, WASTE_REASON_LABEL } from '../lib/movementVisuals'
 
+/** «+1.500 g», «-0,15 kg»: the quantity as people read it, with its unit. */
+function formatMovementQuantity(quantity: number, unit: string): string {
+  const number = Math.abs(quantity).toLocaleString('es-CO', { maximumFractionDigits: 3 })
+  const sign = quantity > 0 ? '+' : quantity < 0 ? '-' : ''
+  return `${sign}${number}${unit ? ` ${unit}` : ''}`
+}
+
 /**
  * Línea de tiempo del ledger. Sin `ingredientId` muestra el histórico global
  * (lo que hacía MovementsPage); con él, solo ese insumo — useMovements ya
@@ -45,10 +52,14 @@ export function MovementTimeline({ ingredientId, showIngredientName = false }: {
             </div>
             <div className="shrink-0 text-right">
               <p className={`text-sm font-semibold tabular-nums ${m.quantityBaseUnit < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                {m.quantityBaseUnit > 0 ? '+' : ''}
-                {m.quantityBaseUnit}
+                {formatMovementQuantity(m.quantityBaseUnit, m.unitCode)}
               </p>
-              {m.unitCost !== null && <p className="text-xs text-neutral-500 tabular-nums">{formatMoney(m.unitCost, { decimals: 'auto' })}</p>}
+              {m.unitCost !== null && (
+                <p className="text-xs text-neutral-500 tabular-nums">
+                  {formatMoney(m.unitCost, { decimals: 'auto' })}
+                  {m.unitCode ? ` / ${m.unitCode}` : ''}
+                </p>
+              )}
             </div>
           </li>
         )

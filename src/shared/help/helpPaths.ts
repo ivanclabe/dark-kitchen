@@ -4,6 +4,7 @@ export const HELP_PATHS: Record<string, string> = {
   "copilot-limits": "/help/assistant/copilot-limits",
   "oye-quanela": "/help/assistant/oye-quanela",
   "dishes-and-menu": "/help/catalog/dishes-and-menu",
+  "quanela-consumer": "/help/catalog/quanela-consumer",
   "recipes-and-cost": "/help/catalog/recipes-and-cost",
   "customers": "/help/customers/customers",
   "faq": "/help/faq/faq",

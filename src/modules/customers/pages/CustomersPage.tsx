@@ -7,7 +7,8 @@ import { Button } from '@/shared/ui/Button'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { Input } from '@/shared/ui/FormField'
+import { Input, Select } from '@/shared/ui/FormField'
+import { Switch } from '@/shared/ui/Switch'
 import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { Pagination } from '@/shared/ui/Pagination'
@@ -42,8 +43,12 @@ interface MoreFilters {
   minOrders: string
   minBalance: string
   maxBalance: string
+  /** ADR 0044: '' (both), 'person' or 'company'. */
+  type: string
+  /** ADR 0044: '1' = only preferred customers. */
+  preferred: string
 }
-const NO_MORE: MoreFilters = { createdFrom: '', createdTo: '', minOrders: '', minBalance: '', maxBalance: '' }
+const NO_MORE: MoreFilters = { createdFrom: '', createdTo: '', minOrders: '', minBalance: '', maxBalance: '', type: '', preferred: '' }
 const num = (s: string) => (s.trim() === '' || Number.isNaN(Number(s)) ? null : Number(s))
 
 /**
@@ -98,6 +103,8 @@ export function CustomersPage() {
       minOrders: showOrders ? num(more.minOrders) : null,
       minBalance: showDebt ? num(more.minBalance) : null,
       maxBalance: showDebt ? num(more.maxBalance) : null,
+      type: more.type === 'person' || more.type === 'company' ? more.type : null,
+      preferredOnly: more.preferred === '1',
     }),
     [debouncedSearch, status, sort, page, more, showOrders, showDebt],
   )
@@ -129,6 +136,19 @@ export function CustomersPage() {
   const s = summary.data
   const kpis: Kpi[] = [
     { id: 'total', label: 'Total clientes', value: (s?.total ?? 0).toLocaleString('es-CO'), change: null, goodWhen: 'neutral', onSelect: () => resetPage(setStatus)('all') },
+    // ADR 0044: the preferred ones (and how many companies), one click to see them.
+    {
+      id: 'preferred',
+      label: 'Preferenciales',
+      value: (s?.preferred ?? 0).toLocaleString('es-CO'),
+      change: null,
+      goodWhen: 'neutral',
+      hint: s?.companies ? `${s.companies.toLocaleString('es-CO')} ${s.companies === 1 ? 'empresa' : 'empresas'} en total` : undefined,
+      onSelect: () => {
+        resetPage(setMore)({ ...more, preferred: '1' })
+        setMoreOpen(true)
+      },
+    },
     ...(showOrders
       ? [{ id: 'active', label: 'Activos', value: (s?.active ?? 0).toLocaleString('es-CO'), change: null, goodWhen: 'neutral' as const, hint: 'Con un pedido en 90 días', onSelect: () => resetPage(setStatus)('active') }]
       : []),
@@ -201,7 +221,7 @@ export function CustomersPage() {
         }
       />
 
-      <KpiStrip items={kpis} columns={4} />
+      <KpiStrip items={kpis} columns={kpis.length >= 5 ? 5 : 4} />
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -214,7 +234,7 @@ export function CustomersPage() {
                 setSearch(e.target.value)
                 setPage(0)
               }}
-              placeholder="Buscar por nombre, teléfono, correo o dirección…"
+              placeholder="Buscar por nombre, NIT, teléfono, correo o dirección…"
               aria-label="Buscar clientes"
               className="!mt-0 pl-10"
             />
@@ -236,7 +256,21 @@ export function CustomersPage() {
           )}
         </div>
         {moreOpen && (
-          <div className="grid gap-3 rounded-2xl border border-neutral-800/60 p-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 rounded-2xl border border-neutral-800/60 p-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="text-xs text-neutral-400">
+              Tipo
+              <Select value={more.type} onChange={(e) => resetPage(setMore)({ ...more, type: e.target.value })} className="!mt-1">
+                <option value="">Personas y empresas</option>
+                <option value="person">Solo personas</option>
+                <option value="company">Solo empresas</option>
+              </Select>
+            </label>
+            <div className="flex items-end">
+              <label className="flex h-10 items-center gap-2 text-sm text-neutral-300">
+                <Switch checked={more.preferred === '1'} onChange={(on) => resetPage(setMore)({ ...more, preferred: on ? '1' : '' })} label="Solo preferenciales" />
+                Solo preferenciales
+              </label>
+            </div>
             <label className="text-xs text-neutral-400">
               Registrado desde
               <Input type="date" value={more.createdFrom} onChange={(e) => resetPage(setMore)({ ...more, createdFrom: e.target.value })} />

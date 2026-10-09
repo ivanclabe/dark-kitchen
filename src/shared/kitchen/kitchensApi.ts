@@ -144,13 +144,15 @@ export interface KitchenDetails {
   timezone: string
   currency: string
   iconKey: string | null
+  /** ADR 0047: the account's cuisine (null = the organization's category). */
+  cuisine: string | null
   active: boolean
 }
 
 export async function getKitchenDetails(id: string): Promise<KitchenDetails> {
   const { data, error } = await supabase
     .from('dk_kitchens')
-    .select('id, slug, name, legal_name, tax_id, phone, address, timezone, currency, icon_key, active')
+    .select('id, slug, name, legal_name, tax_id, phone, address, timezone, currency, icon_key, cuisine, active')
     .eq('id', id)
     .single()
   if (error) throw error
@@ -165,11 +167,12 @@ export async function getKitchenDetails(id: string): Promise<KitchenDetails> {
     timezone: data.timezone,
     currency: data.currency,
     iconKey: data.icon_key,
+    cuisine: data.cuisine,
     active: data.active,
   }
 }
 
-export type KitchenDetailsInput = Pick<KitchenDetails, 'name' | 'slug' | 'legalName' | 'taxId' | 'phone' | 'address' | 'timezone' | 'iconKey'>
+export type KitchenDetailsInput = Pick<KitchenDetails, 'name' | 'slug' | 'legalName' | 'taxId' | 'phone' | 'address' | 'timezone' | 'iconKey' | 'cuisine'>
 
 /** Última Cuenta usada, guardada en el perfil (sirve en cualquier equipo). La base valida el acceso. */
 export async function setLastAccount(accountId: string): Promise<void> {
@@ -189,6 +192,7 @@ export async function updateKitchenDetails(id: string, input: KitchenDetailsInpu
       address: input.address?.trim() || null,
       timezone: input.timezone,
       icon_key: input.iconKey,
+      cuisine: input.cuisine || null,
     })
     .eq('id', id)
   if (error) throw error

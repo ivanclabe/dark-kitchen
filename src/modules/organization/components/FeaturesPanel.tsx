@@ -15,11 +15,17 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Lock, Sparkles, Workflow } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { Section } from '@/shared/ui/Section'
 import { cardClass } from '@/shared/ui/formClasses'
 import { accountFeaturesKey, useAccountFeatureMatrix } from '../hooks/useAccountFeatures'
 import { FeatureSettingsSection } from './FeatureSettings'
+
+/**
+ * ADR 0045: features the business does not manage. «Voz de la aplicación» is
+ * always on with the platform's voice (the same in every account); only the
+ * platform changes it (portal → Voz).
+ */
+const HIDDEN_FEATURES: readonly FeatureKey[] = ['voice_speech']
 
 /**
  * Functions of the active account (ADR 0009, ADR 0018, ADR 0024): one switch
@@ -30,12 +36,9 @@ import { FeatureSettingsSection } from './FeatureSettings'
 export function FeaturesPanel({
   organizationId,
   accountId,
-  extra,
 }: {
   organizationId: string
   accountId: string
-  /** More settings under a feature (e.g. the kitchen voice under «Voz de la aplicación», ADR 0026). */
-  extra?: (key: FeatureKey) => ReactNode
 }) {
   const queryClient = useQueryClient()
   const { show } = useToast()
@@ -57,7 +60,8 @@ export function FeaturesPanel({
   const account = data.accounts.find((a) => a.id === accountId)
   if (!account) return <ErrorState error={new Error('No se encontró esta cuenta')} onRetry={() => void refetch()} />
 
-  const categories = (['ai', 'voice', 'general'] as const).filter((c) => data.features.some((f) => f.category === c))
+  const features = data.features.filter((f) => !HIDDEN_FEATURES.includes(f.key))
+  const categories = (['ai', 'voice', 'general'] as const).filter((c) => features.some((f) => f.category === c))
 
   return (
     <div className="space-y-8">
@@ -68,7 +72,7 @@ export function FeaturesPanel({
           description={category === 'ai' ? 'Activar una función aquí no la activa en tus otras cuentas.' : undefined}
         >
             <div className="space-y-3">
-              {data.features
+              {features
                 .filter((f) => f.category === category)
                 .map((f) => (
                   <FeatureCard
@@ -80,7 +84,6 @@ export function FeaturesPanel({
                     onChanged={refresh}
                     disabled={setEnabled.isPending}
                     onEnabled={(enabled) => setEnabled.mutate({ key: f.key, enabled })}
-                    extra={extra?.(f.key)}
                   />
                 ))}
             </div>
@@ -98,7 +101,6 @@ function FeatureCard({
   onChanged,
   disabled,
   onEnabled,
-  extra,
 }: {
   feature: AccountFeatureMatrix['features'][number]
   account: AccountFeatureMatrix['accounts'][number]
@@ -107,7 +109,6 @@ function FeatureCard({
   onChanged: () => Promise<unknown>
   disabled: boolean
   onEnabled: (enabled: boolean) => void
-  extra?: ReactNode
 }) {
   const on = feature.available && account.enabled[feature.key] === true
   const platformOff = !feature.platformActive
@@ -129,12 +130,7 @@ function FeatureCard({
               ))}
           </div>
           <p className={clsx('mt-1', typography.caption)}>{feature.description}</p>
-          {feature.dependsOn.length > 0 && (
-            <p className="mt-1 text-[11px] text-neutral-500">
-              {feature.key === 'voice_wake_word' ? 'Necesita «Comandos de voz».' : 'Para hablar usa «Voz de la aplicación».'}
-            </p>
-          )}
-          {feature.key === 'voice_speech' && extra && <p className="mt-1 text-[11px] text-neutral-500">La voz, el estilo y la velocidad se ajustan abajo, en «Voz de cocina».</p>}
+          {feature.key === 'voice_wake_word' && <p className="mt-1 text-[11px] text-neutral-500">Necesita «Comandos de voz».</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {platformOff ? (
@@ -159,7 +155,6 @@ function FeatureCard({
       {feature.platformActive && feature.includedInPlan && (
         <FeatureSettingsSection organizationId={organizationId} feature={feature} account={account} accountCount={accountCount} canEdit onChanged={onChanged} />
       )}
-      {feature.platformActive && feature.includedInPlan && extra}
     </article>
   )
 }

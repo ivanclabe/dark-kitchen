@@ -11,6 +11,7 @@ Plataforma operativa para la gestión integral de una dark kitchen (inventario, 
 - [Diseño del ledger de inventario](./docs/02-inventory-ledger.md)
 - [Ciclo de vida del pedido](./docs/03-order-lifecycle.md)
 - [ADRs](./docs/adr/)
+- [Quanela Consumer: el asistente para el cliente final (ADR 0042)](./docs/adr/0042-quanela-consumer.md)
 
 ## Stack
 

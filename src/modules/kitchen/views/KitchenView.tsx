@@ -140,15 +140,17 @@ export function KitchenView() {
             ]}
           />
         }
+        overlay={
+          <KitchenInsightLine
+            active
+            paused={voiceBusy}
+            muted={!soundEnabled}
+            orderNumberOf={(orderId) => ops.live?.find((o) => o.id === orderId)?.orderNumber}
+            onOpenOrder={(orderId) => ops.openDetail({ id: orderId })}
+          />
+        }
         below={
           <>
-            <KitchenInsightLine
-              active
-              paused={voiceBusy}
-              muted={!soundEnabled}
-              orderNumberOf={(orderId) => ops.live?.find((o) => o.id === orderId)?.orderNumber}
-              onOpenOrder={(orderId) => ops.openDetail({ id: orderId })}
-            />
             {mode === 'sla' && (
               <p className={clsx('flex items-center gap-2', typography.small)}>
                 <Gauge size={14} className="text-brasa-400" aria-hidden /> Tiempos por pedido (SLA)

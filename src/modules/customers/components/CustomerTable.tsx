@@ -1,5 +1,7 @@
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { formatPhone } from '@/shared/utils/phone'
+import { companyLine } from '../lib/identity'
+import { CustomerMarks } from './CustomerIdentity'
 import { Badge } from '@/shared/ui/Badge'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { SortableHeader } from '@/shared/ui/SortableHeader'
@@ -71,8 +73,11 @@ export function CustomerTable({
       header: header('Cliente', 'name'),
       cell: (c) => (
         <span className="block min-w-0">
-          <span className="block truncate font-medium text-neutral-100">{c.fullName}</span>
-          <span className="block truncate text-xs text-neutral-500">Desde {relativeDay(c.createdAt)}</span>
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate font-medium text-neutral-100">{c.fullName}</span>
+            <CustomerMarks customer={c} compact />
+          </span>
+          <span className="block truncate text-xs text-neutral-500">{[companyLine(c), `Desde ${relativeDay(c.createdAt)}`].filter(Boolean).join(' · ')}</span>
         </span>
       ),
     },
@@ -133,7 +138,10 @@ export function CustomerTable({
               <li key={c.id} className="flex items-center gap-2 pr-2">
                 <Link to={`/customers/${c.id}`} className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3">
                   <span className="min-w-0">
-                    <span className="block truncate font-medium text-neutral-100">{c.fullName}</span>
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <span className="truncate font-medium text-neutral-100">{c.fullName}</span>
+                      <CustomerMarks customer={c} compact />
+                    </span>
                     <span className="block truncate text-xs text-neutral-500">
                       {[formatPhone(c.phone), showOrders ? (c.lastOrderAt ? `Último: ${relativeDay(c.lastOrderAt)}` : 'Sin pedidos') : null].filter(Boolean).join(' · ')}
                     </span>

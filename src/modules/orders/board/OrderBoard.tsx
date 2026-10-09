@@ -44,7 +44,7 @@ function KanbanColumn({
   const Icon = config.icon
 
   return (
-    <div className={clsx('flex min-h-0 min-w-56 flex-1 flex-col rounded-xl border border-neutral-800/60 transition-opacity', dropState === 'invalid' && 'opacity-35')}>
+    <div className={clsx('flex min-h-0 min-w-52 flex-1 flex-col rounded-xl border border-neutral-800/60 transition-opacity', dropState === 'invalid' && 'opacity-35')}>
       <p className="flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-wide text-neutral-300 uppercase">
         <Icon size={12} className={COLUMN_TONE[status]} aria-hidden />
         {config.label}

@@ -8,7 +8,7 @@ import { Input } from '@/shared/ui/FormField'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { Tabs, type TabItem } from '@/shared/ui/Tabs'
+import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { Activity, Bike, ChefHat, Kanban, List, MoreHorizontal, Plus, Search, X } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
@@ -17,12 +17,17 @@ import { OPERATIONS_VIEW_LABEL, type OperationsView } from '../lib/views'
 
 /** The help center article of each view (ADR 0034). */
 const OPERATIONS_HELP: Record<OperationsView, string> = { board: 'operations-center', kitchen: 'kitchen-view', dispatch: 'dispatch-deliver', list: 'search-orders' }
-const VIEW_ICON: Record<OperationsView, TabItem<OperationsView>['icon']> = { board: Kanban, kitchen: ChefHat, dispatch: Bike, list: List }
+const VIEW_ICON: Record<OperationsView, SubNavItem<OperationsView>['icon']> = { board: Kanban, kitchen: ChefHat, dispatch: Bike, list: List }
 
 /**
  * The frame every view of the Centro de operaciones shares (ADR 0031): one
- * header (views, search, menu, «Nuevo pedido»), the figures, the order open
- * on top. The view brings its own figures, tools and body.
+ * header (search, menu, «Nuevo pedido»), the views, the figures, the order
+ * open on top. The view brings its own figures, tools and body.
+ *
+ * The views are the underlined bar of every other module (Abastecimiento,
+ * Configuración), on their own row and anchored to the left: they used to sit
+ * among the header's buttons, which change from view to view, so switching
+ * view moved them sideways (up to ~100 px).
  */
 export function OperationsShell({
   description,
@@ -30,6 +35,7 @@ export function OperationsShell({
   menuItems = [],
   figures,
   below,
+  overlay,
   searchable = false,
   scope,
   density = 'normal',
@@ -39,8 +45,14 @@ export function OperationsShell({
   actions?: ReactNode
   menuItems?: MenuItem[]
   figures?: ReactNode
-  /** Under the figures (Cocina: the AI line). */
+  /** Under the figures (Cocina: the SLA mode note). */
   below?: ReactNode
+  /**
+   * Floats over the bottom-right corner of the body without taking space
+   * (Cocina: the AI line). It arrives late and only in one view: in the flow
+   * it pushed the columns down when it appeared and when switching view.
+   */
+  overlay?: ReactNode
   /** The board-like views filter what is loaded by number or customer. */
   searchable?: boolean
   /** The actions this view offers (Cocina: preparation, priority and cancel). */
@@ -83,13 +95,14 @@ export function OperationsShell({
       <Page variant="board">
         <div className="shrink-0 space-y-4">
           <PageHeader
+            stackActions
             help={OPERATIONS_HELP[ops.view]}
             title="Centro de operaciones"
             icon={Activity}
-            description={description}
+            // One line of fixed height in every view (on a phone a longer text wrapped and pushed everything down).
+            description={description && <div className="flex h-6 min-w-0 items-center overflow-hidden [&>*]:min-w-0 [&>*]:truncate">{typeof description === 'string' ? <span title={description}>{description}</span> : description}</div>}
             actions={
               <>
-                {tabs.length > 1 && <Tabs value={ops.view} onChange={(v) => ops.setView(v)} items={tabs} />}
                 {searchable &&
                   (searchOpen ? (
                     <div className="relative">
@@ -138,11 +151,19 @@ export function OperationsShell({
               </>
             }
           />
+          {tabs.length > 1 && <SubNav label="Vistas del Centro de operaciones" items={tabs} value={ops.view} onChange={(v) => ops.setView(v)} />}
           {figures}
           {below}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+          {overlay && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-end px-3">
+              <div className="pointer-events-auto w-full max-w-md rounded-xl bg-neutral-950 shadow-float empty:hidden">{overlay}</div>
+            </div>
+          )}
+        </div>
       </Page>
       <OrderDetailDrawer orderId={ops.detailOrderId} onClose={ops.closeDetail} />
     </BoardActionsContext.Provider>

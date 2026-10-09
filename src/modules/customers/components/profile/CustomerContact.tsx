@@ -3,7 +3,7 @@ import { Card } from '@/shared/ui/Card'
 import { typography } from '@/shared/ui/typography'
 import { formatDate } from '@/shared/utils/format'
 import { formatPhone, phoneHref } from '@/shared/utils/phone'
-import { CalendarDays, Mail, MessageCircle, Pencil, Phone, UserRound } from 'lucide-react'
+import { Building2, CalendarDays, FileText, Mail, MessageCircle, Pencil, Phone, Star, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { CustomerDetail } from '../../types'
 
@@ -16,7 +16,11 @@ function Row({ icon: Icon, children }: { icon: typeof Phone; children: ReactNode
   )
 }
 
-/** Contacto (ADR 0040): phone (call or WhatsApp), e-mail, since when, and the WhatsApp link. */
+/**
+ * Contacto (ADR 0040): phone (call or WhatsApp), e-mail, since when, and the
+ * WhatsApp link. ADR 0044: a company's legal name, NIT and contact person; a
+ * person's document; why the customer is preferred.
+ */
 export function CustomerContact({ customer, onEdit }: { customer: CustomerDetail; onEdit?: () => void }) {
   const tel = phoneHref(customer.phone)
   const wa = tel ? `https://wa.me/${customer.phone!.replace(/\D/g, '')}` : null
@@ -33,6 +37,20 @@ export function CustomerContact({ customer, onEdit }: { customer: CustomerDetail
       }
     >
       <ul className="space-y-2.5">
+        {customer.type === 'company' && (
+          <Row icon={Building2}>
+            <span className="block">{customer.legalName ?? <span className="text-neutral-500">Sin razón social</span>}</span>
+            <span className="block text-xs text-neutral-400">{customer.taxId ? `NIT ${customer.taxId}` : 'Sin NIT'}</span>
+          </Row>
+        )}
+        {customer.type === 'company' && customer.contactName && <Row icon={UserRound}>Contacto: {customer.contactName}</Row>}
+        {customer.type !== 'company' && customer.taxId && <Row icon={FileText}>Documento {customer.taxId}</Row>}
+        {customer.preferred && (
+          <Row icon={Star}>
+            <span className="text-amber-300">Cliente preferencial</span>
+            {customer.preferredNote && <span className="block text-xs text-neutral-400">{customer.preferredNote}</span>}
+          </Row>
+        )}
         <Row icon={Phone}>
           {customer.phone ? (
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">

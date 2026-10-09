@@ -12,7 +12,8 @@ import { CustomerFormModal } from './CreateCustomerModal'
 /** Loads the full customer (notes included) only when editing. */
 function EditCustomer({ id, onClose }: { id: string; onClose: () => void }) {
   const { data } = useCustomerDetail(id)
-  return <CustomerFormModal open={!!data} customer={data ? { id: data.id, fullName: data.fullName, phone: data.phone, address: data.address, notes: data.notes } : undefined} onClose={onClose} />
+  // The whole customer (e-mail, company fields, preferred): editing never erases what the form did not show.
+  return <CustomerFormModal open={!!data} customer={data ?? undefined} onClose={onClose} />
 }
 
 /** Loads the customer's orders with balance only when registering a payment. */

@@ -1,5 +1,5 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { Activity, BarChart3, CalendarClock, LayoutDashboard, Settings, Soup, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { Activity, BarChart3, CalendarClock, LayoutDashboard, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
@@ -50,6 +50,13 @@ export const NAV_ITEMS: NavItem[] = [
     modules: ['customers'],
     icon: Users,
     matchPrefixes: ['/customers'],
+  },
+  {
+    to: '/consumer',
+    label: 'Consumer',
+    description: 'Quanela Consumer: lo que ven los clientes en la app',
+    modules: ['consumer'],
+    icon: Store,
   },
   {
     to: '/staff',

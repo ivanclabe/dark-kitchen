@@ -1,3 +1,4 @@
+import { CustomerMarks } from '@/modules/customers/components/CustomerIdentity'
 import { useHere } from '@/shared/hooks/useBackTarget'
 import { formatPhone } from '@/shared/utils/phone'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -146,7 +147,10 @@ function CustomerCard({ order }: { order: Order }) {
     <Card title="Cliente" icon={UserRound}>
       <div className="space-y-1.5 text-sm">
         <p className="flex items-center justify-between gap-3">
-          <span className="font-medium text-neutral-100">{order.customerName}</span>
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate font-medium text-neutral-100">{order.customerName}</span>
+            <CustomerMarks customer={{ type: order.customerType, preferred: order.customerPreferred, preferredNote: order.customerPreferredNote }} />
+          </span>
           {can('customers.view') && (
             <KitchenLink to={`/customers/${order.customerId}`} state={{ from: here }} className="inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline">
               Saldo e historial <ExternalLink size={11} aria-hidden />

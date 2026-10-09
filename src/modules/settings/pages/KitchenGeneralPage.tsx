@@ -1,4 +1,5 @@
 import { OrgGeneralForm } from '@/modules/organization/components/OrgGeneralForm'
+import { CATEGORIES } from '@/modules/organization/lib/business'
 import { PhoneInput } from '@/shared/ui/PhoneInput'
 import { phoneError } from '@/shared/utils/phone'
 import { useOrganizationDetails } from '@/modules/organization/hooks/useOrganization'
@@ -77,7 +78,10 @@ function BusinessSection({ organizationId }: { organizationId: string }) {
  * es de quien administra las cuentas (lo exige la base).
  */
 function AccountDetailsForm() {
-  const { kitchen } = useActiveKitchen()
+  const { kitchen, organization } = useActiveKitchen()
+  // ADR 0047: «Como el negocio» says which cuisine that is.
+  const orgDetails = useOrganizationDetails(organization?.id ?? '')
+  const orgCuisine = CATEGORIES.find((c) => c.value === orgDetails.data?.category)?.label ?? null
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { show } = useToast()
@@ -99,6 +103,7 @@ function AccountDetailsForm() {
         address: details.address,
         timezone: details.timezone,
         iconKey: details.iconKey,
+        cuisine: details.cuisine,
       }
     : null
   const form = edited ?? saved
@@ -150,7 +155,7 @@ function AccountDetailsForm() {
               error={edited ? slugProblem : null}
               hint={
                 <span className="inline-flex items-center gap-1">
-                  <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta.
+                  <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta y, si publicas en Quanela Consumer, tu dirección pública.
                 </span>
               }
             >
@@ -163,6 +168,18 @@ function AccountDetailsForm() {
                   {TIMEZONES.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </FormField>
+            <FormField label="Tipo de cocina" info="Cómo te encuentran en Quanela Consumer («quiero hamburguesas»). Si es igual a la del negocio, déjalo así.">
+              {(a11y) => (
+                <Select {...a11y} value={form.cuisine ?? ''} onChange={(e) => set({ cuisine: e.target.value || null })}>
+                  <option value="">{orgCuisine ? `Como el negocio (${orgCuisine})` : 'Como el negocio (sin definir)'}</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
                     </option>
                   ))}
                 </Select>

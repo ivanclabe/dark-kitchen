@@ -1,3 +1,4 @@
+import { lastUsedKitchenId } from '@/app/accountEntry'
 import { clearActiveKitchen } from '@/app/kitchenEntry'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { setAccountsActive } from '@/modules/organization/api/organization'
@@ -16,16 +17,17 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { ArrowRight, ChefHat, ExternalLink, Flame, LogOut, Plus, Power, Store } from 'lucide-react'
+import { ArrowRight, ChefHat, ExternalLink, Flame, History, LogOut, Plus, Power, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
 
 /**
  * "Tus cuentas" (ADR 0024): after login, when the person has several accounts
- * (or none), and from the menu to switch. One flat list: accounts of another
- * business open on their own subdomain (ADR 0021/0022) without the word
- * "organización". Whoever may create accounts creates them here.
+ * (ADR 0043: always right after signing in) or none, and from the menu to
+ * switch. One flat list: accounts of another business open on their own
+ * subdomain (ADR 0021/0022) without the word "organización"; the one used
+ * last goes first and says so. Whoever may create accounts creates them here.
  */
 export function KitchenSelectorPage() {
   clearActiveKitchen()
@@ -40,8 +42,11 @@ export function KitchenSelectorPage() {
   const tenant = useTenant()
   const organizations = ctx?.organizations ?? []
   const here = tenant.mode === 'tenant' ? organizations.find((o) => o.tenantCode === tenant.code) ?? null : null
-  // The accounts of this subdomain first; the others open on their own subdomain.
-  const accounts = [...(kitchens ?? [])].sort((a, b) => Number(b.organizationId === here?.id) - Number(a.organizationId === here?.id))
+  const lastId = ctx ? lastUsedKitchenId(ctx) : null
+  // The accounts of this subdomain first (the others open on their own subdomain); among them, the one used last.
+  const accounts = [...(kitchens ?? [])].sort(
+    (a, b) => Number(b.organizationId === here?.id) - Number(a.organizationId === here?.id) || Number(b.id === lastId) - Number(a.id === lastId),
+  )
   const creatable = here ? (here.permissions.includes('accounts.create') ? here : null) : (organizations.find((o) => o.permissions.includes('accounts.create')) ?? null)
   const codeOf = (k: MyKitchen) => organizations.find((o) => o.id === k.organizationId)?.tenantCode ?? null
 
@@ -96,6 +101,7 @@ export function KitchenSelectorPage() {
               <AccountCard
                 key={k.id}
                 kitchen={k}
+                last={k.id === lastId && accounts.length > 1}
                 elsewhere={tenant.mode !== 'path' && here !== null && k.organizationId !== here.id ? codeOf(k) : null}
                 canActivate={!k.active && (organizations.find((o) => o.id === k.organizationId)?.permissions.includes('accounts.manage') ?? false)}
               />
@@ -131,7 +137,7 @@ function ActivateButton({ kitchen }: { kitchen: MyKitchen }) {
 }
 
 /** `elsewhere`: the code of another subdomain where this account opens. */
-function AccountCard({ kitchen: k, elsewhere, canActivate }: { kitchen: MyKitchen; elsewhere: string | null; canActivate: boolean }) {
+function AccountCard({ kitchen: k, elsewhere, canActivate, last }: { kitchen: MyKitchen; elsewhere: string | null; canActivate: boolean; last: boolean }) {
   return (
     <li>
       <Link
@@ -157,6 +163,11 @@ function AccountCard({ kitchen: k, elsewhere, canActivate }: { kitchen: MyKitche
           <Badge tone={k.superAdmin ? 'brand' : 'neutral'} size="sm" icon={ChefHat}>
             {k.roleOptions.length > 1 ? `${k.roleName} +${k.roleOptions.length - 1}` : k.roleName}
           </Badge>
+          {last && (
+            <Badge tone="neutral" size="sm" icon={History}>
+              Última que usaste
+            </Badge>
+          )}
           {!k.active && (
             <Badge tone="warning" size="sm">
               Desactivada

@@ -68,6 +68,6 @@ describe('device voice resolution', () => {
   })
 
   it('settings from the database are normalized', () => {
-    expect(toVoiceSettings({ profile: 'daniel', style: 'loud', rate: 9, lang: 'fr-FR' })).toEqual({ profile: 'daniel', style: 'natural', rate: 1.5, volume: 1, lang: 'es-CO' })
+    expect(toVoiceSettings({ profile: 'daniel', style: 'loud', rate: 9, lang: 'fr-FR' })).toEqual({ profile: 'daniel', style: 'natural', rate: 1.5, volume: 1, lang: 'es-US' })
   })
 })

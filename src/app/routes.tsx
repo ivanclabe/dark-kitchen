@@ -21,6 +21,7 @@ import { KitchenSelectorPage } from '@/modules/kitchens/pages/KitchenSelectorPag
 import { ActivitySettingsPage } from '@/modules/settings/pages/ActivitySettingsPage'
 import { AiSettingsPage } from '@/modules/settings/pages/AiSettingsPage'
 import { BillingSettingsPage } from '@/modules/settings/pages/BillingSettingsPage'
+import { ConsumerPage } from '@/modules/consumer/pages/ConsumerPage'
 import { IntegrationsSettingsPage } from '@/modules/settings/pages/IntegrationsSettingsPage'
 import { KitchenGeneralPage } from '@/modules/settings/pages/KitchenGeneralPage'
 import { SettingsLayout } from '@/modules/settings/pages/SettingsLayout'
@@ -176,6 +177,10 @@ const routes: RouteObject[] = [
           // Clientes — saldos, pagos e historial.
           { path: 'customers', element: <CustomersPage /> },
           { path: 'customers/:id', element: <CustomerDetailPage /> },
+          // Quanela Consumer (ADR 0046): Resumen · Perfil del negocio · Platos. It used to live in Configuración.
+          { path: 'consumer', element: <ConsumerPage /> },
+          { path: 'consumer/:section', element: <ConsumerPage /> },
+          { path: 'settings/consumer', element: <KitchenRedirect to="/consumer" /> },
           // Insights (ADR 0027): how the business is doing. /reports is its old address.
           { path: 'insights', element: <Suspense fallback={loading}><InsightsPage /></Suspense> },
           { path: 'reports', element: <KitchenRedirect to="/insights" /> },

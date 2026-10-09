@@ -18,6 +18,7 @@ export function PageHeader({
   backTo,
   backLabel = 'Volver',
   help,
+  stackActions = false,
 }: {
   title: ReactNode
   description?: ReactNode
@@ -30,6 +31,13 @@ export function PageHeader({
   backLabel?: string
   /** The help center article of this screen (ADR 0034): a «?» that opens it apart. */
   help?: string
+  /**
+   * The actions go on their own row below 1024 px and beside the title from
+   * 1024 px, always — instead of wrapping when they do not fit. For screens
+   * whose buttons change from view to view (Operación): otherwise one view
+   * wraps and the next does not, and everything below jumps.
+   */
+  stackActions?: boolean
 }) {
   return (
     <header className="flex flex-col gap-3">
@@ -38,7 +46,7 @@ export function PageHeader({
           <ArrowLeft size={14} aria-hidden /> {backLabel}
         </Link>
       )}
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+      <div className={stackActions ? 'flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-x-6' : 'flex flex-wrap items-start justify-between gap-x-6 gap-y-3'}>
         <div className="flex min-w-0 items-start gap-3">
           {Icon && (
             <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-brasa-500/20 bg-brasa-500/10 text-brasa-400">
@@ -54,7 +62,7 @@ export function PageHeader({
             {description && <div className={`mt-0.5 ${typography.small}`}>{description}</div>}
           </div>
         </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        {actions && <div className={stackActions ? 'flex shrink-0 flex-wrap items-center gap-2' : 'flex flex-wrap items-center gap-2'}>{actions}</div>}
       </div>
     </header>
   )

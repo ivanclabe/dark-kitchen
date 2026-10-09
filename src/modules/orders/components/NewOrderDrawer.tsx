@@ -1,4 +1,6 @@
 import { CreateCustomerModal } from '@/modules/customers/components/CreateCustomerModal'
+import { CustomerMarks } from '@/modules/customers/components/CustomerIdentity'
+import { CustomerOrderHints } from '@/modules/customers/components/CustomerOrderHints'
 import { listCustomersPage } from '@/modules/customers/api/customers'
 import type { Customer } from '@/modules/customers/types'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -8,7 +10,7 @@ import { CancelOrderDialog, ConfirmOrderDialog } from '@/modules/orders/board/Bo
 import type { Order } from '@/modules/orders/types'
 import { useCreateOrder } from '@/modules/orders/hooks/useOrders'
 import { Button } from '@/shared/ui/Button'
-import { Combobox } from '@/shared/ui/Combobox'
+import { Combobox, type ComboboxOption } from '@/shared/ui/Combobox'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField } from '@/shared/ui/FormField'
 import { getErrorMessage } from '@/shared/utils/errors'
@@ -73,7 +75,13 @@ export function NewOrderDrawer({ open, onClose, initialCustomer }: { open: boole
 
   const customerOptions = useMemo(() => {
     const rows = results.data?.rows ?? []
-    const options = rows.map((c) => ({ value: c.id, label: c.fullName, sublabel: c.phone ?? undefined }))
+    // ADR 0044: a company or a preferred customer is recognised in the list itself.
+    const options: ComboboxOption[] = rows.map((c) => ({
+      value: c.id,
+      label: c.fullName,
+      sublabel: [c.type === 'company' ? `Empresa${c.taxId ? ` · NIT ${c.taxId}` : ''}` : null, c.phone].filter(Boolean).join(' · ') || undefined,
+      leading: c.type === 'company' || c.preferred ? <CustomerMarks customer={c} compact /> : undefined,
+    }))
     // The chosen customer stays an option even if the current search does not include it.
     if (picked && !options.some((o) => o.value === picked.id)) options.unshift({ value: picked.id, label: picked.fullName, sublabel: picked.phone ?? undefined })
     return options
@@ -116,7 +124,11 @@ export function NewOrderDrawer({ open, onClose, initialCustomer }: { open: boole
         subtitle={created ? `Cliente: ${created.customerName} · agrega los platos y confírmalo` : 'Elige el cliente para empezar'}
       >
         {created ? (
-          <OrderBuilder orderId={created.id} onConfirm={setConfirming} onCancel={setCancelling} />
+          <div className="space-y-4">
+            {/* ADR 0044: what to know about this customer while adding the dishes. */}
+            {customerId && <CustomerOrderHints customerId={customerId} />}
+            <OrderBuilder orderId={created.id} onConfirm={setConfirming} onCancel={setCancelling} />
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormField label="Cliente" required error={error}>
@@ -127,12 +139,13 @@ export function NewOrderDrawer({ open, onClose, initialCustomer }: { open: boole
                   options={customerOptions}
                   onQueryChange={setQuery}
                   filterLocally={false}
-                  placeholder="Nombre o teléfono… (si no existe, créalo desde aquí)"
+                  placeholder="Nombre, NIT o teléfono… (si no existe, créalo desde aquí)"
                   emptyMessage="Sin clientes con ese nombre o teléfono"
                   onCreateNew={(query) => setCreateCustomerQuery(query)}
                 />
               )}
             </FormField>
+            {customerId && <CustomerOrderHints customerId={customerId} />}
             <Button type="submit" variant="primary" icon={Plus} loading={createOrder.isPending} disabled={!customerId} className="w-full">
               Crear pedido
             </Button>

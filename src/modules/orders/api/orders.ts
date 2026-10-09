@@ -10,7 +10,7 @@ import type { FlowStatus, Order, OrderInput, OrderSearch, OrderStatus, OrderStat
 const SELECT = `
   id, order_number, customer_id, status, channel, subtotal, discount, delivery_fee, total, payment_method, notes,
   requires_review, created_at, updated_at,
-  dk_customers ( full_name, address, phone ),
+  dk_customers ( full_name, address, phone, customer_type, preferred, preferred_note ),
   dk_kitchen_tickets ( priority ),
   dk_deliveries ( status, rider_id, dispatched_at, delivered_at, dk_delivery_riders ( full_name ) ),
   dk_order_items ( id, product_id, quantity, unit_price, line_total, observation, kitchen_status, created_at, dk_products ( name ) ),
@@ -34,7 +34,7 @@ interface OrderRow {
   requires_review: boolean
   created_at: string
   updated_at: string
-  dk_customers: One<{ full_name: string; address: string | null; phone: string | null }>
+  dk_customers: One<{ full_name: string; address: string | null; phone: string | null; customer_type?: string | null; preferred?: boolean | null; preferred_note?: string | null }>
   dk_kitchen_tickets: One<{ priority: number }>
   dk_deliveries: One<{
     status: NonNullable<Order['delivery']>['status']
@@ -77,6 +77,9 @@ export function mapOrder(row: OrderRow): Order {
     customerName: customer?.full_name ?? '—',
     customerAddress: customer?.address ?? null,
     customerPhone: customer?.phone ?? null,
+    customerType: customer?.customer_type === 'company' ? 'company' : 'person',
+    customerPreferred: customer?.preferred ?? false,
+    customerPreferredNote: customer?.preferred_note ?? null,
     status: row.status,
     channel: row.channel,
     subtotal: Number(row.subtotal),

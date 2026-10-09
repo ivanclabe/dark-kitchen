@@ -14,6 +14,7 @@ import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { OwnerMethodButtons, PhoneSignIn } from '@/modules/signup/components/OwnerMethods'
 import { enabledOwnerMethods, oauthErrorFromUrl, OWNER_SIGNUP_RETURN } from '@/modules/signup/ownerAuth'
 import { hasOwnerSignInMark } from '@/modules/signup/ownerSession'
+import { clearAccountChoice, markAccountChoice } from '@/shared/kitchen/accountChoice'
 
 /** A thin grid over the brand panel (white lines, so it reads the same in both themes). */
 const GRID: CSSProperties = {
@@ -66,8 +67,13 @@ export function LoginPage() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
+    // ADR 0043: a plain sign-in (not a link to a page) lets someone with several accounts choose one.
+    if (target === APP_ENTRY) markAccountChoice()
     const { error } = await signIn(normalizeEmail(email), password)
-    if (error) setError(error)
+    if (error) {
+      clearAccountChoice()
+      setError(error)
+    }
     setSubmitting(false)
   }
 

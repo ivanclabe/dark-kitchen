@@ -45,6 +45,8 @@ export interface InventoryMovement {
   ingredientName: string
   movementType: 'COMPRA' | 'MERMA' | 'AJUSTE' | 'CONSUMO' | 'DEVOLUCION'
   quantityBaseUnit: number
+  /** The ingredient's base unit (g, kg, ml, und…): the quantity and the unit cost are in it. */
+  unitCode: string
   unitCost: number | null
   reason: WasteReason | null
   observation: string | null

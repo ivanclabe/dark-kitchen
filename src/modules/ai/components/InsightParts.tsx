@@ -74,7 +74,7 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
         {body}
       </p>
       {!busy && result?.kind !== 'not_configured' && (
-        <Tooltip label="Volver a analizar" side="top">
+        <Tooltip label="Volver a analizar" side="top-end">
           <button type="button" onClick={reanalyze} aria-label="Volver a analizar" className="shrink-0 rounded-full p-1 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200">
             <RefreshCw size={12} />
           </button>

@@ -75,7 +75,7 @@ export const OrderCard = memo(function OrderCard({
         stalledNotes={stalledNotes}
         trailing={
           primary && (
-            <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top">
+            <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top-end">
               <button
                 type="button"
                 aria-label={`${primary.label} pedido #${ticket.orderNumber}`}

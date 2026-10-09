@@ -12,9 +12,10 @@ questions:
   - ¿Cómo cambio de rol?
   - Olvidé mi contraseña
   - ¿Cómo cambio mi contraseña?
-keywords: [login, iniciar sesión, entrar, contraseña, cuenta, rol, cambiar, perfil, avatar]
+  - ¿Cómo elijo la cuenta al entrar?
+keywords: [login, iniciar sesión, entrar, contraseña, cuenta, rol, cambiar, perfil, avatar, varias cuentas, elegir cuenta, tus cuentas]
 related: [concepts, roles, create-business]
-updated: 2026-10-07
+updated: 2026-10-08
 order: 2
 screenshots:
   - id: login
@@ -31,7 +32,9 @@ screenshots:
 1. Abre la dirección de tu negocio (la que termina en `.quanela.com`).
 2. Escribe tu **correo** y tu **contraseña** y toca **Iniciar sesión**.
 3. Si creaste el negocio con Google, Instagram o tu teléfono, usa esos botones debajo de «¿Creaste tu negocio con Google, Instagram o tu teléfono?».
-4. Entras directo a tu cuenta. Si tienes varias y Quanela no sabe cuál usaste la última vez, verás **Tus cuentas** para elegir.
+4. Si tienes **una sola cuenta**, entras directo. Si tienes **varias**, ves **Tus cuentas**: elige con cuál vas a trabajar. La que usaste la última vez va primera y dice **Última que usaste**.
+
+Solo te pregunta al iniciar sesión: si recargas la página o vuelves con la sesión abierta, sigues en la misma cuenta. Si entraste por un enlace a una página concreta, te lleva a esa página.
 
 > **Bueno saber:** si eres nuevo en el equipo y no tienes contraseña, pide a tu administrador una invitación. Ver [Invitar a tu equipo](help:invite-team).
 

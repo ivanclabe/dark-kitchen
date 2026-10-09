@@ -1,18 +1,15 @@
 import { VoiceDeviceSettings } from '@/modules/voice/components/VoiceDeviceSettings'
 import { FeaturesPanel } from '@/modules/organization/components/FeaturesPanel'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
-import { Accordion } from '@/shared/ui/Accordion'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { KpiStrip } from '@/shared/ui/KpiStrip'
 import { typography } from '@/shared/ui/typography'
 import { useQuery } from '@tanstack/react-query'
-import { Volume2 } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchAccountAiUsage, type AccountAiUsage } from '../api'
 import { AiStatusPanel } from '../components/AiStatusPanel'
 import { FeatureStatusCard } from '../components/FeatureStatus'
-import { KitchenVoicePanel } from '../components/KitchenVoicePanel'
 import { SettingsPage } from '../ui/SettingsPage'
 import { Section } from '@/shared/ui/Section'
 import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
@@ -151,7 +148,8 @@ function UsageAndState() {
 
 /**
  * IA y voz of the active account (ADR 0014, ADR 0018, ADR 0024, ADR 0026):
- *   Funciones       — what this account uses and how it behaves (the kitchen voice included)
+ *   Funciones       — what this account uses and how it behaves. ADR 0045: «Voz de la
+ *                     aplicación» is not here — always on, with the platform's voice.
  *   Este dispositivo — the voice and microphone of this tablet
  *   Uso y estado    — connection, usage and the daily limit
  * Without features.manage only "Este dispositivo" remains, without sub-navigation.
@@ -176,23 +174,7 @@ export function AiSettingsPage() {
       subNav={tabs.length > 1 ? <SubNav label="Secciones de IA y voz" items={tabs} value={tab} onChange={(t) => setParams(t === tabs[0].value ? {} : { tab: t }, { replace: true })} /> : undefined}
     >
       {tab === 'features' && organization ? (
-        <FeaturesPanel
-          organizationId={organization.id}
-          accountId={kitchen.id}
-          extra={(key) =>
-            key === 'voice_speech' ? (
-              <Accordion
-                title={
-                  <span className="inline-flex items-center gap-1.5">
-                    <Volume2 size={13} className="text-neutral-500" aria-hidden /> Voz de cocina
-                  </span>
-                }
-              >
-                <KitchenVoicePanel organizationId={organization.id} />
-              </Accordion>
-            ) : null
-          }
-        />
+        <FeaturesPanel organizationId={organization.id} accountId={kitchen.id} />
       ) : tab === 'usage' ? (
         <UsageAndState />
       ) : (

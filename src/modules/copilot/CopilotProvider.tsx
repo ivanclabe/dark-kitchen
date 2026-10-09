@@ -35,6 +35,7 @@ const SCREEN_NAME: Record<string, string> = {
   '/recipes': 'Recetas',
   '/supply': 'Abastecimiento',
   '/customers': 'Clientes',
+  '/consumer': 'Quanela Consumer',
   '/staff': 'Personal',
   '/my-shifts': 'Mis turnos',
   '/insights': 'Insights',
