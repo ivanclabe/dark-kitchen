@@ -2,7 +2,7 @@
 id: recipes-and-cost
 section: catalog
 title: Recetas y costo de un plato
-summary: La receta dice qué insumos lleva un plato y en qué cantidad; con ella Quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio se guarda como una versión nueva.
+summary: La receta dice qué insumos lleva un plato y cuánto; con ella Quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio es una versión nueva. Si el plato no usa inventario, no la necesita.
 audience: [owner, admin, manager, inventory]
 permissions: [recipes.edit]
 appPath: /menu-planner
@@ -12,9 +12,9 @@ questions:
   - ¿Cuál es el margen de un plato?
   - ¿Por qué no puedo confirmar un pedido? Dice que el plato no tiene receta
   - ¿Cómo cambio los ingredientes de un plato?
-keywords: [receta, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
+keywords: [receta, sin receta, descuenta inventario, no usa inventario, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
 related: [dishes-and-menu, inventory-deduction, stock, product-profitability]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 2
 screenshots:
   - id: recipe
@@ -41,6 +41,8 @@ Cada línea vale *cantidad × costo promedio del insumo*. El costo promedio se a
 
 Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos.
 
-> **Cuidado:** sin receta activa, un plato **no se puede confirmar** en un pedido y sus insumos no se descontarían.
+> **Cuidado:** si el plato tiene **Descuenta inventario** encendido y no tiene receta, **no se puede confirmar** en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga **Descuenta inventario** en **Editar plato**.
+
+> **Bueno saber:** un plato que **no usa inventario** se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen.
 
 > **Bueno saber:** si el plato viene de **Platos compartidos**, su receta la define el plato compartido: aquí solo la consultas (**Ver receta**). Desde la receta, **Ventas y rentabilidad** te lleva a sus números en Insights.

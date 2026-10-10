@@ -117,3 +117,20 @@ describe('choosing the account after signing in', async () => {
     expect(pendingAccountChoice()).toBe(false)
   })
 })
+
+// A wrong password says so in Spanish and offers the way to get a new one.
+describe('a wrong password', () => {
+  it('shows the message under the password, the «¿Olvidaste tu contraseña?» guide, and clears when typing again', async () => {
+    const { INVALID_CREDENTIALS_MESSAGE } = await import('@/shared/utils/authErrors')
+    calls.signIn.mockResolvedValueOnce({ error: INVALID_CREDENTIALS_MESSAGE } as never)
+    const user = userEvent.setup()
+    renderLogin()
+    await user.type(screen.getByLabelText(/Correo electrónico/), 'laura@negocio.co')
+    await user.type(screen.getByLabelText(/^Contraseña/), 'mala-123')
+    await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+    expect(await screen.findByText(INVALID_CREDENTIALS_MESSAGE)).toBeTruthy()
+    expect(screen.getByRole('link', { name: '¿Olvidaste tu contraseña?' }).getAttribute('href')).toMatch(/switch-account#si-olvidaste-tu-contrasena$/)
+    await user.type(screen.getByLabelText(/^Contraseña/), 'x')
+    expect(screen.queryByText(INVALID_CREDENTIALS_MESSAGE)).toBeNull()
+  })
+})

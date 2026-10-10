@@ -13,8 +13,8 @@ questions:
   - ¿Cómo cargo una factura de proveedor?
   - ¿Cómo sumo stock?
 keywords: [compra, factura, proveedor, entrada, ingresar inventario, confirmar compra, costo, adjunto, factura del proveedor, cargar factura]
-related: [stock, suppliers, inventory-deduction]
-updated: 2026-10-06
+related: [invoice-import, stock, suppliers, inventory-deduction]
+updated: 2026-10-10
 order: 2
 screenshots:
   - id: purchase
@@ -26,7 +26,7 @@ screenshots:
       - «Confirmar compra» suma el inventario.
 ---
 
-1. Abre **Abastecimiento → Compras** y toca **Nueva**.
+1. Abre **Abastecimiento → Compras** y toca **Nueva → Manual**. Para que Quanela lea la factura por ti, elige **Importar desde factura**: ver [Importar una compra desde una factura](help:invoice-import).
 2. Elige el **Proveedor** (o créalo ahí mismo), escribe el **N.º de factura** y la **Fecha**. Toca **Crear borrador**.
 3. En **Agregar línea**, elige el **Insumo**, la **Cantidad**, la **Unidad de compra** y el **Costo unitario**. Si ya le compraste antes, toca la sugerencia **Último: $…** para usar ese precio. Toca **Agregar línea**.
 4. Repite con cada producto de la factura. Para quitar una línea, toca **Quitar**.
@@ -38,5 +38,7 @@ screenshots:
 Al confirmar, cada línea suma al inventario y el **costo promedio** de cada insumo se recalcula con el precio de la compra.
 
 > **Cuidado:** una compra confirmada **no se puede deshacer**. Si hubo un error, corrígelo con un **ajuste**. Ver [Mermas y ajustes](help:waste-adjustments).
+
+> **Bueno saber:** una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí).
 
 > **Bueno saber:** mientras es **borrador**, la compra no toca el inventario. La lista muestra las 50 más recientes; **Cargar más** trae las anteriores.

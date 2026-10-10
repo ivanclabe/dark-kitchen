@@ -1,4 +1,5 @@
 import { Button } from '@/shared/ui/Button'
+import { signInErrorMessage } from '@/shared/utils/authErrors'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { Input } from '@/shared/ui/FormField'
@@ -56,7 +57,7 @@ function PasswordStep() {
     setError(null)
     const { error: signInError } = await supabase.auth.signInWithPassword({ email: normalizeEmail(email), password })
     if (signInError) {
-      setError(signInError.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : signInError.message)
+      setError(signInErrorMessage(signInError))
       setBusy(false)
       return
     }

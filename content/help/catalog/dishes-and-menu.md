@@ -13,9 +13,10 @@ questions:
   - ¿Cómo pongo un plato en promoción?
   - ¿Cómo marco un plato como agotado?
   - ¿Cómo copio el menú de la semana pasada?
-keywords: [plato, producto, precio, categoría, menú, planificador, calendario, promoción, agotado, copiar menú, desactivar plato]
+  - ¿Puedo vender un plato sin receta?
+keywords: [plato, producto, precio, sin receta, descuenta inventario, no usa inventario, bebidas, categoría, menú, planificador, calendario, promoción, agotado, copiar menú, desactivar plato]
 related: [recipes-and-cost, create-order, setup-account]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 1
 screenshots:
   - id: menu-planner
@@ -33,12 +34,19 @@ screenshots:
 
 1. Abre **Catálogo** y, en **Catálogo de platos**, toca **Nuevo**.
 2. Escribe el **Nombre** y el **Precio de venta** (obligatorios). Opcional: **Código**, **Categoría** (o crea una nueva ahí mismo), **Descripción** y fotos.
-3. Toca **Crear plato**.
-4. Ahora crea su receta: toca el lápiz del plato (**Editar plato**) → **Crear receta**. Ver [Recetas y costo de un plato](help:recipes-and-cost).
+3. Deja encendido **Descuenta inventario** si el plato se prepara con tus insumos. Apágalo si no los controlas en el inventario (por ejemplo, una gaseosa que compras lista).
+4. Toca **Crear plato**.
+5. Si descuenta inventario, crea su receta: toca el lápiz del plato (**Editar plato**) → **Crear receta**. Ver [Recetas y costo de un plato](help:recipes-and-cost).
 
 Para cambiar el precio o el nombre, toca **Editar plato**, cambia lo que necesites y toca **Guardar cambios**. Ahí también puedes **Desactivar** un plato: deja de salir al crear pedidos, pero no se borra.
 
-> **Cuidado:** un plato sin receta muestra **Sin receta** y no se puede confirmar en un pedido.
+## Platos sin receta
+
+Un plato con **Descuenta inventario** apagado se vende **sin receta**: al confirmar el pedido no reserva nada y, cuando está listo, no descuenta nada. En el catálogo dice **No usa inventario**. Si le pones receta, solo sirve para ver su costo.
+
+> **Cuidado:** un plato que descuenta inventario y no tiene receta muestra **Sin receta** (en ámbar) y **no se puede confirmar** en un pedido. Créale la receta o apaga **Descuenta inventario**.
+
+> **Bueno saber:** en un plato de **Platos compartidos**, esta opción la define el plato compartido.
 
 ## Armar el menú de cada día
 

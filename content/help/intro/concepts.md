@@ -12,7 +12,7 @@ questions:
   - ¿Qué es un rol?
 keywords: [cuenta, negocio, organización, rol, permisos, local, glosario]
 related: [what-is-quanela, roles, switch-account]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 2
 ---
 
@@ -32,7 +32,7 @@ order: 2
 
 Un pedido pasa por estos estados: **Por confirmar → En cola → Preparando → Listo → En ruta → Entregado**, o **Cancelado**. Ver [Estados del pedido](help:order-states).
 
-Al **confirmar**, Quanela reserva los insumos de las recetas; al marcar cada plato **Listo**, los descuenta del inventario. El pago es aparte: un pedido puede estar *Preparando* y *Pagado*, o *Preparando* y *Pago pendiente*.
+Al **confirmar**, Quanela reserva los insumos de las recetas; al marcar cada plato **Listo**, los descuenta del inventario. Los platos con **Descuenta inventario** apagado se venden sin receta y no mueven el inventario. El pago es aparte: un pedido puede estar *Preparando* y *Pagado*, o *Preparando* y *Pago pendiente*.
 
 ## Glosario rápido
 

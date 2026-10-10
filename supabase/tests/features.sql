@@ -59,7 +59,7 @@ delete from dk_organization_features where organization_id = (select id from _ct
 select pg_temp.act_as('00000000-0000-0000-0000-0000000fe0b1', (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo', '9', jsonb_array_length(dk_my_features())::text);
+  insert into _t (area, test, expected, got) values ('Catálogo', 'La Cuenta ve el catálogo', '10', jsonb_array_length(dk_my_features())::text);
   insert into _t (area, test, expected, got) values ('Por defecto', 'IA apagada sin fila', 'false · false', pg_temp.feat('supply_reorder', 'enabled') || ' · ' || pg_temp.feat('supply_reorder', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Voz encendida sin fila', 'true', pg_temp.feat('voice_commands', 'usable'));
   insert into _t (area, test, expected, got) values ('Por defecto', 'Parámetros por defecto del catálogo', '7', pg_temp.feat('supply_reorder', 'settings')::jsonb ->> 'coverage_days');
@@ -135,7 +135,7 @@ set local role authenticated;
 do $$ begin
   perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'supply_reorder', false);
   perform dk_set_org_feature((select id from _ctx where key = 'orgA'), 'voice_commands', false);
-  insert into _t (area, test, expected, got) values ('Organización', 'La matriz lista funciones y Cuentas', '9 · sí',
+  insert into _t (area, test, expected, got) values ('Organización', 'La matriz lista funciones y Cuentas', '10 · sí',
     jsonb_array_length(dk_org_feature_matrix((select id from _ctx where key = 'orgA')) -> 'features')::text || ' · ' ||
     case when jsonb_array_length(dk_org_feature_matrix((select id from _ctx where key = 'orgA')) -> 'accounts') >= 1 then 'sí' else 'no' end);
 end $$;

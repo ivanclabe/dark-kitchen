@@ -1023,6 +1023,84 @@ export type Database = {
           },
         ]
       }
+      dk_ingredient_aliases: {
+        Row: {
+          alias_key: string
+          alias_text: string
+          created_at: string
+          created_by: string | null
+          id: string
+          ingredient_id: string
+          kitchen_id: string
+          last_used_at: string
+          purchase_unit_id: string | null
+          supplier_id: string
+          uses: number
+        }
+        Insert: {
+          alias_key: string
+          alias_text: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ingredient_id: string
+          kitchen_id?: string
+          last_used_at?: string
+          purchase_unit_id?: string | null
+          supplier_id: string
+          uses?: number
+        }
+        Update: {
+          alias_key?: string
+          alias_text?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ingredient_id?: string
+          kitchen_id?: string
+          last_used_at?: string
+          purchase_unit_id?: string | null
+          supplier_id?: string
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_ingredient_aliases_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_aliases_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_aliases_kitchen_id_ingredient_id_fkey"
+            columns: ["kitchen_id", "ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_aliases_kitchen_id_supplier_id_fkey"
+            columns: ["kitchen_id", "supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_ingredient_aliases_purchase_unit_id_fkey"
+            columns: ["purchase_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_ingredient_categories: {
         Row: {
           created_at: string
@@ -1347,6 +1425,89 @@ export type Database = {
             columns: ["kitchen_id", "order_item_id"]
             isOneToOne: false
             referencedRelation: "dk_order_items"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_invoice_imports: {
+        Row: {
+          ai_run_id: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          extraction: Json | null
+          file_name: string
+          file_path: string
+          file_sha256: string | null
+          file_size: number | null
+          id: string
+          kitchen_id: string
+          mime_type: string
+          purchase_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_run_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          extraction?: Json | null
+          file_name: string
+          file_path: string
+          file_sha256?: string | null
+          file_size?: number | null
+          id?: string
+          kitchen_id?: string
+          mime_type: string
+          purchase_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_run_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          extraction?: Json | null
+          file_name?: string
+          file_path?: string
+          file_sha256?: string | null
+          file_size?: number | null
+          id?: string
+          kitchen_id?: string
+          mime_type?: string
+          purchase_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_invoice_imports_ai_run_id_fkey"
+            columns: ["ai_run_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ai_insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_invoice_imports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_invoice_imports_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_invoice_imports_kitchen_id_purchase_id_fkey"
+            columns: ["kitchen_id", "purchase_id"]
+            isOneToOne: false
+            referencedRelation: "dk_purchases"
             referencedColumns: ["kitchen_id", "id"]
           },
         ]
@@ -1919,6 +2080,7 @@ export type Database = {
           price: number
           sort_order: number
           updated_at: string
+          uses_inventory: boolean
         }
         Insert: {
           active?: boolean
@@ -1932,6 +2094,7 @@ export type Database = {
           price: number
           sort_order?: number
           updated_at?: string
+          uses_inventory?: boolean
         }
         Update: {
           active?: boolean
@@ -1945,6 +2108,7 @@ export type Database = {
           price?: number
           sort_order?: number
           updated_at?: string
+          uses_inventory?: boolean
         }
         Relationships: [
           {
@@ -2957,6 +3121,7 @@ export type Database = {
           price: number
           price_is_local: boolean
           updated_at: string
+          uses_inventory: boolean
         }
         Insert: {
           active?: boolean
@@ -2974,6 +3139,7 @@ export type Database = {
           price?: number
           price_is_local?: boolean
           updated_at?: string
+          uses_inventory?: boolean
         }
         Update: {
           active?: boolean
@@ -2991,6 +3157,7 @@ export type Database = {
           price?: number
           price_is_local?: boolean
           updated_at?: string
+          uses_inventory?: boolean
         }
         Relationships: [
           {
@@ -4279,6 +4446,10 @@ export type Database = {
         }
         Returns: string
       }
+      dk_create_purchase_from_import: {
+        Args: { p_confirm?: boolean; p_import_id: string; p_payload: Json }
+        Returns: Json
+      }
       dk_create_recipe_version: {
         Args: { p_items: Json; p_product_id: string }
         Returns: string
@@ -4581,6 +4752,44 @@ export type Database = {
           wasted_30d: number
         }[]
       }
+      dk_invoice_import_discard: {
+        Args: { p_import_id: string }
+        Returns: undefined
+      }
+      dk_invoice_import_save: {
+        Args: {
+          p_ai_run_id?: string
+          p_error?: string
+          p_extraction: Json
+          p_import_id: string
+          p_status: string
+        }
+        Returns: undefined
+      }
+      dk_invoice_import_start: {
+        Args: {
+          p_file_name: string
+          p_file_path: string
+          p_file_size: number
+          p_force?: boolean
+          p_mime_type: string
+          p_sha256: string
+        }
+        Returns: Json
+      }
+      dk_invoice_line_suggestions: {
+        Args: {
+          p_code: string
+          p_kitchen: string
+          p_supplier: string
+          p_text: string
+        }
+        Returns: Json
+      }
+      dk_invoice_match: {
+        Args: { p_extraction: Json; p_supplier_id?: string }
+        Returns: Json
+      }
       dk_is_global_admin: { Args: never; Returns: boolean }
       dk_is_kitchen_member: { Args: { p_kitchen_id: string }; Returns: boolean }
       dk_is_org_super_admin: {
@@ -4634,6 +4843,7 @@ export type Database = {
         Args: { p_keys: string[] }
         Returns: number
       }
+      dk_match_key: { Args: { p: string }; Returns: string }
       dk_my_context: { Args: never; Returns: Json }
       dk_my_features: { Args: never; Returns: Json }
       dk_my_kitchens: {
@@ -4657,6 +4867,8 @@ export type Database = {
       }
       dk_new_tenant_code: { Args: never; Returns: string }
       dk_next_order_number: { Args: { p_kitchen_id: string }; Returns: number }
+      dk_nit_base: { Args: { p: string }; Returns: string }
+      dk_nit_matches: { Args: { a: string; b: string }; Returns: boolean }
       dk_normalize_phone: { Args: { p_phone: string }; Returns: string }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
       dk_order_search: {
@@ -4894,6 +5106,7 @@ export type Database = {
           p_price: number
           p_product_id: string
           p_recipe: Json
+          p_uses_inventory?: boolean
         }
         Returns: string
       }
@@ -5015,6 +5228,7 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: boolean
       }
+      dk_supplier_name_key: { Args: { p: string }; Returns: string }
       dk_sync_master_menu_kitchen: {
         Args: { p_kitchen_id: string; p_menu_id: string }
         Returns: undefined

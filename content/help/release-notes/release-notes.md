@@ -12,9 +12,15 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-09
+updated: 2026-10-10
 order: 1
 ---
+
+## 10 de octubre de 2026
+
+- **Importar una compra desde la factura.** En **Compras → Nueva → Importar desde factura** (o soltando la factura sobre la lista), sube la foto o el PDF. Quanela lee el proveedor, el NIT, las líneas y los precios, y busca tus proveedores e insumos. Tú revisas y corriges todo antes de guardar, en borrador o confirmada. Aprende cómo escribe cada proveedor tus insumos y no duplica proveedores ni insumos. Ver [Importar una compra desde una factura](help:invoice-import).
+- **Compras más seguras.** Una compra solo se confirma con **Confirmar compra** (y nunca sin líneas), el costo promedio queda bien cuando un insumo se repite en la factura y no puede haber dos proveedores con el mismo NIT.
+- **Platos sin receta.** Cada plato tiene **Descuenta inventario**. Apágalo en lo que no controlas en el inventario (por ejemplo, bebidas que compras listas): se vende sin receta y nunca reserva ni descuenta insumos. En el catálogo dice **No usa inventario**. Si un plato que descuenta inventario no tiene receta, el pedido se sigue rechazando y el mensaje dice cuál es. Ver [Platos y menú del día](help:dishes-and-menu).
 
 ## 9 de octubre de 2026
 

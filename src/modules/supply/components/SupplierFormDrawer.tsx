@@ -6,7 +6,7 @@ import { phoneError } from '@/shared/utils/phone'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
-import { getErrorMessage } from '@/shared/utils/errors'
+import { getErrorMessage, isUniqueViolation } from '@/shared/utils/errors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Plus } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
@@ -27,6 +27,8 @@ const schema = z.object({
 })
 
 type FormValues = z.infer<typeof schema>
+
+const legendClass = 'mb-3 text-xs font-semibold tracking-wide text-neutral-400 uppercase'
 
 const emptyValues: FormValues = { name: '', taxId: '', phone: '', email: '', address: '', contactName: '' }
 
@@ -74,7 +76,8 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
       }
       onClose()
     } catch (err) {
-      show(getErrorMessage(err, 'No se pudo guardar el proveedor'), 'error')
+      // ADR 0049 (D9): one NIT per account.
+      show(isUniqueViolation(err) ? 'Ya tienes un proveedor con ese NIT. Búscalo en la lista.' : getErrorMessage(err, 'No se pudo guardar el proveedor'), 'error')
     }
   }
 
@@ -82,13 +85,25 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
 
   return (
     <Drawer open={open} onClose={onClose} title={supplier ? 'Editar proveedor' : 'Nuevo proveedor'} subtitle={supplier?.name} size="sm">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <FormField label="Nombre" required error={errors.name?.message}>
-          {(a11y) => <Input {...a11y} {...register('name')} autoComplete="organization" />}
-        </FormField>
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="NIT / identificación" error={errors.taxId?.message}>
-            {(a11y) => <Input {...a11y} {...register('taxId')} />}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* One column: the drawer is narrow and the phone (country + number) needs the full width. */}
+        <fieldset className="space-y-4">
+          <legend className={legendClass}>Empresa</legend>
+          <FormField label="Nombre" required error={errors.name?.message}>
+            {(a11y) => <Input {...a11y} {...register('name')} autoComplete="organization" placeholder="Distribuidora La Cosecha" />}
+          </FormField>
+          <FormField label="NIT o identificación" error={errors.taxId?.message}>
+            {(a11y) => <Input {...a11y} {...register('taxId')} placeholder="900123456-7" />}
+          </FormField>
+          <FormField label="Dirección" error={errors.address?.message}>
+            {(a11y) => <Input {...a11y} {...register('address')} autoComplete="street-address" />}
+          </FormField>
+        </fieldset>
+
+        <fieldset className="space-y-4">
+          <legend className={legendClass}>Contacto</legend>
+          <FormField label="Persona de contacto" error={errors.contactName?.message}>
+            {(a11y) => <Input {...a11y} {...register('contactName')} autoComplete="name" />}
           </FormField>
           <FormField label="Teléfono" error={errors.phone?.message}>
             {(a11y) => (
@@ -100,22 +115,16 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
               />
             )}
           </FormField>
-        </div>
-        <FormField label="Correo" error={errors.email?.message}>
-          {(a11y) => (
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => <EmailInput {...a11y} name={field.name} value={field.value ?? ''} onValueChange={field.onChange} onBlur={field.onBlur} placeholder="ventas@proveedor.com" />}
-            />
-          )}
-        </FormField>
-        <FormField label="Contacto" error={errors.contactName?.message}>
-          {(a11y) => <Input {...a11y} {...register('contactName')} />}
-        </FormField>
-        <FormField label="Dirección" error={errors.address?.message}>
-          {(a11y) => <Input {...a11y} {...register('address')} autoComplete="street-address" />}
-        </FormField>
+          <FormField label="Correo" error={errors.email?.message}>
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => <EmailInput {...a11y} name={field.name} value={field.value ?? ''} onValueChange={field.onChange} onBlur={field.onBlur} placeholder="ventas@proveedor.com" />}
+              />
+            )}
+          </FormField>
+        </fieldset>
 
         <Button type="submit" variant="primary" icon={supplier ? Pencil : Plus} loading={submitting} className="w-full">
           {supplier ? 'Guardar cambios' : 'Crear proveedor'}

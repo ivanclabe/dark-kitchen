@@ -77,7 +77,13 @@ export function DishCatalogCard({
         <p className="flex items-center gap-1 truncate text-xs text-neutral-500">
           <span className="shrink-0 tabular-nums">{formatMoney(product.price)}</span>
           {product.categoryName && <span className="truncate">· {product.categoryName}</span>}
-          {!product.activeRecipeVersion && <span className="shrink-0 text-amber-500">· Sin receta</span>}
+          {!product.usesInventory ? (
+            <span className="shrink-0" title="Se vende sin receta y no descuenta insumos">
+              · No usa inventario
+            </span>
+          ) : (
+            !product.activeRecipeVersion && <span className="shrink-0 text-amber-500">· Sin receta</span>
+          )}
           {product.masterProductId && (
             <span className="shrink-0 text-brasa-400" title="Plato del menú maestro: nombre y receta los define el maestro">
               · Maestro

@@ -46,7 +46,7 @@ delete from dk_ai_insights where kitchen_id = (select id from _ctx where key = '
 select pg_temp.act_as((select id from _ctx where key = 'ivan'), (select id from _ctx where key = 'A'));
 set local role authenticated;
 do $$ begin
-  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '9', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
+  insert into _t (area, test, expected, got) values ('Overview', 'Platform sees all features', '10', jsonb_array_length(dk_platform_ai_overview() -> 'features')::text);
   insert into _t (area, test, expected, got) values ('Overview', 'Models come from the catalog (H3)', 'claude-sonnet-5-5 · claude-haiku-4-5-20251001',
     (select string_agg(f ->> 'modelKey', ' · ' order by f ->> 'key' desc) from jsonb_array_elements(dk_platform_ai_overview() -> 'features') f
      where f ->> 'key' in ('supply_reorder', 'kitchen_insights')));

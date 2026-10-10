@@ -1,3 +1,4 @@
+import { signInErrorMessage } from '@/shared/utils/authErrors'
 import { supabase } from '@/shared/lib/supabase'
 import type { Session, User } from '@supabase/supabase-js'
 import { createContext, use, useEffect, useState, type ReactNode } from 'react'
@@ -89,7 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error?.message ?? null }
+    // Never Supabase's English text: what happened, in plain Spanish.
+    return { error: error ? signInErrorMessage(error) : null }
   }
 
   async function signOut() {

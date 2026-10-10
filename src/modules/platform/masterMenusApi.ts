@@ -24,6 +24,8 @@ export interface MasterProduct {
   categoryName: string | null
   price: number
   active: boolean
+  /** «Descuenta inventario» (ADR 0048): se copia a cada cuenta. false = se vende sin receta. */
+  usesInventory: boolean
   recipe: MasterRecipeItem[]
 }
 
@@ -73,7 +75,7 @@ export async function deleteMasterMenu(id: string): Promise<void> {
 export async function listMasterProducts(menuId: string): Promise<MasterProduct[]> {
   const { data, error } = await supabase
     .from('dk_master_products')
-    .select('id, code, name, description, category_name, price, active, sort_order, dk_master_recipe_items ( ingredient_code, ingredient_name, unit_code, quantity )')
+    .select('id, code, name, description, category_name, price, active, uses_inventory, sort_order, dk_master_recipe_items ( ingredient_code, ingredient_name, unit_code, quantity )')
     .eq('master_menu_id', menuId)
     .order('sort_order')
   if (error) throw error
@@ -85,6 +87,7 @@ export async function listMasterProducts(menuId: string): Promise<MasterProduct[
     categoryName: p.category_name,
     price: Number(p.price),
     active: p.active,
+    usesInventory: p.uses_inventory,
     recipe: (p.dk_master_recipe_items ?? []).map((r) => ({
       ingredientCode: r.ingredient_code,
       ingredientName: r.ingredient_name,
@@ -102,6 +105,7 @@ export interface MasterProductInput {
   categoryName: string
   price: number
   active: boolean
+  usesInventory: boolean
   recipe: MasterRecipeItem[]
 }
 
@@ -116,6 +120,7 @@ export async function saveMasterProduct(menuId: string, input: MasterProductInpu
     p_category: input.categoryName,
     p_price: input.price,
     p_active: input.active,
+    p_uses_inventory: input.usesInventory,
     p_recipe: input.recipe.map((r) => ({ ingredient_code: r.ingredientCode, ingredient_name: r.ingredientName, unit_code: r.unitCode, quantity: r.quantity })),
   })
   if (error) throw error

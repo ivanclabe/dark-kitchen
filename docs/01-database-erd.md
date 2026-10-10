@@ -235,7 +235,8 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
 - `dk_ingredient_stock`: `UNIQUE(ingredient_id)`, mantenida solo por trigger (no editable directo por el cliente).
 - `dk_recipes`: `UNIQUE(product_id, version)`; solo una fila con `is_active = true` por `product_id` (constraint parcial `UNIQUE(product_id) WHERE is_active`).
 - `dk_purchases`: `UNIQUE(supplier_id, invoice_number)` para evitar duplicar una factura.
-- `dk_order_items.recipe_id`: `NOT NULL` una vez el pedido pasa de `NUEVO` (se congela la receta al confirmar) — validado en el RPC, no como constraint de columna, porque en `NUEVO` puede ser null si el producto aún no tiene receta activa forzada.
+- `dk_order_items.recipe_id`: al confirmar (`dk_confirm_order`) se congela la receta activa de cada plato con `dk_products.uses_inventory = true`, y ese plato no se confirma sin receta. Los platos con `uses_inventory = false` quedan con `recipe_id` nulo: no reservan ni descuentan insumos (ADR 0048). Se valida en el RPC, no como constraint de columna.
+- `dk_products.uses_inventory` / `dk_master_products.uses_inventory`: «Descuenta inventario», `true` por defecto. La copia de un menú maestro lo hereda al sincronizar y la cuenta no lo cambia (ADR 0048).
 - `dk_customers.whatsapp_id`: `UNIQUE`, nullable.
 - Todas las tablas: `created_at timestamptz default now()`, y donde aplica `updated_at` mantenido por trigger genérico `dk_set_updated_at()`.
 

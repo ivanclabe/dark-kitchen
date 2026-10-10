@@ -14,7 +14,8 @@ import type { Order } from '../types'
 /**
  * NUEVO → En cola. Mismo RPC y misma advertencia que el botón "Confirmar
  * pedido" del OrderBuilder: confirmar reserva inventario y puede rechazarse
- * por falta de stock o por un plato sin receta activa.
+ * por falta de stock o por un plato sin receta que descuenta inventario
+ * (los que no lo descuentan no reservan nada, ADR 0048).
  */
 export function ConfirmOrderDialog({ ticket, onClose }: { ticket: Order; onClose: () => void }) {
   const confirmOrder = useConfirmOrder()
@@ -40,8 +41,8 @@ export function ConfirmOrderDialog({ ticket, onClose }: { ticket: Order; onClose
       pending={confirmOrder.isPending}
       description={
         <p>
-          Esto reserva el inventario necesario para los {ticket.items.length} plato(s) de {ticket.customerName} ({formatMoney(ticket.total)}) y envía la comanda a
-          cocina. Si algún insumo no tiene stock suficiente, la confirmación se rechazará.
+          Esto reserva el inventario de los {ticket.items.length} plato(s) de {ticket.customerName} ({formatMoney(ticket.total)}) que lo descuentan y envía la
+          comanda a cocina. Si algún insumo no tiene stock suficiente, la confirmación se rechazará.
         </p>
       }
     />

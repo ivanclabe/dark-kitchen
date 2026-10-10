@@ -15,12 +15,13 @@ interface ProductRow {
   active: boolean
   master_product_id: string | null
   price_is_local: boolean
+  uses_inventory: boolean
   dk_product_categories: { name: string } | null
   dk_recipes: { version: number } | null
 }
 
 const SELECT = `
-  id, code, name, description, category_id, price, image_path, active_recipe_id, estimated_cost, active, master_product_id, price_is_local,
+  id, code, name, description, category_id, price, image_path, active_recipe_id, estimated_cost, active, master_product_id, price_is_local, uses_inventory,
   dk_product_categories ( name ),
   dk_recipes!dk_products_active_recipe_fkey ( version )
 `
@@ -41,6 +42,7 @@ function mapRow(row: ProductRow): Product {
     active: row.active,
     masterProductId: row.master_product_id,
     priceIsLocal: row.price_is_local,
+    usesInventory: row.uses_inventory,
   }
 }
 
@@ -59,6 +61,7 @@ export async function createProduct(input: ProductInput): Promise<Product> {
       description: input.description ?? null,
       category_id: input.categoryId ?? null,
       price: input.price,
+      uses_inventory: input.usesInventory ?? true,
     })
     .select(SELECT)
     .single()
@@ -76,6 +79,7 @@ export async function updateProduct(id: string, input: ProductInput): Promise<vo
       description: input.description ?? null,
       category_id: input.categoryId ?? null,
       price: input.price,
+      ...(input.usesInventory === undefined ? {} : { uses_inventory: input.usesInventory }),
     })
     .eq('id', id)
   if (error) throw error

@@ -175,7 +175,12 @@ function RecipeForm({
         title={`Receta — ${product.name}`}
         description={`Precio de venta: ${formatMoney(product.price)}`}
         icon={BookOpen}
-        meta={activeRecipe ? <Badge tone="success">v{activeRecipe.version}</Badge> : <Badge tone="neutral">Sin receta</Badge>}
+        meta={
+          <>
+            {activeRecipe ? <Badge tone="success">v{activeRecipe.version}</Badge> : <Badge tone="neutral">Sin receta</Badge>}
+            {!product.usesInventory && <Badge tone="neutral">No usa inventario</Badge>}
+          </>
+        }
         backTo={back.to}
         backLabel={back.label}
         actions={
@@ -200,6 +205,12 @@ function RecipeForm({
           </>
         }
       />
+
+      {!product.usesInventory && (
+        <p role="status" className="rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-2.5 text-sm text-neutral-300">
+          Este plato no descuenta inventario: se vende sin receta y sus pedidos no reservan ni descuentan insumos. Si le pones receta, solo sirve para ver su costo.
+        </p>
+      )}
 
       {product.masterProductId && (
         <p role="status" className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm text-neutral-300">

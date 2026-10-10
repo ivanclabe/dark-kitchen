@@ -20,6 +20,7 @@ import { SupplierFormDrawer } from '../components/SupplierFormDrawer'
 import { SupplierPanel } from '../components/SupplierPanel'
 import { useIngredients } from '../hooks/useIngredients'
 import { useSuppliers } from '../hooks/useSuppliers'
+import { setPendingInvoiceFile } from '../lib/invoiceFile'
 import type { Ingredient } from '../types'
 
 type SupplyView = 'stock' | 'compras' | 'proveedores'
@@ -85,6 +86,10 @@ export function SupplyPage() {
         selectedId={selectedId}
         onSelect={(p) => go('compras', p.id)}
         onCreate={() => setNewPurchase({ open: true, supplierId: null, lines: [] })}
+        onImport={(file) => {
+          setPendingInvoiceFile(file ?? null)
+          navigate(path('/supply/compras/importar'))
+        }}
       />
     ) : (
       <SupplierPanel selectedId={selectedId} onSelect={(s) => go('proveedores', s.id)} onCreate={() => setSupplierDrawer({ open: true, supplierId: null })} />
@@ -105,7 +110,11 @@ export function SupplyPage() {
     detail = selectedId ? (
       <PurchaseDetail purchaseId={selectedId} />
     ) : (
-      <EmptyState icon={ShoppingCart} title="Selecciona una compra" description="Elige una factura de la lista o crea un borrador nuevo." />
+      <EmptyState
+        icon={ShoppingCart}
+        title="Selecciona una compra"
+        description="Elige una factura de la lista o crea una nueva: a mano o importándola desde la foto o el PDF de la factura."
+      />
     )
   } else {
     detail = selectedSupplier ? (

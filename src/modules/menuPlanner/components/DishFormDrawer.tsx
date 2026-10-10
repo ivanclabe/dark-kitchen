@@ -16,11 +16,12 @@ import { Button, buttonClass } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
+import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BarChart3, BookOpen, Layers, Plus, Power } from 'lucide-react'
 import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { z } from 'zod'
 
@@ -30,12 +31,13 @@ const schema = z.object({
   description: z.string().optional(),
   categoryId: z.string().optional(),
   price: z.coerce.number().min(0),
+  usesInventory: z.boolean(),
 })
 
 type FormValues = z.input<typeof schema>
 type FormOutput = z.output<typeof schema>
 
-const emptyValues: FormValues = { code: '', name: '', description: '', categoryId: '', price: 0 }
+const emptyValues: FormValues = { code: '', name: '', description: '', categoryId: '', price: 0, usesInventory: true }
 
 /**
  * Crear/editar plato desde el planificador — mismo formulario que tenía
@@ -67,9 +69,17 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
   } = useForm<FormValues, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: product
-      ? { code: product.code ?? '', name: product.name, description: product.description ?? '', categoryId: product.categoryId ?? '', price: product.price }
+      ? {
+          code: product.code ?? '',
+          name: product.name,
+          description: product.description ?? '',
+          categoryId: product.categoryId ?? '',
+          price: product.price,
+          usesInventory: product.usesInventory,
+        }
       : emptyValues,
   })
+  const usesInventory = useWatch({ control, name: 'usesInventory' })
 
   // Plato de un menú maestro: aquí solo se ajusta el precio (lo demás lo define el maestro).
   const shared = Boolean(product?.masterProductId)
@@ -87,6 +97,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
       description: values.description || null,
       categoryId: values.categoryId || null,
       price: values.price,
+      usesInventory: values.usesInventory,
     }
     if (product) {
       await updateProduct.mutateAsync({ id: product.id, input })
@@ -207,6 +218,24 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
           )}
         </FormField>
         <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
+
+        {/* ADR 0048: a dish that does not use inventory is sold without a recipe and never touches the stock. */}
+        <div className="space-y-1 rounded-xl border border-neutral-800/60 px-3 py-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-sm font-medium text-neutral-200">Descuenta inventario</span>
+            <Controller
+              control={control}
+              name="usesInventory"
+              render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label="Descuenta inventario" disabled={shared} />}
+            />
+          </div>
+          <p className="text-xs text-neutral-500">
+            {usesInventory
+              ? 'Al confirmar un pedido se reservan los insumos de su receta y, cuando el plato está listo, se descuentan. Necesita receta.'
+              : 'Se vende sin receta y nunca reserva ni descuenta insumos. Útil para lo que no controlas en el inventario, como bebidas compradas.'}
+            {shared && ' Lo define el menú maestro.'}
+          </p>
+        </div>
 
         {product && (
           <div className="space-y-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 p-3">

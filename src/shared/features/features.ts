@@ -20,6 +20,7 @@ export const FEATURE_KEYS = [
   'kitchen_stall_alerts',
   'kitchen_insights',
   'copilot',
+  'invoice_import',
   'voice_commands',
   'voice_speech',
   'voice_wake_word',

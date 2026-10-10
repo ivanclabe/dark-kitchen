@@ -13,14 +13,14 @@ questions:
   - No veo un módulo en el menú
 keywords: [preguntas frecuentes, FAQ, problemas, errores, ayuda, soporte, no puedo]
 related: [confirm-cancel, switch-account, roles]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 1
 ---
 
 ## Pedidos
 
 ### No puedo confirmar un pedido
-Pasa si **falta stock** de algún insumo, si un plato **no tiene receta** o si el pedido **no tiene platos**. El mensaje dice qué falta. Ver [Confirmar y cancelar un pedido](help:confirm-cancel).
+Pasa si **falta stock** de algún insumo, si un plato que descuenta inventario **no tiene receta** o si el pedido **no tiene platos**. El mensaje dice qué falta. Si el plato no usa tus insumos, apaga **Descuenta inventario** en el plato y se vende sin receta. Ver [Confirmar y cancelar un pedido](help:confirm-cancel).
 
 ### ¿Dónde quedaron Pedidos y Cocina?
 Ahora están juntos en **Operación**, con las vistas Tablero, Cocina, Despacho y Lista. Ver [El Centro de operaciones](help:operations-center).

@@ -133,7 +133,7 @@ function MenuDetail({ menu, account }: { menu: MasterMenu; account: MenuAccount 
                     {p.name} <span className="text-xs font-normal text-neutral-500">· {p.code}</span>
                   </p>
                   <p className="text-xs text-neutral-500">
-                    {formatMoney(p.price)} · {p.categoryName ?? 'Sin categoría'} · {p.recipe.length ? `${p.recipe.length} insumos` : 'Sin receta'}
+                    {formatMoney(p.price)} · {p.categoryName ?? 'Sin categoría'} · {!p.usesInventory ? 'No usa inventario' : p.recipe.length ? `${p.recipe.length} insumos` : 'Sin receta'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

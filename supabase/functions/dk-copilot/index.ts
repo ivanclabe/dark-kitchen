@@ -155,7 +155,7 @@ const TOOLS: ToolDef[] = [
     label: "Revisando platos y recetas",
     permission: "products.view",
     fn: "dk_copilot_products",
-    description: "Platos: precio, costo y margen (si el rol lo ve), receta con insumos (si el rol la ve) y unidades vendidas en 30 días. 'ingredient' lista los platos cuya receta usa ese insumo.",
+    description: "Platos: precio, costo y margen (si el rol lo ve; un plato sin receta no tiene costo registrado, así que no hay margen), si descuenta inventario (usesInventory: false = se vende sin receta y no toca el stock), receta con insumos (si el rol la ve) y unidades vendidas en 30 días. 'ingredient' lista los platos cuya receta usa ese insumo.",
     input_schema: { type: "object", properties: { search: { type: "string" }, ingredient: { type: "string" }, limit: { type: "integer" } } },
     args: (i) => ({ p_search: str(i.search), p_ingredient: str(i.ingredient), p_limit: int(i.limit) ?? 15 }),
   },

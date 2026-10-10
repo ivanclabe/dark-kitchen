@@ -20,6 +20,8 @@ export interface Product {
   masterProductId: string | null
   /** La Cocina fijó su propio precio (la sincronización del maestro no lo cambia). */
   priceIsLocal: boolean
+  /** «Descuenta inventario» (ADR 0048). false: se vende sin receta y nunca reserva ni descuenta insumos. */
+  usesInventory: boolean
 }
 
 export interface ProductInput {
@@ -28,4 +30,5 @@ export interface ProductInput {
   description?: string | null
   categoryId?: string | null
   price: number
+  usesInventory?: boolean
 }

@@ -13,7 +13,7 @@ questions:
   - ¿Qué pasa con el inventario si cancelo?
 keywords: [confirmar, cancelar, anular pedido, reservar, stock insuficiente, receta, devolución]
 related: [order-states, inventory-deduction, create-order]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 3
 ---
 
@@ -23,9 +23,9 @@ order: 3
 2. Toca **Confirmar pedido** → **Sí, confirmar**.
 3. El pedido pasa a **En cola** y aparece en la pantalla de la cocina.
 
-Al confirmar, Quanela **reserva** los insumos de todas las recetas: bajan del stock disponible, pero todavía no salen de la bodega.
+Al confirmar, Quanela **reserva** los insumos de las recetas: bajan del stock disponible, pero todavía no salen de la bodega. Los platos que **no usan inventario** no reservan nada.
 
-> **Cuidado:** la confirmación se rechaza si **falta stock** de algún insumo, si un plato **no tiene receta activa** o si el pedido **no tiene platos**. Revisa el mensaje: dice qué falta.
+> **Cuidado:** la confirmación se rechaza si **falta stock** de algún insumo, si un plato que **descuenta inventario** no tiene receta o si el pedido **no tiene platos**. Revisa el mensaje: dice qué falta y cuál es el plato.
 
 ## Cancelar
 

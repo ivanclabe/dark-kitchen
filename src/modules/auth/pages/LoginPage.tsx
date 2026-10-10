@@ -1,3 +1,4 @@
+import { INVALID_CREDENTIALS_MESSAGE } from '@/shared/utils/authErrors'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
@@ -135,7 +136,18 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <FormField label="Correo electrónico" required>
               {(a11y) => (
-                <EmailInput {...a11y} required autoComplete="username" placeholder="nombre@negocio.com" value={email} onValueChange={setEmail} autoFocus />
+                <EmailInput
+                  {...a11y}
+                  required
+                  autoComplete="username"
+                  placeholder="nombre@negocio.com"
+                  value={email}
+                  onValueChange={(v) => {
+                    setEmail(v)
+                    setError(null)
+                  }}
+                  autoFocus
+                />
               )}
             </FormField>
             <FormField label="Contraseña" required error={error}>
@@ -147,7 +159,10 @@ export function LoginPage() {
                     required
                     autoComplete="current-password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setError(null)
+                    }}
                     className="pr-11"
                   />
                   <button
@@ -162,6 +177,17 @@ export function LoginPage() {
                 </div>
               )}
             </FormField>
+            {error === INVALID_CREDENTIALS_MESSAGE && (
+              // There is no self-service reset yet: the guide says how to get a new password.
+              <a
+                href={helpHref('/help/getting-started/switch-account#si-olvidaste-tu-contrasena')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="-mt-2 inline-block text-sm text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline"
+              >
+                ¿Olvidaste tu contraseña?
+              </a>
+            )}
             <Button type="submit" variant="primary" size="lg" icon={LogIn} loading={submitting} className="w-full">
               Iniciar sesión
             </Button>

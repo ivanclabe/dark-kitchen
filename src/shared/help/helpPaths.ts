@@ -19,6 +19,7 @@ export const HELP_PATHS: Record<string, string> = {
   "roles": "/help/intro/roles",
   "what-is-quanela": "/help/intro/what-is-quanela",
   "inventory-deduction": "/help/inventory/inventory-deduction",
+  "invoice-import": "/help/inventory/invoice-import",
   "purchases": "/help/inventory/purchases",
   "stock": "/help/inventory/stock",
   "suppliers": "/help/inventory/suppliers",

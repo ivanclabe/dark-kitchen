@@ -12,7 +12,7 @@ questions:
   - ¿Por dónde empiezo?
 keywords: [configurar, empezar, preparar, primeros pasos, checklist]
 related: [dishes-and-menu, recipes-and-cost, kitchen-hours, invite-team, first-order]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 3
 ---
 
@@ -21,7 +21,7 @@ Para que el primer pedido funcione de punta a punta, deja lista tu cuenta en est
 1. **Insumos.** En **Abastecimiento → Stock**, toca **Nuevo** y crea lo que usas para cocinar, con su unidad base y su stock mínimo. Ver [Stock e insumos bajo el mínimo](help:stock).
 2. **Stock inicial.** Registra una compra con lo que tienes en bodega y confírmala: así entra el inventario. Ver [Registrar una compra](help:purchases).
 3. **Platos.** En **Catálogo**, toca **Nuevo** y crea cada plato con su precio. Ver [Platos y menú del día](help:dishes-and-menu).
-4. **Recetas.** En cada plato, toca **Crear receta** y agrega sus insumos. **Un plato sin receta no se puede confirmar en un pedido.** Ver [Recetas y costo de un plato](help:recipes-and-cost).
+4. **Recetas.** En cada plato, toca **Crear receta** y agrega sus insumos. **Un plato que descuenta inventario y no tiene receta no se puede confirmar en un pedido.** Si un plato no usa tus insumos (una bebida que compras lista, por ejemplo), apaga **Descuenta inventario** en el plato y no necesita receta. Ver [Recetas y costo de un plato](help:recipes-and-cost).
 5. **Horario y alertas de la cocina.** En **Operación → Cocina → ⋯ → Configuración de cocina**. Ver [Horario y tiempos objetivo](help:kitchen-hours).
 6. **Tu equipo.** En **Usuarios → Crear usuario**. Ver [Invitar a tu equipo](help:invite-team).
 7. **Domiciliarios**, si haces envíos: **Operación → ⋯ → Domiciliarios**. Ver [Despachar y entregar](help:dispatch-deliver).

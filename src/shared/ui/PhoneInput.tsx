@@ -44,7 +44,8 @@ export function PhoneInput({
   const selected = PHONE_COUNTRIES.find((c) => c.code === country) ?? PHONE_COUNTRIES[0]
   return (
     <div className={clsx('mt-1.5 flex min-w-0 gap-2', className)}>
-      <label className="relative shrink-0">
+      {/* Fixed narrow width for the country (flag, code and arrow); the number takes the rest. */}
+      <label className="relative w-24 shrink-0">
         <span className="sr-only">País del teléfono</span>
         <select
           value={country}
@@ -53,7 +54,7 @@ export function PhoneInput({
             setCountry(e.target.value)
             emit(e.target.value, text)
           }}
-          className={clsx(inputClass, '!mt-0 w-[6.75rem] cursor-pointer appearance-none pr-2 pl-3 tabular-nums')}
+          className={clsx(inputClass, '!mt-0 cursor-pointer appearance-none pr-2 pl-2.5 tabular-nums')}
           aria-label={`País: ${selected.label}`}
         >
           {PHONE_COUNTRIES.map((c) => (
@@ -63,7 +64,7 @@ export function PhoneInput({
           ))}
         </select>
         {/* The closed select shows the flag and the code only. */}
-        <span className="pointer-events-none absolute inset-px flex items-center gap-1.5 rounded-[7px] bg-neutral-900 pr-2 pl-3 text-sm text-neutral-100" aria-hidden>
+        <span className="pointer-events-none absolute inset-px flex items-center gap-1.5 rounded-[7px] bg-neutral-900 pr-2 pl-2.5 text-sm text-neutral-100" aria-hidden>
           <span>{selected.flag}</span>
           <span className="tabular-nums">+{selected.dial}</span>
           <ChevronDown size={14} className="ml-auto text-neutral-500" />

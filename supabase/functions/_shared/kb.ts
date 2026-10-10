@@ -78,7 +78,7 @@ export const KB: KbArticle[] = [
       "El pedido, el centro de todo",
       "Glosario rápido"
     ],
-    "body": "El negocio y sus cuentas Negocio : tu empresa en Quanela. Tiene su propia dirección web, con un código de 6 caracteres (por ejemplo fr3rk6.quanela.com ). Por ahí entra todo tu equipo. Cuenta : cada establecimiento del negocio (un local, una cocina). Los pedidos, el inventario, los clientes y los reportes son de cada cuenta : lo de una no se mezcla con lo de otra. Si tienes varias cuentas, cambias entre ellas desde el indicador de arriba («Cuenta · ROL ▾»). Ver Entrar a Quanela y cambiar de cuenta. Personas y roles Cada persona entra con su propio usuario (correo y contraseña, o el método con el que creó el negocio). En cada cuenta tiene uno o varios roles , como CAJA o COCINA. El rol decide qué módulos ve y qué puede hacer. Ver Qué ve cada rol. Quien creó el negocio es el SUPER ADMIN : tiene acceso a todas las cuentas. Es intransferible. El pedido, el centro de todo Un pedido pasa por estos estados: Por confirmar → En cola → Preparando → Listo → En ruta → Entregado , o Cancelado . Ver Estados del pedido. Al confirmar , Quanela reserva los insumos de las recetas; al marcar cada plato Listo , los descuenta del inventario. El pago es aparte: un pedido puede estar Preparando y Pagado , o Preparando y Pago pendiente . Glosario rápido Palabra Qué es --- Insumo Lo que compras para cocinar (arroz, pollo, empaques) Receta Los insumos y cantidades de un plato; calcula su costo Merma Insumo que se perdió (vencido, dañado) Cartera Lo que te deben tus clientes Domiciliario Quien entrega los pedidos"
+    "body": "El negocio y sus cuentas Negocio : tu empresa en Quanela. Tiene su propia dirección web, con un código de 6 caracteres (por ejemplo fr3rk6.quanela.com ). Por ahí entra todo tu equipo. Cuenta : cada establecimiento del negocio (un local, una cocina). Los pedidos, el inventario, los clientes y los reportes son de cada cuenta : lo de una no se mezcla con lo de otra. Si tienes varias cuentas, cambias entre ellas desde el indicador de arriba («Cuenta · ROL ▾»). Ver Entrar a Quanela y cambiar de cuenta. Personas y roles Cada persona entra con su propio usuario (correo y contraseña, o el método con el que creó el negocio). En cada cuenta tiene uno o varios roles , como CAJA o COCINA. El rol decide qué módulos ve y qué puede hacer. Ver Qué ve cada rol. Quien creó el negocio es el SUPER ADMIN : tiene acceso a todas las cuentas. Es intransferible. El pedido, el centro de todo Un pedido pasa por estos estados: Por confirmar → En cola → Preparando → Listo → En ruta → Entregado , o Cancelado . Ver Estados del pedido. Al confirmar , Quanela reserva los insumos de las recetas; al marcar cada plato Listo , los descuenta del inventario. Los platos con Descuenta inventario apagado se venden sin receta y no mueven el inventario. El pago es aparte: un pedido puede estar Preparando y Pagado , o Preparando y Pago pendiente . Glosario rápido Palabra Qué es --- Insumo Lo que compras para cocinar (arroz, pollo, empaques) Receta Los insumos y cantidades de un plato; calcula su costo Merma Insumo que se perdió (vencido, dañado) Cartera Lo que te deben tus clientes Domiciliario Quien entrega los pedidos"
   },
   {
     "id": "confirm-cancel",
@@ -121,7 +121,7 @@ export const KB: KbArticle[] = [
       "Confirmar",
       "Cancelar"
     ],
-    "body": "Confirmar Abre el pedido (o usa el botón Confirmar de su tarjeta en Por confirmar ). Toca Confirmar pedido → Sí, confirmar . El pedido pasa a En cola y aparece en la pantalla de la cocina. Al confirmar, Quanela reserva los insumos de todas las recetas: bajan del stock disponible, pero todavía no salen de la bodega. Cuidado: la confirmación se rechaza si falta stock de algún insumo, si un plato no tiene receta activa o si el pedido no tiene platos . Revisa el mensaje: dice qué falta. Cancelar Abre el pedido y toca Cancelar pedido (en Cocina también está en el detalle). Escribe el Motivo (opcional, pero ayuda) y toca Sí, cancelar . Lo que pasa con el inventario: Lo reservado se libera y vuelve a estar disponible. Si algún plato ya estaba listo (sus insumos ya se habían descontado), se registra una devolución y el pedido queda marcado Revisar , para que alguien verifique qué pasó con esa comida. Un pedido Entregado o Cancelado ya no se puede cancelar. La cancelación no se puede deshacer . Bueno saber: cancelar no devuelve el dinero de los pagos registrados. Si hay que corregir un pago, ver Registrar y anular pagos."
+    "body": "Confirmar Abre el pedido (o usa el botón Confirmar de su tarjeta en Por confirmar ). Toca Confirmar pedido → Sí, confirmar . El pedido pasa a En cola y aparece en la pantalla de la cocina. Al confirmar, Quanela reserva los insumos de las recetas: bajan del stock disponible, pero todavía no salen de la bodega. Los platos que no usan inventario no reservan nada. Cuidado: la confirmación se rechaza si falta stock de algún insumo, si un plato que descuenta inventario no tiene receta o si el pedido no tiene platos . Revisa el mensaje: dice qué falta y cuál es el plato. Cancelar Abre el pedido y toca Cancelar pedido (en Cocina también está en el detalle). Escribe el Motivo (opcional, pero ayuda) y toca Sí, cancelar . Lo que pasa con el inventario: Lo reservado se libera y vuelve a estar disponible. Si algún plato ya estaba listo (sus insumos ya se habían descontado), se registra una devolución y el pedido queda marcado Revisar , para que alguien verifique qué pasó con esa comida. Un pedido Entregado o Cancelado ya no se puede cancelar. La cancelación no se puede deshacer . Bueno saber: cancelar no devuelve el dinero de los pagos registrados. Si hay que corregir un pago, ver Registrar y anular pagos."
   },
   {
     "id": "copilot-limits",
@@ -383,12 +383,17 @@ export const KB: KbArticle[] = [
       "¿Cómo armo el menú del día?",
       "¿Cómo pongo un plato en promoción?",
       "¿Cómo marco un plato como agotado?",
-      "¿Cómo copio el menú de la semana pasada?"
+      "¿Cómo copio el menú de la semana pasada?",
+      "¿Puedo vender un plato sin receta?"
     ],
     "keywords": [
       "plato",
       "producto",
       "precio",
+      "sin receta",
+      "descuenta inventario",
+      "no usa inventario",
+      "bebidas",
       "categoría",
       "menú",
       "planificador",
@@ -401,16 +406,18 @@ export const KB: KbArticle[] = [
     "steps": [
       "Abre Catálogo y, en Catálogo de platos , toca Nuevo .",
       "Escribe el Nombre y el Precio de venta (obligatorios). Opcional: Código , Categoría (o crea una nueva ahí mismo), Descripción y fotos.",
+      "Deja encendido Descuenta inventario si el plato se prepara con tus insumos. Apágalo si no los controlas en el inventario (por ejemplo, una gaseosa que compras lista).",
       "Toca Crear plato .",
-      "Ahora crea su receta: toca el lápiz del plato ( Editar plato ) → Crear receta . Ver Recetas y costo de un plato."
+      "Si descuenta inventario, crea su receta: toca el lápiz del plato ( Editar plato ) → Crear receta . Ver Recetas y costo de un plato."
     ],
     "headings": [
       "Crear un plato",
+      "Platos sin receta",
       "Armar el menú de cada día",
       "Reglas de un plato en un día",
       "Copiar la planificación"
     ],
-    "body": "Crear un plato Abre Catálogo y, en Catálogo de platos , toca Nuevo . Escribe el Nombre y el Precio de venta (obligatorios). Opcional: Código , Categoría (o crea una nueva ahí mismo), Descripción y fotos. Toca Crear plato . Ahora crea su receta: toca el lápiz del plato ( Editar plato ) → Crear receta . Ver Recetas y costo de un plato. Para cambiar el precio o el nombre, toca Editar plato , cambia lo que necesites y toca Guardar cambios . Ahí también puedes Desactivar un plato: deja de salir al crear pedidos, pero no se borra. Cuidado: un plato sin receta muestra Sin receta y no se puede confirmar en un pedido. Armar el menú de cada día Elige Semana o Mes arriba. Arrastra un plato de la lista a un día, o selecciona el día y toca + en el plato para agregarlo ahí. Para quitarlo, toca la × del plato en ese día. Reglas de un plato en un día Toca el plato dentro del día. Puedes: Marcarlo agotado / inactivo ese día (el botón cambia entre Disponible este día y Marcado agotado / inactivo ). Darle un horario ( Desde / Hasta ). Ponerle un Precio promocional (vacío = precio normal). Fijar un Límite de unidades o Disponible hasta agotar existencias . Toca Guardar cambios . Para repetir esas reglas en los días siguientes, elige la fecha en Aplicar estas mismas reglas también hasta… y toca Aplicar . Copiar la planificación Toca Copiar , elige Una semana completa o Un día puntual , el origen y el destino. Cuidado: copiar reemplaza todo lo que haya en el destino. No crea platos ni recetas: solo repite la asignación al calendario. Bueno saber: al crear un pedido aparecen todos los platos activos . El calendario es tu plan del menú. Si manejas varias cuentas, Platos compartidos (arriba, para quien tiene permiso) mantiene platos con su receta en un solo lugar para usarlos en todas."
+    "body": "Crear un plato Abre Catálogo y, en Catálogo de platos , toca Nuevo . Escribe el Nombre y el Precio de venta (obligatorios). Opcional: Código , Categoría (o crea una nueva ahí mismo), Descripción y fotos. Deja encendido Descuenta inventario si el plato se prepara con tus insumos. Apágalo si no los controlas en el inventario (por ejemplo, una gaseosa que compras lista). Toca Crear plato . Si descuenta inventario, crea su receta: toca el lápiz del plato ( Editar plato ) → Crear receta . Ver Recetas y costo de un plato. Para cambiar el precio o el nombre, toca Editar plato , cambia lo que necesites y toca Guardar cambios . Ahí también puedes Desactivar un plato: deja de salir al crear pedidos, pero no se borra. Platos sin receta Un plato con Descuenta inventario apagado se vende sin receta : al confirmar el pedido no reserva nada y, cuando está listo, no descuenta nada. En el catálogo dice No usa inventario . Si le pones receta, solo sirve para ver su costo. Cuidado: un plato que descuenta inventario y no tiene receta muestra Sin receta (en ámbar) y no se puede confirmar en un pedido. Créale la receta o apaga Descuenta inventario . Bueno saber: en un plato de Platos compartidos , esta opción la define el plato compartido. Armar el menú de cada día Elige Semana o Mes arriba. Arrastra un plato de la lista a un día, o selecciona el día y toca + en el plato para agregarlo ahí. Para quitarlo, toca la × del plato en ese día. Reglas de un plato en un día Toca el plato dentro del día. Puedes: Marcarlo agotado / inactivo ese día (el botón cambia entre Disponible este día y Marcado agotado / inactivo ). Darle un horario ( Desde / Hasta ). Ponerle un Precio promocional (vacío = precio normal). Fijar un Límite de unidades o Disponible hasta agotar existencias . Toca Guardar cambios . Para repetir esas reglas en los días siguientes, elige la fecha en Aplicar estas mismas reglas también hasta… y toca Aplicar . Copiar la planificación Toca Copiar , elige Una semana completa o Un día puntual , el origen y el destino. Cuidado: copiar reemplaza todo lo que haya en el destino. No crea platos ni recetas: solo repite la asignación al calendario. Bueno saber: al crear un pedido aparecen todos los platos activos . El calendario es tu plan del menú. Si manejas varias cuentas, Platos compartidos (arriba, para quien tiene permiso) mantiene platos con su receta en un solo lugar para usarlos en todas."
   },
   {
     "id": "dispatch-deliver",
@@ -504,7 +511,7 @@ export const KB: KbArticle[] = [
       "Copilot dice que llegué al límite",
       "No veo «Oye Quanela»"
     ],
-    "body": "Pedidos No puedo confirmar un pedido Pasa si falta stock de algún insumo, si un plato no tiene receta o si el pedido no tiene platos . El mensaje dice qué falta. Ver Confirmar y cancelar un pedido. ¿Dónde quedaron Pedidos y Cocina? Ahora están juntos en Operación , con las vistas Tablero, Cocina, Despacho y Lista. Ver El Centro de operaciones. ¿Cómo registro que un cliente pagó? Abre el pedido y, en Pago , toca Registrar pago . Ver Registrar y anular pagos. Cancelé un pedido y el stock no volvió Si algún plato ya estaba Listo , sus insumos ya se usaron: se registra una devolución y el pedido queda para Revisar . Ver Cómo se descuenta el inventario. Inventario ¿Por qué no puedo escribir el stock directamente? Para que siempre cuadre: el stock entra con las compras, sale con los platos listos y se corrige con Merma o Ajuste . Ver Mermas y ajustes. Compré algo y no aparece en el stock La compra debe estar confirmada : en borrador no suma. Ver Registrar una compra. Acceso y cuenta Olvidé mi contraseña Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace (por WhatsApp o correo) para que crees una contraseña nueva; nadie más la ve. Si entraste con Google, Instagram o tu teléfono, no necesitas contraseña: usa ese mismo botón. Ver Entrar a Quanela y cambiar de cuenta o de rol. Mi enlace de activación venció Pídele a quien administra la cuenta que abra tu usuario y toque Generar enlace nuevo . Ver Invitar a tu equipo. No veo un módulo en el menú Cada rol ve solo lo que puede usar. Si tienes varios roles, cambia de rol en el menú de tu avatar. Si te falta algo, pídele a quien administra que revise tu rol. Ver Qué ve cada rol. ¿Puedo usar Quanela en el celular o la tableta? Sí, desde el navegador. En el celular, el menú se abre con ☰. Para la cocina, una tableta con la vista Cocina funciona muy bien. Copilot y voz Copilot dice que llegué al límite Cada cuenta tiene un cupo de preguntas por día según su plan. Ver Límites de Copilot. No veo «Oye Quanela» La voz debe estar activa en tu cuenta y en tu rol. Ver «Oye Quanela». ¿No encontraste tu respuesta? Usa el buscador de arriba o, dentro de Quanela, pregúntale a Copilot."
+    "body": "Pedidos No puedo confirmar un pedido Pasa si falta stock de algún insumo, si un plato que descuenta inventario no tiene receta o si el pedido no tiene platos . El mensaje dice qué falta. Si el plato no usa tus insumos, apaga Descuenta inventario en el plato y se vende sin receta. Ver Confirmar y cancelar un pedido. ¿Dónde quedaron Pedidos y Cocina? Ahora están juntos en Operación , con las vistas Tablero, Cocina, Despacho y Lista. Ver El Centro de operaciones. ¿Cómo registro que un cliente pagó? Abre el pedido y, en Pago , toca Registrar pago . Ver Registrar y anular pagos. Cancelé un pedido y el stock no volvió Si algún plato ya estaba Listo , sus insumos ya se usaron: se registra una devolución y el pedido queda para Revisar . Ver Cómo se descuenta el inventario. Inventario ¿Por qué no puedo escribir el stock directamente? Para que siempre cuadre: el stock entra con las compras, sale con los platos listos y se corrige con Merma o Ajuste . Ver Mermas y ajustes. Compré algo y no aparece en el stock La compra debe estar confirmada : en borrador no suma. Ver Registrar una compra. Acceso y cuenta Olvidé mi contraseña Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace (por WhatsApp o correo) para que crees una contraseña nueva; nadie más la ve. Si entraste con Google, Instagram o tu teléfono, no necesitas contraseña: usa ese mismo botón. Ver Entrar a Quanela y cambiar de cuenta o de rol. Mi enlace de activación venció Pídele a quien administra la cuenta que abra tu usuario y toque Generar enlace nuevo . Ver Invitar a tu equipo. No veo un módulo en el menú Cada rol ve solo lo que puede usar. Si tienes varios roles, cambia de rol en el menú de tu avatar. Si te falta algo, pídele a quien administra que revise tu rol. Ver Qué ve cada rol. ¿Puedo usar Quanela en el celular o la tableta? Sí, desde el navegador. En el celular, el menú se abre con ☰. Para la cocina, una tableta con la vista Cocina funciona muy bien. Copilot y voz Copilot dice que llegué al límite Cada cuenta tiene un cupo de preguntas por día según su plan. Ver Límites de Copilot. No veo «Oye Quanela» La voz debe estar activa en tu cuenta y en tu rol. Ver «Oye Quanela». ¿No encontraste tu respuesta? Usa el buscador de arriba o, dentro de Quanela, pregúntale a Copilot."
   },
   {
     "id": "first-order",
@@ -644,7 +651,7 @@ export const KB: KbArticle[] = [
     "section": "inventory",
     "url": "/help/inventory/inventory-deduction",
     "title": "Cómo se descuenta el inventario",
-    "summary": "Al confirmar un pedido se reservan los insumos de sus recetas; al marcar cada plato Listo se descuentan; al cancelar se libera lo reservado o se registra una devolución.",
+    "summary": "Al confirmar un pedido se reservan los insumos de sus recetas; al marcar cada plato Listo se descuentan; al cancelar se libera lo reservado o se registra una devolución. Los platos que no usan inventario no mueven nada.",
     "audience": [
       "owner",
       "admin",
@@ -681,7 +688,7 @@ export const KB: KbArticle[] = [
       "Disponible y reservado",
       "Costo promedio"
     ],
-    "body": "Quanela mueve el inventario solo, siguiendo al pedido: Momento Qué pasa con los insumos --- Confirmar el pedido Se reservan los de todas las recetas: baja el stock disponible , pero siguen en bodega. Si falta algo, la confirmación se rechaza Iniciar la preparación Nada Marcar un plato Listo Se descuentan los de ese plato (movimiento Consumo , al costo promedio) Cancelar Lo reservado se libera . Si un plato ya estaba listo, se registra una Devolución y el pedido queda para Revisar Confirmar una compra Entra stock y se recalcula el costo promedio Merma / Ajuste Sale o se corrige lo que registres Disponible y reservado En la ficha del insumo, Reservado es lo apartado para pedidos confirmados que aún no se terminan. El stock disponible es lo que queda libre para nuevos pedidos. Costo promedio Cada compra confirmada recalcula el costo promedio mezclando lo que había con lo que entró. Ese costo es el que usan las recetas, el consumo y los reportes de rentabilidad. Bueno saber: por eso es clave que cada plato tenga receta : sin receta no se puede confirmar en un pedido, y sus insumos no se descontarían. Ver Recetas y costo de un plato."
+    "body": "Quanela mueve el inventario solo, siguiendo al pedido: Momento Qué pasa con los insumos --- Confirmar el pedido Se reservan los de las recetas de los platos que descuentan inventario: baja el stock disponible , pero siguen en bodega. Si falta algo, la confirmación se rechaza Iniciar la preparación Nada Marcar un plato Listo Se descuentan los de ese plato (movimiento Consumo , al costo promedio) Cancelar Lo reservado se libera . Si un plato ya estaba listo, se registra una Devolución y el pedido queda para Revisar Confirmar una compra Entra stock y se recalcula el costo promedio Merma / Ajuste Sale o se corrige lo que registres Disponible y reservado En la ficha del insumo, Reservado es lo apartado para pedidos confirmados que aún no se terminan. El stock disponible es lo que queda libre para nuevos pedidos. Costo promedio Cada compra confirmada recalcula el costo promedio mezclando lo que había con lo que entró. Ese costo es el que usan las recetas, el consumo y los reportes de rentabilidad. Bueno saber: por eso es clave que cada plato que se prepara con tus insumos tenga receta : si Descuenta inventario está encendido y no tiene receta, no se puede confirmar en un pedido. Un plato con Descuenta inventario apagado se vende sin receta y nunca reserva ni descuenta insumos. Ver Recetas y costo de un plato."
   },
   {
     "id": "invite-team",
@@ -727,6 +734,53 @@ export const KB: KbArticle[] = [
     ],
     "headings": [],
     "body": "En el menú, abre Usuarios y toca Crear usuario . Escribe el Nombre y el Correo de la persona. En Roles en esta cuenta , marca las cuentas donde trabaja y elige su rol en cada una. Si tiene varios, elige con cuál Entra como . Toca Crear usuario . Aparece Usuario creado con un enlace. Tócalo en Copiar y envíaselo por WhatsApp o correo. Vence en 7 días y por seguridad no se vuelve a mostrar. La persona abre el enlace, crea su contraseña y entra. Bueno saber: tú nunca ves ni defines contraseñas. Si el enlace se pierde o vence, abre el usuario y toca Generar enlace nuevo (el anterior deja de valer). Mientras no se active, el usuario aparece como Pendiente . Más sobre roles y permisos en Usuarios y roles."
+  },
+  {
+    "id": "invoice-import",
+    "section": "inventory",
+    "url": "/help/inventory/invoice-import",
+    "title": "Importar una compra desde una factura",
+    "summary": "Sube la foto o el PDF de la factura y Quanela lee el proveedor, las líneas y los precios. Tú revisas todo, y la compra queda en borrador o confirmada.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager",
+      "inventory"
+    ],
+    "permissions": [
+      "purchasing.create",
+      "invoices.upload"
+    ],
+    "appPath": "/supply/compras/importar",
+    "questions": [
+      "¿Cómo importo una factura de compra?",
+      "¿Puedo subir la foto de la factura para crear la compra?",
+      "¿Quanela lee las facturas?",
+      "¿Por qué un ítem de la factura no se asoció a mi insumo?",
+      "¿Qué pasa si subo la misma factura dos veces?"
+    ],
+    "keywords": [
+      "importar factura",
+      "foto de la factura",
+      "pdf",
+      "leer factura",
+      "escanear",
+      "ocr",
+      "ia",
+      "compra automática",
+      "asociar insumos",
+      "por revisar"
+    ],
+    "steps": [
+      "Arrastra el archivo, toca Elegir archivo o, en el celular, Tomar foto . Sirve una foto (JPG, PNG o WebP) o un PDF de hasta 10 MB.",
+      "Quanela la sube y la lee con IA. Tarda entre 10 y 40 segundos. Puedes salir: la factura queda en Compras → Por revisar ."
+    ],
+    "headings": [
+      "Subir la factura",
+      "Revisar lo que se leyó",
+      "Guardar"
+    ],
+    "body": "En Abastecimiento → Compras , toca Nueva → Importar desde factura . También puedes soltar la factura sobre la lista de Compras. Subir la factura Arrastra el archivo, toca Elegir archivo o, en el celular, Tomar foto . Sirve una foto (JPG, PNG o WebP) o un PDF de hasta 10 MB. Quanela la sube y la lee con IA. Tarda entre 10 y 40 segundos. Puedes salir: la factura queda en Compras → Por revisar . Bueno saber: la factura se envía al proveedor de IA de Quanela solo para leerla, y queda guardada, privada, como adjunto de la compra. Cada lectura cuenta en el cupo diario de IA de tu plan. Revisar lo que se leyó A la izquierda ves la factura (toca la foto para acercarla). En el celular, ábrela con Ver la factura . A la derecha está lo que se leyó, listo para corregir: Proveedor: Quanela lo busca por NIT (con o sin dígito de verificación) y, si no hay NIT, por nombre . Dice por qué lo eligió: «Mismo NIT», «Mismo nombre» o «Parecido 82 %». Toca Cambiar para elegir otro, o Crear proveedor con los datos de la factura . Factura: número, fecha, IVA y notas. Lo que se leyó con dudas lo dice. Líneas: cada línea muestra el texto de la factura y el insumo que le corresponde. Si Quanela está segura (lo asociaste antes, el mismo código o el mismo nombre), ya viene elegido. Si no, toca una de las Sugerencias , busca el insumo, o toca Crear insumo nuevo . Revisa cantidad , unidad y costo . La unidad solo ofrece las que tienen sentido para ese insumo. Si la unidad es caja , bolsa o paquete , Quanela pregunta ¿Cuánto trae? (por ejemplo, 12.000 g). Se guarda en el insumo para las próximas compras. Ignorar deja fuera una línea que no es un insumo (domicilio, bolsas). En ámbar : lo leído con dudas, una cantidad × costo que no da el total de la línea o un precio muy distinto al costo promedio del insumo. Abajo, el cuadre : la suma de las líneas frente al subtotal de la factura. Si no cuadra, revisa cantidades y costos. Guardar Guardar borrador: crea la compra en borrador. No mueve el inventario; la confirmas después desde su detalle, como cualquier compra. Guardar y confirmar: la crea y la confirma de una vez. Entra el inventario y se actualiza el costo promedio. Todo se guarda junto o no se guarda nada. Si pediste crear un proveedor o un insumo que ya existe (mismo NIT, mismo código o mismo nombre), Quanela usa el existente y no lo duplica. Bueno saber: Quanela aprende . Lo que asocies («TOMATE CHONTO X KG» es tu «Tomate») llega ya asociado en la próxima factura de ese proveedor. Si n"
   },
   {
     "id": "kitchen-hours",
@@ -1185,7 +1239,7 @@ export const KB: KbArticle[] = [
       "cargar factura"
     ],
     "steps": [
-      "Abre Abastecimiento → Compras y toca Nueva .",
+      "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura.",
       "Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador .",
       "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea .",
       "Repite con cada producto de la factura. Para quitar una línea, toca Quitar .",
@@ -1193,7 +1247,7 @@ export const KB: KbArticle[] = [
       "Revisa el total y toca Confirmar compra → Sí, confirmar ."
     ],
     "headings": [],
-    "body": "Abre Abastecimiento → Compras y toca Nueva . Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra → Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
+    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra → Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
   },
   {
     "id": "quanela-consumer",
@@ -1250,7 +1304,7 @@ export const KB: KbArticle[] = [
     "section": "catalog",
     "url": "/help/catalog/recipes-and-cost",
     "title": "Recetas y costo de un plato",
-    "summary": "La receta dice qué insumos lleva un plato y en qué cantidad; con ella Quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio se guarda como una versión nueva.",
+    "summary": "La receta dice qué insumos lleva un plato y cuánto; con ella Quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio es una versión nueva. Si el plato no usa inventario, no la necesita.",
     "audience": [
       "owner",
       "admin",
@@ -1270,6 +1324,9 @@ export const KB: KbArticle[] = [
     ],
     "keywords": [
       "receta",
+      "sin receta",
+      "descuenta inventario",
+      "no usa inventario",
       "ingredientes",
       "insumos",
       "costo",
@@ -1288,7 +1345,7 @@ export const KB: KbArticle[] = [
       "Cómo se calcula el costo",
       "Versiones"
     ],
-    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código y escribe la Cantidad en su unidad base (por ejemplo, gramos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: sin receta activa, un plato no se puede confirmar en un pedido y sus insumos no se descontarían. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
+    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código y escribe la Cantidad en su unidad base (por ejemplo, gramos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: si el plato tiene Descuenta inventario encendido y no tiene receta, no se puede confirmar en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga Descuenta inventario en Editar plato . Bueno saber: un plato que no usa inventario se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
   },
   {
     "id": "register-payment",
@@ -1372,6 +1429,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "10 de octubre de 2026",
       "9 de octubre de 2026",
       "8 de octubre de 2026",
       "7 de octubre de 2026",
@@ -1381,7 +1439,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Quanela Consumer usa los datos de tu cuenta. El nombre, la dirección pública y el tipo de cocina que ven los clientes son los de la cuenta: se cambian en un solo lugar. Tipo de cocina ahora está en Configuración → General → Esta cuenta (si no eliges, usa la categoría del negocio). Quanela Consumer es un módulo. Consumer , en el menú lateral, reúne lo que ven los clientes en la app de Quanela Consumer: un Resumen (estado, qué te falta para publicar y cómo te ven), el Perfil del negocio y los Platos , con buscador, filtros y publicar varios a la vez. Antes estaba en Configuración. Ver Publicar tu negocio en Quanela Consumer. Centro de operaciones más estable. Las vistas (Tablero, Cocina, Despacho y Lista) están en su propia barra, y nada salta al cambiar de una a otra. Clientes empresa y preferenciales. Registra empresas con nombre comercial, razón social, NIT y persona de contacto (y un documento opcional para personas). Marca a tus clientes preferenciales con una ⭐ y su motivo. Al tomar un pedido ves lo que no le gusta al cliente, su dieta, sus favoritos y qué recomendarle. En la lista, busca por NIT y filtra empresas o preferenciales. Ver Clientes y saldos pendientes. Movimientos de inventario con unidad. En Abastecimiento, cada movimiento dice su unidad («+2.000 g») y el costo por unidad. de octubre de 2026 Eliges la cuenta al entrar. Si tienes varias cuentas, después de iniciar sesión ves Tus cuentas para elegir con cuál trabajar; la última que usaste va primera. Ver Entrar a Quanela y cambiar de cuenta o de rol. de octubre de 2026 «Oye Quanela» responde más rápido. Cierra tu pregunta apenas terminas de hablar, te escucha desde el tono y empieza a decir la respuesta mientras el detalle sigue llegando. Además, puedes volver a decir «Oye Quanela» justo después de una respuesta. En Voz en este equipo ves si la voz es instalada o en línea. Ver «Oye Quanela». de octubre de 2026 Ficha 360° del cliente. En una sola pantalla: lo que más pide y cada cuánto, sus preferencias (lo que le gusta y lo que no), sus direcciones con historial, sus quejas con seguimiento, qué recomendarle y su saldo. Ahora el cliente tiene correo y se busca también por correo. Ver Clientes. Pesos, teléfonos y correos más claros. Los precios y montos se escriben con puntos de miles ($ 1.250.000 COP) y los costos por gramo muestran sus centavos ($3,25). Los teléfonos llevan el país (🇨🇴 +57) y se ven así: +57 300 123 4567. Los correos se revisan antes de guardar. Cada ca"
+    "body": "de octubre de 2026 Importar una compra desde la factura. En Compras → Nueva → Importar desde factura (o soltando la factura sobre la lista), sube la foto o el PDF. Quanela lee el proveedor, el NIT, las líneas y los precios, y busca tus proveedores e insumos. Tú revisas y corriges todo antes de guardar, en borrador o confirmada. Aprende cómo escribe cada proveedor tus insumos y no duplica proveedores ni insumos. Ver Importar una compra desde una factura. Compras más seguras. Una compra solo se confirma con Confirmar compra (y nunca sin líneas), el costo promedio queda bien cuando un insumo se repite en la factura y no puede haber dos proveedores con el mismo NIT. Platos sin receta. Cada plato tiene Descuenta inventario . Apágalo en lo que no controlas en el inventario (por ejemplo, bebidas que compras listas): se vende sin receta y nunca reserva ni descuenta insumos. En el catálogo dice No usa inventario . Si un plato que descuenta inventario no tiene receta, el pedido se sigue rechazando y el mensaje dice cuál es. Ver Platos y menú del día. de octubre de 2026 Quanela Consumer usa los datos de tu cuenta. El nombre, la dirección pública y el tipo de cocina que ven los clientes son los de la cuenta: se cambian en un solo lugar. Tipo de cocina ahora está en Configuración → General → Esta cuenta (si no eliges, usa la categoría del negocio). Quanela Consumer es un módulo. Consumer , en el menú lateral, reúne lo que ven los clientes en la app de Quanela Consumer: un Resumen (estado, qué te falta para publicar y cómo te ven), el Perfil del negocio y los Platos , con buscador, filtros y publicar varios a la vez. Antes estaba en Configuración. Ver Publicar tu negocio en Quanela Consumer. Centro de operaciones más estable. Las vistas (Tablero, Cocina, Despacho y Lista) están en su propia barra, y nada salta al cambiar de una a otra. Clientes empresa y preferenciales. Registra empresas con nombre comercial, razón social, NIT y persona de contacto (y un documento opcional para personas). Marca a tus clientes preferenciales con una ⭐ y su motivo. Al tomar un pedido ves lo que no le gusta al cliente, su dieta, sus favoritos y qué recomendarle. En la lista, busca por NIT y filtra empresas o preferenciales. Ver Clientes y saldos pendientes. Movimientos de inventario con unidad. En Abastecimiento, cada movimiento dice su unidad («+2.000 g») y el costo por unidad. de octubre de 2026 Eliges la cuenta al entrar. Si tienes varias cuentas, después de iniciar sesión ves Tus cuent"
   },
   {
     "id": "roles",
@@ -1566,13 +1624,13 @@ export const KB: KbArticle[] = [
       "Insumos. En Abastecimiento → Stock , toca Nuevo y crea lo que usas para cocinar, con su unidad base y su stock mínimo. Ver Stock e insumos bajo el mínimo.",
       "Stock inicial. Registra una compra con lo que tienes en bodega y confírmala: así entra el inventario. Ver Registrar una compra.",
       "Platos. En Catálogo , toca Nuevo y crea cada plato con su precio. Ver Platos y menú del día.",
-      "Recetas. En cada plato, toca Crear receta y agrega sus insumos. Un plato sin receta no se puede confirmar en un pedido. Ver Recetas y costo de un plato.",
+      "Recetas. En cada plato, toca Crear receta y agrega sus insumos. Un plato que descuenta inventario y no tiene receta no se puede confirmar en un pedido. Si un plato no usa tus insumos (una bebida que compras lista, por ejemplo), apaga Descuenta inventario en el plato y no necesita receta. Ver Recetas y costo de un plato.",
       "Horario y alertas de la cocina. En Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario y tiempos objetivo.",
       "Tu equipo. En Usuarios → Crear usuario . Ver Invitar a tu equipo.",
       "Domiciliarios , si haces envíos: Operación → ⋯ → Domiciliarios . Ver Despachar y entregar."
     ],
     "headings": [],
-    "body": "Para que el primer pedido funcione de punta a punta, deja lista tu cuenta en este orden: Insumos. En Abastecimiento → Stock , toca Nuevo y crea lo que usas para cocinar, con su unidad base y su stock mínimo. Ver Stock e insumos bajo el mínimo. Stock inicial. Registra una compra con lo que tienes en bodega y confírmala: así entra el inventario. Ver Registrar una compra. Platos. En Catálogo , toca Nuevo y crea cada plato con su precio. Ver Platos y menú del día. Recetas. En cada plato, toca Crear receta y agrega sus insumos. Un plato sin receta no se puede confirmar en un pedido. Ver Recetas y costo de un plato. Horario y alertas de la cocina. En Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario y tiempos objetivo. Tu equipo. En Usuarios → Crear usuario . Ver Invitar a tu equipo. Domiciliarios , si haces envíos: Operación → ⋯ → Domiciliarios . Ver Despachar y entregar. Cuidado: al confirmar un pedido, Quanela revisa que haya stock de todos los insumos de las recetas. Si falta algo, la confirmación se rechaza. Por eso los pasos 1 a 4 van primero. Cuando todo esté, haz tu primer pedido de principio a fin."
+    "body": "Para que el primer pedido funcione de punta a punta, deja lista tu cuenta en este orden: Insumos. En Abastecimiento → Stock , toca Nuevo y crea lo que usas para cocinar, con su unidad base y su stock mínimo. Ver Stock e insumos bajo el mínimo. Stock inicial. Registra una compra con lo que tienes en bodega y confírmala: así entra el inventario. Ver Registrar una compra. Platos. En Catálogo , toca Nuevo y crea cada plato con su precio. Ver Platos y menú del día. Recetas. En cada plato, toca Crear receta y agrega sus insumos. Un plato que descuenta inventario y no tiene receta no se puede confirmar en un pedido. Si un plato no usa tus insumos (una bebida que compras lista, por ejemplo), apaga Descuenta inventario en el plato y no necesita receta. Ver Recetas y costo de un plato. Horario y alertas de la cocina. En Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario y tiempos objetivo. Tu equipo. En Usuarios → Crear usuario . Ver Invitar a tu equipo. Domiciliarios , si haces envíos: Operación → ⋯ → Domiciliarios . Ver Despachar y entregar. Cuidado: al confirmar un pedido, Quanela revisa que haya stock de todos los insumos de las recetas. Si falta algo, la confirmación se rechaza. Por eso los pasos 1 a 4 van primero. Cuando todo esté, haz tu primer pedido de principio a fin."
   },
   {
     "id": "shifts",
@@ -1700,12 +1758,12 @@ export const KB: KbArticle[] = [
     ],
     "steps": [
       "Abre Abastecimiento → Proveedores .",
-      "Para crear uno, toca Nuevo y escribe el Nombre (obligatorio), el NIT , el Teléfono , el Correo , el Contacto y la Dirección . Toca Crear proveedor .",
+      "Para crear uno, toca Nuevo . En Empresa escribe el Nombre (obligatorio), el NIT o identificación y la Dirección ; en Contacto , la Persona de contacto , el Teléfono y el Correo . Toca Crear proveedor .",
       "Toca un proveedor para ver su ficha: Comprado (confirmado) , sus Compras y los Insumos que lo tienen como proveedor principal.",
       "Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo)."
     ],
     "headings": [],
-    "body": "Abre Abastecimiento → Proveedores . Para crear uno, toca Nuevo y escribe el Nombre (obligatorio), el NIT , el Teléfono , el Correo , el Contacto y la Dirección . Toca Crear proveedor . Toca un proveedor para ver su ficha: Comprado (confirmado) , sus Compras y los Insumos que lo tienen como proveedor principal. Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo). Bueno saber: el proveedor principal de un insumo se elige en la ficha del insumo. Con eso, Reponer agrupa lo que hay que comprar por proveedor."
+    "body": "Abre Abastecimiento → Proveedores . Para crear uno, toca Nuevo . En Empresa escribe el Nombre (obligatorio), el NIT o identificación y la Dirección ; en Contacto , la Persona de contacto , el Teléfono y el Correo . Toca Crear proveedor . Toca un proveedor para ver su ficha: Comprado (confirmado) , sus Compras y los Insumos que lo tienen como proveedor principal. Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo). Bueno saber: dos proveedores de la misma cuenta no pueden tener el mismo NIT («900.123.456-7» y «900123456» cuentan como el mismo). Bueno saber: el proveedor principal de un insumo se elige en la ficha del insumo. Con eso, Reponer agrupa lo que hay que comprar por proveedor."
   },
   {
     "id": "switch-account",

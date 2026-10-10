@@ -36,6 +36,7 @@ export function MasterProductDrawer({
   const [categoryName, setCategoryName] = useState(product?.categoryName ?? '')
   const [price, setPrice] = useState(product ? String(product.price) : '')
   const [active, setActive] = useState(product?.active ?? true)
+  const [usesInventory, setUsesInventory] = useState(product?.usesInventory ?? true)
   const [recipe, setRecipe] = useState<MasterRecipeItem[]>(product?.recipe ?? [])
   const [saving, setSaving] = useState(false)
 
@@ -55,7 +56,7 @@ export function MasterProductDrawer({
     if (error) return
     setSaving(true)
     try {
-      await onSave({ id: product?.id ?? null, code, name, description, categoryName, price: Number(price), active, recipe })
+      await onSave({ id: product?.id ?? null, code, name, description, categoryName, price: Number(price), active, usesInventory, recipe })
       show(product ? 'Plato actualizado en todas las cuentas del menú.' : 'Plato agregado a todas las cuentas del menú.')
       onClose()
     } catch (err) {
@@ -88,6 +89,17 @@ export function MasterProductDrawer({
           Activo en las cocinas
           <Switch checked={active} onChange={setActive} label="Plato activo" />
         </label>
+        <div className="space-y-1 rounded-xl border border-neutral-800/60 px-3 py-2.5">
+          <label className="flex items-center justify-between gap-3 text-sm text-neutral-300">
+            Descuenta inventario
+            <Switch checked={usesInventory} onChange={setUsesInventory} label="Descuenta inventario" />
+          </label>
+          <p className={typography.caption}>
+            {usesInventory
+              ? 'Cada cuenta reserva y descuenta los insumos de la receta. Necesita receta para confirmarse en pedidos.'
+              : 'Se vende sin receta y no reserva ni descuenta insumos en ninguna cuenta.'}
+          </p>
+        </div>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -102,7 +114,11 @@ export function MasterProductDrawer({
             </Button>
           </div>
           {recipe.length === 0 ? (
-            <p className={typography.caption}>Sin receta: el plato no se podrá confirmar en pedidos hasta que tenga una.</p>
+            <p className={typography.caption}>
+              {usesInventory
+                ? 'Sin receta: el plato no se podrá confirmar en pedidos hasta que tenga una (o hasta que apagues «Descuenta inventario»).'
+                : 'Sin receta: se vende sin descontar inventario.'}
+            </p>
           ) : (
             <ul className="space-y-2">
               {recipe.map((r, i) => (

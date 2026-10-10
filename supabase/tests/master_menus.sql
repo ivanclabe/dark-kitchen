@@ -131,5 +131,38 @@ do $$ begin
     (select case when master_product_id is null then 'local' else 'enlazado' end from dk_products where kitchen_id = (select id from _ctx where key = 'A') and name = 'Burger Maestra'));
 end $$;
 
+-- ADR 0048: «Descuenta inventario» lo define el maestro y llega a cada cuenta.
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), null);
+set local role authenticated;
+do $$ begin
+  insert into _ctx values ('mp2', dk_save_master_product((select id from _ctx where key = 'menu'), null, 'GASE-M', 'Gaseosa Maestra', null, 'Bebidas', 4000, true, '[]', false));
+end $$;
+reset role;
+do $$ begin
+  insert into _t (area, test, expected, got) values ('Sin inventario', 'A recibe el plato sin receta y sin inventario', 'false · sin receta',
+    (select uses_inventory::text || case when active_recipe_id is null then ' · sin receta' else ' · con receta' end
+     from dk_products where kitchen_id = (select id from _ctx where key = 'A') and master_product_id = (select id from _ctx where key = 'mp2')));
+  insert into _t (area, test, expected, got) values ('Sin inventario', 'La Burger Maestra (guardada sin la opción) sigue descontando', 'true',
+    (select uses_inventory::text from dk_products where kitchen_id = (select id from _ctx where key = 'A') and master_product_id = (select id from _ctx where key = 'mp')));
+end $$;
+select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01', (select id from _ctx where key = 'A'));
+set local role authenticated;
+do $$ begin
+  begin update dk_products set uses_inventory = true where master_product_id = (select id from _ctx where key = 'mp2');
+    insert into _t (area, test, expected, got) values ('Sin inventario', 'A cambia «Descuenta inventario» de un plato maestro', 'bloqueado', 'PERMITIDO');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Sin inventario', 'A cambia «Descuenta inventario» de un plato maestro', 'bloqueado', 'bloqueado', sqlerrm); end;
+end $$;
+reset role;
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), null);
+set local role authenticated;
+do $$ begin
+  perform dk_save_master_product((select id from _ctx where key = 'menu'), (select id from _ctx where key = 'mp2'), 'GASE-M', 'Gaseosa Maestra', null, 'Bebidas', 4000, true, '[]', true);
+end $$;
+reset role;
+do $$ begin
+  insert into _t (area, test, expected, got) values ('Sin inventario', 'Encenderlo en el maestro lo enciende en A', 'true',
+    (select uses_inventory::text from dk_products where kitchen_id = (select id from _ctx where key = 'A') and master_product_id = (select id from _ctx where key = 'mp2')));
+end $$;
+
 select area, test, expected, got, detail, case when got = expected then 'PASS' else 'FAIL' end as result from _t order by n;
 rollback;
