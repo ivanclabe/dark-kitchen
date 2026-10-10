@@ -1,3 +1,4 @@
+import { OnlineIndicator } from './OnlineIndicator'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { canAccessAnyModule } from '@/shared/rbac/roles'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -124,6 +125,7 @@ export function AppLayout() {
         <header className="hidden h-12 shrink-0 items-center border-b border-neutral-800/60 px-4 md:flex lg:px-6">
           <ContextIndicator />
           <div className="ml-auto flex items-center gap-2">
+            <OnlineIndicator />
             <VoiceMenu />
             <CopilotButton />
           </div>
@@ -142,6 +144,7 @@ export function AppLayout() {
           <div className="min-w-0 flex-1">
             <ContextIndicator compact />
           </div>
+          <OnlineIndicator compact />
           <VoiceMenu compact />
           <CopilotButton compact />
           <NotificationBell placement="bottom-end" />

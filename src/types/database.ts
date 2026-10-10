@@ -4970,6 +4970,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_presence_allowed: { Args: { p_topic: string }; Returns: boolean }
       dk_provision_organization: {
         Args: {
           p_account_icon?: string

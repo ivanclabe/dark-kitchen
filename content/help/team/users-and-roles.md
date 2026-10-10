@@ -12,9 +12,10 @@ questions:
   - ¿Cómo quito a alguien de la cuenta?
   - ¿Cómo creo un rol nuevo?
   - ¿Qué permisos tiene cada rol?
-keywords: [usuarios, roles, permisos, desactivar, quitar acceso, empleado, rol propio, plantilla]
+  - ¿Cómo sé quién está en línea?
+keywords: [usuarios, roles, en línea, conectados, quién está, permisos, desactivar, quitar acceso, empleado, rol propio, plantilla]
 related: [invite-team, roles, switch-account]
-updated: 2026-10-06
+updated: 2026-10-10
 order: 1
 ---
 
@@ -45,3 +46,10 @@ Su historial (pedidos, movimientos) se conserva siempre.
 > **Cuidado:** los roles propios aplican a **todas tus cuentas**: un cambio afecta a todas las que usan ese rol. Para eliminar un rol, primero cámbiale el rol a quien lo tenga.
 
 > **Bueno saber:** solo puedes asignar roles con permisos que tú también tienes. Qué hace cada rol del sistema está en [Qué ve cada rol](help:roles).
+
+## Quién está en línea
+
+Arriba, junto a Voz y Copilot, el punto verde dice cuántas personas tienen **esta cuenta** abierta ahora, por ejemplo **3 en línea** (en el celular, solo el número). Tócalo para ver quiénes son: su nombre y su rol, contigo primero. Quien tiene la pantalla oculta o sin usar hace más de 5 minutos aparece **ausente**.
+
+> **Bueno saber:** solo se ve quién está en línea, **nunca** qué pantalla tiene abierta, qué hace ni desde dónde se conecta. Lo ve el equipo de esta cuenta: alguien de otra cuenta, o del soporte de Quanela que no es del negocio, no aparece ni ve la lista. Si el punto se pone gris (**Sin conexión en vivo**), la conexión se recupera sola.
+
