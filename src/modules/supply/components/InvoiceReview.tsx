@@ -10,13 +10,13 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { AlertTriangle, CheckCircle2, FileText, ListChecks, Save, Trash2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, FileText, Info, ListChecks, Plus, Save, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { InvoiceImportError, matchInvoice } from '../api/invoiceImport'
 import { useIngredients } from '../hooks/useIngredients'
 import { useDiscardImport, useIngredientPurchaseUnits, useSavePurchaseFromImport } from '../hooks/useInvoiceImport'
 import { useSuppliers } from '../hooks/useSuppliers'
-import { AUTO_PICK_SCORE, draftProblems, initialDraft, lineProblems, reconcile, toPayload, type IngredientUnitInfoById } from '../lib/invoiceReview'
+import { AUTO_PICK_SCORE, draftProblems, emptyLine, initialDraft, lineProblems, reconcile, toPayload, type IngredientUnitInfoById } from '../lib/invoiceReview'
 import type { InvoiceImport, InvoiceMatch, ReviewDraft, ReviewLine, SupplierChoice } from '../types/invoiceImport'
 import { InvoicePreview } from './InvoicePreview'
 import { ReviewLineCard } from './ReviewLineCard'
@@ -92,6 +92,26 @@ export function InvoiceReview({
     setDraft((d) => ({ ...d, lines: d.lines.map((l) => (l.key === key ? { ...l, ...patch } : l)) }))
   }
 
+  /** What the invoice did not let read is added by hand. */
+  const [addedCount, setAddedCount] = useState(0)
+  function addLine() {
+    setAddedCount((n) => n + 1)
+    setDraft((d) => ({ ...d, lines: [...d.lines, emptyLine(`added-${addedCount + 1}`)] }))
+  }
+  function removeLine(key: string) {
+    setDraft((d) => ({ ...d, lines: d.lines.filter((l) => l.key !== key) }))
+  }
+
+  const documentLabel: Record<string, string> = {
+    tiquete: 'un tiquete de caja',
+    remision: 'una remisión',
+    pedido: 'un pedido',
+    cuenta_de_cobro: 'una cuenta de cobro',
+    cotizacion: 'una cotización',
+    otro: 'un documento que no es una factura',
+  }
+  const documentKind = extraction.documentType ? documentLabel[extraction.documentType] : undefined
+
   /** Another supplier changes what was learned: fresh suggestions (the choices made stay). */
   async function setSupplier(choice: SupplierChoice | null) {
     setDraft((d) => ({ ...d, supplier: choice }))
@@ -158,6 +178,15 @@ export function InvoiceReview({
           {showInvoice && <div className="mt-3 h-[70vh]">{preview}</div>}
         </div>
 
+        {documentKind && (
+          <p className="flex items-start gap-2 rounded-xl border border-sky-500/30 bg-sky-500/5 px-4 py-3 text-sm text-sky-200">
+            <Info size={15} className="mt-0.5 shrink-0" aria-hidden />
+            <span>
+              Es {documentKind}. Se registra igual como compra: revisa lo leído y completa lo que falte.
+            </span>
+          </p>
+        )}
+
         {extraction.warnings.length > 0 && (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
             <p className="flex items-center gap-1.5 font-medium">
@@ -193,7 +222,17 @@ export function InvoiceReview({
 
         <Card title="Factura" icon={FileText}>
           <FormGrid>
-            <FormField label="Número" required hint={extraction.confidence.number !== 'alta' ? 'Leído con dudas: revísalo' : undefined}>
+            <FormField
+              label="Número"
+              required
+              hint={
+                draft.numberProposed
+                  ? 'El documento no tiene número: Quanela propone esta referencia (fecha y hora). Cámbiala si quieres.'
+                  : extraction.confidence.number !== 'alta'
+                    ? 'Leído con dudas: revísalo'
+                    : undefined
+              }
+            >
               {(a11y) => <Input {...a11y} value={draft.invoiceNumber} onChange={(e) => setDraft((d) => ({ ...d, invoiceNumber: e.target.value }))} />}
             </FormField>
             <FormField label="Fecha" required hint={extraction.confidence.date !== 'alta' ? 'Leída con dudas: revísala' : undefined}>
@@ -211,6 +250,11 @@ export function InvoiceReview({
         <Card
           title="Líneas"
           icon={ListChecks}
+          action={
+            <Button variant="secondary" size="sm" icon={Plus} onClick={addLine}>
+              Agregar línea
+            </Button>
+          }
           description={
             pendingLines
               ? `${pendingLines} por completar · ${draft.lines.length - included.length} ignorada(s)`
@@ -218,7 +262,7 @@ export function InvoiceReview({
           }
         >
           {draft.lines.length === 0 ? (
-            <p className="text-sm text-neutral-400">No se leyó ninguna línea. Descarta esta factura y crea la compra a mano.</p>
+            <p className="text-sm text-neutral-400">No se pudo leer ninguna línea. Toca «Agregar línea» para escribirlas tú, viendo la factura.</p>
           ) : (
             <ul className="space-y-3">
               {draft.lines.map((l, i) => (
@@ -231,6 +275,7 @@ export function InvoiceReview({
                   ingredientOptions={ingredientOptions}
                   canCreateIngredient={can('inventory.create')}
                   onChange={(patch) => setLine(l.key, patch)}
+                  onRemove={l.added ? () => removeLine(l.key) : undefined}
                 />
               ))}
             </ul>

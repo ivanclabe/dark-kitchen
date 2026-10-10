@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, CheckCircle2, Copy, FileSearch, Loader2, RefreshCw, ScanText } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { InvoiceImportError, matchInvoice, rereadInvoice, uploadAndReadInvoice } from '../api/invoiceImport'
+import { InvoiceImportError, matchInvoice, reopenInvoiceImport, rereadInvoice, uploadAndReadInvoice } from '../api/invoiceImport'
 import { InvoiceDropzone } from '../components/InvoiceDropzone'
 import { InvoiceReview } from '../components/InvoiceReview'
 import { useInvoiceImport } from '../hooks/useInvoiceImport'
@@ -206,6 +206,21 @@ function ImportReview({ importId }: { importId: string }) {
     }
   }, [invoice, match])
 
+  async function reviewWhatWasRead() {
+    if (!invoice?.extraction) return
+    setRereading(true)
+    setRereadError(null)
+    try {
+      await reopenInvoiceImport(importId, invoice.extraction)
+      setMatch(null)
+      await refetch()
+    } catch (err) {
+      setRereadError(err instanceof Error ? err.message : 'No pudimos abrir lo leído.')
+    } finally {
+      setRereading(false)
+    }
+  }
+
   async function reread() {
     setRereading(true)
     setRereadError(null)
@@ -258,8 +273,16 @@ function ImportReview({ importId }: { importId: string }) {
               <AlertTriangle size={16} className="text-amber-400" aria-hidden /> No pudimos leer esta factura
             </p>
             <p className="text-sm text-neutral-400">{rereadError ?? invoice.error ?? 'La lectura se interrumpió.'}</p>
+            {(invoice.extraction?.lines.length ?? 0) > 0 && (
+              <p className="text-sm text-neutral-300">Quanela alcanzó a leer {invoice.extraction!.lines.length} producto(s): puedes revisarlos y completar lo que falte.</p>
+            )}
             <div className="flex flex-wrap gap-2">
-              <Button variant="primary" size="sm" icon={RefreshCw} onClick={() => void reread()}>
+              {(invoice.extraction?.lines.length ?? 0) > 0 && (
+                <Button variant="primary" size="sm" icon={FileSearch} onClick={() => void reviewWhatWasRead()}>
+                  Revisar lo que se leyó
+                </Button>
+              )}
+              <Button variant={(invoice.extraction?.lines.length ?? 0) > 0 ? 'secondary' : 'primary'} size="sm" icon={RefreshCw} onClick={() => void reread()}>
                 Leer de nuevo
               </Button>
               <KitchenLink to="/supply/compras" className={buttonClass({ variant: 'secondary', size: 'sm' })}>

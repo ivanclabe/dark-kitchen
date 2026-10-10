@@ -43,6 +43,14 @@ export function parseUnitText(text: string | null | undefined): string | null {
   return first ? (UNIT_WORDS[first] ?? null) : null
 }
 
+/** A line the person adds by hand (something the invoice did not let read). */
+export function emptyLine(key: string): ReviewLine {
+  return {
+    key, index: -1, text: '', code: null, ignored: false, ingredient: null, quantity: null, unitCode: null, unitCost: null, factor: null,
+    remember: false, confidence: 'alta', invoiceLineTotal: null, suggestions: [], genericName: null, pack: null, added: true,
+  }
+}
+
 /** The base unit a new ingredient should have, from how the invoice sells it. */
 export function baseUnitFor(unitCode: string | null, units: Unit[]): string {
   const unit = units.find((u) => u.code === unitCode)
@@ -56,11 +64,15 @@ export interface IngredientUnitInfo {
   purchaseUnits: { unitCode: string; factor: number }[]
 }
 
-/** Units that make sense to buy an ingredient in: its type, its own purchase units and packages. */
+/**
+ * Units that make sense to buy an ingredient in: its type, its own purchase
+ * units, packages, and «unidad» (a closed package: «arroz x 1000» bought by the
+ * unit — then it asks how much one brings).
+ */
 export function unitsFor(info: IngredientUnitInfo | null, units: Unit[]): Unit[] {
   if (!info) return units
   const own = new Set(info.purchaseUnits.map((p) => p.unitCode))
-  return units.filter((u) => u.unitType === info.baseUnitType || own.has(u.code) || PACKAGING_UNITS.includes(u.code))
+  return units.filter((u) => u.unitType === info.baseUnitType || own.has(u.code) || PACKAGING_UNITS.includes(u.code) || u.code === 'unidad')
 }
 
 /** Base units in one purchase unit, when it is known without asking. */
@@ -73,6 +85,34 @@ export function knownFactor(unitCode: string | null, info: IngredientUnitInfo | 
   const base = units.find((u) => u.code === info.baseUnitCode)
   if (!unit || !base || unit.unitType !== base.unitType || PACKAGING_UNITS.includes(unit.code)) return null
   return unit.factorToBase / base.factorToBase
+}
+
+/**
+ * How much one purchase unit brings, from what the invoice says («ARROZ X 1000»
+ * bought by the unit → 1000 g), when the pack is measured like the ingredient.
+ */
+export function packFactor(line: Pick<ReviewLine, 'pack' | 'unitCode'>, info: IngredientUnitInfo | null, units: Unit[]): number | null {
+  if (!line.pack || !info || !line.unitCode) return null
+  if (line.unitCode !== 'unidad' && !PACKAGING_UNITS.includes(line.unitCode)) return null
+  const packUnit = units.find((u) => u.code === line.pack!.unitCode)
+  const base = units.find((u) => u.code === info.baseUnitCode)
+  if (!packUnit || !base || packUnit.unitType !== base.unitType) return null
+  return (line.pack.size * packUnit.factorToBase) / base.factorToBase
+}
+
+/** The factor a line starts with: the ingredient's own, or the invoice's pack. */
+export function startingFactor(line: Pick<ReviewLine, 'pack' | 'unitCode'>, info: IngredientUnitInfo | null, units: Unit[]): number | null {
+  if (!info || !line.unitCode) return null
+  const own = info.purchaseUnits.find((p) => p.unitCode === line.unitCode)
+  if (own) return own.factor
+  return needsFactor(line.unitCode, info, units) ? packFactor(line, info, units) : null
+}
+
+/** «SN-20261010-0611»: a reference for a ticket or order without number (editable). */
+export function proposedReference(invoice: Pick<Extraction['invoice'], 'date' | 'time' | 'total'>): string {
+  const date = (invoice.date ?? '').replace(/-/g, '')
+  const time = (invoice.time ?? '').replace(':', '')
+  return ['SN', date || null, time || (invoice.total ? String(Math.round(invoice.total)) : null)].filter(Boolean).join('-')
 }
 
 /** The unit needs the person to say how much it brings («¿Cuántos g trae la caja?»). */
@@ -155,10 +195,12 @@ export function initialDraft(extraction: Extraction, match: InvoiceMatch, units:
   const lines: ReviewLine[] = extraction.lines.map((l, index) => {
     const suggestions = match.lines.find((m) => m.index === index)?.suggestions ?? []
     const picked = pickedSuggestion(suggestions)
-    const parsed = parseUnitText(l.unit)
-    let unitCode: string | null = picked?.learnedUnitCode ?? (parsed && units.some((u) => u.code === parsed) ? parsed : null)
+    const known = (code: string | null | undefined) => (code && units.some((u) => u.code === code) ? code : null)
+    const pack = l.packSize && l.packUnit ? { size: l.packSize, unitCode: l.packUnit } : null
+    // The learned unit, the one the AI normalized, the one written, or «unidad» for a closed package.
+    let unitCode: string | null = picked?.learnedUnitCode ?? known(l.unitCode) ?? known(parseUnitText(l.unit)) ?? (pack ? 'unidad' : null)
     if (picked && !unitCode) unitCode = picked.baseUnitCode
-    const own = picked?.purchaseUnits.find((p) => p.unitCode === unitCode)
+    const info = picked ? { baseUnitCode: picked.baseUnitCode, baseUnitType: picked.baseUnitType, purchaseUnits: picked.purchaseUnits } : null
     return {
       key: `${index}`,
       index,
@@ -169,16 +211,19 @@ export function initialDraft(extraction: Extraction, match: InvoiceMatch, units:
       quantity: l.quantity,
       unitCode,
       unitCost: l.unitPrice,
-      factor: own?.factor ?? null,
+      factor: startingFactor({ pack, unitCode }, info, units),
       remember: true,
       confidence: l.confidence,
       invoiceLineTotal: l.lineTotal,
       suggestions,
+      genericName: l.genericName ?? null,
+      pack,
     }
   })
   return {
     supplier,
-    invoiceNumber: extraction.invoice.number ?? '',
+    invoiceNumber: extraction.invoice.number ?? proposedReference(extraction.invoice),
+    numberProposed: !extraction.invoice.number,
     invoiceDate: extraction.invoice.date ?? '',
     tax: extraction.invoice.tax,
     notes: '',

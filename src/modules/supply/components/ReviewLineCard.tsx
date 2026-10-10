@@ -6,7 +6,7 @@ import { Input, Select } from '@/shared/ui/FormField'
 import { NumberInput } from '@/shared/ui/NumberInput'
 import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { AlertTriangle, CircleCheck, EyeOff, RotateCcw, Sparkles } from 'lucide-react'
+import { AlertTriangle, CircleCheck, EyeOff, RotateCcw, Sparkles, Trash2 } from 'lucide-react'
 import {
   knownFactor,
   lineProblems,
@@ -14,7 +14,9 @@ import {
   lineUnitInfo,
   lineWarnings,
   needsFactor,
+  packFactor,
   reasonLabel,
+  startingFactor,
   unitsFor,
   baseUnitFor,
   type IngredientUnitInfoById,
@@ -36,6 +38,7 @@ export function ReviewLineCard({
   ingredientOptions,
   canCreateIngredient,
   onChange,
+  onRemove,
 }: {
   line: ReviewLine
   number: number
@@ -44,6 +47,8 @@ export function ReviewLineCard({
   ingredientOptions: ComboboxOption[]
   canCreateIngredient: boolean
   onChange: (patch: Partial<ReviewLine>) => void
+  /** Only for a line the person added. */
+  onRemove?: () => void
 }) {
   const info = lineUnitInfo(line, units, ingredients)
   const problems = lineProblems(line, units, ingredients)
@@ -55,18 +60,22 @@ export function ReviewLineCard({
 
   /** Choosing an ingredient also brings the unit it is usually bought in. */
   function chooseExisting(id: string, suggestion?: IngredientSuggestion) {
-    const next = ingredients.get(id)
-    const own = next?.purchaseUnits ?? suggestion?.purchaseUnits ?? []
+    const next = ingredients.get(id) ?? (suggestion ? { baseUnitCode: suggestion.baseUnitCode, baseUnitType: suggestion.baseUnitType, purchaseUnits: suggestion.purchaseUnits } : null)
     let unitCode = suggestion?.learnedUnitCode ?? line.unitCode
-    const nextAllowed = unitsFor(next ?? null, units).map((u) => u.code)
+    const nextAllowed = unitsFor(next, units).map((u) => u.code)
     if (!unitCode || !nextAllowed.includes(unitCode)) unitCode = next?.baseUnitCode ?? unitCode
-    onChange({ ingredient: { kind: 'existing', id }, unitCode, factor: own.find((p) => p.unitCode === unitCode)?.factor ?? null })
+    onChange({ ingredient: { kind: 'existing', id }, unitCode, factor: startingFactor({ pack: line.pack, unitCode }, next, units) })
   }
 
+  /** A new ingredient: named as the AI understood it, measured like its package. */
   function createNew(name: string) {
-    const baseUnitCode = baseUnitFor(line.unitCode, units)
-    onChange({ ingredient: { kind: 'new', name: name || line.text, baseUnitCode }, unitCode: line.unitCode ?? baseUnitCode })
+    const baseUnitCode = line.pack?.unitCode ?? baseUnitFor(line.unitCode, units)
+    const unitCode = line.unitCode ?? baseUnitCode
+    const base = units.find((u) => u.code === baseUnitCode)
+    const info = base ? { baseUnitCode, baseUnitType: base.unitType, purchaseUnits: [] } : null
+    onChange({ ingredient: { kind: 'new', name: name || line.genericName || line.text, baseUnitCode }, unitCode, factor: startingFactor({ pack: line.pack, unitCode }, info, units) })
   }
+  const fromPack = asksFactor && line.factor !== null && line.factor === packFactor(line, info, units)
 
   const total = lineTotal(line)
   const ready = problems.length === 0
@@ -80,14 +89,36 @@ export function ReviewLineCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className={labelClass}>Línea {number} · en la factura</p>
-          <p className={clsx('mt-0.5 text-sm break-words', line.ignored ? 'text-neutral-500 line-through' : 'text-neutral-100')}>
-            {line.text}
-            {line.code && <span className="ml-1.5 text-xs text-neutral-500">({line.code})</span>}
-          </p>
+          {line.added ? (
+            <p className={labelClass}>Línea {number} · agregada por ti</p>
+          ) : (
+            <>
+              <p className={labelClass}>Línea {number} · en la factura</p>
+              <p className={clsx('mt-0.5 text-sm break-words', line.ignored ? 'text-neutral-500 line-through' : 'text-neutral-100')}>
+                {line.text}
+                {line.code && <span className="ml-1.5 text-xs text-neutral-500">({line.code})</span>}
+              </p>
+              {(line.genericName || line.pack) && !line.ignored && (
+                <p className="mt-0.5 text-xs text-neutral-500">
+                  {line.genericName && <>Leído como «{line.genericName}»</>}
+                  {line.genericName && line.pack && ' · '}
+                  {line.pack && <>cada unidad trae {line.pack.size.toLocaleString('es-CO')} {line.pack.unitCode}</>}
+                </p>
+              )}
+            </>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {!line.ignored && (ready ? <CircleCheck size={16} className="text-emerald-400" aria-label="Lista" /> : <Badge tone="warning">Por completar</Badge>)}
+          {onRemove ? (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-400 hover:bg-neutral-800 hover:text-red-400"
+            >
+              <Trash2 size={13} aria-hidden /> Quitar
+            </button>
+          ) : (
           <button
             type="button"
             onClick={() => onChange({ ignored: !line.ignored })}
@@ -96,6 +127,7 @@ export function ReviewLineCard({
             {line.ignored ? <RotateCcw size={13} aria-hidden /> : <EyeOff size={13} aria-hidden />}
             {line.ignored ? 'Incluir' : 'Ignorar'}
           </button>
+          )}
         </div>
       </div>
 
@@ -190,8 +222,7 @@ export function ReviewLineCard({
                 value={line.unitCode ?? ''}
                 onChange={(e) => {
                   const unitCode = e.target.value || null
-                  const own = info?.purchaseUnits.find((p) => p.unitCode === unitCode)
-                  onChange({ unitCode, factor: own?.factor ?? null })
+                  onChange({ unitCode, factor: startingFactor({ pack: line.pack, unitCode }, info, units) })
                 }}
                 className="!mt-0"
               >
@@ -225,7 +256,9 @@ export function ReviewLineCard({
                 unit={info?.baseUnitCode}
                 className="!mt-0 w-36"
               />
-              <span className="text-xs text-neutral-400">Se guarda en el insumo para las próximas compras.</span>
+              <span className="text-xs text-neutral-400">
+                {fromPack ? 'Lo dice la factura; revísalo. ' : ''}Se guarda en el insumo para las próximas compras.
+              </span>
             </label>
           )}
           {!asksFactor && line.unitCode && info && line.unitCode !== info.baseUnitCode && knownFactor(line.unitCode, info, units) && (
@@ -249,10 +282,12 @@ export function ReviewLineCard({
             </ul>
           )}
 
+          {!line.added && (
           <label className="flex items-center gap-2 text-xs text-neutral-400">
             <input type="checkbox" checked={line.remember} onChange={(e) => onChange({ remember: e.target.checked })} className="accent-brasa-500" />
             Recordar esta asociación para las próximas facturas de este proveedor
           </label>
+          )}
         </div>
       )}
     </li>

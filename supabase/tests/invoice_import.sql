@@ -341,6 +341,40 @@ end $$;
 reset role;
 select pg_temp.as_owner();
 
+-- ---------------------------------------------------------------------------
+-- 8. Rev. 2: tiquetes de plaza (descripciones cortadas, tamaños y unidades en el texto)
+-- ---------------------------------------------------------------------------
+insert into _t (area, test, expected, got) values
+  ('Tiquetes', 'Texto sin código, tamaño ni unidad', 'arroz sabroson · trifogon · aguacate papelillo',
+    dk_invoice_clean_key('ARROZ SABROSON X 1000') || ' · ' || dk_invoice_clean_key('TRIFOGON CAJA P X 24') || ' · ' || dk_invoice_clean_key('AGUACATE PAPELILLO X KL'));
+insert into dk_ingredients (id, kitchen_id, code, name, base_unit_id) values
+  ('61000000-0000-0000-0000-000000049a11', pg_temp.k('A'), 'ARROZ', 'Arroz', pg_temp.unit('g')),
+  ('61000000-0000-0000-0000-000000049a12', pg_temp.k('A'), 'ACEITE', 'Aceite vegetal', pg_temp.unit('ml')),
+  ('61000000-0000-0000-0000-000000049a13', pg_temp.k('A'), 'CALDO', 'Caldo de gallina', pg_temp.unit('unidad'));
+select pg_temp.act_as(pg_temp.k('owner'), pg_temp.k('A'));
+set local role authenticated;
+do $$
+declare v jsonb := dk_invoice_match('{
+  "supplier": {"name": "MERKPLAZA VIVERES MKP", "taxId": "1052959291-3"},
+  "invoice": {"total": 68900},
+  "lines": [
+    {"text": "ARROZ SABROSON X 1000", "genericName": "Arroz", "code": "11384", "quantity": 6},
+    {"text": "ACEITE CUISINE X3000", "genericName": "Aceite vegetal", "quantity": 1},
+    {"text": "MAGGI CON ESPECIAS D", "genericName": "Caldo de gallina", "quantity": 12},
+    {"text": "ARROZ SABROSON X 1000", "quantity": 6}
+  ]}');
+begin
+  insert into _t (area, test, expected, got) values
+    ('Tiquetes', 'Con el nombre genérico: «ARROZ SABROSON X 1000» → Arroz', 'Arroz · name',
+      (v -> 'lines' -> 0 -> 'suggestions' -> 0 ->> 'name') || ' · ' || (v -> 'lines' -> 0 -> 'suggestions' -> 0 ->> 'reason')),
+    ('Tiquetes', '«ACEITE CUISINE X3000» → Aceite vegetal', 'Aceite vegetal', v -> 'lines' -> 1 -> 'suggestions' -> 0 ->> 'name'),
+    ('Tiquetes', '«MAGGI CON ESPECIAS D» (marca) → Caldo de gallina por el genérico', 'Caldo de gallina', v -> 'lines' -> 2 -> 'suggestions' -> 0 ->> 'name'),
+    ('Tiquetes', 'Sin genérico, el texto limpio también encuentra Arroz (fuerte)', 'Arroz · sí',
+      (v -> 'lines' -> 3 -> 'suggestions' -> 0 ->> 'name') || ' · ' || case when (v -> 'lines' -> 3 -> 'suggestions' -> 0 ->> 'score')::numeric >= 0.9 then 'sí' else 'no' end);
+end $$;
+reset role;
+select pg_temp.as_owner();
+
 insert into _t (area, test, expected, got) values ('IA', 'La función de IA está en los planes con IA', '2',
   (select count(*)::text from dk_plan_features where feature_key = 'invoice_import'));
 

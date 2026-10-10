@@ -124,4 +124,13 @@ describe('Revisión de la factura (ADR 0049)', () => {
     await waitFor(() => expect(state.save).toHaveBeenCalled())
     expect(state.save.mock.calls[0][0].payload.lines).toHaveLength(2)
   })
+
+  it('what could not be read is added by hand, and an added line can be removed', () => {
+    renderReview()
+    fireEvent.click(screen.getByRole('button', { name: 'Agregar línea' }))
+    expect(screen.getByText('Línea 4 · agregada por ti')).toBeTruthy()
+    expect(screen.getByText(/Faltan completar 3 líneas/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Quitar' }))
+    expect(screen.queryByText('Línea 4 · agregada por ti')).toBeNull()
+  })
 })

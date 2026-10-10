@@ -80,11 +80,19 @@ export interface ReviewLine {
   /** The line total printed on the invoice. */
   invoiceLineTotal: number | null
   suggestions: IngredientSuggestion[]
+  /** The product in plain words, as the AI read it («Arroz»). */
+  genericName: string | null
+  /** What one unit sold holds, as the invoice says («X 1000» → 1000 g). */
+  pack: { size: number; unitCode: string } | null
+  /** Added by the person (not read from the invoice). */
+  added?: boolean
 }
 
 export interface ReviewDraft {
   supplier: SupplierChoice | null
   invoiceNumber: string
+  /** The document had no number: this one was proposed by Quanela. */
+  numberProposed: boolean
   invoiceDate: string
   tax: number | null
   notes: string

@@ -4,6 +4,9 @@ import type { Extraction, IngredientSuggestion, InvoiceMatch, ReviewLine } from 
 import {
   baseUnitFor,
   draftProblems,
+  emptyLine,
+  packFactor,
+  proposedReference,
   initialDraft,
   knownFactor,
   lineProblems,
@@ -63,7 +66,7 @@ const match: InvoiceMatch = {
 function line(patch: Partial<ReviewLine>): ReviewLine {
   return {
     key: '0', index: 0, text: 'x', code: null, ignored: false, ingredient: { kind: 'existing', id: 'tom' }, quantity: 1, unitCode: 'g', unitCost: 4,
-    factor: null, remember: true, confidence: 'alta', invoiceLineTotal: null, suggestions: [], ...patch,
+    factor: null, remember: true, confidence: 'alta', invoiceLineTotal: null, suggestions: [], genericName: null, pack: null, ...patch,
   }
 }
 
@@ -86,7 +89,8 @@ describe('units', () => {
 
   it('only the units that make sense for the ingredient', () => {
     const codes = unitsFor(ingredients.get('tom')!, units).map((u) => u.code)
-    expect(codes).toEqual(['g', 'kg', 'caja'])
+    // «unidad»: a closed package bought by the unit (then it asks how much it brings).
+    expect(codes).toEqual(['g', 'kg', 'unidad', 'caja'])
   })
 
   it('a box asks how much it brings unless the ingredient already says', () => {
@@ -159,3 +163,34 @@ describe('saving', () => {
     expect(reasonLabel('similar', 0.82)).toBe('Parecido 82 %')
   })
 })
+
+describe('tickets (rev. 2)', () => {
+  const rice: IngredientSuggestion = { ...tomato, ingredientId: 'rice', name: 'Arroz', code: 'ARROZ', score: 0.95, reason: 'name', learnedUnitCode: null }
+  const ticket: Extraction = {
+    ...extraction,
+    documentType: 'pedido',
+    invoice: { number: null, date: '2026-10-10', time: '06:11', currency: 'COP', subtotal: null, tax: null, total: 68900 },
+    lines: [{ text: 'ARROZ SABROSON X 1000', genericName: 'Arroz', code: '11384', quantity: 6, unit: null, unitCode: 'unidad', packSize: 1000, packUnit: 'g', unitPrice: 3800, lineTotal: 22800, confidence: 'alta' }],
+  }
+
+  it('a document without number gets a reference to edit', () => {
+    expect(proposedReference({ date: '2026-10-10', time: '06:11', total: 68900 })).toBe('SN-20261010-0611')
+    expect(proposedReference({ date: '2026-10-10', time: null, total: 68900 })).toBe('SN-20261010-68900')
+    const draft = initialDraft(ticket, { ...match, lines: [{ index: 0, suggestions: [rice] }] }, units)
+    expect(draft).toMatchObject({ invoiceNumber: 'SN-20261010-0611', numberProposed: true })
+  })
+
+  it('«X 1000» bought by the unit: 1 unidad = 1000 g, already filled in', () => {
+    const draft = initialDraft(ticket, { ...match, lines: [{ index: 0, suggestions: [rice] }] }, units)
+    expect(draft.lines[0]).toMatchObject({ ingredient: { kind: 'existing', id: 'rice' }, unitCode: 'unidad', factor: 1000, genericName: 'Arroz', pack: { size: 1000, unitCode: 'g' } })
+    const info = { baseUnitCode: 'g', baseUnitType: 'WEIGHT' as const, purchaseUnits: [], avgCost: 3, name: 'Arroz' }
+    expect(lineProblems(draft.lines[0], units, new Map([['rice', info]]))).toEqual([])
+    // A pack in ml does not fit an ingredient in grams.
+    expect(packFactor({ pack: { size: 3000, unitCode: 'ml' }, unitCode: 'unidad' }, info, units)).toBeNull()
+  })
+
+  it('a line added by hand starts empty and is not learned', () => {
+    expect(emptyLine('added-1')).toMatchObject({ added: true, remember: false, text: '', ingredient: null })
+  })
+})
+

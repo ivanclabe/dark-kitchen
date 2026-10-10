@@ -18,6 +18,7 @@ order: 1
 
 ## 10 de octubre de 2026
 
+- **Importar desde tiquetes y pedidos.** **Importar desde factura** ahora lee tiquetes de caja, remisiones y pedidos de la plaza, aunque digan «no tiene validez». Entiende «ARROZ X 1000» (arroz, 1000 g por unidad), propone una referencia si el documento no tiene número, deja **Agregar línea** para lo que no se pudo leer y **Revisar lo que se leyó** si la lectura falló a medias.
 - **Quién está en línea.** Arriba, junto a Voz y Copilot, ves cuántas personas tienen la cuenta abierta ahora y, al tocarlo, quiénes son y quién está ausente. Nunca se ve qué hace cada uno. Ver [Usuarios y roles](help:users-and-roles).
 - **Importar una compra desde la factura.** En **Compras → Nueva → Importar desde factura** (o soltando la factura sobre la lista), sube la foto o el PDF. Quanela lee el proveedor, el NIT, las líneas y los precios, y busca tus proveedores e insumos. Tú revisas y corriges todo antes de guardar, en borrador o confirmada. Aprende cómo escribe cada proveedor tus insumos y no duplica proveedores ni insumos. Ver [Importar una compra desde una factura](help:invoice-import).
 - **Compras más seguras.** Una compra solo se confirma con **Confirmar compra** (y nunca sin líneas), el costo promedio queda bien cuando un insumo se repite en la factura y no puede haber dos proveedores con el mismo NIT.

@@ -8,6 +8,10 @@ describe('readAmount', () => {
     expect(readAmount('12.500,50')).toBe(12500.5)
     expect(readAmount('1.250')).toBe(1250)
     expect(readAmount('1,5')).toBe(1.5)
+    // POS tickets: the comma separates thousands.
+    expect(readAmount('22,800')).toBe(22800)
+    expect(readAmount('1,250,000')).toBe(1250000)
+    expect(readAmount('2,27')).toBe(2.27)
     expect(readAmount('2.5')).toBe(2.5)
     expect(readAmount(8000)).toBe(8000)
   })
@@ -73,3 +77,41 @@ describe('files', () => {
     expect(fileBlock('image/jpeg', 'AAA')).toMatchObject({ type: 'image', source: { media_type: 'image/jpeg' } })
   })
 })
+
+describe('tickets and orders (rev. 2)', () => {
+  // The ticket of a market stall: «ESTE DOCUMENTO NO TIENE VALIDEZ», no number, sizes in the text.
+  const ticket = {
+    isInvoice: false,
+    documentType: 'pedido',
+    supplier: { name: 'MERKPLAZA VIVERES MKP', taxId: '1052959291-3' },
+    invoice: { date: '2026-10-10', time: '6:11', total: 68900 },
+    confidence: { supplier: 'alta', number: 'baja', date: 'alta', totals: 'alta' },
+    lines: [
+      { text: 'ARROZ SABROSON X 1000', genericName: 'Arroz', code: '11384', quantity: 6, lineTotal: 22800, unitCode: 'unidad', packSize: 1000, packUnit: 'g', confidence: 'alta' },
+      { text: 'ACEITE CUISINE X3000', genericName: 'Aceite vegetal', quantity: 1, unitPrice: 25000, packSize: 3000, packUnit: 'ml', unitCode: 'litro', confidence: 'media' },
+      { text: 'TRIFOGON CAJA P X 24', quantity: 1, unitPrice: 2800, packSize: 24, packUnit: 'caja', confidence: 'media' },
+    ],
+    warnings: ['El documento dice «ESTE DOCUMENTO NO TIENE VALIDEZ»'],
+  }
+
+  it('a document with lines is never thrown away, even if the model says it is not an invoice', () => {
+    const e = normalizeExtraction(ticket)
+    expect(e.isInvoice).toBe(true)
+    expect(e.documentType).toBe('pedido')
+    expect(e.invoice).toMatchObject({ number: null, date: '2026-10-10', time: '06:11', total: 68900 })
+  })
+
+  it('keeps the plain name, the normalized unit and what each unit brings (only valid values)', () => {
+    const [rice, oil, box] = normalizeExtraction(ticket).lines
+    expect(rice).toMatchObject({ genericName: 'Arroz', unitCode: 'unidad', packSize: 1000, packUnit: 'g', unitPrice: 3800 })
+    // «litro» is not a Quanela unit code: left out.
+    expect(oil).toMatchObject({ unitCode: null, packSize: 3000, packUnit: 'ml' })
+    // «caja» is not a pack unit: no pack.
+    expect(box).toMatchObject({ packSize: null, packUnit: null })
+  })
+
+  it('without lines and not a purchase document, it is still refused', () => {
+    expect(normalizeExtraction({ isInvoice: false, lines: [] }).isInvoice).toBe(false)
+  })
+})
+

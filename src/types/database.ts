@@ -4752,6 +4752,7 @@ export type Database = {
           wasted_30d: number
         }[]
       }
+      dk_invoice_clean_key: { Args: { p: string }; Returns: string }
       dk_invoice_import_discard: {
         Args: { p_import_id: string }
         Returns: undefined
@@ -4780,6 +4781,7 @@ export type Database = {
       dk_invoice_line_suggestions: {
         Args: {
           p_code: string
+          p_generic?: string
           p_kitchen: string
           p_supplier: string
           p_text: string

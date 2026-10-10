@@ -174,8 +174,9 @@ Deno.serve(async (req: Request) => {
         p_run_id: runId, p_status: "empty", p_latency_ms: latency, p_input_tokens: answer.inputTokens, p_output_tokens: answer.outputTokens,
         p_output: { isInvoice: false },
       });
-      await db.rpc("dk_invoice_import_save", { p_import_id: importId, p_status: "ERROR", p_extraction: extraction, p_ai_run_id: runId, p_error: "No parece una factura" });
-      return json({ error: "NOT_INVOICE", message: "Esto no parece una factura de compra. Revisa el archivo.", importId }, 422);
+      // Only when there is nothing to buy in it: a ticket or order with lines is always reviewed (rev. 2).
+      await db.rpc("dk_invoice_import_save", { p_import_id: importId, p_status: "ERROR", p_extraction: extraction, p_ai_run_id: runId, p_error: "No se encontraron productos" });
+      return json({ error: "NOT_INVOICE", message: "No encontramos productos comprados en este archivo. Revisa que sea la factura, el tiquete o el pedido.", importId }, 422);
     }
 
     const { error: saveError } = await db.rpc("dk_invoice_import_save", { p_import_id: importId, p_status: "LISTA", p_extraction: extraction, p_ai_run_id: runId });

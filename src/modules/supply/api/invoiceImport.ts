@@ -9,6 +9,7 @@ import { supabase } from '@/shared/lib/supabase'
 import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
 import type { Extraction, InvoiceImport, InvoiceImportStatus, InvoiceMatch, ReadResult, SaveResult } from '../types/invoiceImport'
 import { prepareInvoiceFile, sha256Hex } from '../lib/invoiceFile'
+import { normalizeExtraction } from '../../../../supabase/functions/dk-invoice-import/contract'
 
 const BUCKET = 'dk-attachments'
 
@@ -114,6 +115,15 @@ export async function matchInvoice(extraction: Extraction, supplierId: string | 
   const { data, error } = await supabase.rpc('dk_invoice_match', { p_extraction: extraction as never, p_supplier_id: supplierId as string })
   if (error) throw error
   return data as unknown as InvoiceMatch
+}
+
+/**
+ * Rev. 2: a read refused only for «no es una factura» (a ticket that says it
+ * has no validity) still has its lines: it goes to review without reading again.
+ */
+export async function reopenInvoiceImport(id: string, extraction: Extraction): Promise<void> {
+  const { error } = await supabase.rpc('dk_invoice_import_save', { p_import_id: id, p_status: 'LISTA', p_extraction: normalizeExtraction(extraction) as never })
+  if (error) throw error
 }
 
 export async function discardInvoiceImport(id: string): Promise<void> {
