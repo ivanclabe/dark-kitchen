@@ -1,5 +1,5 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { Activity, BarChart3, CalendarClock, LayoutDashboard, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { Activity, BarChart3, CalendarClock, Globe, Landmark, LayoutDashboard, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
@@ -52,6 +52,13 @@ export const NAV_ITEMS: NavItem[] = [
     matchPrefixes: ['/customers'],
   },
   {
+    to: '/public-menu',
+    label: 'Menú público',
+    description: 'Tu menú de hoy en una página para tus clientes, con pedidos que entran a cocina',
+    modules: ['publicMenu'],
+    icon: Globe,
+  },
+  {
     to: '/consumer',
     label: 'Consumer',
     description: 'Quanela Consumer: lo que ven los clientes en la app',
@@ -72,6 +79,14 @@ export const NAV_ITEMS: NavItem[] = [
     modules: ['reports'],
     icon: BarChart3,
     matchPrefixes: ['/insights', '/reports'],
+  },
+  {
+    to: '/finance',
+    label: 'Finanzas',
+    description: 'Lo que se debe, los pagos, el flujo de caja y la rentabilidad real',
+    modules: ['finance'],
+    icon: Landmark,
+    matchPrefixes: ['/finance'],
   },
 ]
 

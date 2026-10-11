@@ -1,5 +1,6 @@
 import { supabase } from '@/shared/lib/supabase'
 import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
+import type { PurchasePayment } from '@/modules/finance/types'
 import type { Attachment, LastIngredientPrice, Purchase, PurchaseInput, PurchaseItem, PurchaseItemInput } from '../types'
 
 interface PurchaseRow {
@@ -71,8 +72,9 @@ export async function createPurchase(input: PurchaseInput): Promise<Purchase> {
   return mapPurchase(data as unknown as PurchaseRow)
 }
 
-export async function confirmPurchase(id: string): Promise<void> {
-  const { error } = await supabase.rpc('dk_confirm_purchase', { p_purchase_id: id })
+/** Confirms (inventory in) and, ADR 0051, says how it was paid: cash or on credit. */
+export async function confirmPurchase(id: string, payment?: PurchasePayment): Promise<void> {
+  const { error } = await supabase.rpc('dk_confirm_purchase', { p_purchase_id: id, ...(payment ? { p_payment: payment as never } : {}) })
   if (error) throw error
 }
 

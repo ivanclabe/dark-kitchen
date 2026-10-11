@@ -8,6 +8,7 @@
     { "id": "catalog", "title": "Catálogo", "description": "Platos, menú del día y recetas." },
     { "id": "customers", "title": "Clientes", "description": "Tus clientes, sus pedidos y lo que deben." },
     { "id": "reports", "title": "Reportes (Insights)", "description": "Cómo va el negocio y qué es rentable." },
+    { "id": "finance", "title": "Finanzas", "description": "Lo que se debe, los pagos, la nómina y la rentabilidad real." },
     { "id": "team", "title": "Equipo", "description": "Usuarios, roles y turnos." },
     { "id": "assistant", "title": "Copilot y «Oye Quanela»", "description": "Pregúntale a Quanela, escribiendo o con la voz." },
     { "id": "settings", "title": "Configuración", "description": "Ajustes de la cuenta." },

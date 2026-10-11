@@ -7,6 +7,8 @@ export interface Supplier {
   address: string | null
   contactName: string | null
   active: boolean
+  /** ADR 0051: days to pay it (0 = cash). */
+  paymentTermsDays: number
 }
 
 export interface SupplierInput {
@@ -16,4 +18,5 @@ export interface SupplierInput {
   email?: string | null
   address?: string | null
   contactName?: string | null
+  paymentTermsDays?: number
 }

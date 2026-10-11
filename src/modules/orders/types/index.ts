@@ -13,7 +13,7 @@ export type PrepStatus = Extract<OrderStatus, 'CONFIRMADO' | 'EN_PREPARACION' | 
 
 export type KitchenItemStatus = 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO'
 
-export type OrderChannel = 'MANUAL' | 'WHATSAPP' | 'PHONE'
+export type OrderChannel = 'MANUAL' | 'WHATSAPP' | 'PHONE' | 'WEB'
 
 export type DeliveryStatus = 'EN_RUTA' | 'ENTREGADO' | 'FALLIDO'
 
@@ -48,6 +48,11 @@ export interface Order {
   total: number
   paymentMethod: string | null
   notes: string | null
+  /** ADR 0052: how a public-menu order is received (null in the other channels). */
+  fulfillment?: 'delivery' | 'pickup' | null
+  /** The delivery address written in the order (public menu); else the customer's. */
+  deliveryAddress?: string | null
+  deliveryReference?: string | null
   requiresReview: boolean
   /** Kitchen priority (0 = normal). */
   priority: number

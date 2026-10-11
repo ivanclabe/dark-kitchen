@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { Bike, Flag, MapPin, Pause } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSlaSettings } from '../hooks/useSlaSettings'
-import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, formatElapsed, minutesAgoSince, TIME_TIER_STYLE, timeTier } from '../lib/orderVisuals'
+import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, formatElapsed, minutesAgoSince, TIME_TIER_STYLE, timeTier, orderAddress } from '../lib/orderVisuals'
 import { PAYMENT_STATE_LABEL, paymentSummary } from '../lib/payment'
 import { isKitchenStage } from '../lib/transitions'
 import type { KitchenItemStatus, Order } from '../types'
@@ -91,7 +91,7 @@ export function OrderCardBody({
       {ticket.status === 'LISTO' && (
         <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
           <MapPin size={11} className="shrink-0 text-neutral-500" aria-hidden />
-          <span className="truncate">{ticket.customerAddress ?? 'Sin dirección registrada'}</span>
+          <span className="truncate">{orderAddress(ticket) ?? 'Sin dirección registrada'}</span>
         </p>
       )}
 

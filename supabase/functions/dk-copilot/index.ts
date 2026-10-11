@@ -93,7 +93,7 @@ const TOOLS: ToolDef[] = [
     label: "Consultando ventas",
     permission: "reports.view",
     fn: "dk_copilot_sales",
-    description: "Ventas de un periodo (todo pedido no cancelado, como Insights; unconfirmed* es la parte aún por confirmar): total, pedidos, ticket promedio, agrupadas por día, plato, cliente, canal, forma de pago, día de la semana (1=lunes) u hora; opcionalmente comparadas con el periodo anterior de igual duración.",
+    description: "Ventas de un periodo (todo pedido no cancelado; unconfirmed* es la parte aún por confirmar. Insights y Finanzas cuentan solo los confirmados: total − unconfirmedTotal): total, pedidos, ticket promedio, agrupadas por día, plato, cliente, canal, forma de pago, día de la semana (1=lunes) u hora; opcionalmente comparadas con el periodo anterior de igual duración.",
     input_schema: {
       type: "object",
       properties: {
@@ -208,6 +208,16 @@ const TOOLS: ToolDef[] = [
     }),
   },
   {
+    name: "finance",
+    label: "Revisando finanzas",
+    permission: "finance.view",
+    fn: "dk_copilot_finance",
+    description:
+      "Finanzas de un periodo (ADR 0051): lo que se debe hoy (payables: total, vencido, próximos 7 días y las obligaciones con su saldo y vencimiento: proveedores, gastos y, si el rol la ve, nómina), el flujo de caja (lo cobrado entra, lo pagado sale) y, si el rol ve costos, la rentabilidad real: ventas netas de pedidos confirmados, costo de ingredientes vendidos, utilidad bruta, domicilios, mermas y ajustes, IVA de compras no descontable, nómina, gastos por categoría y utilidad operativa, con su cobertura. Las compras no son gasto (el ingrediente cuesta al consumirse) y los pagos tampoco.",
+    input_schema: { type: "object", properties: { from: date, to: date }, required: ["from", "to"] },
+    args: (i) => ({ p_from: i.from, p_to: i.to }),
+  },
+  {
     name: "payments",
     label: "Revisando cobros",
     permission: "receivables.view",
@@ -291,7 +301,8 @@ function systemPrompt(ctx: Json, tools: ToolDef[], screen: string | null, channe
       : "",
     "- Resuelve fechas relativas tú mismo (\"esta semana\" = desde el lunes hasta hoy; \"ayer\"; \"el mes pasado\"). Si falta el periodo, asume hoy y dilo.",
     "- Solo lectura: no puedes crear, cambiar ni borrar nada. Si piden una acción (cancelar, cobrar, confirmar, crear…), usa help y di dónde se hace (scope action), con el artículo en links. Un comando de pedido dictado («pedido 1042 listo») solo se ejecuta en Operación → Cocina: indícalo.",
-    "- Si es del negocio pero Quanela no guarda ese dato (gastos, nómina, utilidad neta, pronósticos, competencia), dilo y ofrece lo más cercano que sí hay (scope unsupported).",
+    "- Utilidad real o neta, gastos, nómina, lo que se debe a proveedores y el flujo de caja: usa la herramienta finance. Si la cobertura dice que faltan gastos o nómina sin registrar, dilo: la utilidad estaría sobreestimada.",
+    "- Si es del negocio pero Quanela no guarda ese dato (pronósticos, competencia), dilo y ofrece lo más cercano que sí hay (scope unsupported).",
     "- Si no es del negocio (clima, noticias, tareas, programación, temas generales), declina con amabilidad, sin responderlo, y di en qué sí ayudas (scope out_of_scope). No salgas del contexto del negocio.",
     "- Si es ambigua, haz UNA pregunta corta (scope clarify) o asume lo más razonable y dilo.",
     "- Conversación: los turnos anteriores son contexto. Una pregunta de seguimiento («¿y ayer?», «¿y de ese plato?», «¿y la semana pasada?») completa lo que le falta con el turno anterior (la misma intención, el mismo plato o cliente, otro periodo) y vuelve a consultar las herramientas: nunca reutilices cifras viejas como si fueran nuevas. Las notas [Contexto de esta respuesta: …] son tuyas, no las muestres.",

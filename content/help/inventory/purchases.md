@@ -13,8 +13,8 @@ questions:
   - ¿Cómo cargo una factura de proveedor?
   - ¿Cómo sumo stock?
 keywords: [compra, factura, proveedor, entrada, ingresar inventario, confirmar compra, costo, adjunto, factura del proveedor, cargar factura]
-related: [invoice-import, stock, suppliers, inventory-deduction]
-updated: 2026-10-10
+related: [invoice-import, payables, stock, suppliers, inventory-deduction]
+updated: 2026-10-11
 order: 2
 screenshots:
   - id: purchase
@@ -31,7 +31,7 @@ screenshots:
 3. En **Agregar línea**, elige el **Insumo**, la **Cantidad**, la **Unidad de compra** y el **Costo unitario**. Si ya le compraste antes, toca la sugerencia **Último: $…** para usar ese precio. Toca **Agregar línea**.
 4. Repite con cada producto de la factura. Para quitar una línea, toca **Quitar**.
 5. Opcional: en **Adjuntos**, sube la foto o el PDF de la factura.
-6. Revisa el total y toca **Confirmar compra** → **Sí, confirmar**.
+6. Revisa el total y toca **Confirmar compra**. Elige **¿Cómo se pagó?**: **De contado** (con el método; queda pagada) o **A crédito** (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca **Sí, confirmar**.
 
 {{screenshot:purchase}}
 

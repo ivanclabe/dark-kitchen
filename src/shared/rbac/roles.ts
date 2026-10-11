@@ -17,6 +17,8 @@ export type ModuleKey =
   | 'settings'
   | 'staff'
   | 'consumer'
+  | 'finance'
+  | 'publicMenu'
 
 /** ¿Tiene el usuario este permiso (clave del catálogo, p. ej. 'orders.confirm') en la Cuenta activa? */
 export type Can = (permission: AccountPermission) => boolean
@@ -47,6 +49,10 @@ const MODULE_PERMISSIONS: Record<ModuleKey, readonly AccountPermission[]> = {
   staff: ['staff.view', 'staff.manage'],
   // Quanela Consumer (ADR 0042), its own module since ADR 0046: what the account publishes for end customers.
   consumer: ['storefront.manage'],
+  // Obligaciones, pagos y rentabilidad real (ADR 0051).
+  finance: ['finance.view'],
+  // Menú público (ADR 0052): the same storefront permission as Consumer.
+  publicMenu: ['storefront.manage'],
 }
 
 export function canAccessModule(can: Can, module: ModuleKey): boolean {

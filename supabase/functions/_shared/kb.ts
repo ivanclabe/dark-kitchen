@@ -278,7 +278,7 @@ export const KB: KbArticle[] = [
       "Cuando esté completo, toca Confirmar pedido . Ver Confirmar y cancelar."
     ],
     "headings": [],
-    "body": "En Operación , toca Nuevo pedido o presiona la tecla N . En Cliente , escribe el nombre o el teléfono y elígelo. Si no existe, toca Crear \"…\" y guarda sus datos: el pedido se crea solo. Toca Crear pedido . El borrador aparece de inmediato en Por confirmar . Agrega cada plato: elígelo en Plato , ajusta la Cantidad , revisa el Precio unitario y escribe la Observación si hace falta (o toca una sugerencia: «Sin cebolla», «Para llevar»…). Toca Agregar plato . Revisa la tabla con el subtotal, el descuento, el domicilio y el Total . Para quitar un plato, toca Quitar . Cuando esté completo, toca Confirmar pedido . Ver Confirmar y cancelar. Bueno saber: también puedes crear el pedido desde un cliente: en Clientes , abre el cliente y toca Nuevo pedido ; ya viene elegido. Cuidado: los platos solo se pueden agregar o quitar mientras el pedido está Por confirmar . Los pedidos que llegan por WhatsApp (si tu negocio tiene la integración) aparecen solos en Por confirmar ."
+    "body": "En Operación , toca Nuevo pedido o presiona la tecla N . En Cliente , escribe el nombre o el teléfono y elígelo. Si no existe, toca Crear \"…\" y guarda sus datos: el pedido se crea solo. Toca Crear pedido . El borrador aparece de inmediato en Por confirmar . Agrega cada plato: elígelo en Plato , ajusta la Cantidad , revisa el Precio unitario y escribe la Observación si hace falta (o toca una sugerencia: «Sin cebolla», «Para llevar»…). Toca Agregar plato . Revisa la tabla con el subtotal, el descuento, el domicilio y el Total . Para quitar un plato, toca Quitar . Cuando esté completo, toca Confirmar pedido . Ver Confirmar y cancelar. Bueno saber: también puedes crear el pedido desde un cliente: en Clientes , abre el cliente y toca Nuevo pedido ; ya viene elegido. Cuidado: los platos solo se pueden agregar o quitar mientras el pedido está Por confirmar . Los pedidos que llegan por WhatsApp (si tu negocio tiene la integración) aparecen solos en Por confirmar . Los del Menú web entran directo a Cocina si tienes Confirmar automáticamente encendido. Ver Menú público y pedidos online."
   },
   {
     "id": "customers",
@@ -467,6 +467,52 @@ export const KB: KbArticle[] = [
     "body": "Despachar En Operación , abre la vista Despacho . En Listos para salir , toca Despachar en el pedido. Elige el Domiciliario (los que están de turno aparecen primero) y escribe Notas para el reparto si hace falta («tocar el timbre», «paga en efectivo»). Toca Despachar . El pedido pasa a En ruta . Entregar En En ruta , toca Entregar cuando el pedido llegue. El pedido queda Entregado y sale del tablero (sigue en la Lista ). Domiciliarios En Operación → ⋯ → Domiciliarios agregas uno nuevo (nombre, teléfono y vehículo) y activas o desactivas los existentes. Solo los activos aparecen al despachar. Agregarlos es de administración. Bueno saber: el DOMICILIARIO entra directo a Despacho y solo ve los pedidos que le asignaron, con la dirección y el teléfono del cliente. Puede marcarlos Entregados , pero no despachar."
   },
   {
+    "id": "expenses",
+    "section": "finance",
+    "url": "/help/finance/expenses",
+    "title": "Registrar gastos y gastos fijos",
+    "summary": "En Finanzas → Gastos registras el arriendo, los servicios y demás gastos, con su fecha o periodo, y los gastos fijos que se crean solos cada mes.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "finance.manage"
+    ],
+    "appPath": "/finance/expenses",
+    "questions": [
+      "¿Cómo registro el arriendo?",
+      "¿Dónde anoto los servicios públicos?",
+      "¿Cómo registro un gasto que se repite cada mes?",
+      "¿Un gasto pagado cuenta dos veces?"
+    ],
+    "keywords": [
+      "gastos",
+      "arriendo",
+      "servicios públicos",
+      "gas",
+      "internet",
+      "empaques",
+      "publicidad",
+      "gasto fijo",
+      "gasto recurrente",
+      "categoría"
+    ],
+    "steps": [
+      "En Finanzas → Gastos , toca Registrar gasto .",
+      "Elige la Categoría (Arriendo, Servicios públicos, Gas, Internet y telefonía, Empaques y desechables, Domicilios y transporte, Comisiones de plataformas, Publicidad, Mantenimiento y aseo, Impuestos y trámites, Otros gastos; o crea una con + Nueva categoría ).",
+      "Escribe la Descripción , a quién se le paga (uno de tus proveedores o un nombre) y el Valor .",
+      "Fecha del gasto , o enciende Corresponde a un periodo (por ejemplo, el arriendo del 1 al 31): en la rentabilidad se reparte por días , así una semana lleva su parte.",
+      "Si ya lo pagaste, enciende Ya lo pagué y elige cómo. Si no, pon cuándo Vence : queda en Por pagar.",
+      "Toca Registrar gasto ."
+    ],
+    "headings": [
+      "Gastos fijos"
+    ],
+    "body": "En Finanzas → Gastos , toca Registrar gasto . Elige la Categoría (Arriendo, Servicios públicos, Gas, Internet y telefonía, Empaques y desechables, Domicilios y transporte, Comisiones de plataformas, Publicidad, Mantenimiento y aseo, Impuestos y trámites, Otros gastos; o crea una con + Nueva categoría ). Escribe la Descripción , a quién se le paga (uno de tus proveedores o un nombre) y el Valor . Fecha del gasto , o enciende Corresponde a un periodo (por ejemplo, el arriendo del 1 al 31): en la rentabilidad se reparte por días , así una semana lleva su parte. Si ya lo pagaste, enciende Ya lo pagué y elige cómo. Si no, pon cuándo Vence : queda en Por pagar. Toca Registrar gasto . Bueno saber: el gasto cuenta en la rentabilidad en su fecha o periodo , no cuando lo pagas. Pagarlo no lo vuelve a contar. Cuidado: lo que compras para cocinar (insumos) va en Compras , no aquí: entra al inventario y cuesta cuando se usa. Gastos fijos Para lo que se repite cada mes (arriendo, internet), toca Nuevo gasto fijo : categoría, descripción, valor y el día en que vence. Quanela crea la obligación de cada mes una sola vez , al abrir Finanzas. Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente)."
+  },
+  {
     "id": "faq",
     "section": "faq",
     "url": "/help/faq/faq",
@@ -644,7 +690,7 @@ export const KB: KbArticle[] = [
       "Qué hay en cada pestaña",
       "Exportar"
     ],
-    "body": "Abre Insights . Elige el Periodo : Hoy, Esta semana, Este mes, Mes anterior, Este trimestre, Este año o Personalizado (con fechas Desde y Hasta ). Si quieres, filtra por Categoría o Producto . Quitar filtros vuelve a todo. Activa Comparar para ver cuánto subió o bajó cada cifra frente al periodo anterior. Recorre las pestañas: Resumen , Ventas , Productos y Costos . Qué hay en cada pestaña Pestaña Qué ves --- Resumen Ingresos, pedidos, ticket promedio y, si tienes permiso, costo de ventas, utilidad y margen. El Resumen del negocio son conclusiones calculadas con reglas fijas sobre tus datos (nada es inventado por IA). Abajo, los productos y categorías que más venden Ventas Ingresos y pedidos por día, por canal , por día de la semana y por hora del día Productos Cuánto vende y cuánto deja cada producto. Ver Rentabilidad por producto Costos Costo de ventas, costo por unidad, compras por proveedor, mermas y precio de compra de los insumos. Ver Costos, compras y mermas Exportar Toca Exportar CSV : descarga la pestaña que estás viendo, con el mismo periodo y filtros. El archivo se abre en Excel o Google Sheets. Bueno saber: las ventas cuentan todos los pedidos que no están cancelados , incluido el domicilio, en la fecha y la hora de tu cuenta. Las cifras de costo y margen solo las ve quien tiene permiso de rentabilidad."
+    "body": "Abre Insights . Elige el Periodo : Hoy, Esta semana, Este mes, Mes anterior, Este trimestre, Este año o Personalizado (con fechas Desde y Hasta ). Si quieres, filtra por Categoría o Producto . Quitar filtros vuelve a todo. Activa Comparar para ver cuánto subió o bajó cada cifra frente al periodo anterior. Recorre las pestañas: Resumen , Ventas , Productos y Costos . Qué hay en cada pestaña Pestaña Qué ves --- Resumen Ingresos, pedidos, ticket promedio y, si tienes permiso, costo de ventas, utilidad y margen. El Resumen del negocio son conclusiones calculadas con reglas fijas sobre tus datos (nada es inventado por IA). Abajo, los productos y categorías que más venden Ventas Ingresos y pedidos por día, por canal , por día de la semana y por hora del día Productos Cuánto vende y cuánto deja cada producto. Ver Rentabilidad por producto Costos Costo de ventas, costo por unidad, compras por proveedor, mermas y precio de compra de los insumos. Ver Costos, compras y mermas Exportar Toca Exportar CSV : descarga la pestaña que estás viendo, con el mismo periodo y filtros. El archivo se abre en Excel o Google Sheets. Bueno saber: las ventas cuentan los pedidos confirmados (los que no se han confirmado o están cancelados no cuentan), incluido el domicilio, en la fecha y la hora de tu cuenta. La utilidad real, con nómina y gastos, está en Rentabilidad real. Las cifras de costo y margen solo las ve quien tiene permiso de rentabilidad."
   },
   {
     "id": "inventory-deduction",
@@ -1165,6 +1211,95 @@ export const KB: KbArticle[] = [
     "body": "Hablarle una vez Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J . La primera vez, el navegador pide permiso para el micrófono: toca Permitir . Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa. Quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace Abrir guía . El chat de Copilot no se abre solo : la respuesta queda guardada y el botón ✦ Copilot muestra un número con las respuestas sin ver. Tócalo para leerlas completas. Manos libres Toca el micrófono de arriba → Manos libres en este equipo . Di «Oye Quanela» y, sin pausa larga, tu pregunta. Ya te escucha mientras suena el tono: no hace falta esperar a que termine. En la vista Cocina, también tus comandos (ver Comandos de voz en cocina). Para dejar de escuchar un rato, Pausar ; luego Reanudar . Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida. Conversar sin repetir «Oye Quanela» Después de «Oye Quanela», Quanela sigue escuchando : cuando termina de responder suena un tono corto y tienes unos 8 segundos para la siguiente pregunta, sin repetir la frase. Arriba dice «Conversación · te escucho» . «¿Cuánto vendimos hoy?» … «¿Y ayer?» … «¿Y cuál plato vendió más?» — entiende que hablas de lo mismo. En la cocina también puedes decir comandos («pedido 1042 listo») dentro de la conversación. Para terminar: Quédate en silencio unos segundos. Di «gracias» , «listo» o «eso es todo» (responde «Con gusto.»), o «para» . En el micrófono de arriba → Terminar conversación . Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos. Bueno saber: el botón Hablar ahora y Ctrl/⌘ + Shift + J son para una sola pregunta . La conversación es solo con «Oye Quanela». Bueno saber: la frase «Oye Quanela» se detecta en tu equipo : ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador. Que responda más rápido Quanela empieza a hablar en cuanto tiene la frase de respuesta, mientras el detalle sigue llegando al chat de Copilot. Para que tarde menos: Termina la pregunta y haz una pausa corta : cuando el navegador entiende la frase completa, Quanela la envía enseguida. En Voz en este equipo → Hablar , mira con qué voz habla: si dice en línea , elige una voz instalada , que empieza a hablar antes. En Chrome y Edge, justo después de una respuesta ya puedes volver a decir «Oye Quanela». Ajustar la voz En el micrófono → Voz en este equipo : Escuchar : cómo te oye Quanela y"
   },
   {
+    "id": "payables",
+    "section": "finance",
+    "url": "/help/finance/payables",
+    "title": "Lo que se debe y los pagos",
+    "summary": "En Finanzas → Por pagar ves lo que debe el negocio (a proveedores, gastos y nómina), qué vence y qué está vencido, y registras pagos completos o abonos. En Pagos, el registro de lo que salió.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "finance.view",
+      "finance.pay"
+    ],
+    "appPath": "/finance/payables",
+    "questions": [
+      "¿Cuánto le debo a mis proveedores?",
+      "¿Qué cuentas por pagar tengo?",
+      "¿Cómo registro un pago a un proveedor?",
+      "¿Puedo pagar una factura por partes?",
+      "¿Cómo anulo un pago mal registrado?",
+      "¿Qué compras a crédito tengo?"
+    ],
+    "keywords": [
+      "por pagar",
+      "cuentas por pagar",
+      "deudas",
+      "obligaciones",
+      "pagos",
+      "abono",
+      "crédito",
+      "vencido",
+      "proveedor",
+      "anular pago"
+    ],
+    "steps": [
+      "Toca Pagar en la obligación.",
+      "Escribe el Valor (por defecto, todo el saldo; menos es un abono y el resto queda pendiente), la Fecha del pago , Cómo se pagó y, si quieres, la Referencia .",
+      "Toca Registrar pago ."
+    ],
+    "headings": [
+      "Pagar",
+      "Pagos y anulaciones"
+    ],
+    "body": "Por pagar reúne todo lo que el negocio debe: Proveedores: cada compra confirmada crea una deuda con su proveedor, por el total de la factura. Vence en la fecha de la factura más el plazo de pago del proveedor. Gastos: arriendo, servicios y demás. Ver Gastos. Nómina: lo liquidado a cada persona. Ver Nómina. Arriba ves Por pagar , Vencido y Vence en 7 días . Filtra por estado (Por pagar, Vencidas, Pagadas, Anuladas) o por tipo. Pagar Toca Pagar en la obligación. Escribe el Valor (por defecto, todo el saldo; menos es un abono y el resto queda pendiente), la Fecha del pago , Cómo se pagó y, si quieres, la Referencia . Toca Registrar pago . Al confirmar una compra, Quanela pregunta ¿Cómo se pagó? : De contado la deja pagada en ese momento, y A crédito la deja en Por pagar con su vencimiento. Bueno saber: un pago solo saca plata y baja lo que se debe. No es un gasto nuevo ni mueve el inventario. Pagos y anulaciones En Finanzas → Pagos ves cada pago del periodo. Si uno quedó mal, toca Anular y escribe el motivo: se registra una anulación y lo que se debía vuelve a quedar pendiente. Nada se borra. Un gasto se puede anular si no tiene pagos (primero anula sus pagos). La deuda de una compra no se anula: viene de la compra confirmada. Cuidado: las compras confirmadas antes de Finanzas no se volvieron deuda solas. Si todavía debes alguna, toca Agregar compras anteriores y márcala."
+  },
+  {
+    "id": "payroll",
+    "section": "finance",
+    "url": "/help/finance/payroll",
+    "title": "Nómina",
+    "summary": "En Finanzas → Nómina configuras cómo se le paga a cada persona (por hora o salario mensual) y liquidas la nómina de un periodo con las horas reales de los turnos.",
+    "audience": [
+      "owner",
+      "admin"
+    ],
+    "permissions": [
+      "finance.payroll"
+    ],
+    "appPath": "/finance/payroll",
+    "questions": [
+      "¿Cómo liquido la nómina?",
+      "¿Cómo registro cuánto gana cada empleado?",
+      "¿Quanela calcula las horas trabajadas?",
+      "¿Quién puede ver los salarios?"
+    ],
+    "keywords": [
+      "nómina",
+      "salario",
+      "sueldo",
+      "pago por hora",
+      "horas trabajadas",
+      "liquidar",
+      "quincena",
+      "empleados"
+    ],
+    "steps": [
+      "En Liquidar nómina , elige Desde y Hasta (por ejemplo, la quincena) y toca Calcular .",
+      "Quanela propone, por persona, las horas trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional.",
+      "Ajusta A pagar si hay extras, auxilios o deducciones, con una nota.",
+      "Elige cuándo Se paga y toca Liquidar : queda una obligación por persona en Por pagar ."
+    ],
+    "headings": [
+      "Cómo se le paga a cada persona",
+      "Liquidar"
+    ],
+    "body": "Cómo se le paga a cada persona En Cómo se le paga a cada persona , toca Configurar (o Cambiar ) junto a cada quien: Por hora: el valor de la hora. La nómina usa las horas reales de sus turnos. Salario mensual: el salario del mes. La nómina toma la parte de los días del periodo. Elige Desde cuándo rige: un cambio no altera lo anterior. Liquidar En Liquidar nómina , elige Desde y Hasta (por ejemplo, la quincena) y toca Calcular . Quanela propone, por persona, las horas trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional. Ajusta A pagar si hay extras, auxilios o deducciones, con una nota. Elige cuándo Se paga y toca Liquidar : queda una obligación por persona en Por pagar . Bueno saber: la nómina cuenta en la rentabilidad en su periodo, repartida por días. Pagarla no la vuelve a contar. Cuidado: Quanela no calcula prestaciones sociales ni seguridad social: súmalas en la nota o regístralas como gasto. Una misma persona no se liquida dos veces en el mismo periodo. Los salarios solo los ve quien tiene el permiso Nómina (ADMIN por defecto). El GERENTE ve el total de nómina en la rentabilidad, pero no lo de cada persona."
+  },
+  {
     "id": "product-profitability",
     "section": "reports",
     "url": "/help/reports/product-profitability",
@@ -1209,6 +1344,120 @@ export const KB: KbArticle[] = [
     "body": "Abre Insights y elige el periodo. Toca la pestaña Productos . En Rentabilidad por producto , toca el encabezado Unidades , Ingresos , Utilidad bruta o Margen para ordenar. Toca un producto para ver los pedidos en que se vendió. En Por categoría , toca una categoría para filtrar. Cómo leer el margen Utilidad bruta = lo que vendiste del plato − lo que costaron sus insumos. Margen = utilidad ÷ ventas. Un margen bajo o negativo te dice que revises el precio o la receta. El costo es el real de cada plato preparado (al costo promedio de ese momento). Lo que aún no se ha preparado usa el costo estimado de su receta. Bueno saber: un \\ junto a un producto indica que parte de sus ventas no tiene costo registrado (por ejemplo, un plato que se vendió antes de tener receta). Desde la ficha de un plato o su receta, Ventas y rentabilidad te trae aquí directamente."
   },
   {
+    "id": "profitability",
+    "section": "finance",
+    "url": "/help/finance/profitability",
+    "title": "Rentabilidad real y flujo de caja",
+    "summary": "En Finanzas → Rentabilidad ves la utilidad real del periodo, de las ventas a la utilidad operativa; en Flujo de caja, lo que entró y salió. Las compras y los pagos no son gasto.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "finance.view",
+      "reports.profitability"
+    ],
+    "appPath": "/finance/profit",
+    "questions": [
+      "¿Cuánto me queda de verdad?",
+      "¿Cuál es mi utilidad neta?",
+      "¿Por qué la utilidad no es igual a lo que tengo en caja?",
+      "¿Las compras cuentan como gasto?",
+      "¿Cómo se calcula la rentabilidad?"
+    ],
+    "keywords": [
+      "rentabilidad",
+      "utilidad",
+      "utilidad operativa",
+      "utilidad neta",
+      "estado de resultados",
+      "ganancia",
+      "flujo de caja",
+      "caja",
+      "iva",
+      "mermas"
+    ],
+    "steps": [],
+    "headings": [
+      "Flujo de caja"
+    ],
+    "body": "Abre Finanzas → Rentabilidad y elige el periodo. Es un estado de resultados : cada renglón dice de dónde sale. Renglón Qué es --- Ventas − Descuentos = Ventas netas Pedidos confirmados del periodo. Los que no se confirmaron no cuentan (igual que en Insights) − Costo de los ingredientes vendidos Lo que salió del inventario para esos platos, al costo promedio. Si un plato aún no se preparó, se estima con su receta = Utilidad bruta Con su margen + Domicilios cobrados Lo que pagaron los clientes por el domicilio − Mermas y − Ajustes de inventario Lo que se perdió o faltó en los conteos, al costo promedio (si sobró, suma) − IVA de compras Si no descuentas el IVA, lo que pagaste de IVA en tus compras es un costo − Nómina Las nóminas liquidadas, repartidas por los días del periodo. Ver Nómina − Gastos Por categoría, en su fecha o periodo. Ver Gastos = Utilidad operativa Lo que de verdad dejó el negocio, con su margen Bueno saber: las compras no son gasto : el insumo cuesta cuando se usa en un plato vendido, o cuando se pierde. Y los pagos tampoco : el gasto cuenta en su fecha. Por eso comprar a crédito o de contado da la misma utilidad. A la derecha, Para que la utilidad sea completa te avisa lo que falta: platos sin receta, personas sin pago configurado, periodos sin nómina o sin gastos registrados. Mientras falte algo, la utilidad está sobreestimada . Descuento el IVA de mis compras: apagado (lo normal en una cocina pequeña), el IVA de tus compras es un costo. Enciéndelo si lo recuperas en tu declaración. Flujo de caja En Finanzas → Flujo de caja ves lo que entró (los cobros de pedidos) y lo que salió (pagos a proveedores, gastos y nómina), por día y por método. Bueno saber: la caja no es la utilidad. Una compra a crédito cuesta cuando se usa, pero sale de la caja cuando la pagas. Una venta fiada entra a la caja cuando la cobras."
+  },
+  {
+    "id": "public-menu",
+    "section": "catalog",
+    "url": "/help/catalog/public-menu",
+    "title": "Menú público y pedidos online",
+    "summary": "Publica el menú de hoy en una página para tus clientes (quanela.com/menu/tu-negocio), compártela por WhatsApp o con un QR y recibe pedidos que entran directo a cocina.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "storefront.manage"
+    ],
+    "appPath": "/public-menu",
+    "questions": [
+      "¿Cómo publico mi menú del día?",
+      "¿Cómo comparto mi menú por WhatsApp?",
+      "¿Mis clientes pueden pedir en línea?",
+      "¿Dónde llegan los pedidos del menú web?",
+      "¿Cómo hago un código QR de mi menú?",
+      "¿Por qué un plato no aparece en mi menú público?",
+      "¿Cómo cambio el diseño de mi menú público?",
+      "¿Puedo cambiar los colores y la letra de mi página?",
+      "¿Cómo publico el diseño sin que mis clientes vean los cambios a medias?",
+      "¿La IA puede diseñar mi menú?",
+      "¿Dónde están los diseños que hice antes?",
+      "¿Puedo comparar dos diseños?"
+    ],
+    "keywords": [
+      "menú público",
+      "menú digital",
+      "menú web",
+      "pedidos online",
+      "pedidos en línea",
+      "link",
+      "enlace",
+      "compartir",
+      "whatsapp",
+      "qr",
+      "carta digital",
+      "domicilio",
+      "recoger",
+      "diseño",
+      "plantilla",
+      "colores",
+      "tipografía",
+      "letra",
+      "portada",
+      "fondo",
+      "apariencia",
+      "diseñador con ia",
+      "ia",
+      "inteligencia artificial",
+      "mis diseños",
+      "historial",
+      "comparar"
+    ],
+    "steps": [
+      "Toca Publicar .",
+      "En Tu enlace : Copiar , Compartir por WhatsApp (con un mensaje listo con los platos de hoy) o Ver la página .",
+      "En Código QR , toca Descargar para imprimirlo en la mesa, la vitrina o los empaques."
+    ],
+    "headings": [
+      "Publicar y compartir",
+      "Pedidos",
+      "El diseño de tu página",
+      "Editor visual",
+      "Diseñador con IA",
+      "Mis diseños"
+    ],
+    "body": "En Menú público (menú lateral), pestaña Resumen , publicas el menú de hoy en una página que tus clientes abren desde el celular, sin descargar nada. La dirección es quanela.com/menu/ seguida del identificador de tu cuenta (por ejemplo, quanela.com/menu/sopa-donde-carmen ). Publicar y compartir Toca Publicar . En Tu enlace : Copiar , Compartir por WhatsApp (con un mensaje listo con los platos de hoy) o Ver la página . En Código QR , toca Descargar para imprimirlo en la mesa, la vitrina o los empaques. Despublicar quita el menú de inmediato: el enlace dice «Este menú no está disponible». Bueno saber: la página se arma sola con tu planificador de menús (Catálogo): muestra los platos programados hoy , con su precio (el promocional, si tiene, con el normal tachado), su horario («Desde las 12:00»), cuántos quedan si les pusiste límite y si están agotados. No hay que cargar nada dos veces. Ver Platos y menú del día. Cuidado: el enlace usa el Identificador (URL) de tu cuenta (Configuración → General). Si lo cambias, los enlaces que ya compartiste dejan de funcionar. Pedidos En Pedidos : Recibir pedidos: apagado, el cliente ve el menú, arma su pedido y te lo envía por WhatsApp. Encendido, pide en la página. Confirmar automáticamente: encendido, el pedido entra a Cocina al instante, con la misma confirmación de siempre (receta, stock y comanda). Si algo falla (por ejemplo, falta stock), queda en Por confirmar , marcado para revisar. Apagado, todos llegan a Por confirmar . Domicilio (con su costo) y/o Recoger en el local ; pedido mínimo ; formas de pago (efectivo, transferencia con tus instrucciones, por ejemplo tu Nequi, o datáfono); y un mensaje que sale arriba del menú. Toca Guardar opciones . Quanela revisa todo en el momento de pedir: los precios (los calcula ella, no el navegador); que el plato siga disponible a esa hora; el límite de unidades; el stock de los platos que descuentan inventario; tu horario de cocina (cerrado, no recibe y dice cuándo abre); el pedido mínimo. Si algo cambió, el cliente ve qué pasó antes de pedir. Cada pedido llega con el canal Menú web , el cliente (queda en Clientes con su celular y su dirección), la forma de entrega y la forma de pago. Los pedidos para recoger se entregan en el local con Entregar (recoge) , sin pasar por Despacho. El cliente recibe el número de su pedido y un enlace para seguirlo en vivo: Recibido → En cocina → Listo → En camino → Entregado. Bueno saber: configura el horario de la cocina (Operación → Cocina → Con"
+  },
+  {
     "id": "purchases",
     "section": "inventory",
     "url": "/help/inventory/purchases",
@@ -1250,10 +1499,10 @@ export const KB: KbArticle[] = [
       "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea .",
       "Repite con cada producto de la factura. Para quitar una línea, toca Quitar .",
       "Opcional: en Adjuntos , sube la foto o el PDF de la factura.",
-      "Revisa el total y toca Confirmar compra → Sí, confirmar ."
+      "Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar ."
     ],
     "headings": [],
-    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra → Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
+    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
   },
   {
     "id": "quanela-consumer",
@@ -1435,6 +1684,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "11 de octubre de 2026",
       "10 de octubre de 2026",
       "9 de octubre de 2026",
       "8 de octubre de 2026",
@@ -1445,7 +1695,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Importar desde tiquetes y pedidos. Importar desde factura ahora lee tiquetes de caja, remisiones y pedidos de la plaza, aunque digan «no tiene validez». Entiende «ARROZ X 1000» (arroz, 1000 g por unidad), propone una referencia si el documento no tiene número, deja Agregar línea para lo que no se pudo leer y Revisar lo que se leyó si la lectura falló a medias. Quién está en línea. Arriba, junto a Voz y Copilot, ves cuántas personas tienen la cuenta abierta ahora y, al tocarlo, quiénes son y quién está ausente. Nunca se ve qué hace cada uno. Ver Usuarios y roles. Importar una compra desde la factura. En Compras → Nueva → Importar desde factura (o soltando la factura sobre la lista), sube la foto o el PDF. Quanela lee el proveedor, el NIT, las líneas y los precios, y busca tus proveedores e insumos. Tú revisas y corriges todo antes de guardar, en borrador o confirmada. Aprende cómo escribe cada proveedor tus insumos y no duplica proveedores ni insumos. Ver Importar una compra desde una factura. Compras más seguras. Una compra solo se confirma con Confirmar compra (y nunca sin líneas), el costo promedio queda bien cuando un insumo se repite en la factura y no puede haber dos proveedores con el mismo NIT. Platos sin receta. Cada plato tiene Descuenta inventario . Apágalo en lo que no controlas en el inventario (por ejemplo, bebidas que compras listas): se vende sin receta y nunca reserva ni descuenta insumos. En el catálogo dice No usa inventario . Si un plato que descuenta inventario no tiene receta, el pedido se sigue rechazando y el mensaje dice cuál es. Ver Platos y menú del día. de octubre de 2026 Quanela Consumer usa los datos de tu cuenta. El nombre, la dirección pública y el tipo de cocina que ven los clientes son los de la cuenta: se cambian en un solo lugar. Tipo de cocina ahora está en Configuración → General → Esta cuenta (si no eliges, usa la categoría del negocio). Quanela Consumer es un módulo. Consumer , en el menú lateral, reúne lo que ven los clientes en la app de Quanela Consumer: un Resumen (estado, qué te falta para publicar y cómo te ven), el Perfil del negocio y los Platos , con buscador, filtros y publicar varios a la vez. Antes estaba en Configuración. Ver Publicar tu negocio en Quanela Consumer. Centro de operaciones más estable. Las vistas (Tablero, Cocina, Despacho y Lista) están en su propia barra, y nada salta al cambiar de una a otra. Clientes empresa y preferenciales. Registra empresas con nombre comercial, ra"
+    "body": "de octubre de 2026 Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios («haz el fondo un poco más claro») y cada versión queda guardada. Mis diseños guarda el historial de tu negocio: propuestas, diseños del editor y todo lo que publicaste. Puedes comparar dos lado a lado y publicar cuando quieras. La IA nunca publica sola, y probar diseños no cambia tu página ni tus pedidos. Finanzas. Un módulo nuevo en el menú con: Por pagar: lo que se debe a proveedores, gastos y nómina, con vencimientos, abonos y pagos. Pagos: el registro, con anulación. Gastos , con gastos fijos que se crean solos cada mes. Nómina: por hora con las horas reales de los turnos, o salario mensual. Flujo de caja. Rentabilidad: la utilidad real , de las ventas a la utilidad operativa, con ingredientes, mermas, IVA de compras, nómina y gastos. Las compras y los pagos no cuentan dos veces. Ver Rentabilidad real y flujo de caja. ¿Cómo se pagó? Al confirmar una compra (también la importada), eliges de contado o a crédito . Los proveedores tienen plazo de pago y su ficha dice cuánto les debes. Insights cuenta solo pedidos confirmados. Los que no se han confirmado ya no suman a las ventas, para que Insights y Finanzas digan lo mismo. Los ajustes de inventario tienen costo. Desde ahora se valoran al costo promedio, como las mermas. de octubre de 2026 Importar desde tiquetes y pedidos. Importar desde factura ahora lee t"
   },
   {
     "id": "roles",
@@ -1769,7 +2019,7 @@ export const KB: KbArticle[] = [
       "Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo)."
     ],
     "headings": [],
-    "body": "Abre Abastecimiento → Proveedores . Para crear uno, toca Nuevo . En Empresa escribe el Nombre (obligatorio), el NIT o identificación y la Dirección ; en Contacto , la Persona de contacto , el Teléfono y el Correo . Toca Crear proveedor . Toca un proveedor para ver su ficha: Comprado (confirmado) , sus Compras y los Insumos que lo tienen como proveedor principal. Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo). Bueno saber: dos proveedores de la misma cuenta no pueden tener el mismo NIT («900.123.456-7» y «900123456» cuentan como el mismo). Bueno saber: el proveedor principal de un insumo se elige en la ficha del insumo. Con eso, Reponer agrupa lo que hay que comprar por proveedor."
+    "body": "Abre Abastecimiento → Proveedores . Para crear uno, toca Nuevo . En Empresa escribe el Nombre (obligatorio), el NIT o identificación y la Dirección ; en Contacto , la Persona de contacto , el Teléfono y el Correo . Toca Crear proveedor . Toca un proveedor para ver su ficha: Comprado (confirmado) , sus Compras y los Insumos que lo tienen como proveedor principal. Desde la ficha puedes Editar o Desactivar (un proveedor inactivo no aparece al crear compras; usa Incluir inactivos para verlo). Bueno saber: en Pago , el Plazo de pago son los días que te da el proveedor (0 = de contado). Al confirmar una compra a crédito, propone el vencimiento; en su ficha ves Le debes . Ver Lo que se debe y los pagos. Bueno saber: dos proveedores de la misma cuenta no pueden tener el mismo NIT («900.123.456-7» y «900123456» cuentan como el mismo). Bueno saber: el proveedor principal de un insumo se elige en la ficha del insumo. Con eso, Reponer agrupa lo que hay que comprar por proveedor."
   },
   {
     "id": "switch-account",
@@ -1909,7 +2159,7 @@ export const KB: KbArticle[] = [
       "Registrar una merma",
       "Corregir el stock (ajuste)"
     ],
-    "body": "Registrar una merma En Abastecimiento → Stock , abre el insumo. Toca Merma . Escribe la Cantidad que se perdió y elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda. Toca Registrar merma . Sale del inventario automáticamente. Corregir el stock (ajuste) Abre el insumo y toca Ajuste . Escribe la Cantidad en la unidad base: positiva suma stock, negativa resta. Explica el motivo en Observación («conteo del viernes») y toca Registrar ajuste . Cada merma y ajuste queda en los Movimientos del insumo con quién y cuándo. Las mermas también se ven en Insights → Costos . Cuidado: el inventario es un registro que solo crece: nada se borra. Para deshacer un error, haz el ajuste contrario."
+    "body": "Registrar una merma En Abastecimiento → Stock , abre el insumo. Toca Merma . Escribe la Cantidad que se perdió y elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda. Toca Registrar merma . Sale del inventario automáticamente. Corregir el stock (ajuste) Abre el insumo y toca Ajuste . Escribe la Cantidad en la unidad base: positiva suma stock, negativa resta. Explica el motivo en Observación («conteo del viernes») y toca Registrar ajuste . Cada merma y ajuste queda en los Movimientos del insumo con quién y cuándo. Las mermas también se ven en Insights → Costos . Las dos se valoran al costo promedio del insumo y restan en la utilidad real (un ajuste positivo suma). Ver Rentabilidad real. Cuidado: el inventario es un registro que solo crece: nada se borra. Para deshacer un error, haz el ajuste contrario."
   },
   {
     "id": "what-is-quanela",

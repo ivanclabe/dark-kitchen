@@ -12,6 +12,7 @@ import {
   listPurchases,
   uploadInvoiceAttachment,
 } from '../api/purchases'
+import type { PurchasePayment } from '@/modules/finance/types'
 import type { PurchaseInput, PurchaseItemInput } from '../types'
 
 /** The page size of the purchases list (ADR 0030 D5). */
@@ -74,12 +75,13 @@ export function useDeletePurchaseItem(purchaseId: string) {
 export function useConfirmPurchase(purchaseId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => confirmPurchase(purchaseId),
+    mutationFn: (payment?: PurchasePayment) => confirmPurchase(purchaseId, payment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchases'] })
       queryClient.invalidateQueries({ queryKey: ['ingredients'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
       queryClient.invalidateQueries({ queryKey: ['supply-suggestions'] })
+      queryClient.invalidateQueries({ queryKey: ['finance'] })
     },
   })
 }

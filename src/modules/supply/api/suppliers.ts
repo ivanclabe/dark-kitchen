@@ -10,6 +10,7 @@ function mapRow(row: {
   address: string | null
   contact_name: string | null
   active: boolean
+  payment_terms_days: number
 }): Supplier {
   return {
     id: row.id,
@@ -20,13 +21,14 @@ function mapRow(row: {
     address: row.address,
     contactName: row.contact_name,
     active: row.active,
+    paymentTermsDays: row.payment_terms_days,
   }
 }
 
 export async function listSuppliers(): Promise<Supplier[]> {
   const { data, error } = await supabase
     .from('dk_suppliers')
-    .select('id, name, tax_id, phone, email, address, contact_name, active')
+    .select('id, name, tax_id, phone, email, address, contact_name, active, payment_terms_days')
     .order('name')
 
   if (error) throw error
@@ -43,8 +45,9 @@ export async function createSupplier(input: SupplierInput): Promise<Supplier> {
       email: input.email ?? null,
       address: input.address ?? null,
       contact_name: input.contactName ?? null,
+      ...(input.paymentTermsDays === undefined ? {} : { payment_terms_days: input.paymentTermsDays }),
     })
-    .select('id, name, tax_id, phone, email, address, contact_name, active')
+    .select('id, name, tax_id, phone, email, address, contact_name, active, payment_terms_days')
     .single()
 
   if (error) throw error
@@ -61,9 +64,10 @@ export async function updateSupplier(id: string, input: SupplierInput): Promise<
       email: input.email ?? null,
       address: input.address ?? null,
       contact_name: input.contactName ?? null,
+      ...(input.paymentTermsDays === undefined ? {} : { payment_terms_days: input.paymentTermsDays }),
     })
     .eq('id', id)
-    .select('id, name, tax_id, phone, email, address, contact_name, active')
+    .select('id, name, tax_id, phone, email, address, contact_name, active, payment_terms_days')
     .single()
 
   if (error) throw error

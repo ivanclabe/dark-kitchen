@@ -13,7 +13,7 @@ questions:
   - ¿Cómo registro una venta?
 keywords: [nuevo pedido, crear, venta, platos, observación, cliente, tecla N]
 related: [confirm-cancel, customers, first-order, operations-center]
-updated: 2026-10-06
+updated: 2026-10-11
 order: 2
 screenshots:
   - id: new-order
@@ -37,4 +37,4 @@ screenshots:
 
 > **Cuidado:** los platos solo se pueden agregar o quitar mientras el pedido está **Por confirmar**.
 
-Los pedidos que llegan por WhatsApp (si tu negocio tiene la integración) aparecen solos en **Por confirmar**.
+Los pedidos que llegan por WhatsApp (si tu negocio tiene la integración) aparecen solos en **Por confirmar**. Los del **Menú web** entran directo a Cocina si tienes **Confirmar automáticamente** encendido. Ver [Menú público y pedidos online](help:public-menu).

@@ -5,7 +5,10 @@ import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { FormField, FormGrid, Input } from '@/shared/ui/FormField'
-import { ConfirmDialog } from '@/shared/ui/Modal'
+import { ConfirmDialog, Modal } from '@/shared/ui/Modal'
+import { PurchasePaymentChoice } from '@/modules/finance/components/PurchasePaymentChoice'
+import type { PurchasePayment } from '@/modules/finance/types'
+import { addDays } from '@/modules/insights/lib/periods'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
@@ -58,6 +61,14 @@ export function InvoiceReview({
   }
   const [showInvoice, setShowInvoice] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  // ADR 0051 (D3): «Guardar y confirmar» also says how it was paid.
+  const [payment, setPayment] = useState<PurchasePayment>({ mode: 'cash', method: 'Efectivo' })
+  function openConfirm() {
+    const supplier = draft.supplier?.kind === 'existing' ? suppliers.find((s) => s.id === (draft.supplier as { id: string }).id) : null
+    const terms = supplier?.paymentTermsDays ?? 0
+    setPayment(terms > 0 && draft.invoiceDate ? { mode: 'credit', dueDate: addDays(draft.invoiceDate, terms) } : { mode: 'cash', method: 'Efectivo' })
+    setConfirmOpen(true)
+  }
   const [discardOpen, setDiscardOpen] = useState(false)
   const [error, setError] = useState<{ message: string; purchaseId?: string } | null>(null)
 
@@ -137,7 +148,8 @@ export function InvoiceReview({
   async function handleSave(confirm: boolean) {
     setError(null)
     try {
-      const result = await save.mutateAsync({ importId: invoice.id, payload: toPayload(draft, units, ingredients), confirm })
+      const payload = { ...toPayload(draft, units, ingredients), ...(confirm ? { payment } : {}) }
+      const result = await save.mutateAsync({ importId: invoice.id, payload, confirm })
       const created = [result.supplierCreated && 'el proveedor', result.ingredientsCreated > 0 && `${result.ingredientsCreated} insumo(s)`].filter(Boolean).join(' y ')
       show(
         confirm
@@ -326,7 +338,7 @@ export function InvoiceReview({
                 Guardar borrador
               </Button>
               {can('purchasing.confirm') && (
-                <Button variant="primary" icon={CheckCircle2} onClick={() => setConfirmOpen(true)} disabled={problems.length > 0 || save.isPending}>
+                <Button variant="primary" icon={CheckCircle2} onClick={openConfirm} disabled={problems.length > 0 || save.isPending}>
                   Guardar y confirmar
                 </Button>
               )}
@@ -336,20 +348,30 @@ export function InvoiceReview({
         </div>
       </div>
 
-      <ConfirmDialog
+      <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={() => void handleSave(true)}
         title="Guardar y confirmar la compra"
-        confirmLabel="Sí, confirmar"
-        pending={save.isPending}
-        description={
-          <p>
-            Esto registra la compra ({formatMoney(totals.linesTotal + tax, { code: true })}) y la confirma: entran al inventario los {included.length} insumo(s) y se
-            actualiza su costo promedio. No se puede deshacer; un error se corrige después con un ajuste.
-          </p>
+        description={formatMoney(totals.linesTotal + tax, { code: true })}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirmOpen(false)} disabled={save.isPending}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={() => void handleSave(true)} loading={save.isPending}>
+              Sí, confirmar
+            </Button>
+          </>
         }
-      />
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-neutral-300">
+            Esto registra la compra y la confirma: entran al inventario los {included.length} insumo(s) y se actualiza su costo promedio. No se puede deshacer; un
+            error se corrige después con un ajuste.
+          </p>
+          <PurchasePaymentChoice value={payment} onChange={setPayment} />
+        </div>
+      </Modal>
       <ConfirmDialog
         open={discardOpen}
         onClose={() => setDiscardOpen(false)}

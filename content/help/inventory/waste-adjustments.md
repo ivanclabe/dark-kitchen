@@ -13,7 +13,7 @@ questions:
   - Se dañó un insumo, ¿cómo lo saco?
 keywords: [merma, ajuste, conteo, pérdida, vencido, dañado, corregir stock, desperdicio]
 related: [stock, inventory-deduction, costs-and-purchases]
-updated: 2026-10-06
+updated: 2026-10-11
 order: 4
 ---
 
@@ -30,6 +30,6 @@ order: 4
 2. Escribe la **Cantidad** en la unidad base: **positiva** suma stock, **negativa** resta.
 3. Explica el motivo en **Observación** («conteo del viernes») y toca **Registrar ajuste**.
 
-Cada merma y ajuste queda en los **Movimientos** del insumo con quién y cuándo. Las mermas también se ven en **Insights → Costos**.
+Cada merma y ajuste queda en los **Movimientos** del insumo con quién y cuándo. Las mermas también se ven en **Insights → Costos**. Las dos se valoran al costo promedio del insumo y restan en la utilidad real (un ajuste positivo suma). Ver [Rentabilidad real](help:profitability).
 
 > **Cuidado:** el inventario es un registro que solo crece: nada se borra. Para deshacer un error, haz el ajuste contrario.

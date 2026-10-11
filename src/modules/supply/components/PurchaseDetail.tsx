@@ -8,14 +8,22 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { FormField, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { ConfirmDialog } from '@/shared/ui/Modal'
+import { Modal } from '@/shared/ui/Modal'
+import { Badge } from '@/shared/ui/Badge'
+import { PayObligationModal } from '@/modules/finance/components/FinanceDialogs'
+import { PurchasePaymentChoice } from '@/modules/finance/components/PurchasePaymentChoice'
+import { usePurchaseObligation } from '@/modules/finance/hooks'
+import { STATUS_LABEL, STATUS_TONE } from '@/modules/finance/lib/finance'
+import type { PurchasePayment } from '@/modules/finance/types'
+import { addDays } from '@/modules/insights/lib/periods'
+import { useSuppliers } from '../hooks/useSuppliers'
 import { NumberStepper } from '@/shared/ui/NumberStepper'
 import { useToast } from '@/shared/ui/Toast'
 import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate, formatMoney } from '@/shared/utils/format'
-import { CheckCircle2, History, Paperclip, Plus, ShoppingCart, Trash2 } from 'lucide-react'
+import { CheckCircle2, HandCoins, History, Paperclip, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { CreateIngredientModal } from './CreateIngredientModal'
 import { useIngredients } from '../hooks/useIngredients'
@@ -60,6 +68,11 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const [unitCost, setUnitCost] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  // ADR 0051 (D3): how it was paid, asked when confirming.
+  const [payment, setPayment] = useState<PurchasePayment>({ mode: 'cash', method: 'Efectivo' })
+  const [paying, setPaying] = useState(false)
+  const { data: suppliers } = useSuppliers()
+  const { data: obligation } = usePurchaseObligation(purchaseId, can('finance.view') && purchase?.status === 'CONFIRMADA')
   const [createIngredientQuery, setCreateIngredientQuery] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -101,9 +114,9 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   async function handleConfirm() {
     setError(null)
     try {
-      await confirmPurchase.mutateAsync()
+      await confirmPurchase.mutateAsync(payment)
       setConfirmOpen(false)
-      show('Compra confirmada — inventario actualizado.')
+      show(payment.mode === 'cash' ? 'Compra confirmada y pagada — inventario actualizado.' : 'Compra confirmada — inventario actualizado; quedó en Por pagar.')
     } catch (err) {
       const message = getErrorMessage(err, 'Error al confirmar la compra')
       setError(message)
@@ -152,7 +165,17 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
             </div>
           </div>
           {canConfirm && (
-            <Button variant="primary" icon={CheckCircle2} onClick={() => setConfirmOpen(true)} disabled={!items?.length}>
+            <Button
+              variant="primary"
+              icon={CheckCircle2}
+              onClick={() => {
+                // A supplier with a payment term proposes «a crédito», due on the invoice date plus the term.
+                const terms = suppliers?.find((s) => s.id === purchase.supplierId)?.paymentTermsDays ?? 0
+                setPayment(terms > 0 ? { mode: 'credit', dueDate: addDays(purchase.invoiceDate, terms) } : { mode: 'cash', method: 'Efectivo' })
+                setConfirmOpen(true)
+              }}
+              disabled={!items?.length}
+            >
               Confirmar compra
             </Button>
           )}
@@ -167,6 +190,24 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
           <p className="inline-flex items-center gap-1.5 text-sm text-emerald-400">
             <CheckCircle2 size={15} aria-hidden /> Compra confirmada — inventario actualizado.
           </p>
+        )}
+        {/* ADR 0051: what is owed for this purchase (one obligation per purchase). */}
+        {obligation && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-3 py-2.5 text-sm">
+            <span className="flex flex-wrap items-center gap-2 text-neutral-300">
+              Pago al proveedor <Badge tone={STATUS_TONE[obligation.status]}>{STATUS_LABEL[obligation.status]}</Badge>
+              {obligation.balance > 0 && (
+                <span className="text-neutral-400">
+                  debe {formatMoney(obligation.balance)} · vence el {formatDate(obligation.dueDate)}
+                </span>
+              )}
+            </span>
+            {obligation.balance > 0 && can('finance.pay') && (
+              <Button variant="secondary" size="sm" icon={HandCoins} onClick={() => setPaying(true)}>
+                Registrar pago
+              </Button>
+            )}
+          </div>
         )}
       </div>
 
@@ -308,20 +349,31 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         </Card>
       )}
 
-      <ConfirmDialog
+      <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={handleConfirm}
         title="Confirmar compra"
-        confirmLabel="Sí, confirmar"
-        pending={confirmPurchase.isPending}
-        description={
-          <p>
-            Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea ({formatMoney(total, { code: true })} en total) y actualiza el costo promedio de los
-            insumos. No se puede deshacer — para corregir un error habría que registrar un ajuste manual después.
-          </p>
+        description={`${formatMoney(total, { code: true })} de ${purchase.supplierName}`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirmOpen(false)} disabled={confirmPurchase.isPending}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={() => void handleConfirm()} loading={confirmPurchase.isPending}>
+              Sí, confirmar
+            </Button>
+          </>
         }
-      />
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-neutral-300">
+            Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea y actualiza el costo promedio de los insumos. No se puede deshacer — para
+            corregir un error habría que registrar un ajuste manual después.
+          </p>
+          <PurchasePaymentChoice value={payment} onChange={setPayment} />
+        </div>
+      </Modal>
+      {paying && obligation && <PayObligationModal obligation={obligation} onClose={() => setPaying(false)} />}
 
       <CreateIngredientModal
         open={createIngredientQuery !== null}

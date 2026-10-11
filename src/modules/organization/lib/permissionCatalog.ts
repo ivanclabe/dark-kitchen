@@ -20,6 +20,7 @@ export const MODULE_LABEL: Record<string, string> = {
   settings: 'Configuración',
   team: 'Equipo de la cuenta',
   staff: 'Personal y turnos',
+  finance: 'Finanzas',
   copilot: 'Quanela Copilot',
   voice: 'Oye Quanela',
   audit: 'Auditoría',
@@ -44,6 +45,8 @@ export const ACTION_LABEL: Record<string, string> = {
   upload: 'Subir',
   profitability: 'Rentabilidad',
   use: 'Usar',
+  pay: 'Registrar pagos',
+  payroll: 'Nómina',
 }
 
 export interface ModuleGroup {

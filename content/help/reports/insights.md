@@ -15,7 +15,7 @@ questions:
   - ¿Cómo comparo con el mes anterior?
 keywords: [reportes, informes, ventas, ingresos, ticket promedio, comparar, periodo, exportar, CSV, Excel, canal, hora, día de la semana]
 related: [product-profitability, costs-and-purchases, home-screen]
-updated: 2026-10-06
+updated: 2026-10-11
 order: 1
 screenshots:
   - id: insights
@@ -49,4 +49,4 @@ screenshots:
 
 Toca **Exportar CSV**: descarga la pestaña que estás viendo, con el mismo periodo y filtros. El archivo se abre en Excel o Google Sheets.
 
-> **Bueno saber:** las ventas cuentan todos los pedidos **que no están cancelados**, incluido el domicilio, en la fecha y la hora de tu cuenta. Las cifras de costo y margen solo las ve quien tiene permiso de rentabilidad.
+> **Bueno saber:** las ventas cuentan los pedidos **confirmados** (los que no se han confirmado o están cancelados no cuentan), incluido el domicilio, en la fecha y la hora de tu cuenta. La utilidad real, con nómina y gastos, está en [Rentabilidad real](help:profitability). Las cifras de costo y margen solo las ve quien tiene permiso de rentabilidad.

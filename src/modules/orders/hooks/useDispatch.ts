@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createRider, dispatchOrder, listRiders, markDelivered, setRiderActive } from '../api/dispatch'
+import { createRider, dispatchOrder, listRiders, markDelivered, setRiderActive, markPickedUp } from '../api/dispatch'
 import type { RiderInput } from '../types'
 import { useInvalidateOrders } from './useOrders'
 
@@ -33,4 +33,9 @@ export function useDispatchOrder() {
 export function useMarkDelivered() {
   const invalidate = useInvalidateOrders()
   return useMutation({ mutationFn: (orderId: string) => markDelivered(orderId), onSuccess: () => invalidate() })
+}
+
+export function useMarkPickedUp() {
+  const invalidate = useInvalidateOrders()
+  return useMutation({ mutationFn: (orderId: string) => markPickedUp(orderId), onSuccess: () => invalidate() })
 }

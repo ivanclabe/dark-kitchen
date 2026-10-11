@@ -14,6 +14,12 @@ export async function markDelivered(orderId: string): Promise<void> {
   if (error) throw error
 }
 
+/** ADR 0052: an order to pick up is handed over at the counter (LISTO → ENTREGADO, without Despacho). */
+export async function markPickedUp(orderId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_mark_picked_up', { p_order_id: orderId })
+  if (error) throw error
+}
+
 const RIDER_SELECT = 'id, full_name, phone, vehicle_type, active, user_id'
 
 function mapRider(row: { id: string; full_name: string; phone: string | null; vehicle_type: string | null; active: boolean; user_id: string | null }): Rider {

@@ -10,7 +10,7 @@ import { useOnShiftNow } from '@/modules/staff/hooks/useStaff'
 import { allows, useBoardActions } from '../board/boardActions'
 import { useOrderActions } from '../board/useOrderActions'
 import { ACTION_DENIED_REASON } from '../lib/permissions'
-import { formatElapsed, minutesAgoSince } from '../lib/orderVisuals'
+import { formatElapsed, minutesAgoSince, orderAddress } from '../lib/orderVisuals'
 import type { Order } from '../types'
 import { PaymentBadge } from '../components/PaymentCard'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -42,7 +42,7 @@ function DispatchCard({ order, now, onOpen, action }: { order: Order; now: numbe
         </p>
         <p className="mt-1 flex items-start gap-1.5 text-sm text-neutral-300">
           <MapPin size={13} className="mt-0.5 shrink-0 text-neutral-500" aria-hidden />
-          {order.customerAddress ?? 'Sin dirección registrada'}
+          {orderAddress(order) ?? 'Sin dirección registrada'}
         </p>
         {order.customerPhone && (
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">

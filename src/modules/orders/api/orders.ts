@@ -8,7 +8,7 @@ import type { FlowStatus, Order, OrderInput, OrderSearch, OrderStatus, OrderStat
  * with customers.view, the payments only with receivables.view — ADR 0031).
  */
 const SELECT = `
-  id, order_number, customer_id, status, channel, subtotal, discount, delivery_fee, total, payment_method, notes,
+  id, order_number, customer_id, status, channel, subtotal, discount, delivery_fee, total, payment_method, notes, fulfillment, delivery_address, delivery_reference,
   requires_review, created_at, updated_at,
   dk_customers ( full_name, address, phone, customer_type, preferred, preferred_note ),
   dk_kitchen_tickets ( priority ),
@@ -28,6 +28,9 @@ interface OrderRow {
   subtotal: number
   discount: number
   delivery_fee: number
+  fulfillment?: Order['fulfillment']
+  delivery_address?: string | null
+  delivery_reference?: string | null
   total: number | null
   payment_method: string | null
   notes: string | null
@@ -88,6 +91,9 @@ export function mapOrder(row: OrderRow): Order {
     total: Number(row.total ?? 0),
     paymentMethod: row.payment_method,
     notes: row.notes,
+    fulfillment: row.fulfillment ?? null,
+    deliveryAddress: row.delivery_address ?? null,
+    deliveryReference: row.delivery_reference ?? null,
     requiresReview: row.requires_review,
     priority: first(row.dk_kitchen_tickets)?.priority ?? 0,
     createdAt: row.created_at,

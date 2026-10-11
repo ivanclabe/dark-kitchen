@@ -1,7 +1,7 @@
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { Bike, CheckCircle2, ChevronRight, PackageCheck, Play, type LucideIcon } from 'lucide-react'
-import { useMarkDelivered } from '../hooks/useDispatch'
+import { useMarkDelivered, useMarkPickedUp } from '../hooks/useDispatch'
 import { useAdvanceOrderItems, useRevertOrderItems, useSetOrderPriority } from '../hooks/useOrders'
 import type { FlowAction } from '../lib/permissions'
 import { isKitchenStage, prevStatus } from '../lib/transitions'
@@ -16,6 +16,9 @@ export const PRIMARY_ACTION: Partial<Record<OrderStatus, { action: FlowAction; l
   LISTO: { action: 'dispatch', label: 'Despachar', icon: Bike },
   DESPACHADO: { action: 'deliver', label: 'Entregar', icon: PackageCheck },
 }
+
+/** ADR 0052: an order to pick up skips Despacho. */
+export const PICKUP_ACTION: { action: FlowAction; label: string; icon: LucideIcon } = { action: 'deliver', label: 'Entregar (recoge)', icon: PackageCheck }
 
 export const REVERT_LABEL: Partial<Record<OrderStatus, string>> = {
   EN_PREPARACION: 'Retroceder a la cola',
@@ -34,10 +37,13 @@ export function useOrderActions(ticket: Order) {
   const { revertOrderItems, isPending: reverting } = useRevertOrderItems()
   const setPriority = useSetOrderPriority()
   const markDelivered = useMarkDelivered()
+  const markPickedUp = useMarkPickedUp()
+  // ADR 0052: an order to pick up is handed over when ready, without Despacho.
+  const pickup = ticket.fulfillment === 'pickup'
   const { show } = useToast()
 
   const prioritized = ticket.priority > 0
-  const primaryDef = PRIMARY_ACTION[ticket.status]
+  const primaryDef = pickup && ticket.status === 'LISTO' ? PICKUP_ACTION : PRIMARY_ACTION[ticket.status]
   const primaryInScope = primaryDef && inScope(board, primaryDef.action) ? primaryDef : undefined
   const backTarget = prevStatus(ticket.status)
 
@@ -61,6 +67,13 @@ export function useOrderActions(ticket: Order) {
         void run(() => advanceOrderItems(ticket.items, 'LISTO'), `No se pudo marcar listo el pedido ${ticket.orderNumber}.`)
         return
       case 'LISTO':
+        if (pickup) {
+          void run(async () => {
+            await markPickedUp.mutateAsync(ticket.id)
+            show(`Pedido #${ticket.orderNumber} entregado en el local.`)
+          }, `No se pudo entregar el pedido ${ticket.orderNumber}.`)
+          return
+        }
         board.requestDispatch(ticket)
         return
       case 'DESPACHADO':

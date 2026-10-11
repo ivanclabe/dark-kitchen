@@ -1,4 +1,5 @@
 import { Button } from '@/shared/ui/Button'
+import { orderAddress } from '../lib/orderVisuals'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { ConfirmDialog, Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
@@ -103,7 +104,7 @@ export function DispatchDialog({ ticket, onClose }: { ticket: Order; onClose: ()
       <form id="dispatch-form" onSubmit={handleSubmit} className="space-y-4">
         <p className="flex items-center gap-1.5 rounded-xl border border-neutral-800/60 bg-neutral-950/60 px-3 py-2.5 text-sm text-neutral-300">
           <MapPin size={14} className="shrink-0 text-neutral-500" aria-hidden />
-          {ticket.customerAddress ?? 'El cliente no tiene dirección registrada'}
+          {orderAddress(ticket) ?? 'El cliente no tiene dirección registrada'}
         </p>
         <FormField
           label="Domiciliario"

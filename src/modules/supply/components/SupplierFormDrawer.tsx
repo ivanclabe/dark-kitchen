@@ -2,6 +2,7 @@ import { Button } from '@/shared/ui/Button'
 import { emailError } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { PhoneInput } from '@/shared/ui/PhoneInput'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { phoneError } from '@/shared/utils/phone'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FormField, Input } from '@/shared/ui/FormField'
@@ -24,13 +25,14 @@ const schema = z.object({
     .refine((v) => !emailError(v ?? ''), { message: 'Revisa el correo: falta la @ o el dominio (por ejemplo, ventas@proveedor.com).' }),
   address: z.string().optional(),
   contactName: z.string().optional(),
+  paymentTermsDays: z.number().int().min(0).max(365),
 })
 
 type FormValues = z.infer<typeof schema>
 
 const legendClass = 'mb-3 text-xs font-semibold tracking-wide text-neutral-400 uppercase'
 
-const emptyValues: FormValues = { name: '', taxId: '', phone: '', email: '', address: '', contactName: '' }
+const emptyValues: FormValues = { name: '', taxId: '', phone: '', email: '', address: '', contactName: '', paymentTermsDays: 0 }
 
 /** Alta y edición de proveedor — mismos campos y validación que la antigua SuppliersPage, en un Drawer. */
 export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supplier | null; open: boolean; onClose: () => void }) {
@@ -53,6 +55,7 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
           email: supplier.email ?? '',
           address: supplier.address ?? '',
           contactName: supplier.contactName ?? '',
+          paymentTermsDays: supplier.paymentTermsDays ?? 0,
         }
       : emptyValues,
   })
@@ -65,6 +68,7 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
       email: values.email || null,
       address: values.address || null,
       contactName: values.contactName || null,
+      paymentTermsDays: values.paymentTermsDays,
     }
     try {
       if (supplier) {
@@ -121,6 +125,20 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
                 control={control}
                 name="email"
                 render={({ field }) => <EmailInput {...a11y} name={field.name} value={field.value ?? ''} onValueChange={field.onChange} onBlur={field.onBlur} placeholder="ventas@proveedor.com" />}
+              />
+            )}
+          </FormField>
+        </fieldset>
+
+        {/* ADR 0051 (D3): proposes when a purchase on credit falls due. */}
+        <fieldset className="space-y-4">
+          <legend className={legendClass}>Pago</legend>
+          <FormField label="Plazo de pago" hint="Días que te da para pagar. 0 = de contado." error={errors.paymentTermsDays?.message}>
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="paymentTermsDays"
+                render={({ field }) => <NumberInput {...a11y} value={field.value} onValueChange={(v) => field.onChange(v ?? 0)} min={0} max={365} unit="días" />}
               />
             )}
           </FormField>

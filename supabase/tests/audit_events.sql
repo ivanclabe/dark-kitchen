@@ -105,8 +105,10 @@ select pg_temp.as_owner();
 insert into _t (area, test, expected, got) values
   ('Eventos', 'Fallo de IA en la bitácora', 'ai.run_failed · failure · edge · sí',
     (select event_type || ' · ' || result || ' · ' || source || ' · ' || case when summary like '%timeout del modelo%' then 'sí' else 'no' end from pg_temp.last_event('ai.run_failed'))),
+  -- Una fila por organización activa del usuario (cada bitácora ve su inicio de sesión): se cuenta la de A.
   ('Eventos', 'Inicio de sesión: uno por minuto', '1',
-    (select count(*)::text from dk_audit_log where event_type = 'auth.signed_in' and changed_by = (select id from _ctx where key = 'ivan') and created_at > now() - interval '1 minute'));
+    (select count(*)::text from dk_audit_log where event_type = 'auth.signed_in' and changed_by = (select id from _ctx where key = 'ivan')
+       and organization_id = (select id from _ctx where key = 'orgA') and created_at > now() - interval '1 minute'));
 
 -- 3. Solo agregar
 select pg_temp.act_as((select id from _ctx where key = 'ivanAuth'), (select id from _ctx where key = 'A'));

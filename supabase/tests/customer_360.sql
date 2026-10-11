@@ -68,7 +68,11 @@ insert into _t (area, test, expected, got) values
     (select count(*)::text from dk_customer_addresses where customer_id = '30000000-0000-0000-0000-000000040a01'));
 
 -- A new address from anywhere (here, as n8n or the edit form would): the old one stays.
+-- In real life each write is its own transaction; here now() does not move, so the history is aged a minute
+-- between writes (otherwise every last_used_at ties and "the most recent" is arbitrary).
+update dk_customer_addresses set last_used_at = last_used_at - interval '1 minute' where customer_id = '30000000-0000-0000-0000-000000040a01';
 update dk_customers set address = 'Carrera 5 # 6-7' where id = '30000000-0000-0000-0000-000000040a01';
+update dk_customer_addresses set last_used_at = last_used_at - interval '1 minute' where customer_id = '30000000-0000-0000-0000-000000040a01';
 update dk_customers set address = '  calle 10   # 20-30 ' where id = '30000000-0000-0000-0000-000000040a01';
 insert into _t (area, test, expected, got) values
   ('Address', 'A new address adds a row; the old ones stay (never overwritten)', '2',

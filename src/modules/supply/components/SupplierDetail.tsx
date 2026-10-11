@@ -10,7 +10,8 @@ import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate, formatMoney } from '@/shared/utils/format'
-import { Boxes, Mail, MapPin, Pencil, Phone, Power, ShoppingCart, Truck, User } from 'lucide-react'
+import { Boxes, Landmark, Mail, MapPin, Pencil, Phone, Power, ShoppingCart, Truck, User } from 'lucide-react'
+import { useSupplierOwed } from '@/modules/finance/hooks'
 import { useMemo } from 'react'
 import { useIngredients } from '../hooks/useIngredients'
 import { useSupplierPurchases } from '../hooks/usePurchases'
@@ -29,6 +30,8 @@ function ContactRow({ icon: Icon, value }: { icon: typeof Phone; value: string |
 
 export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplier: Supplier; onEdit: () => void; onSelectPurchase: (purchase: Purchase) => void }) {
   const { can } = useActiveKitchen()
+  // ADR 0051: what is owed to this supplier now.
+  const { data: owed } = useSupplierOwed(supplier.id, can('finance.view'))
   const { data: supplierPurchases = [] } = useSupplierPurchases(supplier.id)
   const { data: ingredients } = useIngredients()
   const setActive = useSetSupplierActive()
@@ -85,9 +88,19 @@ export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplie
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <StatCard label="Comprado (confirmado)" value={formatMoney(totalBought)} hint={`${supplierPurchases.length} factura(s)`} icon={ShoppingCart} tone="brand" />
         <StatCard label="Insumos asignados" value={supplierIngredients.length} hint="Como proveedor principal" icon={Boxes} />
+        {can('finance.view') && (
+          <StatCard
+            label="Le debes"
+            value={formatMoney(owed ?? 0)}
+            hint={supplier.paymentTermsDays > 0 ? `Plazo de ${supplier.paymentTermsDays} días` : 'De contado'}
+            icon={Landmark}
+            tone={(owed ?? 0) > 0 ? 'warn' : 'neutral'}
+            to="/finance/payables"
+          />
+        )}
       </div>
 
       <Card title="Compras" description="Facturas registradas a este proveedor" icon={ShoppingCart}>

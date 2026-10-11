@@ -1,6 +1,6 @@
-import { Bike, CheckCircle2, Clock, FilePen, Flame, MessageCircle, PackageCheck, Phone, Store, XCircle } from 'lucide-react'
+import { Bike, CheckCircle2, Clock, FilePen, Flame, Globe, MessageCircle, PackageCheck, Phone, Store, XCircle } from 'lucide-react'
 import type { ComponentType } from 'react'
-import type { KitchenItemStatus, OrderStatus, OrderChannel } from '../types'
+import type { KitchenItemStatus, Order, OrderStatus, OrderChannel } from '../types'
 
 /**
  * Paleta semántica compartida por las vistas del pedido (Pedidos, Cocina,
@@ -48,6 +48,8 @@ export const CHANNEL_CONFIG: Record<
   MANUAL: { label: 'Mostrador', badge: 'bg-neutral-700/60 text-neutral-300', icon: Store },
   WHATSAPP: { label: 'WhatsApp', badge: 'bg-emerald-500/20 text-emerald-400', icon: MessageCircle },
   PHONE: { label: 'Teléfono', badge: 'bg-sky-500/20 text-sky-400', icon: Phone },
+  // ADR 0052: orders placed on the public menu.
+  WEB: { label: 'Menú web', badge: 'bg-violet-500/20 text-violet-300', icon: Globe },
 }
 
 /** Paleta rotativa para el avatar de iniciales del cliente — mismo color siempre para el mismo nombre. */
@@ -144,4 +146,14 @@ export function formatElapsed(minutesAgo: number): string {
   const hours = Math.floor(minutesAgo / 60)
   const mins = minutesAgo % 60
   return `${hours}h ${String(mins).padStart(2, '0')}m`
+}
+
+/**
+ * Where the order goes (ADR 0052): the address written in the order (public
+ * menu, with its reference), «Recoge en el local», or the customer's address.
+ */
+export function orderAddress(order: Pick<Order, 'fulfillment' | 'deliveryAddress' | 'deliveryReference' | 'customerAddress'>): string | null {
+  if (order.fulfillment === 'pickup') return 'Recoge en el local'
+  if (order.deliveryAddress) return order.deliveryReference ? `${order.deliveryAddress} · ${order.deliveryReference}` : order.deliveryAddress
+  return order.customerAddress
 }

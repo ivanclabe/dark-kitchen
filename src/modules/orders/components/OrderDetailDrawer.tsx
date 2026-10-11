@@ -19,7 +19,7 @@ import { useOrderActions } from '../board/useOrderActions'
 import { useAdvanceKitchenItem, useOrder, useOrderReservations, useRevertKitchenItem } from '../hooks/useOrders'
 import { ACTION_DENIED_REASON, type FlowAction } from '../lib/permissions'
 import { OrderStatusBadge } from '../lib/orderStatus'
-import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL } from '../lib/orderVisuals'
+import { ITEM_STATUS_BADGE, ITEM_STATUS_LABEL, orderAddress } from '../lib/orderVisuals'
 import type { Order, OrderItem } from '../types'
 import { isKitchenStage } from '../lib/transitions'
 import { OrderBuilder } from './OrderBuilder'
@@ -162,9 +162,9 @@ function CustomerCard({ order }: { order: Order }) {
             <Phone size={13} aria-hidden /> {formatPhone(order.customerPhone)}
           </p>
         )}
-        {order.customerAddress && (
+        {orderAddress(order) && (
           <p className="flex items-center gap-1.5 text-neutral-400">
-            <MapPin size={13} aria-hidden /> {order.customerAddress}
+            <MapPin size={13} aria-hidden /> {orderAddress(order)}
           </p>
         )}
       </div>

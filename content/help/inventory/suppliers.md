@@ -12,7 +12,7 @@ questions:
   - ¿Qué insumos me surte un proveedor?
 keywords: [proveedor, NIT, contacto, compras, surtir]
 related: [purchases, stock]
-updated: 2026-10-10
+updated: 2026-10-11
 order: 3
 ---
 
@@ -20,6 +20,8 @@ order: 3
 2. Para crear uno, toca **Nuevo**. En **Empresa** escribe el **Nombre** (obligatorio), el **NIT o identificación** y la **Dirección**; en **Contacto**, la **Persona de contacto**, el **Teléfono** y el **Correo**. Toca **Crear proveedor**.
 3. Toca un proveedor para ver su ficha: **Comprado (confirmado)**, sus **Compras** y los **Insumos** que lo tienen como proveedor principal.
 4. Desde la ficha puedes **Editar** o **Desactivar** (un proveedor inactivo no aparece al crear compras; usa **Incluir inactivos** para verlo).
+
+> **Bueno saber:** en **Pago**, el **Plazo de pago** son los días que te da el proveedor (0 = de contado). Al confirmar una compra a crédito, propone el vencimiento; en su ficha ves **Le debes**. Ver [Lo que se debe y los pagos](help:payables).
 
 > **Bueno saber:** dos proveedores de la misma cuenta no pueden tener el mismo **NIT** («900.123.456-7» y «900123456» cuentan como el mismo).
 

@@ -1,4 +1,5 @@
 import { Section } from '@/shared/ui/Section'
+import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { typography } from '@/shared/ui/typography'
 import clsx from 'clsx'
@@ -382,7 +383,13 @@ export function CostsTab({ data, compareLabel }: TabProps) {
           emptyState={<p className="p-4 text-sm text-neutral-500">Sin compras en este periodo.</p>}
         />
       </Section>
-      <p className={typography.caption}>No incluye nómina, arriendo ni otros gastos operativos: Quanela todavía no los registra. Por eso se muestra la utilidad bruta y no la utilidad neta.</p>
+      <p className={typography.caption}>
+        Aquí está la utilidad bruta (ventas menos ingredientes). La utilidad real, con nómina, arriendo, gastos, mermas y el IVA de las compras, está en{' '}
+        <KitchenLink to="/finance/profit" className="text-brasa-400 hover:underline">
+          Finanzas → Rentabilidad
+        </KitchenLink>
+        .
+      </p>
     </>
   )
 }

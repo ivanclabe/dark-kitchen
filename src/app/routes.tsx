@@ -13,6 +13,9 @@ import { OperationsRedirect } from '@/modules/operations/components/OperationsRe
 import { OperationsPage } from '@/modules/operations/pages/OperationsPage'
 import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
 import { StaffPage } from '@/modules/staff/pages/StaffPage'
+import { FinancePage } from '@/modules/finance/pages/FinancePage'
+import { PublicMenuAdminPage } from '@/modules/publicMenu/pages/PublicMenuAdminPage'
+import { OrderTrackingRoute, PublicMenuRoute } from '@/modules/publicMenu/public/PublicRoutes'
 import { RolesPage, UsersLayout, UsersPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
@@ -88,6 +91,9 @@ const routes: RouteObject[] = [
   // Registro público de un negocio (ADR 0008, Fase F) y la vuelta del enlace de confirmación.
   { path: '/registro', element: <SignUpPage /> },
   { path: '/registro/confirmado', element: <SignUpConfirmedPage /> },
+  // Menú público (ADR 0052): today's menu of a business and its orders, without a session, on any host.
+  { path: '/menu/:slug', element: <PublicMenuRoute /> },
+  { path: '/menu/:slug/pedido/:token', element: <OrderTrackingRoute /> },
 
   // "/" (ADR 0036): en quanela.com, siempre la landing (con sesión, «Ir a mi cuenta»). En el subdominio
   // de un negocio (y sin dominio raíz), la app: sin sesión, su login; con sesión, la Cuenta por defecto.
@@ -177,6 +183,12 @@ const routes: RouteObject[] = [
           { path: 'suppliers', element: <KitchenRedirect to="/supply/proveedores" /> },
           // Personal y Turnos (ADR 0020); "Mis turnos" es de cada persona, sin permiso.
           { path: 'staff', element: <StaffPage /> },
+          // Finanzas (ADR 0051): obligaciones, pagos, flujo de caja y rentabilidad real.
+          { path: 'finance', element: <FinancePage /> },
+          { path: 'finance/:tab', element: <FinancePage /> },
+          // Menú público (ADR 0052): publish, ordering options, link and QR; Diseño (ADR 0053).
+          { path: 'public-menu', element: <PublicMenuAdminPage /> },
+          { path: 'public-menu/:tab', element: <PublicMenuAdminPage /> },
           { path: 'my-shifts', element: <MyShiftsPage /> },
           // Clientes — saldos, pagos e historial.
           { path: 'customers', element: <CustomersPage /> },

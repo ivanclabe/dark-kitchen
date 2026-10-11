@@ -12,9 +12,36 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-10
+updated: 2026-10-11
 order: 1
 ---
+
+## 11 de octubre de 2026
+
+- **Menú público y pedidos online.** En **Menú público** publicas el menú de hoy en `quanela.com/menu/tu-negocio`. Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular.
+  - El menú sale del planificador, con precios, horarios, límites y agotados.
+  - Los pedidos llegan con el canal **Menú web** y entran directo a Cocina, con domicilio o para recoger.
+  - El cliente sigue su pedido en vivo.
+  - Ver [Menú público y pedidos online](help:public-menu).
+- **Diseño del menú público.** En **Menú público → Diseño** eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos.
+  - Ves cada cambio al instante, en celular o en escritorio.
+  - Lo que cambias queda en borrador hasta que tocas **Publicar diseño**; puedes descartar los cambios o volver al diseño anterior.
+  - Los precios, los platos y los pedidos no cambian con el diseño.
+- **Diseñador de menú con IA y «Mis diseños».** En **Menú público → Diseño → Diseñador con IA** describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios («haz el fondo un poco más claro») y cada versión queda guardada.
+  - **Mis diseños** guarda el historial de tu negocio: propuestas, diseños del editor y todo lo que publicaste. Puedes comparar dos lado a lado y publicar cuando quieras.
+  - La IA nunca publica sola, y probar diseños no cambia tu página ni tus pedidos.
+
+- **Finanzas.** Un módulo nuevo en el menú con:
+  - **Por pagar:** lo que se debe a proveedores, gastos y nómina, con vencimientos, abonos y pagos.
+  - **Pagos:** el registro, con anulación.
+  - **Gastos**, con gastos fijos que se crean solos cada mes.
+  - **Nómina:** por hora con las horas reales de los turnos, o salario mensual.
+  - **Flujo de caja.**
+  - **Rentabilidad:** la utilidad **real**, de las ventas a la utilidad operativa, con ingredientes, mermas, IVA de compras, nómina y gastos.
+  - Las compras y los pagos no cuentan dos veces. Ver [Rentabilidad real y flujo de caja](help:profitability).
+- **¿Cómo se pagó?** Al confirmar una compra (también la importada), eliges **de contado** o **a crédito**. Los proveedores tienen **plazo de pago** y su ficha dice cuánto les debes.
+- **Insights cuenta solo pedidos confirmados.** Los que no se han confirmado ya no suman a las ventas, para que Insights y Finanzas digan lo mismo.
+- **Los ajustes de inventario tienen costo.** Desde ahora se valoran al costo promedio, como las mermas.
 
 ## 10 de octubre de 2026
 

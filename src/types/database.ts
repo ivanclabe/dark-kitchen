@@ -934,6 +934,41 @@ export type Database = {
           },
         ]
       }
+      dk_expense_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          kitchen_id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kitchen_id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kitchen_id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_expense_categories_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_features: {
         Row: {
           active: boolean
@@ -1916,6 +1951,7 @@ export type Database = {
           name: string
           organization_id: string
           phone: string | null
+          purchase_vat_deductible: boolean
           slug: string
           tax_id: string | null
           timezone: string
@@ -1935,6 +1971,7 @@ export type Database = {
           name: string
           organization_id: string
           phone?: string | null
+          purchase_vat_deductible?: boolean
           slug: string
           tax_id?: string | null
           timezone?: string
@@ -1954,6 +1991,7 @@ export type Database = {
           name?: string
           organization_id?: string
           phone?: string | null
+          purchase_vat_deductible?: boolean
           slug?: string
           tax_id?: string | null
           timezone?: string
@@ -2169,6 +2207,61 @@ export type Database = {
           },
         ]
       }
+      dk_member_pay: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          id: string
+          kitchen_id: string
+          pay_type: string
+          rate: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          id?: string
+          kitchen_id?: string
+          pay_type: string
+          rate: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          id?: string
+          kitchen_id?: string
+          pay_type?: string
+          rate?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_member_pay_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_member_pay_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_member_pay_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_member_roles: {
         Row: {
           assigned_at: string
@@ -2211,6 +2304,83 @@ export type Database = {
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "dk_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_menu_designs: {
+        Row: {
+          ai_run_id: string | null
+          created_at: string
+          created_by: string | null
+          design: Json
+          favorite: boolean
+          id: string
+          kitchen_id: string
+          last_published_at: string | null
+          name: string
+          parent_id: string | null
+          prompt: string | null
+          source: string
+          summary: string | null
+        }
+        Insert: {
+          ai_run_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          design: Json
+          favorite?: boolean
+          id?: string
+          kitchen_id?: string
+          last_published_at?: string | null
+          name: string
+          parent_id?: string | null
+          prompt?: string | null
+          source: string
+          summary?: string | null
+        }
+        Update: {
+          ai_run_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          design?: Json
+          favorite?: boolean
+          id?: string
+          kitchen_id?: string
+          last_published_at?: string | null
+          name?: string
+          parent_id?: string | null
+          prompt?: string | null
+          source?: string
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_menu_designs_ai_run_id_fkey"
+            columns: ["ai_run_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ai_insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_designs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_designs_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_menu_designs_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "dk_menu_designs"
             referencedColumns: ["id"]
           },
         ]
@@ -2423,6 +2593,219 @@ export type Database = {
           },
         ]
       }
+      dk_obligation_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          kitchen_id: string
+          method: string
+          note: string | null
+          obligation_id: string
+          paid_on: string
+          reference: string | null
+          voids_payment_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kitchen_id?: string
+          method: string
+          note?: string | null
+          obligation_id: string
+          paid_on: string
+          reference?: string | null
+          voids_payment_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kitchen_id?: string
+          method?: string
+          note?: string | null
+          obligation_id?: string
+          paid_on?: string
+          reference?: string | null
+          voids_payment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_obligation_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligation_payments_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligation_payments_kitchen_id_obligation_id_fkey"
+            columns: ["kitchen_id", "obligation_id"]
+            isOneToOne: false
+            referencedRelation: "dk_obligation_balances"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligation_payments_kitchen_id_obligation_id_fkey"
+            columns: ["kitchen_id", "obligation_id"]
+            isOneToOne: false
+            referencedRelation: "dk_obligations"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligation_payments_voids_payment_id_fkey"
+            columns: ["voids_payment_id"]
+            isOneToOne: true
+            referencedRelation: "dk_obligation_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_obligations: {
+        Row: {
+          accrual_date: string
+          amount: number
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          due_date: string
+          id: string
+          kind: string
+          kitchen_id: string
+          member_user_id: string | null
+          notes: string | null
+          payee_name: string | null
+          period_end: string | null
+          period_start: string | null
+          purchase_id: string | null
+          recurring_id: string | null
+          recurring_period: string | null
+          supplier_id: string | null
+          updated_at: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          accrual_date: string
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          due_date: string
+          id?: string
+          kind: string
+          kitchen_id?: string
+          member_user_id?: string | null
+          notes?: string | null
+          payee_name?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          purchase_id?: string | null
+          recurring_id?: string | null
+          recurring_period?: string | null
+          supplier_id?: string | null
+          updated_at?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          accrual_date?: string
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          due_date?: string
+          id?: string
+          kind?: string
+          kitchen_id?: string
+          member_user_id?: string | null
+          notes?: string | null
+          payee_name?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          purchase_id?: string | null
+          recurring_id?: string | null
+          recurring_period?: string | null
+          supplier_id?: string | null
+          updated_at?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_obligations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_category_id_fkey"
+            columns: ["kitchen_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "dk_expense_categories"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_purchase_id_fkey"
+            columns: ["kitchen_id", "purchase_id"]
+            isOneToOne: false
+            referencedRelation: "dk_purchases"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_recurring_id_fkey"
+            columns: ["kitchen_id", "recurring_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recurring_obligations"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_supplier_id_fkey"
+            columns: ["kitchen_id", "supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_member_user_id_fkey"
+            columns: ["member_user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_order_items: {
         Row: {
           created_at: string
@@ -2623,15 +3006,19 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_id: string
+          delivery_address: string | null
           delivery_fee: number
+          delivery_reference: string | null
           discount: number
           due_date: string | null
           external_reference: string | null
+          fulfillment: string | null
           id: string
           kitchen_id: string
           notes: string | null
           order_number: number
           payment_method: string | null
+          public_token: string | null
           requires_review: boolean
           status: Database["public"]["Enums"]["dk_order_status"]
           subtotal: number
@@ -2643,15 +3030,19 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id: string
+          delivery_address?: string | null
           delivery_fee?: number
+          delivery_reference?: string | null
           discount?: number
           due_date?: string | null
           external_reference?: string | null
+          fulfillment?: string | null
           id?: string
           kitchen_id?: string
           notes?: string | null
           order_number?: number
           payment_method?: string | null
+          public_token?: string | null
           requires_review?: boolean
           status?: Database["public"]["Enums"]["dk_order_status"]
           subtotal?: number
@@ -2663,15 +3054,19 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string
+          delivery_address?: string | null
           delivery_fee?: number
+          delivery_reference?: string | null
           discount?: number
           due_date?: string | null
           external_reference?: string | null
+          fulfillment?: string | null
           id?: string
           kitchen_id?: string
           notes?: string | null
           order_number?: number
           payment_method?: string | null
+          public_token?: string | null
           requires_review?: boolean
           status?: Database["public"]["Enums"]["dk_order_status"]
           subtotal?: number
@@ -3190,6 +3585,38 @@ export type Database = {
           },
         ]
       }
+      dk_public_order_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          ip: string | null
+          kitchen_id: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip?: string | null
+          kitchen_id: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip?: string | null
+          kitchen_id?: string
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_public_order_attempts_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_purchase_items: {
         Row: {
           created_at: string
@@ -3426,6 +3853,83 @@ export type Database = {
           },
         ]
       }
+      dk_recurring_obligations: {
+        Row: {
+          active: boolean
+          amount: number
+          category_id: string
+          created_at: string
+          created_by: string | null
+          day_of_month: number
+          description: string
+          id: string
+          kitchen_id: string
+          payee_name: string | null
+          starts_on: string
+          supplier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amount: number
+          category_id: string
+          created_at?: string
+          created_by?: string | null
+          day_of_month: number
+          description: string
+          id?: string
+          kitchen_id?: string
+          payee_name?: string | null
+          starts_on: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          category_id?: string
+          created_at?: string
+          created_by?: string | null
+          day_of_month?: number
+          description?: string
+          id?: string
+          kitchen_id?: string
+          payee_name?: string | null
+          starts_on?: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_recurring_obligations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_recurring_obligations_kitchen_id_category_id_fkey"
+            columns: ["kitchen_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "dk_expense_categories"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_recurring_obligations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_recurring_obligations_kitchen_id_supplier_id_fkey"
+            columns: ["kitchen_id", "supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
       dk_role_permissions: {
         Row: {
           permission_key: string
@@ -3657,6 +4161,21 @@ export type Database = {
           tagline: string | null
           updated_at: string
           updated_by: string | null
+          web_auto_confirm: boolean
+          web_delivery: boolean
+          web_delivery_fee: number
+          web_message: string | null
+          web_min_order: number
+          web_orders_enabled: boolean
+          web_payment_methods: string[]
+          web_pickup: boolean
+          web_published: boolean
+          web_published_at: string | null
+          web_theme: Json | null
+          web_theme_draft: Json | null
+          web_theme_previous: Json | null
+          web_theme_published_at: string | null
+          web_transfer_instructions: string | null
           whatsapp_phone: string | null
         }
         Insert: {
@@ -3669,6 +4188,21 @@ export type Database = {
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          web_auto_confirm?: boolean
+          web_delivery?: boolean
+          web_delivery_fee?: number
+          web_message?: string | null
+          web_min_order?: number
+          web_orders_enabled?: boolean
+          web_payment_methods?: string[]
+          web_pickup?: boolean
+          web_published?: boolean
+          web_published_at?: string | null
+          web_theme?: Json | null
+          web_theme_draft?: Json | null
+          web_theme_previous?: Json | null
+          web_theme_published_at?: string | null
+          web_transfer_instructions?: string | null
           whatsapp_phone?: string | null
         }
         Update: {
@@ -3681,6 +4215,21 @@ export type Database = {
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          web_auto_confirm?: boolean
+          web_delivery?: boolean
+          web_delivery_fee?: number
+          web_message?: string | null
+          web_min_order?: number
+          web_orders_enabled?: boolean
+          web_payment_methods?: string[]
+          web_pickup?: boolean
+          web_published?: boolean
+          web_published_at?: string | null
+          web_theme?: Json | null
+          web_theme_draft?: Json | null
+          web_theme_previous?: Json | null
+          web_theme_published_at?: string | null
+          web_transfer_instructions?: string | null
           whatsapp_phone?: string | null
         }
         Relationships: [
@@ -3831,6 +4380,7 @@ export type Database = {
           id: string
           kitchen_id: string
           name: string
+          payment_terms_days: number
           phone: string | null
           tax_id: string | null
           updated_at: string
@@ -3844,6 +4394,7 @@ export type Database = {
           id?: string
           kitchen_id?: string
           name: string
+          payment_terms_days?: number
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -3857,6 +4408,7 @@ export type Database = {
           id?: string
           kitchen_id?: string
           name?: string
+          payment_terms_days?: number
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -4115,6 +4667,81 @@ export type Database = {
       }
     }
     Views: {
+      dk_obligation_balances: {
+        Row: {
+          accrual_date: string | null
+          amount: number | null
+          balance: number | null
+          category_id: string | null
+          category_name: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string | null
+          invoice_number: string | null
+          kind: string | null
+          kitchen_id: string | null
+          member_name: string | null
+          member_user_id: string | null
+          notes: string | null
+          paid: number | null
+          payee: string | null
+          payee_name: string | null
+          period_end: string | null
+          period_start: string | null
+          purchase_id: string | null
+          recurring_id: string | null
+          status: string | null
+          supplier_id: string | null
+          supplier_name: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_category_id_fkey"
+            columns: ["kitchen_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "dk_expense_categories"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_purchase_id_fkey"
+            columns: ["kitchen_id", "purchase_id"]
+            isOneToOne: false
+            referencedRelation: "dk_purchases"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_recurring_id_fkey"
+            columns: ["kitchen_id", "recurring_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recurring_obligations"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_kitchen_id_supplier_id_fkey"
+            columns: ["kitchen_id", "supplier_id"]
+            isOneToOne: false
+            referencedRelation: "dk_suppliers"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_obligations_member_user_id_fkey"
+            columns: ["member_user_id"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_receivables: {
         Row: {
           balance: number | null
@@ -4317,8 +4944,12 @@ export type Database = {
       dk_clock_in: { Args: never; Returns: string }
       dk_clock_out: { Args: never; Returns: string }
       dk_confirm_order: { Args: { p_order_id: string }; Returns: undefined }
+      dk_confirm_order_internal: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       dk_confirm_purchase: {
-        Args: { p_purchase_id: string }
+        Args: { p_payment?: Json; p_purchase_id: string }
         Returns: undefined
       }
       dk_consumer_ai_allow: { Args: never; Returns: boolean }
@@ -4339,6 +4970,10 @@ export type Database = {
         Returns: Json
       }
       dk_copilot_deliveries: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_copilot_finance: {
         Args: { p_from: string; p_to: string }
         Returns: Json
       }
@@ -4570,6 +5205,84 @@ export type Database = {
         Returns: string
       }
       dk_feature_state: { Args: { p_key: string }; Returns: Json }
+      dk_finance_add_previous_purchases: {
+        Args: { p_purchase_ids: string[] }
+        Returns: number
+      }
+      dk_finance_cashflow: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_finance_create_expense: { Args: { p: Json }; Returns: string }
+      dk_finance_generate_recurring: { Args: never; Returns: number }
+      dk_finance_liquidate_payroll: {
+        Args: { p_due: string; p_from: string; p_lines: Json; p_to: string }
+        Returns: number
+      }
+      dk_finance_pay: {
+        Args: {
+          p_amount: number
+          p_method: string
+          p_note?: string
+          p_obligation: string
+          p_paid_on: string
+          p_reference?: string
+        }
+        Returns: string
+      }
+      dk_finance_payables_summary: { Args: never; Returns: Json }
+      dk_finance_payroll_proposal: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
+      dk_finance_pnl: { Args: { p_from: string; p_to: string }; Returns: Json }
+      dk_finance_prorate: {
+        Args: {
+          p_accrual: string
+          p_amount: number
+          p_end: string
+          p_from: string
+          p_start: string
+          p_to: string
+        }
+        Returns: number
+      }
+      dk_finance_save_recurring: { Args: { p: Json }; Returns: string }
+      dk_finance_set_vat_deductible: {
+        Args: { p_deductible: boolean }
+        Returns: undefined
+      }
+      dk_finance_team: {
+        Args: never
+        Returns: {
+          active: boolean
+          avatar_key: string
+          effective_from: string
+          full_name: string
+          pay_type: string
+          rate: number
+          role_name: string
+          user_id: string
+        }[]
+      }
+      dk_finance_void_obligation: {
+        Args: { p_obligation: string; p_reason: string }
+        Returns: undefined
+      }
+      dk_finance_void_payment: {
+        Args: { p_payment: string; p_reason: string }
+        Returns: string
+      }
+      dk_finance_worked_hours: {
+        Args: {
+          p_from: string
+          p_kitchen: string
+          p_to: string
+          p_tz: string
+          p_user: string
+        }
+        Returns: number
+      }
       dk_find_or_create_customer_by_phone: {
         Args: { p_full_name?: string; p_phone: string }
         Returns: string
@@ -4799,6 +5512,10 @@ export type Database = {
         Returns: boolean
       }
       dk_is_reserved_slug: { Args: { p_slug: string }; Returns: boolean }
+      dk_is_sale_status: {
+        Args: { p: Database["public"]["Enums"]["dk_order_status"] }
+        Returns: boolean
+      }
       dk_is_staff: { Args: never; Returns: boolean }
       dk_is_superadmin: { Args: never; Returns: boolean }
       dk_is_syncing_master: { Args: never; Returns: boolean }
@@ -4845,7 +5562,39 @@ export type Database = {
         Args: { p_keys: string[] }
         Returns: number
       }
+      dk_mark_picked_up: { Args: { p_order_id: string }; Returns: undefined }
       dk_match_key: { Args: { p: string }; Returns: string }
+      dk_menu_design_ai_context: { Args: never; Returns: Json }
+      dk_menu_design_backup_draft: {
+        Args: { p_kitchen: string }
+        Returns: boolean
+      }
+      dk_menu_design_delete: { Args: { p_id: string }; Returns: undefined }
+      dk_menu_design_guard: { Args: never; Returns: string }
+      dk_menu_design_json: {
+        Args: { d: Database["public"]["Tables"]["dk_menu_designs"]["Row"] }
+        Returns: Json
+      }
+      dk_menu_design_list: { Args: never; Returns: Json }
+      dk_menu_design_publish: { Args: { p_id: string }; Returns: Json }
+      dk_menu_design_save: {
+        Args: {
+          p_ai_run_id?: string
+          p_design: Json
+          p_name: string
+          p_parent_id?: string
+          p_prompt?: string
+          p_source?: string
+          p_summary?: string
+        }
+        Returns: Json
+      }
+      dk_menu_design_update: {
+        Args: { p_favorite?: boolean; p_id: string; p_name?: string }
+        Returns: Json
+      }
+      dk_menu_design_use: { Args: { p_id: string }; Returns: Json }
+      dk_menu_designs_prune: { Args: { p_kitchen: string }; Returns: undefined }
       dk_my_context: { Args: never; Returns: Json }
       dk_my_features: { Args: never; Returns: Json }
       dk_my_kitchens: {
@@ -4873,6 +5622,7 @@ export type Database = {
       dk_nit_matches: { Args: { a: string; b: string }; Returns: boolean }
       dk_normalize_phone: { Args: { p_phone: string }; Returns: string }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
+      dk_obligation_balance: { Args: { p_obligation: string }; Returns: number }
       dk_order_search: {
         Args: {
           p_channel?: Database["public"]["Enums"]["dk_order_channel"]
@@ -4995,6 +5745,66 @@ export type Database = {
           new_kitchen_slug: string
           new_organization_id: string
         }[]
+      }
+      dk_public_menu: { Args: { p_slug: string }; Returns: Json }
+      dk_public_menu_account: {
+        Args: { p_slug: string }
+        Returns: {
+          cuisine: string
+          currency: string
+          icon_key: string
+          kitchen_id: string
+          name: string
+          sf: Database["public"]["Tables"]["dk_storefronts"]["Row"]
+          slug: string
+          timezone: string
+        }[]
+      }
+      dk_public_menu_build: {
+        Args: { p_kitchen: string; p_theme: Json }
+        Returns: Json
+      }
+      dk_public_menu_items: {
+        Args: { p_kitchen: string }
+        Returns: {
+          active_recipe_id: string
+          availability: string
+          category: string
+          category_id: string
+          category_order: number
+          description: string
+          display_order: number
+          end_time: string
+          image_path: string
+          images: Json
+          name: string
+          price: number
+          product_id: string
+          regular_price: number
+          remaining: number
+          start_time: string
+          unit_limit: number
+          uses_inventory: boolean
+        }[]
+      }
+      dk_public_menu_preview: { Args: never; Returns: Json }
+      dk_public_menu_settings: { Args: never; Returns: Json }
+      dk_public_menu_settings_save: { Args: { p: Json }; Returns: undefined }
+      dk_public_menu_theme_discard: { Args: never; Returns: undefined }
+      dk_public_menu_theme_problem: {
+        Args: { p: Json; p_kitchen: string }
+        Returns: string
+      }
+      dk_public_menu_theme_publish: { Args: never; Returns: undefined }
+      dk_public_menu_theme_revert: { Args: never; Returns: undefined }
+      dk_public_menu_theme_save_draft: {
+        Args: { p_theme: Json }
+        Returns: undefined
+      }
+      dk_public_order_status: { Args: { p_token: string }; Returns: Json }
+      dk_public_place_order: {
+        Args: { p_order: Json; p_slug: string }
+        Returns: Json
       }
       dk_public_search_dishes: { Args: { p_params?: Json }; Returns: Json }
       dk_purge_audit_log: { Args: { p_days?: number }; Returns: number }
@@ -5122,6 +5932,10 @@ export type Database = {
           p_role_id: string
         }
         Returns: string
+      }
+      dk_seed_expense_categories: {
+        Args: { p_kitchen: string }
+        Returns: undefined
       }
       dk_set_kitchen_feature: {
         Args: {
@@ -5280,7 +6094,7 @@ export type Database = {
       dk_delivery_status: "EN_RUTA" | "ENTREGADO" | "FALLIDO"
       dk_kitchen_item_status: "PENDIENTE" | "EN_PREPARACION" | "LISTO"
       dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
-      dk_order_channel: "MANUAL" | "WHATSAPP" | "PHONE"
+      dk_order_channel: "MANUAL" | "WHATSAPP" | "PHONE" | "WEB"
       dk_order_status:
         | "NUEVO"
         | "CONFIRMADO"
@@ -5440,7 +6254,7 @@ export const Constants = {
       dk_delivery_status: ["EN_RUTA", "ENTREGADO", "FALLIDO"],
       dk_kitchen_item_status: ["PENDIENTE", "EN_PREPARACION", "LISTO"],
       dk_movement_type: ["COMPRA", "MERMA", "AJUSTE", "CONSUMO", "DEVOLUCION"],
-      dk_order_channel: ["MANUAL", "WHATSAPP", "PHONE"],
+      dk_order_channel: ["MANUAL", "WHATSAPP", "PHONE", "WEB"],
       dk_order_status: [
         "NUEVO",
         "CONFIRMADO",
