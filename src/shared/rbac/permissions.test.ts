@@ -11,9 +11,9 @@ describe('catálogo de permisos de la app', () => {
     expect(sqlKeys.sort()).toEqual([...ACCOUNT_PERMISSION_KEYS, ...ORGANIZATION_PERMISSION_KEYS].sort())
   })
 
-  it('tiene 56 permisos de Cuenta y 12 de organización, sin repetidos y con formato módulo.acción', () => {
+  it('tiene 59 permisos de Cuenta y 12 de organización, sin repetidos y con formato módulo.acción', () => {
     const all = [...ACCOUNT_PERMISSION_KEYS, ...ORGANIZATION_PERMISSION_KEYS]
-    expect(ACCOUNT_PERMISSION_KEYS).toHaveLength(56)
+    expect(ACCOUNT_PERMISSION_KEYS).toHaveLength(59)
     expect(ORGANIZATION_PERMISSION_KEYS).toHaveLength(12)
     expect(new Set(all).size).toBe(all.length)
     for (const key of all) expect(key).toMatch(/^[a-z_]+\.[a-z_]+$/)

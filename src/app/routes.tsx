@@ -14,6 +14,7 @@ import { OperationsPage } from '@/modules/operations/pages/OperationsPage'
 import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
 import { StaffPage } from '@/modules/staff/pages/StaffPage'
 import { FinancePage } from '@/modules/finance/pages/FinancePage'
+import { IntegrationsPage } from '@/modules/integrations/pages/IntegrationsPage'
 import { PublicMenuAdminPage } from '@/modules/publicMenu/pages/PublicMenuAdminPage'
 import { OrderTrackingRoute, PublicMenuRoute } from '@/modules/publicMenu/public/PublicRoutes'
 import { RolesPage, UsersLayout, UsersPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
@@ -189,6 +190,9 @@ const routes: RouteObject[] = [
           // Menú público (ADR 0052): publish, ordering options, link and QR; Diseño (ADR 0053).
           { path: 'public-menu', element: <PublicMenuAdminPage /> },
           { path: 'public-menu/:tab', element: <PublicMenuAdminPage /> },
+          // WhatsApp e Integraciones (ADR 0055).
+          { path: 'integrations', element: <IntegrationsPage /> },
+          { path: 'integrations/:tab', element: <IntegrationsPage /> },
           { path: 'my-shifts', element: <MyShiftsPage /> },
           // Clientes — saldos, pagos e historial.
           { path: 'customers', element: <CustomersPage /> },

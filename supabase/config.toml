@@ -412,3 +412,11 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# ADR 0055: Meta calls the webhook without a Supabase session (it checks Meta's signature),
+# and pg_net wakes the dispatcher (it only drains the outbox; the request body is ignored).
+[functions.dk-whatsapp-webhook]
+verify_jwt = false
+
+[functions.dk-whatsapp-dispatch]
+verify_jwt = false

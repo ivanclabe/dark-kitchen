@@ -1,5 +1,7 @@
 # Integración conversacional (WhatsApp → n8n → Supabase → Quanela)
 
+> **Actualización (ADR 0055):** el número de WhatsApp ahora se conecta en Quanela (módulo **WhatsApp e Integraciones**), y n8n recibe eventos firmados y actúa con `dk_wa_send_text` y `dk_wa_place_order_for`. Ver **`whatsapp-meta-n8n.md`**. Este documento queda como referencia de la ruta anterior.
+
 > Actualizado para organizaciones, Cuentas y catálogo de permisos (ADR 0008).
 
 Este documento describe cómo el futuro workflow de n8n debe consumir esta aplicación. **Nada de WhatsApp ni de Anthropic vive dentro de React** — esta app y Supabase son la fuente de verdad operacional; n8n es quien orquesta la conversación.

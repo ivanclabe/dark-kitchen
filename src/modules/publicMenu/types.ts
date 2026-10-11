@@ -51,6 +51,8 @@ export interface PublicMenu {
     paymentMethods: PublicPaymentMethod[]
     transferInstructions: string | null
     autoConfirm: boolean
+    /** ADR 0055: the business sends order notices by WhatsApp (offer the opt-in). */
+    whatsappNotices?: boolean
   }
   today: string
   items: PublicMenuItem[]
@@ -73,6 +75,8 @@ export interface PlaceOrderInput {
   paymentMethod: PublicPaymentMethod
   notes: string
   items: CartLine[]
+  /** ADR 0055: the customer accepts order notices by WhatsApp. */
+  whatsappOptIn?: boolean
   /** Honeypot: people never fill it. */
   website: string
 }

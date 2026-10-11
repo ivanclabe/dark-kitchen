@@ -46,6 +46,7 @@ export const HELP_PATHS: Record<string, string> = {
   "product-profitability": "/help/reports/product-profitability",
   "screen-tour": "/help/screenshots/screen-tour",
   "settings": "/help/settings/settings",
+  "whatsapp": "/help/settings/whatsapp",
   "shifts": "/help/team/shifts",
   "users-and-roles": "/help/team/users-and-roles"
 }

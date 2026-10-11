@@ -717,6 +717,10 @@ export type Database = {
           tax_id: string | null
           updated_at: string
           whatsapp_id: string | null
+          whatsapp_opt_in: boolean
+          whatsapp_opt_in_at: string | null
+          whatsapp_opt_in_source: string | null
+          whatsapp_opt_out_at: string | null
         }
         Insert: {
           address?: string | null
@@ -735,6 +739,10 @@ export type Database = {
           tax_id?: string | null
           updated_at?: string
           whatsapp_id?: string | null
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_in_source?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Update: {
           address?: string | null
@@ -753,6 +761,10 @@ export type Database = {
           tax_id?: string | null
           updated_at?: string
           whatsapp_id?: string | null
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_in_source?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Relationships: [
           {
@@ -1339,6 +1351,69 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_suppliers"
             referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_integration_endpoints: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          events: string[]
+          id: string
+          kind: string
+          kitchen_id: string
+          last_delivery_at: string | null
+          last_error: string | null
+          last_status: number | null
+          secret_id: string | null
+          updated_at: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          events?: string[]
+          id?: string
+          kind?: string
+          kitchen_id: string
+          last_delivery_at?: string | null
+          last_error?: string | null
+          last_status?: number | null
+          secret_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          events?: string[]
+          id?: string
+          kind?: string
+          kitchen_id?: string
+          last_delivery_at?: string | null
+          last_error?: string | null
+          last_status?: number | null
+          secret_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_integration_endpoints_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: true
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_integration_endpoints_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3405,6 +3480,24 @@ export type Database = {
         }
         Relationships: []
       }
+      dk_platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       dk_product_categories: {
         Row: {
           created_at: string
@@ -4617,6 +4710,389 @@ export type Database = {
           },
         ]
       }
+      dk_wa_accounts: {
+        Row: {
+          access_token_id: string | null
+          app_secret_id: string | null
+          connected_at: string | null
+          display_phone: string | null
+          kitchen_id: string
+          last_check_at: string | null
+          last_error: string | null
+          mode: string
+          notifications_enabled: boolean
+          ordering_greeting: string | null
+          ordering_mode: string
+          phone_number_id: string
+          quality_rating: string | null
+          status: string
+          test_recipients: string[]
+          updated_at: string
+          updated_by: string | null
+          verified_name: string | null
+          verify_token_hash: string | null
+          waba_id: string
+        }
+        Insert: {
+          access_token_id?: string | null
+          app_secret_id?: string | null
+          connected_at?: string | null
+          display_phone?: string | null
+          kitchen_id: string
+          last_check_at?: string | null
+          last_error?: string | null
+          mode?: string
+          notifications_enabled?: boolean
+          ordering_greeting?: string | null
+          ordering_mode?: string
+          phone_number_id: string
+          quality_rating?: string | null
+          status?: string
+          test_recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+          verified_name?: string | null
+          verify_token_hash?: string | null
+          waba_id: string
+        }
+        Update: {
+          access_token_id?: string | null
+          app_secret_id?: string | null
+          connected_at?: string | null
+          display_phone?: string | null
+          kitchen_id?: string
+          last_check_at?: string | null
+          last_error?: string | null
+          mode?: string
+          notifications_enabled?: boolean
+          ordering_greeting?: string | null
+          ordering_mode?: string
+          phone_number_id?: string
+          quality_rating?: string | null
+          status?: string
+          test_recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+          verified_name?: string | null
+          verify_token_hash?: string | null
+          waba_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_wa_accounts_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: true
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_accounts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_wa_conversations: {
+        Row: {
+          attention_reason: string | null
+          created_at: string
+          customer_id: string | null
+          customer_name: string | null
+          id: string
+          kitchen_id: string
+          last_inbound_at: string | null
+          last_message_at: string | null
+          last_order_id: string | null
+          needs_attention: boolean
+          phone: string
+          state: Json
+          status: string
+          unread: number
+          updated_at: string
+        }
+        Insert: {
+          attention_reason?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          id?: string
+          kitchen_id: string
+          last_inbound_at?: string | null
+          last_message_at?: string | null
+          last_order_id?: string | null
+          needs_attention?: boolean
+          phone: string
+          state?: Json
+          status?: string
+          unread?: number
+          updated_at?: string
+        }
+        Update: {
+          attention_reason?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          id?: string
+          kitchen_id?: string
+          last_inbound_at?: string | null
+          last_message_at?: string | null
+          last_order_id?: string | null
+          needs_attention?: boolean
+          phone?: string
+          state?: Json
+          status?: string
+          unread?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_wa_conversations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "dk_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_conversations_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_conversations_last_order_id_fkey"
+            columns: ["last_order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_conversations_last_order_id_fkey"
+            columns: ["last_order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
+      dk_wa_messages: {
+        Row: {
+          author: string
+          body: string | null
+          conversation_id: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          id: string
+          kind: string
+          kitchen_id: string
+          outbox_id: string | null
+          wamid: string | null
+        }
+        Insert: {
+          author: string
+          body?: string | null
+          conversation_id: string
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          id?: string
+          kind?: string
+          kitchen_id: string
+          outbox_id?: string | null
+          wamid?: string | null
+        }
+        Update: {
+          author?: string
+          body?: string | null
+          conversation_id?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          kind?: string
+          kitchen_id?: string
+          outbox_id?: string | null
+          wamid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_wa_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "dk_wa_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_messages_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_messages_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_messages_outbox_id_fkey"
+            columns: ["outbox_id"]
+            isOneToOne: false
+            referencedRelation: "dk_wa_outbox"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dk_wa_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          error_code: string | null
+          event: string
+          id: string
+          kind: string
+          kitchen_id: string
+          last_error: string | null
+          locked_at: string | null
+          next_attempt_at: string
+          order_id: string | null
+          payload: Json
+          read_at: string | null
+          recipient: string
+          sent_at: string | null
+          status: string
+          wamid: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          error_code?: string | null
+          event: string
+          id?: string
+          kind: string
+          kitchen_id: string
+          last_error?: string | null
+          locked_at?: string | null
+          next_attempt_at?: string
+          order_id?: string | null
+          payload?: Json
+          read_at?: string | null
+          recipient: string
+          sent_at?: string | null
+          status?: string
+          wamid?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          error_code?: string | null
+          event?: string
+          id?: string
+          kind?: string
+          kitchen_id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          next_attempt_at?: string
+          order_id?: string | null
+          payload?: Json
+          read_at?: string | null
+          recipient?: string
+          sent_at?: string | null
+          status?: string
+          wamid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_wa_outbox_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_outbox_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_outbox_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_wa_outbox_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dk_receivables"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
+      dk_wa_templates: {
+        Row: {
+          body: string | null
+          enabled: boolean
+          event: string
+          kitchen_id: string
+          language: string
+          meta_reason: string | null
+          meta_status: string
+          meta_template_id: string | null
+          params: string[]
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          enabled?: boolean
+          event: string
+          kitchen_id: string
+          language?: string
+          meta_reason?: string | null
+          meta_status?: string
+          meta_template_id?: string | null
+          params?: string[]
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          enabled?: boolean
+          event?: string
+          kitchen_id?: string
+          language?: string
+          meta_reason?: string | null
+          meta_status?: string
+          meta_template_id?: string | null
+          params?: string[]
+          template_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_wa_templates_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_weekly_menu_items: {
         Row: {
           created_at: string
@@ -4882,8 +5358,24 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_ai_run_finish_system: {
+        Args: {
+          p_error?: string
+          p_input_tokens?: number
+          p_latency_ms?: number
+          p_output?: Json
+          p_output_tokens?: number
+          p_run_id: string
+          p_status: string
+        }
+        Returns: undefined
+      }
       dk_ai_run_reserve: {
         Args: { p_feature_key: string; p_input?: Json }
+        Returns: Json
+      }
+      dk_ai_run_reserve_system: {
+        Args: { p_conversation: string; p_input?: Json; p_kitchen: string }
         Returns: Json
       }
       dk_assert_in_active_kitchen: {
@@ -5125,6 +5617,10 @@ export type Database = {
       dk_customer_order_stats: { Args: { p_id: string }; Returns: Json }
       dk_customer_preference_options: { Args: never; Returns: Json }
       dk_customer_profile: { Args: { p_id: string }; Returns: Json }
+      dk_customer_set_whatsapp_opt_in: {
+        Args: { p_customer_id: string; p_opt_in: boolean }
+        Returns: undefined
+      }
       dk_customer_type_json: { Args: { p_id: string }; Returns: Json }
       dk_customers_list: {
         Args: {
@@ -5423,6 +5919,23 @@ export type Database = {
         Args: { p_from: string; p_product: string; p_to: string }
         Returns: Json
       }
+      dk_integration_delete_endpoint: { Args: never; Returns: undefined }
+      dk_integration_emit: {
+        Args: {
+          p_data: Json
+          p_event: string
+          p_kitchen: string
+          p_order?: string
+          p_suffix?: string
+        }
+        Returns: string
+      }
+      dk_integration_rotate_secret: { Args: never; Returns: Json }
+      dk_integration_save_endpoint: {
+        Args: { p_enabled?: boolean; p_events?: string[]; p_url: string }
+        Returns: Json
+      }
+      dk_integration_test: { Args: never; Returns: string }
       dk_inventory_signals: {
         Args: {
           p_coverage_days?: number
@@ -5666,6 +6179,14 @@ export type Database = {
       }
       dk_org_users: { Args: { p_organization_id: string }; Returns: Json }
       dk_owner_signup_verified: { Args: { p_auth: unknown }; Returns: boolean }
+      dk_place_order_internal: {
+        Args: {
+          p_channel: Database["public"]["Enums"]["dk_order_channel"]
+          p_kitchen: string
+          p_order: Json
+        }
+        Returns: Json
+      }
       dk_plan_includes: {
         Args: { p_feature_key: string; p_organization_id: string }
         Returns: boolean
@@ -6081,6 +6602,167 @@ export type Database = {
         Args: { p_payment_id: string; p_reason: string }
         Returns: string
       }
+      dk_wa_admin_context: { Args: never; Returns: Json }
+      dk_wa_ai_context: { Args: { p_conversation: string }; Returns: Json }
+      dk_wa_apply_status: {
+        Args: {
+          p_at: string
+          p_error?: string
+          p_error_code?: string
+          p_phone_number_id: string
+          p_status: string
+          p_wamid: string
+        }
+        Returns: boolean
+      }
+      dk_wa_claim: { Args: { p_limit?: number }; Returns: Json }
+      dk_wa_connect: {
+        Args: {
+          p_access_token?: string
+          p_app_secret?: string
+          p_phone_number_id: string
+          p_waba_id: string
+        }
+        Returns: Json
+      }
+      dk_wa_credentials: { Args: { p_kitchen: string }; Returns: Json }
+      dk_wa_disconnect: { Args: never; Returns: undefined }
+      dk_wa_enqueue_order_event: {
+        Args: {
+          p_from: Database["public"]["Enums"]["dk_order_status"]
+          p_note: string
+          p_order_id: string
+          p_to: Database["public"]["Enums"]["dk_order_status"]
+        }
+        Returns: string
+      }
+      dk_wa_event_for: {
+        Args: {
+          p_fulfillment: string
+          p_status: Database["public"]["Enums"]["dk_order_status"]
+        }
+        Returns: string
+      }
+      dk_wa_guard: { Args: { p_permission: string }; Returns: string }
+      dk_wa_kick: { Args: never; Returns: undefined }
+      dk_wa_mark: {
+        Args: {
+          p_error?: string
+          p_error_code?: string
+          p_id: string
+          p_ok: boolean
+          p_retryable?: boolean
+          p_wamid?: string
+        }
+        Returns: undefined
+      }
+      dk_wa_place_order: {
+        Args: { p_conversation: string; p_idempotency: string; p_order: Json }
+        Returns: Json
+      }
+      dk_wa_place_order_for: {
+        Args: { p_conversation_id: string; p_order: Json }
+        Returns: Json
+      }
+      dk_wa_receive: {
+        Args: {
+          p_at: string
+          p_from: string
+          p_name: string
+          p_phone_number_id: string
+          p_text: string
+          p_type: string
+          p_wamid: string
+        }
+        Returns: Json
+      }
+      dk_wa_record_check: {
+        Args: {
+          p_error: string
+          p_info: Json
+          p_kitchen: string
+          p_ok: boolean
+        }
+        Returns: undefined
+      }
+      dk_wa_record_templates: {
+        Args: { p_kitchen: string; p_templates: Json }
+        Returns: undefined
+      }
+      dk_wa_regenerate_verify_token: { Args: never; Returns: Json }
+      dk_wa_reply_internal: {
+        Args: {
+          p_author?: string
+          p_check_window?: boolean
+          p_conversation: string
+          p_text: string
+        }
+        Returns: string
+      }
+      dk_wa_retry: { Args: { p_id: string }; Returns: undefined }
+      dk_wa_save_settings: { Args: { p: Json }; Returns: undefined }
+      dk_wa_save_state: {
+        Args: {
+          p_attention?: string
+          p_conversation: string
+          p_state: Json
+          p_status?: string
+        }
+        Returns: undefined
+      }
+      dk_wa_save_template: {
+        Args: {
+          p_enabled: boolean
+          p_event: string
+          p_language?: string
+          p_params?: string[]
+          p_template_name?: string
+        }
+        Returns: undefined
+      }
+      dk_wa_send_template: {
+        Args: {
+          p_language?: string
+          p_params?: string[]
+          p_template: string
+          p_to: string
+        }
+        Returns: string
+      }
+      dk_wa_send_test: {
+        Args: { p_event: string; p_to: string }
+        Returns: string
+      }
+      dk_wa_send_text: {
+        Args: {
+          p_conversation_id: string
+          p_take_over?: boolean
+          p_text: string
+        }
+        Returns: string
+      }
+      dk_wa_set_conversation: {
+        Args: { p_conversation_id: string; p_read?: boolean; p_status?: string }
+        Returns: undefined
+      }
+      dk_wa_settings: { Args: never; Returns: Json }
+      dk_wa_template_catalog: {
+        Args: never
+        Returns: {
+          body: string
+          enabled_default: boolean
+          event: string
+          params: string[]
+          sort_order: number
+          template_name: string
+        }[]
+      }
+      dk_wa_tick: { Args: never; Returns: undefined }
+      dk_wa_webhook_account: {
+        Args: { p_phone_number_id: string }
+        Returns: Json
+      }
+      dk_wa_webhook_verify: { Args: { p_token: string }; Returns: boolean }
     }
     Enums: {
       dk_day_of_week:

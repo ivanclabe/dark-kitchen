@@ -1,0 +1,404 @@
+{
+  "name": "Quanela · Pedidos por WhatsApp (modo n8n)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "quanela-pedidos",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "name": "Webhook Quanela",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "quanela-pedidos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "secret",
+              "value": "PEGA_AQUI_EL_SECRETO_QNS",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "supabaseUrl",
+              "value": "https://TU-PROYECTO.supabase.co",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "publishableKey",
+              "value": "PEGA_AQUI_LA_PUBLISHABLE_KEY",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "accountId",
+              "value": "PEGA_AQUI_EL_ID_DE_LA_CUENTA",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "menuSlug",
+              "value": "tu-negocio",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Configuración",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Quanela firma cada evento: X-Quanela-Signature = \"sha256=\" + HMAC-SHA256(secreto, cuerpo).\n// Activa «Raw Body» en el nodo Webhook para comparar exactamente los bytes recibidos.\nconst crypto = require('crypto');\nconst cfg = $('Configuración').first().json;\nconst item = $input.first();\nconst raw = item.binary?.data ? Buffer.from(item.binary.data.data, 'base64').toString('utf8') : JSON.stringify(item.json.body);\nconst given = String(item.json.headers?.['x-quanela-signature'] ?? '');\nconst expected = 'sha256=' + crypto.createHmac('sha256', cfg.secret).update(raw).digest('hex');\nconst valid = given.length === expected.length && crypto.timingSafeEqual(Buffer.from(given), Buffer.from(expected));\nconst body = JSON.parse(raw);\nreturn [{ json: { valid, event: body.event, data: body.data, deliveryId: body.id, accountId: body.accountId } }];"
+      },
+      "name": "Verificar firma",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "v",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "¿Firma válida?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { received: true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "name": "Responder 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: 'firma inválida' } }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "name": "Responder 401",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "m",
+              "leftValue": "={{ $('Verificar firma').item.json.event }}",
+              "rightValue": "whatsapp.message.received",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "¿Es un mensaje?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.supabaseUrl }}/auth/v1/token?grant_type=password",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Configuración').item.json.publishableKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { email: $env.QUANELA_SERVICE_EMAIL ?? 'usuario-servicio@tu-negocio.co', password: $env.QUANELA_SERVICE_PASSWORD } }}",
+        "options": {}
+      },
+      "name": "Entrar (usuario de servicio)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        300
+      ],
+      "notes": "Usa un usuario de servicio con rol Caja, solo en esta cuenta. Mejor: guarda correo y contraseña como credencial de n8n."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.supabaseUrl }}/rest/v1/rpc/dk_public_menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Configuración').item.json.publishableKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_slug: $('Configuración').item.json.menuSlug } }}",
+        "options": {}
+      },
+      "name": "Menú de hoy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aquí va tu lógica (o un agente de IA). Este ejemplo responde con el menú de hoy, con precios de Quanela.\nconst menu = $('Menú de hoy').first().json;\nconst msg = $('Verificar firma').first().json.data;\nconst items = (menu.items ?? []).filter((i) => i.availability === 'available');\nconst fmt = (n) => '$' + Math.round(n).toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');\nconst text = items.length\n  ? `Hola ${msg.name ?? ''}, hoy tenemos:\\n` + items.map((i) => `• ${i.name} — ${fmt(i.price)}`).join('\\n') + '\\n¿Qué te gustaría pedir?'\n  : 'Hola, hoy no tenemos platos disponibles.';\nreturn [{ json: { conversationId: msg.conversationId, wamid: msg.wamid, text } }];"
+      },
+      "name": "Armar respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.supabaseUrl }}/rest/v1/rpc/dk_wa_send_text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Configuración').item.json.publishableKey }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Entrar (usuario de servicio)').item.json.access_token }}"
+            },
+            {
+              "name": "x-dk-kitchen-id",
+              "value": "={{ $('Configuración').item.json.accountId }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_conversation_id: $json.conversationId, p_text: $json.text, p_take_over: false } }}",
+        "options": {}
+      },
+      "name": "Responder por WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        300
+      ],
+      "notes": "Quanela envía con el número y el token de la cuenta: n8n nunca tiene el token de Meta."
+    },
+    {
+      "parameters": {
+        "content": "## Crear el pedido\nCuando el cliente confirme, llama `dk_wa_place_order_for` con los mismos encabezados:\n```json\n{ \"p_conversation_id\": \"…\", \"p_order\": { \"idempotencyKey\": \"<wamid del «sí»>\", \"fulfillment\": \"delivery|pickup\", \"address\": \"…\", \"paymentMethod\": \"Efectivo\", \"items\": [{ \"productId\": \"…\", \"quantity\": 2, \"note\": \"sin cebolla\" }] } }\n```\nQuanela calcula precios, domicilio, mínimo y total, y lo envía a cocina con las reglas del menú público.",
+        "height": 300,
+        "width": 460
+      },
+      "name": "Nota",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Quanela": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración": {
+      "main": [
+        [
+          {
+            "node": "Verificar firma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar firma": {
+      "main": [
+        [
+          {
+            "node": "¿Firma válida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Firma válida?": {
+      "main": [
+        [
+          {
+            "node": "Responder 200",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder 401",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder 200": {
+      "main": [
+        [
+          {
+            "node": "¿Es un mensaje?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es un mensaje?": {
+      "main": [
+        [
+          {
+            "node": "Entrar (usuario de servicio)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Entrar (usuario de servicio)": {
+      "main": [
+        [
+          {
+            "node": "Menú de hoy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú de hoy": {
+      "main": [
+        [
+          {
+            "node": "Armar respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar respuesta": {
+      "main": [
+        [
+          {
+            "node": "Responder por WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

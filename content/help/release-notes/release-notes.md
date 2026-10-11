@@ -18,6 +18,11 @@ order: 1
 
 ## 11 de octubre de 2026
 
+- **WhatsApp e Integraciones.** Un módulo nuevo para conectar el **número oficial de WhatsApp** de tu negocio.
+  - **Avisos de pedidos:** tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos.
+  - **Pedidos por WhatsApp:** los atiende tu equipo desde **Mensajes**, el **asistente de Quanela** (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu **n8n**.
+  - **n8n:** recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela.
+  - Ver [WhatsApp e Integraciones](help:whatsapp).
 - **Menú público y pedidos online.** En **Menú público** publicas el menú de hoy en `quanela.com/menu/tu-negocio`. Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular.
   - El menú sale del planificador, con precios, horarios, límites y agotados.
   - Los pedidos llegan con el canal **Menú web** y entran directo a Cocina, con domicilio o para recoger.

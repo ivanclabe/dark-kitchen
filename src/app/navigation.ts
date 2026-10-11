@@ -1,5 +1,5 @@
 import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/roles'
-import { Activity, BarChart3, CalendarClock, Globe, Landmark, LayoutDashboard, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
+import { Activity, BarChart3, CalendarClock, Globe, Landmark, LayoutDashboard, MessageCircle, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
  * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
@@ -57,6 +57,13 @@ export const NAV_ITEMS: NavItem[] = [
     description: 'Tu menú de hoy en una página para tus clientes, con pedidos que entran a cocina',
     modules: ['publicMenu'],
     icon: Globe,
+  },
+  {
+    to: '/integrations',
+    label: 'WhatsApp',
+    description: 'WhatsApp e Integraciones: tu número oficial, avisos de pedidos y n8n',
+    modules: ['integrations'],
+    icon: MessageCircle,
   },
   {
     to: '/consumer',

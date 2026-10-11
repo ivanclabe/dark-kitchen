@@ -1,9 +1,10 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
-import { Copy } from 'lucide-react'
+import { Copy, MessageCircle } from 'lucide-react'
 import { SettingsPage } from '../ui/SettingsPage'
 import { Section } from '@/shared/ui/Section'
 
@@ -17,6 +18,11 @@ export function IntegrationsSettingsPage() {
   const { show } = useToast()
   return (
     <SettingsPage title="Integraciones" description="Conecta sistemas externos a esta cuenta.">
+      <Section title="WhatsApp e Integraciones" description="Tu número oficial de WhatsApp, los avisos de pedidos y n8n tienen su propio módulo (ADR 0055)." card>
+        <KitchenLink to="/integrations" className="inline-flex items-center gap-1.5 text-sm text-brasa-400 hover:underline">
+          <MessageCircle size={14} aria-hidden /> Ir a WhatsApp e Integraciones
+        </KitchenLink>
+      </Section>
       <Section title="ID de la cuenta" description="Por ejemplo, para pedidos por WhatsApp con n8n: la integración lo envía en cada petición y con él solo ve esta cuenta." card>
         <FormField
           label="ID de la cuenta"
@@ -45,7 +51,7 @@ export function IntegrationsSettingsPage() {
           )}
         </FormField>
       </Section>
-      <p className={typography.caption}>Las fallas de las integraciones todavía no se registran; la actividad por canal sí (Actividad → Operación).</p>
+      <p className={typography.caption}>Cada aviso de WhatsApp queda en WhatsApp e Integraciones → Registro, con su estado y su error.</p>
     </SettingsPage>
   )
 }

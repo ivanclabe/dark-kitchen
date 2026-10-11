@@ -22,6 +22,8 @@ export const FEATURE_KEYS = [
   'copilot',
   'invoice_import',
   'menu_designer',
+  'whatsapp_notifications',
+  'whatsapp_ordering',
   'voice_commands',
   'voice_speech',
   'voice_wake_word',

@@ -1695,7 +1695,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios («haz el fondo un poco más claro») y cada versión queda guardada. Mis diseños guarda el historial de tu negocio: propuestas, diseños del editor y todo lo que publicaste. Puedes comparar dos lado a lado y publicar cuando quieras. La IA nunca publica sola, y probar diseños no cambia tu página ni tus pedidos. Finanzas. Un módulo nuevo en el menú con: Por pagar: lo que se debe a proveedores, gastos y nómina, con vencimientos, abonos y pagos. Pagos: el registro, con anulación. Gastos , con gastos fijos que se crean solos cada mes. Nómina: por hora con las horas reales de los turnos, o salario mensual. Flujo de caja. Rentabilidad: la utilidad real , de las ventas a la utilidad operativa, con ingredientes, mermas, IVA de compras, nómina y gastos. Las compras y los pagos no cuentan dos veces. Ver Rentabilidad real y flujo de caja. ¿Cómo se pagó? Al confirmar una compra (también la importada), eliges de contado o a crédito . Los proveedores tienen plazo de pago y su ficha dice cuánto les debes. Insights cuenta solo pedidos confirmados. Los que no se han confirmado ya no suman a las ventas, para que Insights y Finanzas digan lo mismo. Los ajustes de inventario tienen costo. Desde ahora se valoran al costo promedio, como las mermas. de octubre de 2026 Importar desde tiquetes y pedidos. Importar desde factura ahora lee t"
+    "body": "de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios («haz el fondo un poco más claro») y cada versión queda guardada. Mis diseños guarda el historial de tu negocio: propuestas, diseños del editor y todo lo que publicaste. Puedes comparar dos lado a lado y publicar cuando quieras. La IA nunca publica sola, y probar diseños no cambia tu página ni tus pedidos. Finanzas. Un módulo nuevo en el menú con: Por pagar: lo que se debe a proveedores, gastos y nómina, con vencimientos, abonos y pagos. Pagos: el registro, con anulación. Gastos , con gastos fijos que se crean solos cada mes. Nómina: por hora con las horas reales de los turnos, o salario mensual. Flujo de caja. Rentabilidad: la utilidad real , de las ventas a la utilidad operativa, con ingredientes, mermas, IVA de comp"
   },
   {
     "id": "roles",
@@ -2189,5 +2189,60 @@ export const KB: KbArticle[] = [
       "Cómo se ve"
     ],
     "body": "Quanela reúne en un solo lugar lo que pasa en un negocio de comida —una cocina oculta, un restaurante con domicilios, un punto de comidas rápidas—: los pedidos que entran, lo que prepara la cocina, lo que sale a domicilio, lo que se cobra, lo que queda en bodega y cómo va el negocio. Qué puedes hacer Operar el día en el Centro de operaciones : crear pedidos, confirmarlos, prepararlos, despacharlos y cobrarlos. Ver El Centro de operaciones. Armar tu catálogo : platos, precios, el menú de cada día y la receta de cada plato, que calcula su costo. Ver Platos y menú del día. Controlar el inventario : el stock se descuenta solo a medida que la cocina termina los platos; tú registras compras, mermas y ajustes. Ver Stock e insumos bajo el mínimo. Conocer a tus clientes : sus pedidos, lo que compran y lo que deben. Ver Clientes y cartera. Entender el negocio en Insights : ventas, platos más rentables y costos. Ver Leer Insights. Preguntarle a Quanela , escribiendo o con la voz: «Oye Quanela, ¿cuánto vendimos hoy?». Ver Preguntarle a Copilot. Cómo se ve En el computador, a la izquierda está el menú con los módulos: Inicio , Operación , Catálogo , Abastecimiento , Clientes , Personal e Insights ; debajo, Usuarios y Configuración . Arriba están la cuenta en la que estás, «Oye Quanela» y Copilot . En el celular, el menú se abre con el botón ☰. Cada persona ve solo los módulos que su rol le permite. Ver Qué ve cada rol. Bueno saber: lo que hace una persona lo ve el resto del equipo en segundos: si la caja confirma un pedido, aparece solo en la pantalla de la cocina."
+  },
+  {
+    "id": "whatsapp",
+    "section": "settings",
+    "url": "/help/settings/whatsapp",
+    "title": "WhatsApp e Integraciones",
+    "summary": "Conecta el número oficial de WhatsApp de tu negocio para avisarles a tus clientes el estado de su pedido, recibir pedidos por WhatsApp (con tu equipo, el asistente de Quanela o n8n) y conectar tus automatizaciones.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager"
+    ],
+    "permissions": [
+      "integrations.view"
+    ],
+    "appPath": "/integrations",
+    "questions": [
+      "¿Cómo conecto mi número de WhatsApp?",
+      "¿Cómo les aviso a mis clientes que su pedido está listo?",
+      "¿Puedo recibir pedidos por WhatsApp?",
+      "¿La IA puede tomar pedidos por WhatsApp?",
+      "¿Cómo respondo los mensajes de WhatsApp desde Quanela?",
+      "¿Cómo conecto n8n?",
+      "¿Por qué un cliente no recibió el aviso?"
+    ],
+    "keywords": [
+      "whatsapp",
+      "meta",
+      "número oficial",
+      "avisos",
+      "notificaciones",
+      "estado del pedido",
+      "plantillas",
+      "bandeja",
+      "mensajes",
+      "pedidos por whatsapp",
+      "asistente",
+      "ia",
+      "n8n",
+      "webhook",
+      "integraciones",
+      "baja"
+    ],
+    "steps": [
+      "En Meta (developers.facebook.com): crea una app de tipo Empresa con el producto WhatsApp y agrega tu número; copia el Phone Number ID y el WhatsApp Business Account ID ; genera un token permanente de un usuario del sistema; copia el App Secret .",
+      "En Conexión , pega esos cuatro datos y toca Conectar . Quanela verifica el número.",
+      "En Meta, configura el webhook con la URL y el token de verificación que te muestra Quanela, y suscríbete a messages ."
+    ],
+    "headings": [
+      "Conectar tu número",
+      "Avisos de pedidos",
+      "Pedidos por WhatsApp",
+      "n8n"
+    ],
+    "body": "En WhatsApp (menú lateral) conectas el número oficial de WhatsApp de tu negocio. Usa WhatsApp Business Platform de Meta, con tu propio número y tu propia cuenta de Meta. Conectar tu número En Meta (developers.facebook.com): crea una app de tipo Empresa con el producto WhatsApp y agrega tu número; copia el Phone Number ID y el WhatsApp Business Account ID ; genera un token permanente de un usuario del sistema; copia el App Secret . En Conexión , pega esos cuatro datos y toca Conectar . Quanela verifica el número. En Meta, configura el webhook con la URL y el token de verificación que te muestra Quanela, y suscríbete a messages . Bueno saber: el token y el App Secret se guardan cifrados y nunca se vuelven a mostrar. Empieza en modo Prueba : solo les llegan mensajes a los números que autorices. Cuando todo funcione, cambia a Producción . Avisos de pedidos En Avisos eliges qué cambios de estado se le avisan al cliente: confirmado; en preparación; listo para recoger; listo para domicilio; en camino; entregado; cancelado, con el motivo. Toca Crear plantillas en Meta . Fuera de una conversación, WhatsApp solo permite plantillas aprobadas, y Quanela trae las suyas listas. Cuando Meta las apruebe (unos minutos), toca Actualizar estado . Con Probar envías un ejemplo a un número. El aviso sale solo cuando el pedido cambia de estado, desde Pedidos, Cocina o Despacho, sin que nadie haga nada más. Lleva el enlace de seguimiento del pedido. Cuidado: solo se avisa a clientes que aceptaron . Aceptan de tres maneras: con la casilla «Recibir el estado de mi pedido por WhatsApp» del menú público; escribiéndote por WhatsApp; porque tú lo marcaste en su ficha, cuando te lo pidió. Si escriben BAJA , dejan de recibir avisos al instante. En Registro ves cada aviso: enviado, entregado, leído, o por qué falló o no se envió. Los fallidos se pueden reintentar . Pedidos por WhatsApp En Pedidos por WhatsApp eliges quién atiende los mensajes: Tu equipo: los mensajes llegan a Mensajes y respondes desde ahí. Asistente de Quanela: entiende el pedido y lo busca en el menú de hoy ; muestra el resumen con el total real y lo crea cuando el cliente responde SÍ ; el pedido entra a cocina como cualquier otro, con el canal WhatsApp y las reglas de tu Menú público. Tu flujo de n8n: los mensajes van a tu n8n. Bueno saber: el asistente nunca inventa platos ni precios. Solo puede elegir platos de tu menú de hoy, y los precios, el domicilio y el total los calcula Quanela. Si no entiende dos veces, si el"
   }
 ]

@@ -57,6 +57,7 @@ export function CartSheet({
   const [reference, setReference] = useState('')
   const [payment, setPayment] = useState<PublicPaymentMethod>(ordering.paymentMethods[0] ?? 'Efectivo')
   const [notes, setNotes] = useState('')
+  const [whatsappOptIn, setWhatsappOptIn] = useState(false)
   const [website, setWebsite] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -109,6 +110,7 @@ export function CartSheet({
         paymentMethod: payment,
         notes: notes.trim(),
         items: lines,
+        whatsappOptIn: ordering.whatsappNotices ? whatsappOptIn : false,
         website,
       })
       onPlaced(result.token)
@@ -209,6 +211,15 @@ export function CartSheet({
               <Field label="Tu celular" hint="El negocio te escribe a este número si hace falta.">
                 <input className={inputClass} value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" inputMode="tel" autoComplete="tel" placeholder="300 123 4567" required />
               </Field>
+              {ordering.whatsappNotices && (
+                <label className="flex items-start gap-2.5 rounded-xl bg-(--pm-soft) px-3 py-2.5 text-sm">
+                  <input type="checkbox" className="mt-0.5 size-4 accent-(--pm-primary)" checked={whatsappOptIn} onChange={(e) => setWhatsappOptIn(e.target.checked)} />
+                  <span>
+                    Recibir el estado de mi pedido por WhatsApp
+                    <span className="block text-xs text-(--pm-muted)">Solo avisos de este pedido. Escribe BAJA para no recibir más.</span>
+                  </span>
+                </label>
+              )}
               {ordering.delivery && ordering.pickup && (
                 <fieldset>
                   <legend className="text-sm font-medium">¿Cómo lo recibes?</legend>

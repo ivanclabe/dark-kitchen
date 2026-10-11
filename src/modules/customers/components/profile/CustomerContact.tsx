@@ -6,6 +6,7 @@ import { formatPhone, phoneHref } from '@/shared/utils/phone'
 import { Building2, CalendarDays, FileText, Mail, MessageCircle, Pencil, Phone, Star, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { CustomerDetail } from '../../types'
+import { WhatsappConsent } from './WhatsappConsent'
 
 function Row({ icon: Icon, children }: { icon: typeof Phone; children: ReactNode }) {
   return (
@@ -82,6 +83,7 @@ export function CustomerContact({ customer, onEdit }: { customer: CustomerDetail
         </Row>
         <Row icon={CalendarDays}>Cliente desde el {formatDate(customer.createdAt)}</Row>
       </ul>
+      {customer.phone && <WhatsappConsent customerId={customer.id} />}
       {customer.hasWhatsapp && (
         <p className={`mt-3 ${typography.caption}`}>
           <Badge size="sm" tone="success" icon={MessageCircle}>
