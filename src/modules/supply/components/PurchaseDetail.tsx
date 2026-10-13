@@ -90,11 +90,11 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const canConfirm = isDraft && can('purchasing.confirm')
   const total = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
 
-  const ingredientOptions = useMemo(() => ingredients?.map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [], [ingredients])
+  const ingredientOptions = useMemo(() => ingredients?.filter((i) => !i.isPreparation).map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [], [ingredients])
   const ingredient = ingredients?.find((i) => i.id === ingredientId)
   const info = infoFor(ingredient)
   // What can be bought: the units that convert, plus generic packages (it asks how much one brings).
-  const unitChoices = info ? units.filter((u) => unitFactor(u.code, info, units) !== null || PACKAGING_UNITS.includes(u.code)) : []
+  const unitChoices = info ? units.filter((u) => u.code !== 'porcion' && (unitFactor(u.code, info, units) !== null || PACKAGING_UNITS.includes(u.code))) : []
   const chosenUnit = units.find((u) => u.id === purchaseUnitId) ?? null
   const knownFactor = chosenUnit ? unitFactor(chosenUnit.code, info, units) : null
   const needsPack = Boolean(chosenUnit && knownFactor === null && PACKAGING_UNITS.includes(chosenUnit.code))

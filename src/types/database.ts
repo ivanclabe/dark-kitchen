@@ -1278,6 +1278,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_preparation: boolean
           kitchen_id: string
           max_stock: number | null
           min_stock: number
@@ -1296,6 +1297,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_preparation?: boolean
           kitchen_id?: string
           max_stock?: number | null
           min_stock?: number
@@ -1314,6 +1316,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_preparation?: boolean
           kitchen_id?: string
           max_stock?: number | null
           min_stock?: number
@@ -3592,6 +3595,112 @@ export type Database = {
           },
         ]
       }
+      dk_production_batches: {
+        Row: {
+          actual_yield: number
+          batches: number
+          created_at: string
+          created_by: string | null
+          expected_yield: number
+          id: string
+          ingredient_id: string
+          kitchen_id: string
+          observation: string | null
+          recipe_id: string
+          status: string
+          total_cost: number
+          unit_cost: number
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+          yield_unit_id: string | null
+          yield_unit_quantity: number | null
+        }
+        Insert: {
+          actual_yield: number
+          batches: number
+          created_at?: string
+          created_by?: string | null
+          expected_yield: number
+          id?: string
+          ingredient_id: string
+          kitchen_id?: string
+          observation?: string | null
+          recipe_id: string
+          status?: string
+          total_cost?: number
+          unit_cost?: number
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+          yield_unit_id?: string | null
+          yield_unit_quantity?: number | null
+        }
+        Update: {
+          actual_yield?: number
+          batches?: number
+          created_at?: string
+          created_by?: string | null
+          expected_yield?: number
+          id?: string
+          ingredient_id?: string
+          kitchen_id?: string
+          observation?: string | null
+          recipe_id?: string
+          status?: string
+          total_cost?: number
+          unit_cost?: number
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+          yield_unit_id?: string | null
+          yield_unit_quantity?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_production_batches_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_production_batches_ingredient_id_fkey"
+            columns: ["kitchen_id", "ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_production_batches_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_production_batches_recipe_id_fkey"
+            columns: ["kitchen_id", "recipe_id"]
+            isOneToOne: false
+            referencedRelation: "dk_recipes"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_production_batches_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_production_batches_yield_unit_id_fkey"
+            columns: ["yield_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_products: {
         Row: {
           active: boolean
@@ -3912,28 +4021,40 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          ingredient_id: string | null
           is_active: boolean
           kitchen_id: string
-          product_id: string
+          product_id: string | null
           version: number
+          yield_quantity: number | null
+          yield_unit_id: string | null
+          yield_unit_quantity: number | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           id?: string
+          ingredient_id?: string | null
           is_active?: boolean
           kitchen_id?: string
-          product_id: string
+          product_id?: string | null
           version: number
+          yield_quantity?: number | null
+          yield_unit_id?: string | null
+          yield_unit_quantity?: number | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
           id?: string
+          ingredient_id?: string | null
           is_active?: boolean
           kitchen_id?: string
-          product_id?: string
+          product_id?: string | null
           version?: number
+          yield_quantity?: number | null
+          yield_unit_id?: string | null
+          yield_unit_quantity?: number | null
         }
         Relationships: [
           {
@@ -3942,6 +4063,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_users"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_recipes_ingredient_id_fkey"
+            columns: ["kitchen_id", "ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["kitchen_id", "id"]
           },
           {
             foreignKeyName: "dk_recipes_kitchen_id_fkey"
@@ -3956,6 +4084,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_products"
             referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_recipes_yield_unit_id_fkey"
+            columns: ["yield_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -5257,6 +5392,7 @@ export type Database = {
           coverage_days: number | null
           daily_burn: number | null
           ingredient_id: string | null
+          is_preparation: boolean | null
           max_stock: number | null
           min_stock: number | null
           name: string | null
@@ -5586,6 +5722,26 @@ export type Database = {
         }
         Returns: string
       }
+      dk_create_preparation: {
+        Args: {
+          p_base_unit_id: string
+          p_category_id?: string
+          p_code?: string
+          p_name: string
+        }
+        Returns: string
+      }
+      dk_create_preparation_version: {
+        Args: {
+          p_ingredient_id: string
+          p_items: Json
+          p_portion?: number
+          p_portion_unit_id?: string
+          p_yield: number
+          p_yield_unit_id?: string
+        }
+        Returns: string
+      }
       dk_create_purchase_from_import: {
         Args: { p_confirm?: boolean; p_import_id: string; p_payload: Json }
         Returns: Json
@@ -5797,6 +5953,10 @@ export type Database = {
         Returns: string
       }
       dk_fold: { Args: { p_text: string }; Returns: string }
+      dk_format_quantity: {
+        Args: { p_quantity: number; p_unit: string }
+        Returns: string
+      }
       dk_ga_activity: {
         Args: {
           p_category?: string
@@ -5885,6 +6045,7 @@ export type Database = {
         Args: { p_factor: number; p_ingredient_id: string; p_unit_id: string }
         Returns: undefined
       }
+      dk_ingredient_usage: { Args: { p_ingredient_id: string }; Returns: Json }
       dk_insights: {
         Args: {
           p_category?: string
@@ -6260,6 +6421,33 @@ export type Database = {
         }
         Returns: undefined
       }
+      dk_preparation_ancestor_depth: {
+        Args: { p_ingredient_id: string }
+        Returns: number
+      }
+      dk_preparation_contains: {
+        Args: { p_ingredient_id: string; p_target: string }
+        Returns: boolean
+      }
+      dk_preparation_detail: {
+        Args: { p_ingredient_id: string }
+        Returns: Json
+      }
+      dk_preparation_height: {
+        Args: { p_ingredient_id: string }
+        Returns: number
+      }
+      dk_preparation_json: { Args: { p_ingredient_id: string }; Returns: Json }
+      dk_preparation_list: { Args: never; Returns: Json }
+      dk_preparation_theoretical_cost: {
+        Args: { p_ingredient_id: string }
+        Returns: number
+      }
+      dk_preparation_tree: {
+        Args: { p_depth?: number; p_ingredient_id: string }
+        Returns: Json
+      }
+      dk_preparations_can_read: { Args: never; Returns: boolean }
       dk_presence_allowed: { Args: { p_topic: string }; Returns: boolean }
       dk_provision_organization: {
         Args: {
@@ -6346,6 +6534,10 @@ export type Database = {
       }
       dk_public_search_dishes: { Args: { p_params?: Json }; Returns: Json }
       dk_purge_audit_log: { Args: { p_days?: number }; Returns: number }
+      dk_recipe_insert_items: {
+        Args: { p_items: Json; p_recipe_id: string }
+        Returns: undefined
+      }
       dk_register_adjustment: {
         Args: {
           p_ingredient_id: string
@@ -6363,6 +6555,16 @@ export type Database = {
           p_order_id: string
         }
         Returns: string
+      }
+      dk_register_production: {
+        Args: {
+          p_actual_yield?: number
+          p_batches?: number
+          p_ingredient_id: string
+          p_observation?: string
+          p_yield_unit_id?: string
+        }
+        Returns: Json
       }
       dk_register_waste: {
         Args: {
@@ -6626,6 +6828,10 @@ export type Database = {
         Args: { p_payment_id: string; p_reason: string }
         Returns: string
       }
+      dk_void_production: {
+        Args: { p_batch_id: string; p_reason?: string }
+        Returns: undefined
+      }
       dk_wa_admin_context: { Args: never; Returns: Json }
       dk_wa_ai_context: { Args: { p_conversation: string }; Returns: Json }
       dk_wa_apply_status: {
@@ -6799,7 +7005,13 @@ export type Database = {
         | "DOMINGO"
       dk_delivery_status: "EN_RUTA" | "ENTREGADO" | "FALLIDO"
       dk_kitchen_item_status: "PENDIENTE" | "EN_PREPARACION" | "LISTO"
-      dk_movement_type: "COMPRA" | "MERMA" | "AJUSTE" | "CONSUMO" | "DEVOLUCION"
+      dk_movement_type:
+        | "COMPRA"
+        | "MERMA"
+        | "AJUSTE"
+        | "CONSUMO"
+        | "DEVOLUCION"
+        | "PRODUCCION"
       dk_order_channel: "MANUAL" | "WHATSAPP" | "PHONE" | "WEB"
       dk_order_status:
         | "NUEVO"
@@ -6959,7 +7171,14 @@ export const Constants = {
       ],
       dk_delivery_status: ["EN_RUTA", "ENTREGADO", "FALLIDO"],
       dk_kitchen_item_status: ["PENDIENTE", "EN_PREPARACION", "LISTO"],
-      dk_movement_type: ["COMPRA", "MERMA", "AJUSTE", "CONSUMO", "DEVOLUCION"],
+      dk_movement_type: [
+        "COMPRA",
+        "MERMA",
+        "AJUSTE",
+        "CONSUMO",
+        "DEVOLUCION",
+        "PRODUCCION",
+      ],
       dk_order_channel: ["MANUAL", "WHATSAPP", "PHONE", "WEB"],
       dk_order_status: [
         "NUEVO",

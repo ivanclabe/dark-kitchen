@@ -1,7 +1,7 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { ActiveBadge, Badge } from '@/shared/ui/Badge'
 import { formatQuantity } from '@/shared/units/conversion'
-import { Button } from '@/shared/ui/Button'
+import { Button, buttonClass } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { StatCard } from '@/shared/ui/StatCard'
 import { useToast } from '@/shared/ui/Toast'
@@ -9,8 +9,8 @@ import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
-import { AlertTriangle, BookOpen, History, Package, Pencil, Power, SlidersHorizontal, Trash2, Truck } from 'lucide-react'
-import { useDishesUsingIngredient } from '@/modules/recipes/hooks/useRecipes'
+import { AlertTriangle, BookOpen, CookingPot, History, Package, Pencil, Power, SlidersHorizontal, Trash2, Truck } from 'lucide-react'
+import { useIngredientUsage } from '../hooks/usePreparations'
 import { useHere } from '@/shared/hooks/useBackTarget'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { useSetIngredientActive } from '../hooks/useIngredients'
@@ -20,30 +20,46 @@ import { StockBar } from './IngredientPanel'
 import { MovementTimeline } from './MovementTimeline'
 import type { MovementMode } from './MovementFormDrawer'
 
-/** ADR 0031: from the stock back to the menu — the dishes whose recipe takes this ingredient. */
-function UsedIn({ ingredient }: { ingredient: Ingredient }) {
+/**
+ * ADR 0031: from the stock back to the menu — the dishes whose recipe takes this ingredient.
+ * ADR 0057: also the preparations that carry it, and the dishes that take it through them.
+ */
+export function UsedIn({ ingredient }: { ingredient: Pick<Ingredient, 'id' | 'baseUnitCode'> }) {
   const { can } = useActiveKitchen()
   const here = useHere()
   const visible = can('recipes.view')
-  const { data: dishes, isLoading } = useDishesUsingIngredient(ingredient.id, visible)
+  const { data: usage, isLoading } = useIngredientUsage(ingredient.id, visible)
   if (!visible) return null
+  const rowClass = '-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-sm hover:bg-neutral-800/40'
   return (
-    <Card title="Se usa en" description="Platos cuya receta activa lleva este insumo" icon={BookOpen}>
+    <Card title="Se usa en" description="Platos y preparaciones cuya receta activa lo lleva" icon={BookOpen}>
       {isLoading ? (
         <p className={typography.caption}>Cargando…</p>
-      ) : !dishes?.length ? (
-        <p className={typography.caption}>Ningún plato lo usa en su receta activa.</p>
+      ) : !usage?.dishes.length && !usage?.preparations.length ? (
+        <p className={typography.caption}>Ningún plato ni preparación lo usa en su receta activa.</p>
       ) : (
         <ul className="divide-y divide-neutral-800/60">
-          {dishes.map((d) => (
+          {usage?.preparations.map((p) => (
+            <li key={p.ingredientId}>
+              <Link to={`/supply/preparaciones/${p.ingredientId}`} state={{ from: here }} className={rowClass}>
+                <span className="inline-flex items-center gap-2 text-neutral-100">
+                  <CookingPot size={14} className="text-sky-400" aria-hidden />
+                  {p.name}
+                  <Badge tone="info">Preparación</Badge>
+                </span>
+                <span className="tabular-nums text-neutral-400">{formatQuantity(p.quantity, ingredient.baseUnitCode)} por lote</span>
+              </Link>
+            </li>
+          ))}
+          {usage?.dishes.map((d) => (
             <li key={d.productId}>
-              <Link to={`/recipes/${d.productId}`} state={{ from: here }} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-sm hover:bg-neutral-800/40">
+              <Link to={`/recipes/${d.productId}`} state={{ from: here }} className={rowClass}>
                 <span className={d.active ? 'text-neutral-100' : 'text-neutral-500'}>
-                  {d.productName}
+                  {d.name}
                   {!d.active && ' (inactivo)'}
                 </span>
                 <span className="tabular-nums text-neutral-400">
-                  {formatQuantity(d.quantity, ingredient.baseUnitCode)}
+                  {d.via ? `vía ${d.via}` : d.quantity !== null ? formatQuantity(d.quantity, ingredient.baseUnitCode) : ''}
                 </span>
               </Link>
             </li>
@@ -99,6 +115,7 @@ export function IngredientDetail({
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className={typography.h2}>{ingredient.name}</h2>
                 <ActiveBadge active={ingredient.active} />
+                {ingredient.isPreparation && <Badge tone="info">Preparación</Badge>}
                 {low && ingredient.active && (
                   <Badge tone="danger" icon={AlertTriangle}>
                     Bajo mínimo
@@ -114,6 +131,11 @@ export function IngredientDetail({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {ingredient.isPreparation && (
+              <Link to={`/supply/preparaciones/${ingredient.id}`} className={buttonClass({ variant: 'secondary', size: 'sm' })}>
+                <CookingPot size={14} aria-hidden /> Receta y lotes
+              </Link>
+            )}
             {can('inventory.adjust') && (
               <>
                 <Button variant="secondary" size="sm" icon={Trash2} onClick={() => onRegisterMovement('merma')}>

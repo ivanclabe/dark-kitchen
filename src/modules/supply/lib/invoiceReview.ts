@@ -67,7 +67,7 @@ export function baseUnitFor(unitCode: string | null, units: Unit[]): string {
 export function unitsFor(info: IngredientUnitInfo | null, units: Unit[]): Unit[] {
   if (!info) return units
   const own = new Set(info.purchaseUnits.map((p) => p.unitCode))
-  return units.filter((u) => u.unitType === info.baseUnitType || own.has(u.code) || PACKAGING_UNITS.includes(u.code) || u.code === 'unidad')
+  return units.filter((u) => u.code !== 'porcion').filter((u) => u.unitType === info.baseUnitType || own.has(u.code) || PACKAGING_UNITS.includes(u.code) || u.code === 'unidad')
 }
 
 /** Base units in one purchase unit, when it is known without asking (ADR 0056: the shared rule). */

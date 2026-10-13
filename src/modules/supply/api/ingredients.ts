@@ -3,7 +3,7 @@ import type { Ingredient, IngredientInput } from '../types'
 
 const SELECT = `
   id, code, name, description, category_id, base_unit_id, primary_supplier_id,
-  min_stock, max_stock, avg_cost, perishable, shelf_life_days, active,
+  min_stock, max_stock, avg_cost, perishable, shelf_life_days, active, is_preparation,
   dk_ingredient_categories ( name ),
   dk_units ( code ),
   dk_suppliers ( name ),
@@ -24,6 +24,7 @@ interface IngredientRow {
   perishable: boolean
   shelf_life_days: number | null
   active: boolean
+  is_preparation: boolean
   dk_ingredient_categories: { name: string } | null
   dk_units: { code: string } | null
   dk_suppliers: { name: string } | null
@@ -49,6 +50,7 @@ function mapRow(row: IngredientRow): Ingredient {
     perishable: row.perishable,
     shelfLifeDays: row.shelf_life_days,
     active: row.active,
+    isPreparation: Boolean(row.is_preparation),
     stockOnHand: Number(stockOf(row)?.stock_on_hand ?? 0),
     stockAvailable: Number(stockOf(row)?.stock_available ?? 0),
   }

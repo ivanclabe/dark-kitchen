@@ -39,6 +39,7 @@ export const ACCOUNT_PERMISSION_KEYS = [
   'inventory.edit',
   'inventory.delete',
   'inventory.adjust',
+  'inventory.produce',
   'purchasing.view',
   'purchasing.create',
   'purchasing.confirm',

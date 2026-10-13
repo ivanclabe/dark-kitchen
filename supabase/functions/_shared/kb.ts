@@ -1300,6 +1300,63 @@ export const KB: KbArticle[] = [
     "body": "Cómo se le paga a cada persona En Cómo se le paga a cada persona , toca Configurar (o Cambiar ) junto a cada quien: Por hora: el valor de la hora. La nómina usa las horas reales de sus turnos. Salario mensual: el salario del mes. La nómina toma la parte de los días del periodo. Elige Desde cuándo rige: un cambio no altera lo anterior. Liquidar En Liquidar nómina , elige Desde y Hasta (por ejemplo, la quincena) y toca Calcular . Quanela propone, por persona, las horas trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional. Ajusta A pagar si hay extras, auxilios o deducciones, con una nota. Elige cuándo Se paga y toca Liquidar : queda una obligación por persona en Por pagar . Bueno saber: la nómina cuenta en la rentabilidad en su periodo, repartida por días. Pagarla no la vuelve a contar. Cuidado: Quanela no calcula prestaciones sociales ni seguridad social: súmalas en la nota o regístralas como gasto. Una misma persona no se liquida dos veces en el mismo periodo. Los salarios solo los ve quien tiene el permiso Nómina (ADMIN por defecto). El GERENTE ve el total de nómina en la rentabilidad, pero no lo de cada persona."
   },
   {
+    "id": "preparations",
+    "section": "inventory",
+    "url": "/help/inventory/preparations",
+    "title": "Preparaciones y sub-recetas",
+    "summary": "Una salsa de la casa o una ensalada base se prepara por lotes y se usa en varios platos. Al preparar un lote salen sus insumos una sola vez; los platos descuentan solo la preparación, con su costo real.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager",
+      "inventory",
+      "kitchen"
+    ],
+    "permissions": [
+      "inventory.produce",
+      "recipes.edit"
+    ],
+    "appPath": "/supply/preparaciones",
+    "questions": [
+      "¿Cómo creo una sub-receta?",
+      "¿Cómo uso una salsa en varios platos?",
+      "¿Cómo registro un lote de salsa?",
+      "¿Qué es el rendimiento de una preparación?",
+      "¿Cuánto me cuesta una porción de salsa?",
+      "No puedo confirmar un pedido, dice que falta una preparación"
+    ],
+    "keywords": [
+      "sub-receta",
+      "subreceta",
+      "preparación",
+      "preparaciones",
+      "lote",
+      "lotes",
+      "producción",
+      "salsa",
+      "ensalada base",
+      "mise en place",
+      "rendimiento",
+      "porción",
+      "costo por porción",
+      "anular lote"
+    ],
+    "steps": [
+      "Abre Abastecimiento → Preparaciones y toca Nueva .",
+      "Escribe el Nombre y elige dónde se guarda: gramos, mililitros o unidades. Toca Crear y escribir su receta .",
+      "Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones.",
+      "En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg ). Si quieres, define Una porción (por ejemplo 25 g).",
+      "Toca Guardar como nueva versión . Ves el costo del lote , el costo por gramo y el costo por porción ."
+    ],
+    "headings": [
+      "Crear una preparación",
+      "Preparar un lote",
+      "Usarla en los platos",
+      "Dependencias"
+    ],
+    "body": "Una preparación (o sub-receta) es algo que haces en tu cocina y luego usas en varios platos: una salsa de ajo, una ensalada base, un fondo. Tiene su propia receta, lo que rinde un lote y su costo , y se guarda en el inventario como cualquier insumo. Crear una preparación Abre Abastecimiento → Preparaciones y toca Nueva . Escribe el Nombre y elige dónde se guarda: gramos, mililitros o unidades. Toca Crear y escribir su receta . Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones. En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg ). Si quieres, define Una porción (por ejemplo 25 g). Toca Guardar como nueva versión . Ves el costo del lote , el costo por gramo y el costo por porción . Preparar un lote En la preparación, toca Preparar lote . Escribe cuántos Lotes hiciste. Antes de confirmar ves lo que sale del inventario, cuánto hay de cada insumo y el costo del lote. En Rendimiento real , escribe lo que realmente salió (por ejemplo 0,82 kg). Si lo dejas vacío, se toma lo de la receta. Toca Registrar lote . Los insumos salen del inventario una sola vez , en el lote. La preparación entra al costo real : el costo del lote dividido entre lo que rindió. Si rinde menos de lo esperado, cada gramo cuesta más, y lo ves en el historial de Lotes («−3,5 %»). Usarla en los platos En la receta de un plato, busca la preparación como cualquier insumo (dice Preparación ) y escribe la cantidad: 30 g , o 1 porción si definiste una. El plato toma el costo real de la preparación, así que no copias costos a mano. Cuando preparas otro lote con precios nuevos, el costo de todos los platos que la llevan se actualiza solo. Al vender, el plato descuenta solo la preparación : sus insumos ya salieron cuando preparaste el lote. Dependencias La preparación muestra Se usa en (los platos y otras preparaciones que la llevan) y, si lleva otras preparaciones, Lleva con todo lo que hay detrás. La ficha de un insumo en Stock también dice en qué preparaciones está y qué platos lo usan a través de ellas. Cuidado: si un pedido lleva una preparación y no hay suficiente, no se puede confirmar: el mensaje dice cuál falta y cuánto. Prepara un lote primero. Las preparaciones bajo su mínimo aparecen como Por preparar . Bueno saber: un lote registrado por error se anula desde el historial de Lotes : la preparación sale y sus insumos vuelven, cada uno a su costo. Si ya se usó parte, no se puede anular; registra una me"
+  },
+  {
     "id": "product-profitability",
     "section": "reports",
     "url": "/help/reports/product-profitability",
@@ -1589,6 +1646,9 @@ export const KB: KbArticle[] = [
       "¿Puedo escribir la receta en gramos si compro en kilos?"
     ],
     "keywords": [
+      "sub-receta",
+      "preparación",
+      "salsa",
       "gramos",
       "kilos",
       "unidad",
@@ -1614,9 +1674,10 @@ export const KB: KbArticle[] = [
     "headings": [
       "Cómo se calcula el costo",
       "Unidades: compra en kilos, cocina en gramos",
+      "Preparaciones dentro de un plato",
       "Versiones"
     ],
-    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código, escribe la Cantidad y elige la Unidad (por ejemplo, 150 g de carne aunque la compres en kilos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Unidades: compra en kilos, cocina en gramos Cada insumo lleva su inventario en una unidad base (g, ml o unidad). En la receta puedes escribir la cantidad en cualquier unidad compatible : g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base. Bueno saber: solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo). Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: si el plato tiene Descuenta inventario encendido y no tiene receta, no se puede confirmar en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga Descuenta inventario en Editar plato . Bueno saber: un plato que no usa inventario se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
+    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código, escribe la Cantidad y elige la Unidad (por ejemplo, 150 g de carne aunque la compres en kilos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Unidades: compra en kilos, cocina en gramos Cada insumo lleva su inventario en una unidad base (g, ml o unidad). En la receta puedes escribir la cantidad en cualquier unidad compatible : g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base. Bueno saber: solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo). Preparaciones dentro de un plato Una salsa o una ensalada base que haces por lotes se agrega como cualquier insumo: aparece como Preparación . Puedes escribirla en gramos o en porciones . El plato toma su costo real, y al vender descuenta solo la preparación, no sus insumos. Ver Preparaciones y sub-recetas. Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: si el plato tiene Descuenta inventario encendido y no tiene receta, no se puede confirmar en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga Descuenta inventario en Editar plato . Bueno saber: un plato que no usa inventario se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
   },
   {
     "id": "register-payment",
@@ -1712,7 +1773,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Conversión automática de unidades. Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas. Compras: compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una caja o bolsa dices una vez cuántas trae. Recetas: escribe 150 g aunque compres por kilo, o media docena de huevos. La receta recuerda la unidad y el costo sigue exacto. Mermas y ajustes: también en kg, g, l, ml o docenas. Stock y movimientos se leen más fácil: «1,45 kg» en vez de «1450 g». Para cuidar tu historial, la unidad base de un insumo con movimientos o recetas ya no se puede cambiar. Ver Recetas y costo de un plato y Registrar una compra. de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios "
+    "body": "de octubre de 2026 Preparaciones y sub-recetas. En Abastecimiento → Preparaciones creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción. Preparar lote: los insumos salen del inventario una sola vez y la preparación entra a su costo real, según lo que realmente rindió. En los platos: la agregas como cualquier insumo (30 g o «1 porción»). El plato toma su costo sin copiarlo, y al vender descuenta solo la preparación. Ves en qué platos se usa cada preparación y cada insumo, el historial de lotes y puedes anular un lote registrado por error. Ver Preparaciones y sub-recetas. Conversión automática de unidades. Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas. Compras: compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una caja o bolsa dices una vez cuántas trae. Recetas: escribe 150 g aunque compres por kilo, o media docena de huevos. La receta recuerda la unidad y el costo sigue exacto. Mermas y ajustes: también en kg, g, l, ml o docenas. Stock y movimientos se leen más fácil: «1,45 kg» en vez de «1450 g». Para cuidar tu historial, la unidad base de un insumo con movimientos o recetas ya no se puede cambiar. Ver Recetas y costo de un plato y Registrar una compra. de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesan"
   },
   {
     "id": "roles",

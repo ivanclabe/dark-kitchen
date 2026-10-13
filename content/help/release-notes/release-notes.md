@@ -18,6 +18,12 @@ order: 1
 
 ## 12 de octubre de 2026
 
+- **Preparaciones y sub-recetas.** En **Abastecimiento → Preparaciones** creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción.
+  - **Preparar lote:** los insumos salen del inventario una sola vez y la preparación entra a su costo real, según lo que realmente rindió.
+  - **En los platos:** la agregas como cualquier insumo (30 g o «1 porción»). El plato toma su costo sin copiarlo, y al vender descuenta solo la preparación.
+  - Ves en qué platos se usa cada preparación y cada insumo, el historial de lotes y puedes anular un lote registrado por error.
+  - Ver [Preparaciones y sub-recetas](help:preparations).
+
 - **Conversión automática de unidades.** Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas.
   - **Compras:** compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una **caja** o **bolsa** dices una vez cuántas trae.
   - **Recetas:** escribe 150 **g** aunque compres por kilo, o media **docena** de huevos. La receta recuerda la unidad y el costo sigue exacto.

@@ -13,8 +13,8 @@ questions:
   - ¿Por qué no puedo confirmar un pedido? Dice que el plato no tiene receta
   - ¿Cómo cambio los ingredientes de un plato?
   - ¿Puedo escribir la receta en gramos si compro en kilos?
-keywords: [gramos, kilos, unidad, conversión, receta, sin receta, descuenta inventario, no usa inventario, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
-related: [dishes-and-menu, inventory-deduction, stock, product-profitability]
+keywords: [sub-receta, preparación, salsa, gramos, kilos, unidad, conversión, receta, sin receta, descuenta inventario, no usa inventario, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
+related: [dishes-and-menu, preparations, inventory-deduction, stock, product-profitability]
 updated: 2026-10-12
 order: 2
 screenshots:
@@ -43,6 +43,10 @@ Cada línea vale *cantidad × costo promedio del insumo*. El costo promedio se a
 Cada insumo lleva su inventario en una **unidad base** (g, ml o unidad). En la receta puedes escribir la cantidad en **cualquier unidad compatible**: g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base.
 
 > **Bueno saber:** solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo).
+
+## Preparaciones dentro de un plato
+
+Una salsa o una ensalada base que haces por lotes se agrega como cualquier insumo: aparece como **Preparación**. Puedes escribirla en gramos o en **porciones**. El plato toma su costo real, y al vender descuenta solo la preparación, no sus insumos. Ver [Preparaciones y sub-recetas](help:preparations).
 
 ## Versiones
 

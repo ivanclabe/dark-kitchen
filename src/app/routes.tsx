@@ -5,6 +5,7 @@ import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
 import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
 import { InvoiceImportPage } from '@/modules/supply/pages/InvoiceImportPage'
+import { PreparationRecipePage } from '@/modules/supply/pages/PreparationRecipePage'
 import { CatalogPage } from '@/modules/menuPlanner/pages/CatalogPage'
 import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
@@ -175,6 +176,8 @@ const routes: RouteObject[] = [
           { path: 'supply/:view', element: <SupplyPage /> },
           { path: 'supply/:view/:id', element: <SupplyPage /> },
           // ADR 0049: importar una compra desde una factura (leer y revisar).
+          // ADR 0057: a preparation's recipe, in the recipe editor.
+          { path: 'supply/preparaciones/:id/receta', element: <PreparationRecipePage /> },
           { path: 'supply/compras/importar', element: <InvoiceImportPage /> },
           { path: 'supply/compras/importar/:importId', element: <InvoiceImportPage /> },
           { path: 'inventory', element: <KitchenRedirect to="/supply/stock" /> },

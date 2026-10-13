@@ -2,7 +2,7 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
-import { ShoppingCart, Truck, Warehouse } from 'lucide-react'
+import { CookingPot, ShoppingCart, Truck, Warehouse } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -11,6 +11,9 @@ import { IngredientDetail } from '../components/IngredientDetail'
 import { IngredientFormDrawer } from '../components/IngredientFormDrawer'
 import { IngredientPanel } from '../components/IngredientPanel'
 import { MovementFormDrawer, type MovementMode } from '../components/MovementFormDrawer'
+import { NewPreparationDrawer } from '../components/NewPreparationDrawer'
+import { PreparationDetail } from '../components/PreparationDetail'
+import { PreparationPanel } from '../components/PreparationPanel'
 import { NewPurchaseDialog, type PresetLine } from '../components/NewPurchaseDialog'
 import { PurchaseDetail } from '../components/PurchaseDetail'
 import { PurchasePanel } from '../components/PurchasePanel'
@@ -23,18 +26,28 @@ import { useSuppliers } from '../hooks/useSuppliers'
 import { setPendingInvoiceFile } from '../lib/invoiceFile'
 import type { Ingredient } from '../types'
 
-type SupplyView = 'stock' | 'compras' | 'proveedores'
+type SupplyView = 'stock' | 'preparaciones' | 'compras' | 'proveedores'
 
 /** The help center article of each section (ADR 0034). */
-const SUPPLY_HELP: Record<SupplyView, string> = { stock: 'stock', compras: 'purchases', proveedores: 'suppliers' }
+const SUPPLY_HELP: Record<SupplyView, string> = { stock: 'stock', preparaciones: 'preparations', compras: 'purchases', proveedores: 'suppliers' }
 const VIEWS: SubNavItem<SupplyView>[] = [
   { value: 'stock', label: 'Stock' },
+  // ADR 0057: sub-recipes made in batches.
+  { value: 'preparaciones', label: 'Preparaciones' },
   { value: 'compras', label: 'Compras' },
   { value: 'proveedores', label: 'Proveedores' },
 ]
 
+/** Who sees each section: the kitchen (inventory.produce) only sees Preparaciones. */
+const VIEW_PERMISSIONS: Record<SupplyView, Parameters<ReturnType<typeof useActiveKitchen>['can']>[0][]> = {
+  stock: ['inventory.view'],
+  preparaciones: ['inventory.view', 'inventory.produce', 'recipes.view'],
+  compras: ['purchasing.view'],
+  proveedores: ['suppliers.view'],
+}
+
 function isView(value: string | undefined): value is SupplyView {
-  return value === 'stock' || value === 'compras' || value === 'proveedores'
+  return value === 'stock' || value === 'preparaciones' || value === 'compras' || value === 'proveedores'
 }
 
 /**
@@ -47,10 +60,11 @@ function isView(value: string | undefined): value is SupplyView {
 export function SupplyPage() {
   const { view: viewParam, id } = useParams<{ view?: string; id?: string }>()
   const navigate = useNavigate()
-  const { path } = useActiveKitchen()
+  const { path, can } = useActiveKitchen()
   // ADR 0031: arriving from a recipe (or Insights), «Volver» takes the person back there.
   const cameFrom = useCameFrom()
-  const view: SupplyView = isView(viewParam) ? viewParam : 'stock'
+  const views = VIEWS.filter((v) => VIEW_PERMISSIONS[v.value].some((p) => can(p)))
+  const view: SupplyView = isView(viewParam) && views.some((v) => v.value === viewParam) ? viewParam : (views[0]?.value ?? 'stock')
   const selectedId = id ?? null
 
   const { data: ingredients } = useIngredients()
@@ -60,6 +74,7 @@ export function SupplyPage() {
   const [ingredientDrawerOpen, setIngredientDrawerOpen] = useState(false)
   const [supplierDrawer, setSupplierDrawer] = useState<{ open: boolean; supplierId: string | null }>({ open: false, supplierId: null })
   const [movementDrawer, setMovementDrawer] = useState<{ open: boolean; mode: MovementMode; ingredientId?: string }>({ open: false, mode: 'merma' })
+  const [newPreparation, setNewPreparation] = useState(false)
   const [newPurchase, setNewPurchase] = useState<{ open: boolean; supplierId: string | null; lines: PresetLine[] }>({
     open: false,
     supplierId: null,
@@ -81,6 +96,8 @@ export function SupplyPage() {
   const panel =
     view === 'stock' ? (
       <IngredientPanel selectedId={selectedId} onSelect={(i) => go('stock', i.id)} onCreate={() => openIngredientDrawer(null)} />
+    ) : view === 'preparaciones' ? (
+      <PreparationPanel selectedId={selectedId} onSelect={(p) => go('preparaciones', p.id)} onCreate={() => setNewPreparation(true)} />
     ) : view === 'compras' ? (
       <PurchasePanel
         selectedId={selectedId}
@@ -105,6 +122,16 @@ export function SupplyPage() {
       />
     ) : (
       <ReorderPanel onSelectIngredient={(ingredientId) => go('stock', ingredientId)} onCreatePurchaseFor={(supplierId, lines) => setNewPurchase({ open: true, supplierId, lines })} />
+    )
+  } else if (view === 'preparaciones') {
+    detail = selectedId ? (
+      <PreparationDetail preparationId={selectedId} />
+    ) : (
+      <EmptyState
+        icon={CookingPot}
+        title="Selecciona una preparación"
+        description="Una salsa de la casa o una ensalada base: escribe su receta con lo que rinde, prepárala por lotes y úsala en tus platos sin copiar su costo."
+      />
     )
   } else if (view === 'compras') {
     detail = selectedId ? (
@@ -135,12 +162,12 @@ export function SupplyPage() {
       <PageHeader
         help={SUPPLY_HELP[view]}
         title="Abastecimiento"
-        description="Stock, compras y proveedores en un solo lugar."
+        description="Stock, preparaciones, compras y proveedores en un solo lugar."
         icon={Warehouse}
         backTo={cameFrom?.to}
         backLabel={cameFrom?.label}
       />
-      <SubNav label="Secciones de abastecimiento" items={VIEWS} value={view} onChange={(next) => go(next)} />
+      <SubNav label="Secciones de abastecimiento" items={views} value={view} onChange={(next) => go(next)} />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="shrink-0 lg:w-80 xl:w-96">{panel}</div>
@@ -167,6 +194,17 @@ export function SupplyPage() {
           mode={movementDrawer.mode}
           ingredientId={movementDrawer.ingredientId}
           onClose={() => setMovementDrawer({ open: false, mode: movementDrawer.mode })}
+        />
+      )}
+
+      {newPreparation && (
+        <NewPreparationDrawer
+          open
+          onClose={() => setNewPreparation(false)}
+          onCreated={(id) => {
+            setNewPreparation(false)
+            navigate(path(`/supply/preparaciones/${id}/receta`))
+          }}
         />
       )}
 

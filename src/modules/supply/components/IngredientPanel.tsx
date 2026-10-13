@@ -7,7 +7,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { AlertTriangle, Boxes, Plus, Search } from 'lucide-react'
+import { AlertTriangle, Boxes, CookingPot, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useCategories, useIngredients } from '../hooks/useIngredients'
@@ -135,7 +135,11 @@ export function IngredientPanel({
                 )}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="min-w-0 truncate text-sm font-medium text-neutral-100">{ing.name}</p>
+                  <p className="flex min-w-0 items-center gap-1.5 truncate text-sm font-medium text-neutral-100">
+                    {/* ADR 0057: a preparation, made in batches. */}
+                    {ing.isPreparation && <CookingPot size={13} className="shrink-0 text-sky-400" aria-label="Preparación" />}
+                    <span className="truncate">{ing.name}</span>
+                  </p>
                   {low && ing.active && <AlertTriangle size={13} className="shrink-0 text-red-400" aria-label="Bajo mínimo" />}
                 </div>
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">

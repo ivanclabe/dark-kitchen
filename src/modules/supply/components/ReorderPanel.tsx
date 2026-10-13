@@ -69,7 +69,7 @@ export function ReorderPanel({
   const aiByRef = useMemo(() => insightItemsByRef(aiResult), [aiResult])
 
   const active = useMemo(() => (ingredients ?? []).filter((i) => i.active), [ingredients])
-  const attention = useMemo(() => (suggestions ?? []).filter((s) => needsAttention(s, coverageDays)), [suggestions, coverageDays])
+  const attention = useMemo(() => (suggestions ?? []).filter((s) => !s.isPreparation && needsAttention(s, coverageDays)), [suggestions, coverageDays])
   const wasted30d = useMemo(() => (suggestions ?? []).reduce((sum, s) => sum + s.wasted30d * s.avgCost, 0), [suggestions])
 
   const bySupplier = useMemo(() => {

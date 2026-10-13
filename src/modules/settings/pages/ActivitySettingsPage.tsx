@@ -22,7 +22,7 @@ import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
 type Tab = 'operacion' | 'bitacora'
 
 const CHANNEL_LABEL: Record<string, string> = { MANUAL: 'Manual (en la app)', WHATSAPP: 'WhatsApp (integración)', PHONE: 'Teléfono' }
-const MOVEMENT_LABEL: Record<string, string> = { COMPRA: 'Compras', CONSUMO: 'Consumo', MERMA: 'Mermas', AJUSTE: 'Ajustes', DEVOLUCION: 'Devoluciones' }
+const MOVEMENT_LABEL: Record<string, string> = { COMPRA: 'Compras', CONSUMO: 'Consumo', MERMA: 'Mermas', AJUSTE: 'Ajustes', DEVOLUCION: 'Devoluciones', PRODUCCION: 'Producción' }
 
 function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (

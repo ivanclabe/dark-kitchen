@@ -11,6 +11,15 @@ import type { Unit } from '@/shared/api/units'
 /** Units that hold an unknown amount: the person says how much they bring. */
 export const PACKAGING_UNITS = ['caja', 'bolsa', 'paquete']
 
+/** ADR 0057: «1 porción = 150 g» of a preparation — like a package, only with the ingredient's own factor. Never bought. */
+export const PORTION_UNIT = 'porcion'
+
+/** How a unit reads on screen: «porcion» → «porción» / «porciones». */
+export function unitLabel(code: string, quantity = 1): string {
+  if (code === PORTION_UNIT) return Math.abs(quantity) === 1 ? 'porción' : 'porciones'
+  return code
+}
+
 export interface IngredientUnitInfo {
   baseUnitCode: string
   baseUnitType: Unit['unitType']
@@ -25,7 +34,7 @@ export function unitFactor(unitCode: string | null, info: IngredientUnitInfo | n
   if (own) return own.factor
   const unit = units.find((u) => u.code === unitCode)
   const base = units.find((u) => u.code === info.baseUnitCode)
-  if (!unit || !base || unit.unitType !== base.unitType || PACKAGING_UNITS.includes(unit.code) || PACKAGING_UNITS.includes(base.code)) return null
+  if (!unit || !base || unit.unitType !== base.unitType || [...PACKAGING_UNITS, PORTION_UNIT].includes(unit.code) || [...PACKAGING_UNITS, PORTION_UNIT].includes(base.code)) return null
   return unit.factorToBase / base.factorToBase
 }
 
@@ -69,5 +78,5 @@ export function formatQuantity(quantity: number, baseUnitCode: string): string {
 export function equivalence(quantity: number, unitCode: string | null, info: IngredientUnitInfo | null, units: Unit[]): string | null {
   if (!info || !unitCode || unitCode === info.baseUnitCode || !(quantity > 0)) return null
   const base = toBase(quantity, unitCode, info, units)
-  return base === null ? null : `${formatNumber(quantity)} ${unitCode} = ${formatNumber(base)} ${info.baseUnitCode}`
+  return base === null ? null : `${formatNumber(quantity)} ${unitLabel(unitCode, quantity)} = ${formatNumber(base)} ${info.baseUnitCode}`
 }

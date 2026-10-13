@@ -89,7 +89,7 @@ export function InvoiceReview({
   }, [allIngredients, units, purchaseUnits])
 
   const ingredientOptions = useMemo(
-    () => allIngredients.filter((i) => i.active).map((i) => ({ value: i.id, label: i.name, sublabel: `${i.code} · ${i.baseUnitCode}` })),
+    () => allIngredients.filter((i) => i.active && !i.isPreparation).map((i) => ({ value: i.id, label: i.name, sublabel: `${i.code} · ${i.baseUnitCode}` })),
     [allIngredients],
   )
 

@@ -35,7 +35,7 @@ const MODULE_PERMISSIONS: Record<ModuleKey, readonly AccountPermission[]> = {
   // Usuarios y permisos: quien ve el equipo (el SUPER_ADMIN tiene todo).
   users: ['team.view', 'team.manage'],
   // Stock, compras y proveedores.
-  supply: ['inventory.view', 'purchasing.view', 'suppliers.view'],
+  supply: ['inventory.view', 'purchasing.view', 'suppliers.view', 'inventory.produce'],
   // Platos, calendario y recetas.
   menuPlanner: ['menus.view'],
   // Pedidos (ADR 0020): Tablero y Lista con orders.view; Despacho también con dispatch.view.

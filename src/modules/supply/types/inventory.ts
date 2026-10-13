@@ -20,6 +20,8 @@ export interface Ingredient {
   perishable: boolean
   shelfLifeDays: number | null
   active: boolean
+  /** ADR 0057: a sub-recipe made in batches (Abastecimiento → Preparaciones). */
+  isPreparation: boolean
   stockOnHand: number
   stockAvailable: number
 }
@@ -43,7 +45,7 @@ export interface InventoryMovement {
   id: string
   ingredientId: string
   ingredientName: string
-  movementType: 'COMPRA' | 'MERMA' | 'AJUSTE' | 'CONSUMO' | 'DEVOLUCION'
+  movementType: 'COMPRA' | 'MERMA' | 'AJUSTE' | 'CONSUMO' | 'DEVOLUCION' | 'PRODUCCION'
   quantityBaseUnit: number
   /** The ingredient's base unit (g, kg, ml, und…): the quantity and the unit cost are in it. */
   unitCode: string
@@ -74,4 +76,6 @@ export interface SupplySuggestion {
   coverageDays: number | null
   belowMin: boolean
   suggestedQuantity: number
+  /** ADR 0057: a preparation is prepared, not bought: suggestedQuantity is what to prepare. */
+  isPreparation: boolean
 }

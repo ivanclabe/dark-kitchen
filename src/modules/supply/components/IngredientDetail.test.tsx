@@ -12,10 +12,20 @@ vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () =
 vi.mock('@/shared/kitchen/KitchenLink', () => ({ KitchenLink: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a> }))
 vi.mock('../hooks/useIngredients', () => ({ useSetIngredientActive: () => ({ mutateAsync: vi.fn(), isPending: false }) }))
 vi.mock('./MovementTimeline', () => ({ MovementTimeline: () => null }))
-vi.mock('@/modules/recipes/hooks/useRecipes', () => ({
-  useDishesUsingIngredient: (_id: string, enabled: boolean) => {
+vi.mock('../hooks/usePreparations', () => ({
+  useIngredientUsage: (_id: string, enabled: boolean) => {
     state.asked.push(enabled)
-    return { data: [{ productId: 'p1', productName: 'Arroz con pollo', active: true, quantity: 120 }, { productId: 'p2', productName: 'Paella', active: false, quantity: 90 }], isLoading: false }
+    return {
+      data: {
+        dishes: [
+          { productId: 'p1', name: 'Arroz con pollo', active: true, quantity: 120, via: null },
+          { productId: 'p2', name: 'Paella', active: false, quantity: 90, via: null },
+          { productId: 'p3', name: 'Arroz con salsa', active: true, quantity: null, via: 'Salsa de la casa' },
+        ],
+        preparations: [{ ingredientId: 'i9', name: 'Salsa de la casa', quantity: 300 }],
+      },
+      isLoading: false,
+    }
   },
 }))
 
@@ -24,7 +34,7 @@ const { IngredientDetail } = await import('./IngredientDetail')
 const arroz: Ingredient = {
   id: 'i1', code: 'ARR', name: 'Arroz', description: null, categoryId: null, categoryName: null, baseUnitId: 'u', baseUnitCode: 'g',
   primarySupplierId: null, primarySupplierName: null, minStock: 1000, maxStock: 5000, avgCost: 5, perishable: false, shelfLifeDays: null,
-  active: true, stockOnHand: 3000, stockAvailable: 3000,
+  active: true, isPreparation: false, stockOnHand: 3000, stockAvailable: 3000,
 }
 
 function renderDetail() {
@@ -50,6 +60,14 @@ describe('Insumo → «Se usa en» (ADR 0031)', () => {
     expect(screen.getByRole('link', { name: /Arroz con pollo/ }).getAttribute('href')).toBe('/recipes/p1')
     expect(screen.getByText('120 g')).toBeTruthy()
     expect(screen.getByText(/Paella \(inactivo\)/)).toBeTruthy()
+  })
+
+  it('ADR 0057: the preparations that carry it, and the dishes that take it through them', () => {
+    state.perms = new Set(['inventory.view', 'recipes.view'])
+    renderDetail()
+    expect(screen.getByRole('link', { name: /^Salsa de la casa/ }).getAttribute('href')).toBe('/supply/preparaciones/i9')
+    expect(screen.getByText('300 g por lote')).toBeTruthy()
+    expect(screen.getByText('vía Salsa de la casa')).toBeTruthy()
   })
 
   it('without recipes.view it is not shown nor asked for', () => {

@@ -18,6 +18,7 @@ interface SuggestionRow {
   coverage_days: number | null
   below_min: boolean
   suggested_quantity: number
+  is_preparation: boolean
 }
 
 /**
@@ -29,7 +30,7 @@ export async function listSupplySuggestions(): Promise<SupplySuggestion[]> {
   const { data, error } = await supabase
     .from('dk_supply_suggestions')
     .select(
-      'ingredient_id, code, name, base_unit_code, primary_supplier_id, supplier_name, stock_available, min_stock, max_stock, avg_cost, consumed_30d, wasted_30d, daily_burn, coverage_days, below_min, suggested_quantity',
+      'ingredient_id, code, name, base_unit_code, primary_supplier_id, supplier_name, stock_available, min_stock, max_stock, avg_cost, consumed_30d, wasted_30d, daily_burn, coverage_days, below_min, suggested_quantity, is_preparation',
     )
     .order('name')
 
@@ -51,5 +52,6 @@ export async function listSupplySuggestions(): Promise<SupplySuggestion[]> {
     coverageDays: row.coverage_days === null ? null : Number(row.coverage_days),
     belowMin: row.below_min,
     suggestedQuantity: Number(row.suggested_quantity),
+    isPreparation: Boolean(row.is_preparation),
   }))
 }

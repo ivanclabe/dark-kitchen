@@ -1,4 +1,4 @@
-import { ArrowDownCircle, ArrowUpCircle, ShoppingBag, SlidersHorizontal, Trash2, Undo2, type LucideIcon } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, CookingPot, ShoppingBag, SlidersHorizontal, Trash2, Undo2, type LucideIcon } from 'lucide-react'
 import type { InventoryMovement, WasteReason } from '../types'
 
 export type MovementType = InventoryMovement['movementType']
@@ -10,6 +10,8 @@ export const MOVEMENT: Record<MovementType, { label: string; icon: LucideIcon; c
   AJUSTE: { label: 'Ajuste', icon: SlidersHorizontal, color: 'text-neutral-300' },
   CONSUMO: { label: 'Consumo', icon: ArrowDownCircle, color: 'text-brasa-400' },
   DEVOLUCION: { label: 'Devolución', icon: Undo2, color: 'text-emerald-400' },
+  // ADR 0057: a batch takes its components out and puts the preparation in.
+  PRODUCCION: { label: 'Producción', icon: CookingPot, color: 'text-sky-400' },
 }
 
 export function movementMeta(type: MovementType) {

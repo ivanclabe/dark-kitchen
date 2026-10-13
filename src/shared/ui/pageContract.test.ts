@@ -13,8 +13,8 @@ const SOURCES = import.meta.glob<string>('../../modules/*/pages/*.tsx', { query:
 
 /** Screens outside the app (no AppLayout): they have their own design. */
 const OUTSIDE_APP = new Set(['auth', 'signup', 'landing', 'invitations', 'kitchens', 'help'])
-/** Pages that only choose another page (no UI of their own). */
-const ROUTERS = new Set(['menuPlanner/pages/CatalogPage.tsx'])
+/** Pages that only choose another page, or hand their data to a shared screen that has the header (no UI of their own). */
+const ROUTERS = new Set(['menuPlanner/pages/CatalogPage.tsx', 'supply/pages/PreparationRecipePage.tsx'])
 
 const source = (page: string) => SOURCES[`../../modules/${page}`]
 const pages = Object.keys(SOURCES)
