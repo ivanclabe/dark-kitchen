@@ -54,6 +54,17 @@ function withProfile(state: ConversationState, profile: ConsumerProfile | null |
   }
 }
 
+const DIET_LABEL: Record<string, string> = { vegetarian: 'vegetariano', vegan: 'vegano', gluten_free: 'sin gluten', spicy: 'picante', healthy: 'saludable' }
+
+/** "sin gluten, sin cebolla": the saved preferences that act as filters. */
+function profileSummary(profile: ConsumerProfile | null | undefined): string {
+  const prefs = profile?.profileConsent ? profile.preferences : []
+  return [
+    ...prefs.filter((p) => p.kind === 'dietary').map((p) => DIET_LABEL[p.value] ?? p.value),
+    ...prefs.filter((p) => p.kind === 'avoid_ingredient').map((p) => `sin ${p.value}`),
+  ].join(', ')
+}
+
 async function focusDish(deps: TurnDeps, state: ConversationState): Promise<PublicDish | null> {
   const id = state.focusId ?? state.lastResultIds[0]
   if (!id) return null
@@ -158,7 +169,14 @@ export async function runTurn(message: string, rawState: unknown, deps: TurnDeps
     focusStorefront: ranked[0]?.dish.storefront.name ?? null,
     askedSort: applied.askedSort || reply.chips.includes('Lo más rápido'),
   }
-  const personalNote = usedProfile && ranked.length ? ['Tuve en cuenta tus preferencias guardadas.'] : []
+  // Always say which saved preferences narrowed the search — above all when nothing matched,
+  // or "sin gluten" would look like something Quanela made up.
+  const personal = usedProfile ? profileSummary(deps.profile) : ''
+  const personalNote = usedProfile
+    ? [ranked.length
+        ? `Tuve en cuenta tus preferencias guardadas (${personal}).`
+        : `Busqué con tus preferencias guardadas (${personal}). Puedes cambiarlas en «Tus gustos».`]
+    : []
   return {
     reply: { text: reply.text, chips: reply.chips, notes: [...reply.notes, ...personalNote], needsLocation: reply.needsLocation },
     results: cardsOf(ranked),

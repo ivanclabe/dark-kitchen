@@ -1,5 +1,6 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { ActiveBadge, Badge } from '@/shared/ui/Badge'
+import { formatQuantity } from '@/shared/units/conversion'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { StatCard } from '@/shared/ui/StatCard'
@@ -42,7 +43,7 @@ function UsedIn({ ingredient }: { ingredient: Ingredient }) {
                   {!d.active && ' (inactivo)'}
                 </span>
                 <span className="tabular-nums text-neutral-400">
-                  {d.quantity} {ingredient.baseUnitCode}
+                  {formatQuantity(d.quantity, ingredient.baseUnitCode)}
                 </span>
               </Link>
             </li>
@@ -152,7 +153,7 @@ export function IngredientDetail({
           </div>
           {low && ingredient.active && restock > 0 && (
             <p className="mt-2 text-xs text-amber-400">
-              Sugerido reponer {restock} {ingredient.baseUnitCode} para llegar a la meta.
+              Sugerido reponer {formatQuantity(restock, ingredient.baseUnitCode)} para llegar a la meta.
             </p>
           )}
         </div>
@@ -167,7 +168,7 @@ export function IngredientDetail({
         <dl className="divide-y divide-neutral-800/60">
           <Field label="Proveedor principal" value={ingredient.primarySupplierName ?? <span className="text-neutral-600">Sin definir</span>} />
           <Field label="Unidad base" value={ingredient.baseUnitCode} />
-          <Field label="Reservado" value={`${Math.round((ingredient.stockOnHand - ingredient.stockAvailable) * 100) / 100} ${ingredient.baseUnitCode}`} />
+          <Field label="Reservado" value={formatQuantity(ingredient.stockOnHand - ingredient.stockAvailable, ingredient.baseUnitCode)} />
           <Field
             label="Perecedero"
             value={ingredient.perishable ? `Sí${ingredient.shelfLifeDays ? ` · ${ingredient.shelfLifeDays} días` : ''}` : 'No'}

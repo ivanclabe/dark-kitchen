@@ -22,12 +22,17 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
 import { BarChart3, BookOpen, Plus, Save, Trash2, Warehouse } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useIngredientUnits } from '@/shared/hooks/useIngredientUnits'
+import { compatibleUnits, equivalence, toBase } from '@/shared/units/conversion'
+import { Select } from '@/shared/ui/FormField'
 import { useParams } from 'react-router-dom'
 import { useActiveRecipe, useCreateRecipeVersion } from '../hooks/useRecipes'
 import type { ActiveRecipe, RecipeItemDraft } from '../types'
 
-interface DraftRow extends RecipeItemDraft {
+interface DraftRow extends Omit<RecipeItemDraft, 'unitId'> {
   key: string
+  /** ADR 0056: the unit the quantity is written in (null = the ingredient's base unit). */
+  unitCode: string | null
 }
 
 function RecipeForm({
@@ -44,13 +49,16 @@ function RecipeForm({
   const back = useBackTarget({ to: '/menu-planner', label: 'Volver al planificador' })
   const here = useHere('Receta')
   const { show } = useToast()
+  const { units, infoFor } = useIngredientUnits()
   // Consultar la receta (y su costo) no es lo mismo que cambiarla: recipes.edit. Un plato de menú maestro tampoco se edita aquí.
   const readOnly = Boolean(product.masterProductId) || !can('recipes.edit')
   const [rows, setRows] = useState<DraftRow[]>(() =>
     (activeRecipe?.items ?? []).map((item) => ({
       key: crypto.randomUUID(),
       ingredientId: item.ingredientId,
-      quantity: item.quantity,
+      // ADR 0056: shown as it was written (150 g), even when the base is kg.
+      quantity: item.unitQuantity ?? item.quantity,
+      unitCode: item.unitCode,
     })),
   )
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +69,7 @@ function RecipeForm({
   )
 
   function addRow() {
-    setRows((r) => [...r, { key: crypto.randomUUID(), ingredientId: '', quantity: 0 }])
+    setRows((r) => [...r, { key: crypto.randomUUID(), ingredientId: '', quantity: 0, unitCode: null }])
   }
 
   function updateRow(key: string, patch: Partial<DraftRow>) {
@@ -76,7 +84,14 @@ function RecipeForm({
     return ingredients.find((i) => i.id === ingredientId)?.avgCost ?? 0
   }
 
-  const estimatedCost = rows.reduce((sum, row) => sum + row.quantity * ingredientAvgCost(row.ingredientId), 0)
+  const ingredientOf = (id: string) => ingredients.find((i) => i.id === id)
+  /** The line's quantity in the ingredient's base unit (what it consumes and costs). */
+  function baseQuantity(row: DraftRow): number {
+    const ingredient = ingredientOf(row.ingredientId)
+    if (!row.unitCode || !ingredient || row.unitCode === ingredient.baseUnitCode) return row.quantity
+    return toBase(row.quantity, row.unitCode, infoFor(ingredient), units) ?? 0
+  }
+  const estimatedCost = rows.reduce((sum, row) => sum + baseQuantity(row) * ingredientAvgCost(row.ingredientId), 0)
   const margin = product.price - estimatedCost
   const nextVersion = (activeRecipe?.version ?? 0) + 1
 
@@ -88,7 +103,12 @@ function RecipeForm({
       return
     }
     try {
-      await createVersion.mutateAsync(validRows.map(({ ingredientId, quantity }) => ({ ingredientId, quantity })))
+      await createVersion.mutateAsync(
+        validRows.map(({ ingredientId, quantity, unitCode }) => {
+          const base = ingredientOf(ingredientId)?.baseUnitCode
+          return { ingredientId, quantity, unitId: unitCode && unitCode !== base ? (units.find((u) => u.code === unitCode)?.id ?? null) : null }
+        }),
+      )
       show(`Receta de "${product.name}" guardada como v${nextVersion}.`)
     } catch (err) {
       setError(getErrorMessage(err, 'Error al guardar la receta'))
@@ -105,7 +125,7 @@ function RecipeForm({
             <Combobox
               aria-label="Insumo"
               value={row.ingredientId}
-              onChange={(value) => updateRow(row.key, { ingredientId: value })}
+              onChange={(value) => updateRow(row.key, { ingredientId: value, unitCode: null })}
               options={ingredientOptions}
               placeholder="Nombre o código…"
               emptyMessage="Sin insumos con ese nombre o código"
@@ -132,19 +152,39 @@ function RecipeForm({
       key: 'quantity',
       header: 'Cantidad',
       cell: (row) => {
-        const ingredient = ingredients.find((i) => i.id === row.ingredientId)
+        const ingredient = ingredientOf(row.ingredientId)
+        const info = infoFor(ingredient)
+        const options = compatibleUnits(info, units)
+        const unitCode = row.unitCode ?? ingredient?.baseUnitCode ?? null
+        const hint = equivalence(row.quantity, unitCode, info, units)
         return (
-          <span className="inline-flex items-center gap-2">
-            <NumberInput
-              value={row.quantity || null}
-              onValueChange={(v) => updateRow(row.key, { quantity: v ?? 0 })}
-              decimals={3}
-              min={0}
-              unit={ingredient?.baseUnitCode}
-              disabled={readOnly}
-              aria-label={ingredient ? `Cantidad de ${ingredient.name}` : 'Cantidad'}
-              className="!mt-0 w-36"
-            />
+          <span className="flex flex-col gap-1">
+            <span className="inline-flex items-center gap-2">
+              <NumberInput
+                value={row.quantity || null}
+                onValueChange={(v) => updateRow(row.key, { quantity: v ?? 0 })}
+                decimals={3}
+                min={0}
+                disabled={readOnly}
+                aria-label={ingredient ? `Cantidad de ${ingredient.name}` : 'Cantidad'}
+                className="!mt-0 w-28"
+              />
+              {/* ADR 0056: any unit that converts (150 g of an ingredient kept in kg); the base is the default. */}
+              <Select
+                aria-label={ingredient ? `Unidad de ${ingredient.name}` : 'Unidad'}
+                value={unitCode ?? ''}
+                onChange={(e) => updateRow(row.key, { unitCode: e.target.value === ingredient?.baseUnitCode ? null : e.target.value })}
+                disabled={readOnly || options.length <= 1}
+                className="!mt-0 w-24"
+              >
+                {(options.length ? options : ingredient ? [{ code: ingredient.baseUnitCode }] : []).map((u) => (
+                  <option key={u.code} value={u.code}>
+                    {u.code}
+                  </option>
+                ))}
+              </Select>
+            </span>
+            {hint && <span className="text-xs text-neutral-500 tabular-nums">{hint}</span>}
           </span>
         )
       },
@@ -152,7 +192,7 @@ function RecipeForm({
     {
       key: 'lineCost',
       header: 'Costo línea',
-      cell: (row) => <span className="tabular-nums">{formatMoney(row.quantity * ingredientAvgCost(row.ingredientId), { decimals: 'auto' })}</span>,
+      cell: (row) => <span className="tabular-nums">{formatMoney(baseQuantity(row) * ingredientAvgCost(row.ingredientId), { decimals: 'auto' })}</span>,
       align: 'right',
       hideBelow: 'sm',
     },
@@ -272,6 +312,9 @@ function RecipeForm({
           {error}
         </p>
       )}
+      <p className={typography.caption}>
+        Escribe cada insumo en la unidad que te sea cómoda (por ejemplo 150 g aunque lo compres en kilos): Quanela lo convierte a la unidad del inventario para descontar y costear.
+      </p>
       <p className={typography.caption}>Guardar crea una nueva versión de la receta (v{nextVersion}) sin borrar el historial de versiones anteriores.</p>
     </Page>
   )

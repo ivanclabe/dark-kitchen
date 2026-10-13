@@ -1,5 +1,6 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Button } from '@/shared/ui/Button'
+import { formatQuantity } from '@/shared/units/conversion'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -139,7 +140,7 @@ export function IngredientPanel({
                 </div>
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">
                   <span className="tabular-nums">
-                    {ing.stockAvailable} {ing.baseUnitCode}
+                    {formatQuantity(ing.stockAvailable, ing.baseUnitCode)}
                   </span>
                   <span className="text-neutral-700">·</span>
                   <span className="tabular-nums">{formatMoney(ing.avgCost, { decimals: 'auto' })}</span>

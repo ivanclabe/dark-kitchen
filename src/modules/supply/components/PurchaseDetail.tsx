@@ -1,6 +1,10 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { CurrencyInput } from '@/shared/ui/CurrencyInput'
-import { useUnits } from '@/shared/hooks/useUnits'
+import { setIngredientPackage } from '@/shared/api/units'
+import { INGREDIENT_PACKAGES_KEY, useIngredientUnits } from '@/shared/hooks/useIngredientUnits'
+import { formatNumber, PACKAGING_UNITS, unitFactor } from '@/shared/units/conversion'
+import { NumberInput } from '@/shared/ui/NumberInput'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Combobox } from '@/shared/ui/Combobox'
@@ -17,7 +21,6 @@ import { STATUS_LABEL, STATUS_TONE } from '@/modules/finance/lib/finance'
 import type { PurchasePayment } from '@/modules/finance/types'
 import { addDays } from '@/modules/insights/lib/periods'
 import { useSuppliers } from '../hooks/useSuppliers'
-import { NumberStepper } from '@/shared/ui/NumberStepper'
 import { useToast } from '@/shared/ui/Toast'
 import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
@@ -54,7 +57,9 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const { data: items, isLoading: itemsLoading, isError: itemsError, error: itemsErr, refetch: refetchItems } = usePurchaseItems(purchaseId)
   const { data: attachments } = useAttachments(purchaseId)
   const { data: ingredients } = useIngredients()
-  const { data: units } = useUnits()
+  // ADR 0056: only the units that convert for the chosen ingredient, and its packages.
+  const { units, infoFor } = useIngredientUnits()
+  const queryClient = useQueryClient()
 
   const addItem = useAddPurchaseItem(purchaseId)
   const deleteItem = useDeletePurchaseItem(purchaseId)
@@ -66,6 +71,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const [quantity, setQuantity] = useState(0)
   const [purchaseUnitId, setPurchaseUnitId] = useState('')
   const [unitCost, setUnitCost] = useState<number | null>(null)
+  const [packFactor, setPackFactor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   // ADR 0051 (D3): how it was paid, asked when confirming.
@@ -85,6 +91,25 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const total = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
 
   const ingredientOptions = useMemo(() => ingredients?.map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [], [ingredients])
+  const ingredient = ingredients?.find((i) => i.id === ingredientId)
+  const info = infoFor(ingredient)
+  // What can be bought: the units that convert, plus generic packages (it asks how much one brings).
+  const unitChoices = info ? units.filter((u) => unitFactor(u.code, info, units) !== null || PACKAGING_UNITS.includes(u.code)) : []
+  const chosenUnit = units.find((u) => u.id === purchaseUnitId) ?? null
+  const knownFactor = chosenUnit ? unitFactor(chosenUnit.code, info, units) : null
+  const needsPack = Boolean(chosenUnit && knownFactor === null && PACKAGING_UNITS.includes(chosenUnit.code))
+  const factor = knownFactor ?? (needsPack && packFactor ? packFactor : null)
+  const equivalenceText =
+    ingredient && chosenUnit && factor && chosenUnit.code !== ingredient.baseUnitCode && quantity > 0
+      ? `${formatNumber(quantity)} ${chosenUnit.code} = ${formatNumber(quantity * factor)} ${ingredient.baseUnitCode}${unitCost ? ` · ${formatMoney(unitCost / factor, { decimals: 'auto' })}/${ingredient.baseUnitCode}` : ''}`
+      : null
+
+  function chooseIngredient(id: string) {
+    setIngredientId(id)
+    setPackFactor(null)
+    const base = units.find((u) => u.code === ingredients?.find((i) => i.id === id)?.baseUnitCode)
+    setPurchaseUnitId(base?.id ?? '')
+  }
 
   function applyLastPrice() {
     if (!lastPrice) return
@@ -101,11 +126,21 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
     e.preventDefault()
     setError(null)
     try {
+      // A new package («caja de 12») is remembered for this ingredient before the line is added.
+      if (needsPack) {
+        if (!packFactor || packFactor <= 0) {
+          setError(`Indica cuántos ${ingredient?.baseUnitCode ?? ''} trae 1 ${chosenUnit?.code ?? ''}`)
+          return
+        }
+        await setIngredientPackage(ingredientId, purchaseUnitId, packFactor)
+        await queryClient.invalidateQueries({ queryKey: INGREDIENT_PACKAGES_KEY })
+      }
       await addItem.mutateAsync({ ingredientId, quantity, purchaseUnitId, unitCost: unitCost ?? 0 })
       setIngredientId('')
       setQuantity(0)
       setPurchaseUnitId('')
       setUnitCost(null)
+      setPackFactor(null)
     } catch (err) {
       setError(getErrorMessage(err, 'Error al agregar la línea'))
     }
@@ -234,7 +269,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
               {() => (
                 <Combobox
                   value={ingredientId}
-                  onChange={setIngredientId}
+                  onChange={chooseIngredient}
                   options={ingredientOptions}
                   placeholder="Nombre o código…"
                   emptyMessage="Sin insumos con ese nombre o código"
@@ -245,15 +280,25 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
             </FormField>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <FormField label="Cantidad" required>
-                {(a11y) => <NumberStepper {...a11y} value={quantity} onChange={setQuantity} min={0} step={1} required />}
+                {(a11y) => <NumberInput {...a11y} value={quantity || null} onValueChange={(v) => setQuantity(v ?? 0)} decimals={3} min={0} required />}
               </FormField>
-              <FormField label="Unidad de compra" required>
+              <FormField label="Unidad de compra" required info="Compra en la unidad de la factura (kg, l, caja…): Quanela la convierte a la unidad del inventario al confirmar.">
                 {(a11y) => (
-                  <Select {...a11y} value={purchaseUnitId} onChange={(e) => setPurchaseUnitId(e.target.value)} required>
-                    <option value="">Selecciona…</option>
-                    {units?.map((u) => (
+                  <Select
+                    {...a11y}
+                    value={purchaseUnitId}
+                    onChange={(e) => {
+                      setPurchaseUnitId(e.target.value)
+                      setPackFactor(null)
+                    }}
+                    required
+                    disabled={!ingredient}
+                  >
+                    <option value="">{ingredient ? 'Selecciona…' : 'Elige el insumo'}</option>
+                    {unitChoices.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.name}
+                        {u.code === ingredient?.baseUnitCode ? ' (inventario)' : ''}
                       </option>
                     ))}
                   </Select>
@@ -263,6 +308,20 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 {(a11y) => <CurrencyInput {...a11y} value={unitCost} onValueChange={setUnitCost} decimals={2} required />}
               </FormField>
             </div>
+            {needsPack && ingredient && chosenUnit && (
+              <FormField
+                label={`¿Cuántos ${ingredient.baseUnitCode} trae 1 ${chosenUnit.code}?`}
+                required
+                hint="Se recuerda para este insumo: la próxima vez no lo vuelve a preguntar."
+              >
+                {(a11y) => <NumberInput {...a11y} value={packFactor} onValueChange={setPackFactor} decimals={3} min={0} unit={ingredient.baseUnitCode} required />}
+              </FormField>
+            )}
+            {equivalenceText && (
+              <p className="text-xs text-neutral-400 tabular-nums" aria-live="polite">
+                Entra al inventario: {equivalenceText}
+              </p>
+            )}
             <Button type="submit" variant="primary" icon={Plus} loading={addItem.isPending}>
               Agregar línea
             </Button>
@@ -289,7 +348,12 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-neutral-100">{item.ingredientName}</p>
                   <p className="text-xs text-neutral-500 tabular-nums">
-                    {item.quantity} {item.purchaseUnitCode} × {formatMoney(item.unitCost, { decimals: 'auto' })}
+                    {formatNumber(item.quantity)} {item.purchaseUnitCode} × {formatMoney(item.unitCost, { decimals: 'auto' })}
+                    {(() => {
+                      const base = ingredients?.find((i) => i.id === item.ingredientId)
+                      const f = base && item.purchaseUnitCode !== base.baseUnitCode ? unitFactor(item.purchaseUnitCode, infoFor(base), units) : null
+                      return f ? ` → ${formatNumber(item.quantity * f)} ${base!.baseUnitCode}` : ''
+                    })()}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">

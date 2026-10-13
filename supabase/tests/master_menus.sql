@@ -88,10 +88,11 @@ do $$ begin
     '[{"ingredient_code": "PAN-M", "ingredient_name": "Pan brioche", "unit_code": "unidad", "quantity": 1},
       {"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne de res", "unit_code": "g", "quantity": 180}]');
   begin
-    perform dk_save_master_product((select id from _ctx where key = 'menu'), null, 'MAL-01', 'Unidad equivocada', null, null, 1000, true,
+    -- ADR 0056: a compatible unit (kg for an ingredient in g) is converted, no longer refused (incompatible ones: see the end).
+    perform dk_save_master_product((select id from _ctx where key = 'menu'), null, 'MAL-01', 'Unidad distinta', null, null, 1000, true,
       '[{"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne", "unit_code": "kg", "quantity": 1}]');
-    insert into _t (area, test, expected, got) values ('Cambios', 'Receta con unidad distinta a la de la Cocina', 'bloqueado', 'PERMITIDO');
-  exception when others then insert into _t (area, test, expected, got, detail) values ('Cambios', 'Receta con unidad distinta a la de la Cocina', 'bloqueado', 'bloqueado', sqlerrm); end;
+    insert into _t (area, test, expected, got) values ('Cambios', 'Receta en kg sobre un insumo en g: se convierte (ADR 0056)', 'convertida', 'convertida');
+  exception when others then insert into _t (area, test, expected, got, detail) values ('Cambios', 'Receta en kg sobre un insumo en g: se convierte (ADR 0056)', 'convertida', 'bloqueado', sqlerrm); end;
 end $$;
 reset role;
 
@@ -164,5 +165,26 @@ do $$ begin
     (select uses_inventory::text from dk_products where kitchen_id = (select id from _ctx where key = 'A') and master_product_id = (select id from _ctx where key = 'mp2')));
 end $$;
 
+-- ADR 0056: a master recipe in kg reaches an account whose ingredient is in g, converted; an incompatible unit fails.
+select pg_temp.act_as((select id from _ctx where key = 'ivan'), null);
+set local role authenticated;
+do $$
+declare v_err text;
+begin
+  perform dk_save_master_product((select id from _ctx where key = 'menu'), null, 'BURG-KG', 'Burger en kilos', null, 'Hamburguesas', 21000, true,
+    '[{"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne de res", "unit_code": "kg", "quantity": 0.2}]');
+  begin
+    perform dk_save_master_product((select id from _ctx where key = 'menu'), null, 'BURG-UN', 'Burger por unidades', null, 'Hamburguesas', 21000, true,
+      '[{"ingredient_code": "CARNE-PRB-01", "ingredient_name": "Carne de res", "unit_code": "unidad", "quantity": 1}]');
+    v_err := 'PERMITIDO';
+  exception when others then v_err := case when sqlerrm like '%no convierte desde unidad%' then 'rechazado' else sqlerrm end;
+  end;
+  insert into _t (area, test, expected, got) values ('Unidades (ADR 0056)', 'Receta maestra con unidad incompatible', 'rechazado', v_err);
+end $$;
+reset role;
+insert into _t (area, test, expected, got) values ('Unidades (ADR 0056)', 'Receta maestra en kg: la cuenta (insumo en g) recibe 200 g y recuerda «0,2 kg»', 'true · kg · true',
+  (select (ri.quantity = 200)::text || ' · ' || u.code || ' · ' || (ri.unit_quantity = 0.2)::text
+   from dk_products p join dk_recipe_items ri on ri.recipe_id = p.active_recipe_id join dk_units u on u.id = ri.unit_id
+   where p.kitchen_id = (select id from _ctx where key = 'A') and p.code = 'BURG-KG'));
 select area, test, expected, got, detail, case when got = expected then 'PASS' else 'FAIL' end as result from _t order by n;
 rollback;

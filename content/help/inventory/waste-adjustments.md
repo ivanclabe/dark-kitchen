@@ -11,9 +11,9 @@ questions:
   - ¿Cómo ajusto el inventario?
   - El stock no coincide con lo que hay
   - Se dañó un insumo, ¿cómo lo saco?
-keywords: [merma, ajuste, conteo, pérdida, vencido, dañado, corregir stock, desperdicio]
+keywords: [kilos, gramos, unidad, merma, ajuste, conteo, pérdida, vencido, dañado, corregir stock, desperdicio]
 related: [stock, inventory-deduction, costs-and-purchases]
-updated: 2026-10-11
+updated: 2026-10-12
 order: 4
 ---
 
@@ -21,13 +21,13 @@ order: 4
 
 1. En **Abastecimiento → Stock**, abre el insumo.
 2. Toca **Merma**.
-3. Escribe la **Cantidad** que se perdió y elige el **Motivo**: Vencimiento, Daño, Error de preparación u Otro. Agrega una **Observación** si ayuda.
+3. Escribe la **Cantidad** que se perdió y su **unidad** (por ejemplo, 0,1 **kg** de un insumo en gramos: Quanela te muestra «0,1 kg = 100 g»). Elige el **Motivo**: Vencimiento, Daño, Error de preparación u Otro. Agrega una **Observación** si ayuda.
 4. Toca **Registrar merma**. Sale del inventario automáticamente.
 
 ## Corregir el stock (ajuste)
 
 1. Abre el insumo y toca **Ajuste**.
-2. Escribe la **Cantidad** en la unidad base: **positiva** suma stock, **negativa** resta.
+2. Escribe la **Cantidad** y elige la unidad (la base, o otra compatible como kg o docena): **positiva** suma stock, **negativa** resta.
 3. Explica el motivo en **Observación** («conteo del viernes») y toca **Registrar ajuste**.
 
 Cada merma y ajuste queda en los **Movimientos** del insumo con quién y cuándo. Las mermas también se ven en **Insights → Costos**. Las dos se valoran al costo promedio del insumo y restan en la utilidad real (un ajuste positivo suma). Ver [Rentabilidad real](help:profitability).

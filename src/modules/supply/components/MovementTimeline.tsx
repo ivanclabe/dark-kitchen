@@ -3,14 +3,14 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import { History } from 'lucide-react'
+import { formatNumber, formatQuantity } from '@/shared/units/conversion'
 import { useMovements } from '../hooks/useMovements'
 import { movementMeta, WASTE_REASON_LABEL } from '../lib/movementVisuals'
 
-/** «+1.500 g», «-0,15 kg»: the quantity as people read it, with its unit. */
+/** «+1,5 kg», «-150 g»: the quantity as people read it (ADR 0056: the shared format), with its sign. */
 function formatMovementQuantity(quantity: number, unit: string): string {
-  const number = Math.abs(quantity).toLocaleString('es-CO', { maximumFractionDigits: 3 })
   const sign = quantity > 0 ? '+' : quantity < 0 ? '-' : ''
-  return `${sign}${number}${unit ? ` ${unit}` : ''}`
+  return unit ? `${sign}${formatQuantity(Math.abs(quantity), unit)}` : `${sign}${formatNumber(Math.abs(quantity))}`
 }
 
 /**

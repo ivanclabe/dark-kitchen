@@ -59,7 +59,7 @@ export const CONCEPTS: Concept[] = [
   { key: 'chicken', label: 'pollo', triggers: ['pollo', 'alita', 'ala', 'broaster', 'chicken', 'nugget'], terms: ['pollo', 'alita', 'chicken'] },
   { key: 'mexican', label: 'comida mexicana', triggers: ['mexicana', 'mexicano', 'taco', 'burrito', 'quesadilla', 'nacho', 'mexican'], terms: ['taco', 'burrito', 'quesadilla', 'nacho', 'mexican'] },
   { key: 'asian', label: 'comida asiática', triggers: ['asiatica', 'asiatico', 'china', 'chino', 'sushi', 'ramen', 'wok', 'thai', 'japonesa', 'arroz chino'], terms: ['sushi', 'ramen', 'wok', 'asian', 'arroz chino'] },
-  { key: 'healthy', label: 'algo saludable', triggers: ['saludable', 'sano', 'sana', 'fit', 'ligero', 'ligera', 'liviano', 'liviana', 'healthy', 'light'], terms: ['bowl', 'ensalada', 'wrap', 'healthy', 'quinoa'], preferTags: ['healthy', 'vegetarian', 'vegan'] },
+  { key: 'healthy', label: 'comida saludable', triggers: ['saludable', 'sano', 'sana', 'fit', 'ligero', 'ligera', 'liviano', 'liviana', 'healthy', 'light'], terms: ['bowl', 'ensalada', 'wrap', 'healthy', 'quinoa'], preferTags: ['healthy', 'vegetarian', 'vegan'] },
   { key: 'salad', label: 'ensaladas', triggers: ['ensalada'], terms: ['ensalada'] },
   { key: 'bowl', label: 'bowls', triggers: ['bowl', 'poke'], terms: ['bowl', 'poke'] },
   { key: 'wrap', label: 'wraps', triggers: ['wrap'], terms: ['wrap'] },

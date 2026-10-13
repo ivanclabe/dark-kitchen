@@ -1479,9 +1479,17 @@ export const KB: KbArticle[] = [
       "¿Cómo registro una compra?",
       "¿Cómo ingreso inventario?",
       "¿Cómo cargo una factura de proveedor?",
-      "¿Cómo sumo stock?"
+      "¿Cómo sumo stock?",
+      "Compré en kilos pero el insumo está en gramos",
+      "¿Cómo registro una caja?"
     ],
     "keywords": [
+      "kilos",
+      "gramos",
+      "caja",
+      "empaque",
+      "conversión",
+      "unidad de compra",
       "compra",
       "factura",
       "proveedor",
@@ -1496,13 +1504,15 @@ export const KB: KbArticle[] = [
     "steps": [
       "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura.",
       "Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador .",
-      "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea .",
+      "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea .",
       "Repite con cada producto de la factura. Para quitar una línea, toca Quitar .",
       "Opcional: en Adjuntos , sube la foto o el PDF de la factura.",
       "Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar ."
     ],
-    "headings": [],
-    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
+    "headings": [
+      "Comprar en otra unidad"
+    ],
+    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Comprar en otra unidad Compra en la unidad de la factura: Quanela convierte a la unidad base del insumo. Si compras 2 kg de carne a $40.000 el kilo y el insumo está en gramos, entran 2.000 g a $20 el gramo . Para un empaque ( caja , bolsa o paquete ), la primera vez Quanela pregunta ¿Cuántos trae? («¿Cuántos unidad trae 1 caja?»). Escribe 12 y queda guardado para ese insumo: la próxima vez ya lo sabe. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
   },
   {
     "id": "quanela-consumer",
@@ -1575,9 +1585,14 @@ export const KB: KbArticle[] = [
       "¿Cuánto me cuesta un plato?",
       "¿Cuál es el margen de un plato?",
       "¿Por qué no puedo confirmar un pedido? Dice que el plato no tiene receta",
-      "¿Cómo cambio los ingredientes de un plato?"
+      "¿Cómo cambio los ingredientes de un plato?",
+      "¿Puedo escribir la receta en gramos si compro en kilos?"
     ],
     "keywords": [
+      "gramos",
+      "kilos",
+      "unidad",
+      "conversión",
       "receta",
       "sin receta",
       "descuenta inventario",
@@ -1592,15 +1607,16 @@ export const KB: KbArticle[] = [
     ],
     "steps": [
       "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …).",
-      "Toca Agregar ingrediente , busca el insumo por nombre o código y escribe la Cantidad en su unidad base (por ejemplo, gramos).",
+      "Toca Agregar ingrediente , busca el insumo por nombre o código, escribe la Cantidad y elige la Unidad (por ejemplo, 150 g de carne aunque la compres en kilos).",
       "Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta.",
       "Toca Guardar como nueva versión ."
     ],
     "headings": [
       "Cómo se calcula el costo",
+      "Unidades: compra en kilos, cocina en gramos",
       "Versiones"
     ],
-    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código y escribe la Cantidad en su unidad base (por ejemplo, gramos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: si el plato tiene Descuenta inventario encendido y no tiene receta, no se puede confirmar en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga Descuenta inventario en Editar plato . Bueno saber: un plato que no usa inventario se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
+    "body": "En Catálogo , toca el lápiz del plato ( Editar plato ) y luego Crear receta (si ya tiene, dice Receta v1 , v2 …). Toca Agregar ingrediente , busca el insumo por nombre o código, escribe la Cantidad y elige la Unidad (por ejemplo, 150 g de carne aunque la compres en kilos). Repite con cada insumo. Abajo ves el Costo estimado y el Margen frente al precio de venta. Toca Guardar como nueva versión . Cómo se calcula el costo Cada línea vale cantidad × costo promedio del insumo . El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el Margen sale en rojo, el plato cuesta más de lo que lo vendes. Unidades: compra en kilos, cocina en gramos Cada insumo lleva su inventario en una unidad base (g, ml o unidad). En la receta puedes escribir la cantidad en cualquier unidad compatible : g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base. Bueno saber: solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo). Versiones Guardar nunca borra la receta anterior: crea la versión siguiente (v2, v3…) y esa queda activa para los pedidos nuevos. Cuidado: si el plato tiene Descuenta inventario encendido y no tiene receta, no se puede confirmar en un pedido: el mensaje dice cuál es. Créale la receta o, si no usa tus insumos (por ejemplo, una bebida que compras lista), apaga Descuenta inventario en Editar plato . Bueno saber: un plato que no usa inventario se vende sin receta. Si tiene una, solo sirve para ver su costo: sus pedidos no reservan ni descuentan insumos. Sin receta no tiene costo registrado, así que Insights y Copilot no le calculan margen. Bueno saber: si el plato viene de Platos compartidos , su receta la define el plato compartido: aquí solo la consultas ( Ver receta ). Desde la receta, Ventas y rentabilidad te lleva a sus números en Insights."
   },
   {
     "id": "register-payment",
@@ -1684,6 +1700,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "12 de octubre de 2026",
       "11 de octubre de 2026",
       "10 de octubre de 2026",
       "9 de octubre de 2026",
@@ -1695,7 +1712,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios («haz el fondo un poco más claro») y cada versión queda guardada. Mis diseños guarda el historial de tu negocio: propuestas, diseños del editor y todo lo que publicaste. Puedes comparar dos lado a lado y publicar cuando quieras. La IA nunca publica sola, y probar diseños no cambia tu página ni tus pedidos. Finanzas. Un módulo nuevo en el menú con: Por pagar: lo que se debe a proveedores, gastos y nómina, con vencimientos, abonos y pagos. Pagos: el registro, con anulación. Gastos , con gastos fijos que se crean solos cada mes. Nómina: por hora con las horas reales de los turnos, o salario mensual. Flujo de caja. Rentabilidad: la utilidad real , de las ventas a la utilidad operativa, con ingredientes, mermas, IVA de comp"
+    "body": "de octubre de 2026 Conversión automática de unidades. Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas. Compras: compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una caja o bolsa dices una vez cuántas trae. Recetas: escribe 150 g aunque compres por kilo, o media docena de huevos. La receta recuerda la unidad y el costo sigue exacto. Mermas y ajustes: también en kg, g, l, ml o docenas. Stock y movimientos se leen más fácil: «1,45 kg» en vez de «1450 g». Para cuidar tu historial, la unidad base de un insumo con movimientos o recetas ya no se puede cambiar. Ver Recetas y costo de un plato y Registrar una compra. de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesanal, Dark premium, Fresca y Carta tradicional) y ajustas colores, letra, fondo, cabecera y cómo se ven los platos. Ves cada cambio al instante, en celular o en escritorio. Lo que cambias queda en borrador hasta que tocas Publicar diseño ; puedes descartar los cambios o volver al diseño anterior. Los precios, los platos y los pedidos no cambian con el diseño. Diseñador de menú con IA y «Mis diseños». En Menú público → Diseño → Diseñador con IA describes cómo quieres tu menú («una carta elegante con fondo negro y detalles dorados») y la IA te propone dos diseños con vista previa real. Le puedes pedir cambios "
   },
   {
     "id": "roles",
@@ -2140,6 +2157,9 @@ export const KB: KbArticle[] = [
       "Se dañó un insumo, ¿cómo lo saco?"
     ],
     "keywords": [
+      "kilos",
+      "gramos",
+      "unidad",
       "merma",
       "ajuste",
       "conteo",
@@ -2152,14 +2172,14 @@ export const KB: KbArticle[] = [
     "steps": [
       "En Abastecimiento → Stock , abre el insumo.",
       "Toca Merma .",
-      "Escribe la Cantidad que se perdió y elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda.",
+      "Escribe la Cantidad que se perdió y su unidad (por ejemplo, 0,1 kg de un insumo en gramos: Quanela te muestra «0,1 kg = 100 g»). Elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda.",
       "Toca Registrar merma . Sale del inventario automáticamente."
     ],
     "headings": [
       "Registrar una merma",
       "Corregir el stock (ajuste)"
     ],
-    "body": "Registrar una merma En Abastecimiento → Stock , abre el insumo. Toca Merma . Escribe la Cantidad que se perdió y elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda. Toca Registrar merma . Sale del inventario automáticamente. Corregir el stock (ajuste) Abre el insumo y toca Ajuste . Escribe la Cantidad en la unidad base: positiva suma stock, negativa resta. Explica el motivo en Observación («conteo del viernes») y toca Registrar ajuste . Cada merma y ajuste queda en los Movimientos del insumo con quién y cuándo. Las mermas también se ven en Insights → Costos . Las dos se valoran al costo promedio del insumo y restan en la utilidad real (un ajuste positivo suma). Ver Rentabilidad real. Cuidado: el inventario es un registro que solo crece: nada se borra. Para deshacer un error, haz el ajuste contrario."
+    "body": "Registrar una merma En Abastecimiento → Stock , abre el insumo. Toca Merma . Escribe la Cantidad que se perdió y su unidad (por ejemplo, 0,1 kg de un insumo en gramos: Quanela te muestra «0,1 kg = 100 g»). Elige el Motivo : Vencimiento, Daño, Error de preparación u Otro. Agrega una Observación si ayuda. Toca Registrar merma . Sale del inventario automáticamente. Corregir el stock (ajuste) Abre el insumo y toca Ajuste . Escribe la Cantidad y elige la unidad (la base, o otra compatible como kg o docena): positiva suma stock, negativa resta. Explica el motivo en Observación («conteo del viernes») y toca Registrar ajuste . Cada merma y ajuste queda en los Movimientos del insumo con quién y cuándo. Las mermas también se ven en Insights → Costos . Las dos se valoran al costo promedio del insumo y restan en la utilidad real (un ajuste positivo suma). Ver Rentabilidad real. Cuidado: el inventario es un registro que solo crece: nada se borra. Para deshacer un error, haz el ajuste contrario."
   },
   {
     "id": "what-is-quanela",

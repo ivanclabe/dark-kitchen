@@ -1,5 +1,4 @@
 import { Button } from '@/shared/ui/Button'
-import { formatLocaleNumber } from '@/shared/utils/numberInput'
 import { NumberInput } from '@/shared/ui/NumberInput'
 import { Chip } from '@/shared/ui/Chip'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -8,6 +7,8 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { SlidersHorizontal, Trash2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { useIngredientUnits } from '@/shared/hooks/useIngredientUnits'
+import { compatibleUnits, equivalence, formatNumber } from '@/shared/units/conversion'
 import { useIngredients } from '../hooks/useIngredients'
 import { useRegisterAdjustment, useRegisterWaste } from '../hooks/useMovements'
 import { WASTE_REASONS } from '../lib/movementVisuals'
@@ -42,9 +43,17 @@ export function MovementFormDrawer({
   const [quantity, setQuantity] = useState<number | null>(null)
   const [reason, setReason] = useState<WasteReason>('DANO')
   const [observation, setObservation] = useState('')
+  // ADR 0056: any unit that converts («se dañó medio kilo» of an ingredient kept in grams).
+  const [unitCode, setUnitCode] = useState<string | null>(null)
+  const { units, infoFor } = useIngredientUnits()
   const [error, setError] = useState<string | null>(null)
 
   const ingredient = ingredients?.find((i) => i.id === ingredientId)
+  const info = infoFor(ingredient)
+  const unitOptions = compatibleUnits(info, units)
+  const currentUnit = unitCode ?? ingredient?.baseUnitCode ?? null
+  const unitId = currentUnit && currentUnit !== ingredient?.baseUnitCode ? (units.find((u) => u.code === currentUnit)?.id ?? null) : null
+  const hint = quantity !== null ? equivalence(Math.abs(quantity), currentUnit, info, units) : null
   const pending = registerWaste.isPending || registerAdjustment.isPending
 
   async function handleSubmit(e: FormEvent) {
@@ -53,10 +62,10 @@ export function MovementFormDrawer({
     const name = ingredient?.name ?? 'Insumo'
     try {
       if (mode === 'merma') {
-        await registerWaste.mutateAsync({ ingredientId, quantity: quantity ?? 0, reason, observation: observation || undefined })
-        show(`Merma registrada: ${formatLocaleNumber(quantity, { decimals: 3 })} de ${name}.`)
+        await registerWaste.mutateAsync({ ingredientId, quantity: quantity ?? 0, reason, observation: observation || undefined, unitId })
+        show(`Merma registrada: ${formatNumber(quantity ?? 0)} ${currentUnit ?? ''} de ${name}.`)
       } else {
-        await registerAdjustment.mutateAsync({ ingredientId, quantity: quantity ?? 0, observation: observation || undefined })
+        await registerAdjustment.mutateAsync({ ingredientId, quantity: quantity ?? 0, observation: observation || undefined, unitId })
         show(`Ajuste registrado en ${name}.`)
       }
       onClose()
@@ -77,7 +86,15 @@ export function MovementFormDrawer({
 
         <FormField label="Insumo" required>
           {(a11y) => (
-            <Select {...a11y} value={ingredientId} onChange={(e) => setIngredientId(e.target.value)} required>
+            <Select
+              {...a11y}
+              value={ingredientId}
+              onChange={(e) => {
+                setIngredientId(e.target.value)
+                setUnitCode(null)
+              }}
+              required
+            >
               <option value="">Selecciona…</option>
               {ingredients?.map((i) => (
                 <option key={i.id} value={i.id}>
@@ -91,19 +108,39 @@ export function MovementFormDrawer({
         <FormField
           label="Cantidad"
           required
-          info={mode === 'merma' ? 'Lo que se perdió, en la unidad del insumo. Sale del inventario al registrarla.' : 'Positiva suma al inventario; negativa (con «-») resta. Úsala para corregir el stock tras un conteo.'}
+          info={
+            mode === 'merma'
+              ? 'Lo que se perdió, en la unidad que quieras (se convierte a la del inventario). Sale del inventario al registrarla.'
+              : 'Positiva suma al inventario; negativa (con «-») resta. Úsala para corregir el stock tras un conteo.'
+          }
+          hint={hint ?? undefined}
         >
           {(a11y) => (
-            <NumberInput
-              {...a11y}
-              value={quantity}
-              onValueChange={setQuantity}
-              decimals={3}
-              min={mode === 'merma' ? 0 : undefined}
-              allowNegative={mode !== 'merma'}
-              unit={ingredient?.baseUnitCode}
-              required
-            />
+            <span className="flex gap-2">
+              <NumberInput
+                {...a11y}
+                value={quantity}
+                onValueChange={setQuantity}
+                decimals={3}
+                min={mode === 'merma' ? 0 : undefined}
+                allowNegative={mode !== 'merma'}
+                required
+                className="!mt-0 flex-1"
+              />
+              <Select
+                aria-label="Unidad"
+                value={currentUnit ?? ''}
+                onChange={(e) => setUnitCode(e.target.value === ingredient?.baseUnitCode ? null : e.target.value)}
+                disabled={!ingredient || unitOptions.length <= 1}
+                className="!mt-0 w-28"
+              >
+                {(unitOptions.length ? unitOptions : ingredient ? [{ code: ingredient.baseUnitCode }] : []).map((u) => (
+                  <option key={u.code} value={u.code}>
+                    {u.code}
+                  </option>
+                ))}
+              </Select>
+            </span>
           )}
         </FormField>
 

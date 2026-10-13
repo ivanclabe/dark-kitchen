@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -3853,6 +3853,8 @@ export type Database = {
           kitchen_id: string
           quantity: number
           recipe_id: string
+          unit_id: string | null
+          unit_quantity: number | null
         }
         Insert: {
           created_at?: string
@@ -3861,6 +3863,8 @@ export type Database = {
           kitchen_id?: string
           quantity: number
           recipe_id: string
+          unit_id?: string | null
+          unit_quantity?: number | null
         }
         Update: {
           created_at?: string
@@ -3869,6 +3873,8 @@ export type Database = {
           kitchen_id?: string
           quantity?: number
           recipe_id?: string
+          unit_id?: string | null
+          unit_quantity?: number | null
         }
         Relationships: [
           {
@@ -3891,6 +3897,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_recipes"
             referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_recipe_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -5868,6 +5881,10 @@ export type Database = {
         Returns: boolean
       }
       dk_hash_token: { Args: { p_token: string }; Returns: string }
+      dk_ingredient_set_purchase_unit: {
+        Args: { p_factor: number; p_ingredient_id: string; p_unit_id: string }
+        Returns: undefined
+      }
       dk_insights: {
         Args: {
           p_category?: string
@@ -6334,6 +6351,7 @@ export type Database = {
           p_ingredient_id: string
           p_observation?: string
           p_quantity: number
+          p_unit_id?: string
         }
         Returns: string
       }
@@ -6352,6 +6370,7 @@ export type Database = {
           p_observation?: string
           p_quantity: number
           p_reason: Database["public"]["Enums"]["dk_waste_reason"]
+          p_unit_id?: string
         }
         Returns: string
       }
@@ -6585,6 +6604,11 @@ export type Database = {
         Args: { p_base: string; p_table: string }
         Returns: string
       }
+      dk_unit_factor: {
+        Args: { p_ingredient_id: string; p_unit_id: string }
+        Returns: number
+      }
+      dk_unit_options: { Args: { p_ingredient_ids: string[] }; Returns: Json }
       dk_update_my_profile: {
         Args: { p_avatar_key: string; p_full_name: string }
         Returns: undefined

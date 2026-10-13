@@ -1,19 +1,47 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/shared/ui/Toast'
 
 // ADR 0030: the recipe goes back to where the person came from and links to its sales.
-const state = vi.hoisted(() => ({ perms: new Set<string>(), usesInventory: true }))
+const state = vi.hoisted(() => ({ perms: new Set<string>(), usesInventory: true, save: vi.fn() }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () => ({ can: (p: string) => state.perms.has(p) }) }))
 vi.mock('@/shared/kitchen/KitchenLink', () => ({ KitchenLink: ({ to, children, state: _state, ...rest }: { to: string; state?: unknown; children: React.ReactNode }) => <a href={to} {...rest}>{children}</a> }))
 vi.mock('@/modules/products/hooks/useProducts', () => ({ useProducts: () => ({ data: [{ id: 'p1', name: 'Sopa', price: 16000, masterProductId: null, usesInventory: state.usesInventory }] }) }))
-vi.mock('@/modules/supply/hooks/useIngredients', () => ({ useIngredients: () => ({ data: [{ id: 'i1', name: 'Arroz', code: 'ARR', baseUnitCode: 'g', avgCost: 5 }] }) }))
+vi.mock('@/modules/supply/hooks/useIngredients', () => ({
+  useIngredients: () => ({ data: [{ id: 'i1', name: 'Arroz', code: 'ARR', baseUnitCode: 'g', avgCost: 5 }, { id: 'i2', name: 'Sal gruesa', code: 'SAL', baseUnitCode: 'kg', avgCost: 1000 }] }),
+}))
+// ADR 0056: units as in the database (g, kg, l, unidad) and no own packages.
+vi.mock('@/shared/hooks/useIngredientUnits', async () => {
+  const units = [
+    { id: 'u-g', code: 'g', name: 'Gramo', unitType: 'WEIGHT', factorToBase: 1 },
+    { id: 'u-kg', code: 'kg', name: 'Kilogramo', unitType: 'WEIGHT', factorToBase: 1000 },
+    { id: 'u-l', code: 'l', name: 'Litro', unitType: 'VOLUME', factorToBase: 1000 },
+    { id: 'u-un', code: 'unidad', name: 'Unidad', unitType: 'UNIT', factorToBase: 1 },
+  ]
+  return {
+    useIngredientUnits: () => ({
+      units,
+      isLoading: false,
+      infoFor: (i: { baseUnitCode: string } | undefined) => (i ? { baseUnitCode: i.baseUnitCode, baseUnitType: 'WEIGHT', purchaseUnits: [] } : null),
+    }),
+  }
+})
 vi.mock('../hooks/useRecipes', () => ({
-  useActiveRecipe: () => ({ data: { recipeId: 'r1', version: 2, items: [{ ingredientId: 'i1', ingredientName: 'Arroz', baseUnitCode: 'g', quantity: 100 }] }, isLoading: false }),
-  useCreateRecipeVersion: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useActiveRecipe: () => ({
+    data: {
+      recipeId: 'r1',
+      version: 2,
+      items: [
+        { ingredientId: 'i1', ingredientName: 'Arroz', baseUnitCode: 'g', quantity: 100, unitCode: null, unitQuantity: null },
+        { ingredientId: 'i2', ingredientName: 'Sal gruesa', baseUnitCode: 'kg', quantity: 0.005, unitCode: 'g', unitQuantity: 5 },
+      ],
+    },
+    isLoading: false,
+  }),
+  useCreateRecipeVersion: () => ({ mutateAsync: state.save, isPending: false }),
 }))
 
 const { RecipeEditorPage } = await import('./RecipeEditorPage')
@@ -33,6 +61,7 @@ function renderAt(entry: string | { pathname: string; state: unknown }) {
 beforeEach(() => {
   state.perms = new Set(['recipes.view', 'reports.view'])
   state.usesInventory = true
+  state.save.mockReset()
 })
 afterEach(cleanup)
 
@@ -76,5 +105,32 @@ describe('Dishes that do not use inventory (ADR 0048)', () => {
   it('a dish that uses inventory shows no such notice', () => {
     renderAt('/k/centro/recipes/p1')
     expect(screen.queryByText('No usa inventario')).toBeNull()
+  })
+})
+
+describe('Recipes in any compatible unit (ADR 0056)', () => {
+  it('shows each line as it was written (5 g of salt kept in kg), with its equivalence and real cost', () => {
+    renderAt('/k/centro/recipes/p1')
+    expect((screen.getByRole('combobox', { name: 'Unidad de Sal gruesa' }) as HTMLSelectElement).value).toBe('g')
+    expect([...(screen.getByRole('combobox', { name: 'Unidad de Sal gruesa' }) as HTMLSelectElement).options].map((o) => o.value)).toEqual(['kg', 'g'])
+    expect(screen.getByText('5 g = 0,005 kg')).toBeTruthy()
+    // 100 g × $5 + 0,005 kg × $1.000 = $505
+    expect(screen.getAllByText('$505').length).toBeGreaterThan(0)
+  })
+
+  it('changing the unit converts at once (0,2 kg of rice = 200 g → $1.000) and saves the chosen unit', async () => {
+    state.perms = new Set(['recipes.view', 'recipes.edit'])
+    renderAt('/k/centro/recipes/p1')
+    fireEvent.change(screen.getByRole('combobox', { name: 'Unidad de Arroz' }), { target: { value: 'kg' } })
+    fireEvent.change(screen.getByRole('textbox', { name: 'Cantidad de Arroz' }), { target: { value: '0,2' } })
+    fireEvent.blur(screen.getByRole('textbox', { name: 'Cantidad de Arroz' }))
+    expect(screen.getByText('0,2 kg = 200 g')).toBeTruthy()
+    expect(screen.getAllByText('$1.005').length).toBeGreaterThan(0)
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar como nueva versión' }))
+    await waitFor(() => expect(state.save).toHaveBeenCalled())
+    expect(state.save.mock.calls[0][0]).toEqual([
+      { ingredientId: 'i1', quantity: 0.2, unitId: 'u-kg' },
+      { ingredientId: 'i2', quantity: 5, unitId: 'u-g' },
+    ])
   })
 })

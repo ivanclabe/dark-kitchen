@@ -25,15 +25,15 @@ const movement = (over: Partial<InventoryMovement>): InventoryMovement => ({
 afterEach(cleanup)
 
 describe('Movimientos recientes', () => {
-  it('shows the quantity with its unit (thousands and decimals as in Colombia) and the cost per unit', () => {
+  it('shows the quantity as people read it (ADR 0056: 1.500 g → 1,5 kg; 0,15 kg → 150 g) and the cost per base unit', () => {
     state.movements = [
       movement({ id: 'm1' }),
       movement({ id: 'm2', movementType: 'CONSUMO', quantityBaseUnit: -0.15, unitCode: 'kg', unitCost: null, ingredientName: 'Papa' }),
     ]
     render(<MovementTimeline showIngredientName />)
-    expect(screen.getByText('+1.500 g')).toBeTruthy()
+    expect(screen.getByText('+1,5 kg')).toBeTruthy()
     expect(screen.getByText('$32,50 / g')).toBeTruthy()
-    expect(screen.getByText('-0,15 kg')).toBeTruthy()
+    expect(screen.getByText('-150 g')).toBeTruthy()
   })
 
   it('without a unit it still shows the number', () => {

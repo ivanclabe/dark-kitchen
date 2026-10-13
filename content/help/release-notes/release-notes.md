@@ -12,9 +12,19 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-11
+updated: 2026-10-12
 order: 1
 ---
+
+## 12 de octubre de 2026
+
+- **Conversión automática de unidades.** Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas.
+  - **Compras:** compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una **caja** o **bolsa** dices una vez cuántas trae.
+  - **Recetas:** escribe 150 **g** aunque compres por kilo, o media **docena** de huevos. La receta recuerda la unidad y el costo sigue exacto.
+  - **Mermas y ajustes:** también en kg, g, l, ml o docenas.
+  - Stock y movimientos se leen más fácil: «1,45 kg» en vez de «1450 g».
+  - Para cuidar tu historial, la unidad base de un insumo con movimientos o recetas ya no se puede cambiar.
+  - Ver [Recetas y costo de un plato](help:recipes-and-cost) y [Registrar una compra](help:purchases).
 
 ## 11 de octubre de 2026
 

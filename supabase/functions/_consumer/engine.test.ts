@@ -216,7 +216,11 @@ describe('a conversation', () => {
     const profile = { profileConsent: true, preferences: [{ kind: 'dietary' as const, value: 'vegetarian' }] }
     const [withConsent] = await talk(['hamburguesas'], { profile })
     expect(withConsent.results.map((c) => c.name)).toEqual(['Veggie Burger'])
-    expect(withConsent.reply.notes).toContain('Tuve en cuenta tus preferencias guardadas.')
+    expect(withConsent.reply.notes).toContain('Tuve en cuenta tus preferencias guardadas (vegetariano).')
+    // Nothing matches the saved diet: the reply says the filter came from the profile.
+    const [none] = await talk(['hamburguesas'], { profile: { profileConsent: true, preferences: [{ kind: 'dietary' as const, value: 'gluten_free' }] } })
+    expect(none.results).toHaveLength(0)
+    expect(none.reply.notes).toContain('Busqué con tus preferencias guardadas (sin gluten). Puedes cambiarlas en «Tus gustos».')
     const [without] = await talk(['hamburguesas'], { profile: { ...profile, profileConsent: false } })
     expect(without.results.length).toBeGreaterThan(1)
   })

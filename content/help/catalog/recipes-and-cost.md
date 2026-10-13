@@ -12,22 +12,23 @@ questions:
   - ¿Cuál es el margen de un plato?
   - ¿Por qué no puedo confirmar un pedido? Dice que el plato no tiene receta
   - ¿Cómo cambio los ingredientes de un plato?
-keywords: [receta, sin receta, descuenta inventario, no usa inventario, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
+  - ¿Puedo escribir la receta en gramos si compro en kilos?
+keywords: [gramos, kilos, unidad, conversión, receta, sin receta, descuenta inventario, no usa inventario, ingredientes, insumos, costo, margen, versión, escandallo, ficha técnica]
 related: [dishes-and-menu, inventory-deduction, stock, product-profitability]
-updated: 2026-10-10
+updated: 2026-10-12
 order: 2
 screenshots:
   - id: recipe
     alt: Editor de receta de un plato con sus ingredientes, el costo estimado y el margen
     notes:
       - La versión activa de la receta.
-      - Cada insumo con su cantidad en la unidad base y su costo.
+      - Cada insumo con su cantidad, la unidad que elegiste y su costo.
       - «Costo estimado» y «Margen» frente al precio de venta.
       - «Guardar como nueva versión».
 ---
 
 1. En **Catálogo**, toca el lápiz del plato (**Editar plato**) y luego **Crear receta** (si ya tiene, dice **Receta v1**, **v2**…).
-2. Toca **Agregar ingrediente**, busca el insumo por nombre o código y escribe la **Cantidad** en su unidad base (por ejemplo, gramos).
+2. Toca **Agregar ingrediente**, busca el insumo por nombre o código, escribe la **Cantidad** y elige la **Unidad** (por ejemplo, 150 **g** de carne aunque la compres en kilos).
 3. Repite con cada insumo. Abajo ves el **Costo estimado** y el **Margen** frente al precio de venta.
 4. Toca **Guardar como nueva versión**.
 
@@ -36,6 +37,12 @@ screenshots:
 ## Cómo se calcula el costo
 
 Cada línea vale *cantidad × costo promedio del insumo*. El costo promedio se actualiza con cada compra confirmada, así que el costo del plato sigue a tus precios reales. Si el **Margen** sale en rojo, el plato cuesta más de lo que lo vendes.
+
+## Unidades: compra en kilos, cocina en gramos
+
+Cada insumo lleva su inventario en una **unidad base** (g, ml o unidad). En la receta puedes escribir la cantidad en **cualquier unidad compatible**: g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base.
+
+> **Bueno saber:** solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo).
 
 ## Versiones
 

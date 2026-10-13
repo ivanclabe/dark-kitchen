@@ -12,9 +12,11 @@ questions:
   - ¿Cómo ingreso inventario?
   - ¿Cómo cargo una factura de proveedor?
   - ¿Cómo sumo stock?
-keywords: [compra, factura, proveedor, entrada, ingresar inventario, confirmar compra, costo, adjunto, factura del proveedor, cargar factura]
+  - Compré en kilos pero el insumo está en gramos
+  - ¿Cómo registro una caja?
+keywords: [kilos, gramos, caja, empaque, conversión, unidad de compra, compra, factura, proveedor, entrada, ingresar inventario, confirmar compra, costo, adjunto, factura del proveedor, cargar factura]
 related: [invoice-import, payables, stock, suppliers, inventory-deduction]
-updated: 2026-10-11
+updated: 2026-10-12
 order: 2
 screenshots:
   - id: purchase
@@ -28,7 +30,7 @@ screenshots:
 
 1. Abre **Abastecimiento → Compras** y toca **Nueva → Manual**. Para que Quanela lea la factura por ti, elige **Importar desde factura**: ver [Importar una compra desde una factura](help:invoice-import).
 2. Elige el **Proveedor** (o créalo ahí mismo), escribe el **N.º de factura** y la **Fecha**. Toca **Crear borrador**.
-3. En **Agregar línea**, elige el **Insumo**, la **Cantidad**, la **Unidad de compra** y el **Costo unitario**. Si ya le compraste antes, toca la sugerencia **Último: $…** para usar ese precio. Toca **Agregar línea**.
+3. En **Agregar línea**, elige el **Insumo**, la **Cantidad**, la **Unidad de compra** y el **Costo unitario**. Si ya le compraste antes, toca la sugerencia **Último: $…** para usar ese precio. Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca **Agregar línea**.
 4. Repite con cada producto de la factura. Para quitar una línea, toca **Quitar**.
 5. Opcional: en **Adjuntos**, sube la foto o el PDF de la factura.
 6. Revisa el total y toca **Confirmar compra**. Elige **¿Cómo se pagó?**: **De contado** (con el método; queda pagada) o **A crédito** (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca **Sí, confirmar**.
@@ -36,6 +38,12 @@ screenshots:
 {{screenshot:purchase}}
 
 Al confirmar, cada línea suma al inventario y el **costo promedio** de cada insumo se recalcula con el precio de la compra.
+
+## Comprar en otra unidad
+
+Compra en la unidad de la factura: Quanela convierte a la unidad base del insumo. Si compras **2 kg** de carne a $40.000 el kilo y el insumo está en gramos, entran **2.000 g** a **$20 el gramo**.
+
+Para un empaque (**caja**, **bolsa** o **paquete**), la primera vez Quanela pregunta **¿Cuántos trae?** («¿Cuántos unidad trae 1 caja?»). Escribe 12 y queda guardado para ese insumo: la próxima vez ya lo sabe.
 
 > **Cuidado:** una compra confirmada **no se puede deshacer**. Si hubo un error, corrígelo con un **ajuste**. Ver [Mermas y ajustes](help:waste-adjustments).
 

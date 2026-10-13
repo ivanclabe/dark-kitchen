@@ -27,7 +27,8 @@ interface IngredientRow {
   dk_ingredient_categories: { name: string } | null
   dk_units: { code: string } | null
   dk_suppliers: { name: string } | null
-  dk_ingredient_stock: { stock_on_hand: number; stock_available: number } | null
+  // One row per ingredient; newer PostgREST versions return a one-to-one embed as a list.
+  dk_ingredient_stock: { stock_on_hand: number; stock_available: number } | { stock_on_hand: number; stock_available: number }[] | null
 }
 
 function mapRow(row: IngredientRow): Ingredient {
@@ -48,9 +49,13 @@ function mapRow(row: IngredientRow): Ingredient {
     perishable: row.perishable,
     shelfLifeDays: row.shelf_life_days,
     active: row.active,
-    stockOnHand: Number(row.dk_ingredient_stock?.stock_on_hand ?? 0),
-    stockAvailable: Number(row.dk_ingredient_stock?.stock_available ?? 0),
+    stockOnHand: Number(stockOf(row)?.stock_on_hand ?? 0),
+    stockAvailable: Number(stockOf(row)?.stock_available ?? 0),
   }
+}
+
+function stockOf(row: IngredientRow) {
+  return Array.isArray(row.dk_ingredient_stock) ? (row.dk_ingredient_stock[0] ?? null) : row.dk_ingredient_stock
 }
 
 export async function listIngredients(): Promise<Ingredient[]> {

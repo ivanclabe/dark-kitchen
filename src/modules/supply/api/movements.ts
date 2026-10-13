@@ -46,12 +46,15 @@ export async function registerWaste(
   quantity: number,
   reason: WasteReason,
   observation?: string,
+  /** ADR 0056: the unit the quantity is in (the base unit when omitted); the database converts. */
+  unitId?: string | null,
 ): Promise<void> {
   const { error } = await supabase.rpc('dk_register_waste', {
     p_ingredient_id: ingredientId,
     p_quantity: quantity,
     p_reason: reason,
     p_observation: observation,
+    p_unit_id: unitId ?? undefined,
   })
   if (error) throw error
 }
@@ -60,11 +63,14 @@ export async function registerAdjustment(
   ingredientId: string,
   quantity: number,
   observation?: string,
+  /** ADR 0056: the unit the quantity is in (the base unit when omitted). */
+  unitId?: string | null,
 ): Promise<void> {
   const { error } = await supabase.rpc('dk_register_adjustment', {
     p_ingredient_id: ingredientId,
     p_quantity: quantity,
     p_observation: observation,
+    p_unit_id: unitId ?? undefined,
   })
   if (error) throw error
 }

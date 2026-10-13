@@ -135,13 +135,19 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
           <FormField label="Código" required error={errors.code?.message}>
             {(a11y) => <Input {...a11y} {...register('code')} />}
           </FormField>
-          <FormField label="Unidad base" required error={errors.baseUnitId?.message}>
+          <FormField
+            label="Unidad base"
+            required
+            error={errors.baseUnitId?.message}
+            info="La unidad en que se cuenta el inventario y se calcula el costo. Usa la más pequeña (g, ml o unidad): igual puedes comprar en kg, l o cajas y escribir las recetas en la unidad que quieras; Quanela convierte sola. Si el insumo ya tiene movimientos, compras o recetas, no se puede cambiar."
+          >
             {(a11y) => (
               <Select {...a11y} {...register('baseUnitId')}>
                 <option value="">Selecciona…</option>
                 {units?.map((unit) => (
                   <option key={unit.id} value={unit.id}>
                     {unit.name} ({unit.code})
+                    {['g', 'ml', 'unidad'].includes(unit.code) ? ' · recomendada' : ''}
                   </option>
                 ))}
               </Select>

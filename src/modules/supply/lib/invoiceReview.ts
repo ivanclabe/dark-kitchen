@@ -7,8 +7,9 @@
 import type { Unit } from '@/shared/api/units'
 import type { Extraction, IngredientSuggestion, InvoiceMatch, ReviewDraft, ReviewLine, SupplierChoice } from '../types/invoiceImport'
 
-/** Units that hold an unknown amount: the person says how much they bring. */
-export const PACKAGING_UNITS = ['caja', 'bolsa', 'paquete']
+// ADR 0056: the conversion rule is shared with recipes, purchases and waste (one place, same as the database).
+import { PACKAGING_UNITS, unitFactor, type IngredientUnitInfo } from '@/shared/units/conversion'
+export { PACKAGING_UNITS, type IngredientUnitInfo }
 
 /** A suggestion this sure is chosen for the person (still visible and changeable). */
 export const AUTO_PICK_SCORE = 0.9
@@ -58,12 +59,6 @@ export function baseUnitFor(unitCode: string | null, units: Unit[]): string {
   return unit.unitType === 'WEIGHT' ? 'g' : unit.unitType === 'VOLUME' ? 'ml' : 'unidad'
 }
 
-export interface IngredientUnitInfo {
-  baseUnitCode: string
-  baseUnitType: Unit['unitType']
-  purchaseUnits: { unitCode: string; factor: number }[]
-}
-
 /**
  * Units that make sense to buy an ingredient in: its type, its own purchase
  * units, packages, and «unidad» (a closed package: «arroz x 1000» bought by the
@@ -75,16 +70,9 @@ export function unitsFor(info: IngredientUnitInfo | null, units: Unit[]): Unit[]
   return units.filter((u) => u.unitType === info.baseUnitType || own.has(u.code) || PACKAGING_UNITS.includes(u.code) || u.code === 'unidad')
 }
 
-/** Base units in one purchase unit, when it is known without asking. */
+/** Base units in one purchase unit, when it is known without asking (ADR 0056: the shared rule). */
 export function knownFactor(unitCode: string | null, info: IngredientUnitInfo | null, units: Unit[]): number | null {
-  if (!unitCode || !info) return null
-  if (unitCode === info.baseUnitCode) return 1
-  const own = info.purchaseUnits.find((p) => p.unitCode === unitCode)
-  if (own) return own.factor
-  const unit = units.find((u) => u.code === unitCode)
-  const base = units.find((u) => u.code === info.baseUnitCode)
-  if (!unit || !base || unit.unitType !== base.unitType || PACKAGING_UNITS.includes(unit.code)) return null
-  return unit.factorToBase / base.factorToBase
+  return unitFactor(unitCode, info, units)
 }
 
 /**

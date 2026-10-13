@@ -2,16 +2,17 @@ import { OnlineIndicator } from './OnlineIndicator'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { canAccessAnyModule } from '@/shared/rbac/roles'
 import { Drawer } from '@/shared/ui/Drawer'
+import { Popover, PopoverItem } from '@/shared/ui/Popover'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
-import { Flame, Menu } from 'lucide-react'
-import { useState } from 'react'
-import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Ellipsis, Flame, Menu } from 'lucide-react'
+import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { ContextIndicator } from './AccountSwitcher'
 import { CopilotButton, CopilotProvider } from '@/modules/copilot/CopilotProvider'
 import { VoiceMenu } from '@/modules/voice/components/VoiceMenu'
 import { VoiceProvider } from '@/modules/voice/VoiceProvider'
-import { ADMIN_NAV_ITEMS, homeSection, isNavItemActive, isSectionAllowed, NAV_ITEMS, type NavItem } from './navigation'
+import { ADMIN_NAV_ITEMS, fitRail, homeSection, isNavItemActive, isSectionAllowed, NAV_GROUP_LABELS, NAV_ITEMS, type NavItem } from './navigation'
 import { NotificationBell } from '@/modules/notifications/components/NotificationBell'
 import { UserMenu } from './UserMenu'
 import { WelcomeCard } from './WelcomeCard'
@@ -25,7 +26,24 @@ export function AppLayout() {
 
   const visibleItems = NAV_ITEMS.filter((item) => canAccessAnyModule(can, item.modules))
   const adminItems = ADMIN_NAV_ITEMS.filter((item) => canAccessAnyModule(can, item.modules))
-  const currentItem = [...visibleItems, ...adminItems].find((item) => isNavItemActive(section, item))
+  const allItems = [...visibleItems, ...adminItems]
+  const currentItem = allItems.find((item) => isNavItemActive(section, item))
+
+  // The rail only shows what fits the window; the rest goes into «Más» (see fitRail).
+  const navRef = useRef<HTMLElement>(null)
+  const [navHeight, setNavHeight] = useState<number | null>(null)
+  useLayoutEffect(() => {
+    const el = navRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(([entry]) => setNavHeight(entry.contentRect.height || null))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  const rail = fitRail(allItems, navHeight)
+  const overflowActive = rail.overflow.some((item) => isNavItemActive(section, item))
+  const navigate = useNavigate()
+  // «Más» opens upwards from its button: it may not grow past the top of the window.
+  const [moreMaxHeight, setMoreMaxHeight] = useState<number | null>(null)
 
   const railLink = (item: NavItem) => {
     const Icon = item.icon
@@ -61,7 +79,7 @@ export function AppLayout() {
           active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-300 hover:bg-neutral-800 hover:text-neutral-50',
         )}
       >
-        <Icon size={18} aria-hidden />
+        <Icon size={18} className="shrink-0" aria-hidden />
         <span className="min-w-0">
           <span className="block text-sm font-medium">{item.label}</span>
           <span className="block text-xs text-neutral-500">{item.description}</span>
@@ -96,25 +114,77 @@ export function AppLayout() {
           <Link
             to={path('/')}
             aria-label="Inicio"
-            className="mb-4 flex size-10 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_6px_18px_-8px_var(--color-brasa-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-300"
+            className="mb-4 flex size-10 shrink-0 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_6px_18px_-8px_var(--color-brasa-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-300"
           >
             <Flame size={19} className="text-white" strokeWidth={2.5} aria-hidden />
           </Link>
         </Tooltip>
 
-        {/* Sin overflow-y-auto: recortaría el tooltip, que sale a la derecha del rail. */}
-        <nav aria-label="Principal" className="flex flex-1 flex-col items-center gap-1.5">
-          {visibleItems.map(railLink)}
-          {adminItems.length > 0 && (
-            <>
-              <span className="my-1.5 h-px w-8 bg-neutral-800/80" aria-hidden />
-              {adminItems.map(railLink)}
-            </>
+        {/* Sin overflow-y-auto: recortaría el tooltip, que sale a la derecha del rail. En cambio,
+            min-h-0 lo deja encoger y lo que no cabe pasa a «Más» (fitRail). */}
+        <nav
+          ref={navRef}
+          aria-label="Principal"
+          className="flex min-h-0 w-full flex-1 flex-col items-center gap-1.5"
+          style={moreMaxHeight ? ({ '--rail-more-max': `${moreMaxHeight}px` } as CSSProperties) : undefined}
+        >
+          {rail.visible.map((item, i) => (
+            <Fragment key={item.to}>
+              {i > 0 && item.group !== rail.visible[i - 1].group && <span className="my-1.5 h-px w-8 shrink-0 bg-neutral-800/80" aria-hidden />}
+              {railLink(item)}
+            </Fragment>
+          ))}
+          {rail.overflow.length > 0 && (
+            <Popover
+              placement="right-end"
+              label="Más módulos"
+              className="md:w-64 md:max-h-[var(--rail-more-max,80vh)]!"
+              trigger={(props) => (
+                <Tooltip label={overflowActive && currentItem ? `Más · ${currentItem.label}` : 'Más módulos'}>
+                  <button
+                    type="button"
+                    {...props}
+                    onClick={(e) => {
+                      setMoreMaxHeight(Math.floor(e.currentTarget.getBoundingClientRect().bottom) - 8)
+                      props.onClick()
+                    }}
+                    aria-label="Más módulos"
+                    className={clsx(
+                      'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+                      overflowActive || props['aria-expanded'] ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
+                    )}
+                  >
+                    <Ellipsis size={19} strokeWidth={2} aria-hidden />
+                  </button>
+                </Tooltip>
+              )}
+            >
+              {(close) =>
+                rail.overflow.map((item, i) => (
+                  <Fragment key={item.to}>
+                    {(i === 0 || item.group !== rail.overflow[i - 1].group) && (
+                      <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">{NAV_GROUP_LABELS[item.group]}</p>
+                    )}
+                    <PopoverItem
+                      icon={item.icon}
+                      checked={isNavItemActive(section, item)}
+                      trailing={isNavItemActive(section, item) && <span className="size-1.5 rounded-full bg-brasa-400" aria-hidden />}
+                      onSelect={() => {
+                        close()
+                        navigate(path(item.to))
+                      }}
+                    >
+                      {item.label}
+                    </PopoverItem>
+                  </Fragment>
+                ))
+              }
+            </Popover>
           )}
         </nav>
 
-        {/* The bell (ADR 0037) right above the user menu. */}
-        <div className="mt-2 flex flex-col items-center gap-2 border-t border-neutral-800/60 pt-3">
+        {/* The bell (ADR 0037) right above the user menu: always visible, the modules give way first. */}
+        <div className="mt-2 flex shrink-0 flex-col items-center gap-2 border-t border-neutral-800/60 pt-3">
           <NotificationBell placement="right-end" />
           <UserMenu placement="right-end" />
         </div>
@@ -165,13 +235,14 @@ export function AppLayout() {
 
       <Drawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title={kitchen.name} subtitle={currentItem ? `Estás en ${currentItem.label}` : kitchen.roleName} side="left" size="sm">
         <nav aria-label="Principal" className="-mx-2 flex flex-col gap-1">
-          {visibleItems.map(drawerLink)}
-          {adminItems.length > 0 && (
-            <>
-              <span className="mx-3 my-2 h-px bg-neutral-800/80" aria-hidden />
-              {adminItems.map(drawerLink)}
-            </>
-          )}
+          {allItems.map((item, i) => (
+            <Fragment key={item.to}>
+              {(i === 0 || item.group !== allItems[i - 1].group) && (
+                <p className={clsx('px-3 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase', i > 0 && 'mt-3')}>{NAV_GROUP_LABELS[item.group]}</p>
+              )}
+              {drawerLink(item)}
+            </Fragment>
+          ))}
         </nav>
       </Drawer>
     </div>

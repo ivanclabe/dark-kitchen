@@ -28,12 +28,14 @@ export function useRegisterWaste() {
       quantity,
       reason,
       observation,
+      unitId,
     }: {
       ingredientId: string
       quantity: number
       reason: WasteReason
       observation?: string
-    }) => registerWaste(ingredientId, quantity, reason, observation),
+      unitId?: string | null
+    }) => registerWaste(ingredientId, quantity, reason, observation, unitId),
     onSuccess: invalidate,
   })
 }
@@ -45,11 +47,13 @@ export function useRegisterAdjustment() {
       ingredientId,
       quantity,
       observation,
+      unitId,
     }: {
       ingredientId: string
       quantity: number
       observation?: string
-    }) => registerAdjustment(ingredientId, quantity, observation),
+      unitId?: string | null
+    }) => registerAdjustment(ingredientId, quantity, observation, unitId),
     onSuccess: invalidate,
   })
 }
