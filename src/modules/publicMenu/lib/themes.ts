@@ -9,7 +9,22 @@ import type { CSSProperties } from 'react'
 export const TEMPLATE_IDS = ['modern', 'elegant', 'artisan', 'dark', 'fresh', 'classic'] as const
 export type TemplateId = (typeof TEMPLATE_IDS)[number]
 
-export const FONTS = ['Inter', 'Poppins', 'Nunito', 'Montserrat', 'Lora', 'Playfair Display', 'Cormorant Garamond', 'DM Serif Display', 'Fraunces', 'Caveat'] as const
+export const FONTS = [
+  'Inter',
+  'Poppins',
+  'Nunito',
+  'Montserrat',
+  'Lora',
+  'Playfair Display',
+  'Cormorant Garamond',
+  'DM Serif Display',
+  'Fraunces',
+  'Caveat',
+  // ADR 0058: modern faces for the renewed templates.
+  'Plus Jakarta Sans',
+  'Outfit',
+  'Bricolage Grotesque',
+] as const
 export type FontName = (typeof FONTS)[number]
 
 export type HeaderStyle = 'compact' | 'centered' | 'cover' | 'logo'
@@ -19,6 +34,10 @@ export type NavStyle = 'chips' | 'tabs' | 'select' | 'none'
 export type ButtonShape = 'rounded' | 'pill' | 'square'
 export type BackgroundKind = 'solid' | 'gradient' | 'texture' | 'image'
 export type Texture = 'paper' | 'dots' | 'lines'
+/** ADR 0058: how strong the veil over a background photo is (the text must always read). */
+export type Overlay = 'light' | 'medium' | 'strong'
+/** ADR 0058: which part of the header image shows on a phone. */
+export type CoverPosition = 'top' | 'center' | 'bottom'
 
 export interface ThemeColors {
   primary: string
@@ -33,8 +52,9 @@ export interface ResolvedTheme {
   template: TemplateId
   colors: ThemeColors
   fonts: { heading: FontName; body: FontName; scale: 'S' | 'M' | 'L' }
-  background: { kind: BackgroundKind; texture: Texture; image: string | null }
-  header: { style: HeaderStyle; cover: string | null; showTagline: boolean; showHours: boolean }
+  background: { kind: BackgroundKind; texture: Texture; image: string | null; overlay: Overlay }
+  /** ADR 0058: `cover` works with every header style; `logo` replaces the account icon. */
+  header: { style: HeaderStyle; cover: string | null; coverPosition: CoverPosition; logo: string | null; showTagline: boolean; showHours: boolean }
   cards: { layout: CardLayout; style: CardStyle; image: 'show' | 'hide'; imageShape: 'square' | 'rounded' | 'circle'; imagePosition: 'left' | 'right' | 'top'; description: 'full' | 'clamp' | 'hide' }
   nav: NavStyle
   buttons: ButtonShape
@@ -61,19 +81,26 @@ export interface TemplateDef {
 
 const base = (t: Omit<ResolvedTheme, 'template'> & { template: TemplateId }): ResolvedTheme => t
 
-/** Six templates that differ in structure, not just color. */
+/**
+ * Six templates that differ in structure, not just color. ADR 0058 renewed
+ * them: modern type, no printed-menu ornaments, and a page that looks
+ * finished without dish photos (most dishes have none).
+ */
+const header = (style: HeaderStyle): ResolvedTheme['header'] => ({ style, cover: null, coverPosition: 'center', logo: null, showTagline: true, showHours: true })
+const background = (kind: BackgroundKind, texture: Texture = 'dots'): ResolvedTheme['background'] => ({ kind, texture, image: null, overlay: 'medium' })
+
 export const TEMPLATES: Record<TemplateId, TemplateDef> = {
   modern: {
     id: 'modern',
     name: 'Moderna',
-    description: 'Limpia y directa: portada grande y platos en cuadrícula con foto.',
+    description: 'Blanca y directa, como las apps de domicilios: portada de borde a borde y platos con la foto a un lado.',
     theme: base({
       template: 'modern',
-      colors: { primary: '#111111', background: '#FFFFFF', surface: '#F5F5F4', text: '#111111', muted: '#6B6B6B', price: '#111111' },
-      fonts: { heading: 'Poppins', body: 'Inter', scale: 'M' },
-      background: { kind: 'solid', texture: 'dots', image: null },
-      header: { style: 'cover', cover: null, showTagline: true, showHours: true },
-      cards: { layout: 'grid', style: 'flat', image: 'show', imageShape: 'rounded', imagePosition: 'top', description: 'clamp' },
+      colors: { primary: '#E8492B', background: '#FFFFFF', surface: '#F6F5F3', text: '#141414', muted: '#666460', price: '#141414' },
+      fonts: { heading: 'Bricolage Grotesque', body: 'Plus Jakarta Sans', scale: 'M' },
+      background: background('solid'),
+      header: header('cover'),
+      cards: { layout: 'list', style: 'flat', image: 'show', imageShape: 'rounded', imagePosition: 'right', description: 'clamp' },
       nav: 'chips',
       buttons: 'pill',
     }),
@@ -81,43 +108,43 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
   elegant: {
     id: 'elegant',
     name: 'Elegante',
-    description: 'Crema y dorado, letra fina con serifa y lista con puntos hasta el precio.',
+    description: 'Crema y oro, títulos con serifa fina y precios alineados con una línea de puntos.',
     theme: base({
       template: 'elegant',
-      colors: { primary: '#8C6A3E', background: '#FBF7EF', surface: '#FFFFFF', text: '#2B2622', muted: '#7A6E62', price: '#8C6A3E' },
-      fonts: { heading: 'Cormorant Garamond', body: 'Lora', scale: 'M' },
-      background: { kind: 'solid', texture: 'paper', image: null },
-      header: { style: 'centered', cover: null, showTagline: true, showHours: true },
-      cards: { layout: 'list', style: 'flat', image: 'show', imageShape: 'circle', imagePosition: 'left', description: 'full' },
+      colors: { primary: '#9A7442', background: '#F8F4EC', surface: '#FFFFFF', text: '#1F1A15', muted: '#756A5E', price: '#1F1A15' },
+      fonts: { heading: 'Cormorant Garamond', body: 'Outfit', scale: 'M' },
+      background: background('solid', 'paper'),
+      header: header('centered'),
+      cards: { layout: 'list', style: 'flat', image: 'show', imageShape: 'rounded', imagePosition: 'left', description: 'full' },
       nav: 'tabs',
-      buttons: 'square',
+      buttons: 'pill',
     }),
   },
   artisan: {
     id: 'artisan',
     name: 'Artesanal',
-    description: 'Papel kraft, títulos escritos a mano y tarjetas de borde irregular.',
+    description: 'Cálida, de cocina de barrio: tonos tierra, títulos con carácter y tarjetas suaves.',
     theme: base({
       template: 'artisan',
-      colors: { primary: '#A8481F', background: '#E9D8BC', surface: '#F7ECDA', text: '#3B2A1E', muted: '#6E5845', price: '#A8481F' },
-      fonts: { heading: 'Caveat', body: 'Lora', scale: 'L' },
-      background: { kind: 'texture', texture: 'paper', image: null },
-      header: { style: 'centered', cover: null, showTagline: true, showHours: true },
-      cards: { layout: 'list', style: 'rough', image: 'show', imageShape: 'rounded', imagePosition: 'left', description: 'full' },
+      colors: { primary: '#B4532A', background: '#F5EDE1', surface: '#FFFBF5', text: '#2E2118', muted: '#776353', price: '#B4532A' },
+      fonts: { heading: 'Fraunces', body: 'Plus Jakarta Sans', scale: 'M' },
+      background: background('texture', 'paper'),
+      header: header('centered'),
+      cards: { layout: 'list', style: 'shadow', image: 'show', imageShape: 'rounded', imagePosition: 'left', description: 'full' },
       nav: 'chips',
       buttons: 'rounded',
     }),
   },
   dark: {
     id: 'dark',
-    name: 'Dark premium',
-    description: 'Negro y dorado: fotos a todo lo ancho con el nombre encima.',
+    name: 'Noche',
+    description: 'Negro y dorado: portada a todo lo ancho y fotos grandes con el nombre encima.',
     theme: base({
       template: 'dark',
-      colors: { primary: '#D4A64A', background: '#0E0E10', surface: '#1A1A1E', text: '#F5F2EA', muted: '#A39E93', price: '#E2BD6B' },
-      fonts: { heading: 'DM Serif Display', body: 'Inter', scale: 'M' },
-      background: { kind: 'gradient', texture: 'dots', image: null },
-      header: { style: 'cover', cover: null, showTagline: true, showHours: true },
+      colors: { primary: '#E8B04B', background: '#0B0B0D', surface: '#17171B', text: '#F4F1EA', muted: '#A39E94', price: '#EDC062' },
+      fonts: { heading: 'Outfit', body: 'Outfit', scale: 'M' },
+      background: background('gradient'),
+      header: header('cover'),
       cards: { layout: 'large', style: 'glass', image: 'show', imageShape: 'rounded', imagePosition: 'top', description: 'clamp' },
       nav: 'chips',
       buttons: 'pill',
@@ -126,46 +153,37 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
   fresh: {
     id: 'fresh',
     name: 'Fresca',
-    description: 'Menta y coral, letra redondeada y platos en carrusel por categoría.',
+    description: 'Clara y colorida: menta y coral, letra redondeada y platos en cuadrícula.',
     theme: base({
       template: 'fresh',
-      colors: { primary: '#F2604F', background: '#EAF8F1', surface: '#FFFFFF', text: '#14342B', muted: '#4D6B62', price: '#0B7A54' },
-      fonts: { heading: 'Nunito', body: 'Nunito', scale: 'M' },
-      background: { kind: 'gradient', texture: 'dots', image: null },
-      header: { style: 'compact', cover: null, showTagline: true, showHours: true },
-      cards: { layout: 'carousel', style: 'shadow', image: 'show', imageShape: 'rounded', imagePosition: 'top', description: 'clamp' },
+      colors: { primary: '#F2604F', background: '#EEF8F3', surface: '#FFFFFF', text: '#12352B', muted: '#4F6B62', price: '#0B7A54' },
+      fonts: { heading: 'Outfit', body: 'Nunito', scale: 'M' },
+      background: background('solid'),
+      header: header('compact'),
+      cards: { layout: 'grid', style: 'shadow', image: 'show', imageShape: 'rounded', imagePosition: 'top', description: 'clamp' },
       nav: 'chips',
       buttons: 'pill',
     }),
   },
   classic: {
     id: 'classic',
-    name: 'Carta tradicional',
-    description: 'Como una carta impresa: marco, ornamentos, platos numerados y sin fotos.',
+    name: 'Clásica',
+    description: 'Una carta de restaurante: serifa, platos numerados con su precio y sin fotos.',
     theme: base({
       template: 'classic',
-      colors: { primary: '#7A1F1F', background: '#F3EAD6', surface: '#FBF6EA', text: '#2A1E14', muted: '#6B5A48', price: '#2A1E14' },
+      colors: { primary: '#8A2B22', background: '#F6F0E4', surface: '#FFFCF6', text: '#22180F', muted: '#6B5A48', price: '#22180F' },
       fonts: { heading: 'Playfair Display', body: 'Lora', scale: 'M' },
-      background: { kind: 'texture', texture: 'paper', image: null },
-      header: { style: 'logo', cover: null, showTagline: true, showHours: true },
+      background: background('solid', 'paper'),
+      header: header('logo'),
       cards: { layout: 'menu', style: 'flat', image: 'hide', imageShape: 'circle', imagePosition: 'right', description: 'full' },
       nav: 'tabs',
-      buttons: 'square',
+      buttons: 'rounded',
     }),
   },
 }
 
-/**
- * Without a published design, the page looks as it did before ADR 0053: a
- * light, clean menu (list with photo, chips). It is «Moderna» with that layout.
- */
-export const DEFAULT_THEME: ResolvedTheme = {
-  ...TEMPLATES.modern.theme,
-  colors: { primary: '#171717', background: '#FAFAF9', surface: '#FFFFFF', text: '#171717', muted: '#525252', price: '#171717' },
-  fonts: { heading: 'Inter', body: 'Inter', scale: 'M' },
-  header: { style: 'compact', cover: null, showTagline: true, showHours: true },
-  cards: { layout: 'list', style: 'shadow', image: 'show', imageShape: 'rounded', imagePosition: 'left', description: 'clamp' },
-}
+/** Without a published design, the page is the renewed «Moderna» (ADR 0058). */
+export const DEFAULT_THEME: ResolvedTheme = TEMPLATES.modern.theme
 
 const isHex = (v: unknown): v is string => typeof v === 'string' && /^#[0-9A-Fa-f]{6}$/.test(v)
 function pick<T extends string>(v: unknown, allowed: readonly T[], fallback: T): T {
@@ -190,10 +208,13 @@ export function resolveTheme(design: ThemeDesign | null | undefined): ResolvedTh
       kind: pick(design.background?.kind, ['solid', 'gradient', 'texture', 'image'] as const, t.background.kind),
       texture: pick(design.background?.texture, ['paper', 'dots', 'lines'] as const, t.background.texture),
       image: design.background?.image ?? t.background.image,
+      overlay: pick(design.background?.overlay, ['light', 'medium', 'strong'] as const, t.background.overlay),
     },
     header: {
       style: pick(design.header?.style, ['compact', 'centered', 'cover', 'logo'] as const, t.header.style),
       cover: design.header?.cover ?? t.header.cover,
+      coverPosition: pick(design.header?.coverPosition, ['top', 'center', 'bottom'] as const, t.header.coverPosition),
+      logo: design.header?.logo ?? t.header.logo,
       showTagline: design.header?.showTagline ?? t.header.showTagline,
       showHours: design.header?.showHours ?? t.header.showHours,
     },
@@ -283,9 +304,14 @@ const FONT_STACK: Record<FontName, string> = {
   'DM Serif Display': "'DM Serif Display', ui-serif, Georgia, serif",
   Fraunces: "'Fraunces', ui-serif, Georgia, serif",
   Caveat: "'Caveat', 'Comic Sans MS', cursive",
+  'Plus Jakarta Sans': "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
+  Outfit: "'Outfit', ui-sans-serif, system-ui, sans-serif",
+  'Bricolage Grotesque': "'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif",
 }
 
 const SCALE = { S: '15px', M: '16px', L: '17.5px' } as const
+/** ADR 0058: the veil of the page color over a background photo — the text must always read. */
+const VEIL: Record<Overlay, number> = { light: 0.62, medium: 0.8, strong: 0.92 }
 const BUTTON_RADIUS: Record<ButtonShape, string> = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' }
 
 /** The Google Fonts stylesheet for the two fonts of a theme (only those). */
@@ -317,7 +343,7 @@ export function themeStyle(theme: ResolvedTheme, imageUrl: (path: string) => str
       : theme.background.kind === 'texture'
         ? textureImage(theme.background.texture, c.text)
         : theme.background.kind === 'image' && theme.background.image
-          ? `linear-gradient(${hexToRgba(c.background, 0.86)}, ${hexToRgba(c.background, 0.86)}), url("${imageUrl(theme.background.image)}")`
+          ? `linear-gradient(${hexToRgba(c.background, VEIL[theme.background.overlay])}, ${hexToRgba(c.background, VEIL[theme.background.overlay])}), url("${imageUrl(theme.background.image)}")`
           : 'none'
   return {
     '--pm-bg': c.background,
@@ -388,12 +414,15 @@ export function normalizeDesign(design: ThemeDesign | null | undefined): ThemeDe
   return designFrom(theme.template, theme)
 }
 
-/** The template with the owner's brand images kept (cover and background survive a template change). */
+/** The template with the owner's brand images kept (logo, header image and background survive a template change). */
 export function withTemplate(template: TemplateId, current: ResolvedTheme): ResolvedTheme {
   const t = TEMPLATES[template].theme
+  const photoBackground = current.background.kind === 'image' && current.background.image
   return {
     ...t,
-    background: { ...t.background, image: current.background.image },
-    header: { ...t.header, cover: current.header.cover },
+    background: photoBackground
+      ? { ...t.background, kind: 'image', image: current.background.image, overlay: current.background.overlay }
+      : { ...t.background, image: current.background.image },
+    header: { ...t.header, cover: current.header.cover, coverPosition: current.header.coverPosition, logo: current.header.logo },
   }
 }

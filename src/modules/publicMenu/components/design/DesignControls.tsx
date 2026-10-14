@@ -6,6 +6,7 @@ import { FormField, Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { AlertTriangle, ImagePlus, Trash2, Wand2 } from 'lucide-react'
+import type { BrandImageKind } from '../../api/publicMenu'
 import { useRef, useState, type ReactNode } from 'react'
 import { contrastIssues, FONTS, fixContrast, PALETTES, type ResolvedTheme, type ThemeColors } from '../../lib/themes'
 
@@ -72,8 +73,25 @@ function ColorField({ name, value, onChange }: { name: keyof ThemeColors; value:
   )
 }
 
-/** A cover or background photo of the brand: upload (shrunk in the browser), see and remove. */
-function BrandImage({ label, path, onUpload, onRemove }: { label: string; path: string | null; onUpload: (file: File) => Promise<void>; onRemove: () => void }) {
+/** A brand image (logo, header or background): upload (shrunk in the browser), see and remove. */
+function BrandImage({
+  label,
+  hint,
+  path,
+  shape = 'wide',
+  onUpload,
+  onRemove,
+  children,
+}: {
+  label: string
+  hint: string
+  path: string | null
+  shape?: 'wide' | 'square'
+  onUpload: (file: File) => Promise<void>
+  onRemove: () => void
+  /** Options of the image (framing, veil), shown once there is one. */
+  children?: ReactNode
+}) {
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -95,19 +113,33 @@ function BrandImage({ label, path, onUpload, onRemove }: { label: string; path: 
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-xs font-medium text-neutral-400">{label}</p>
-      {path && <img src={productImageUrl(path)} alt="" className="h-24 w-full rounded-lg object-cover" />}
+    <div role="group" aria-label={label} className="space-y-2 rounded-xl border border-neutral-800 p-3">
+      <div className="flex items-start gap-3">
+        {shape === 'square' ? (
+          <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-800 bg-white">
+            {path ? <img src={productImageUrl(path)} alt="" className="size-full object-contain p-1" /> : <ImagePlus size={18} className="text-neutral-400" aria-hidden />}
+          </span>
+        ) : (
+          <span className="flex h-14 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900">
+            {path ? <img src={productImageUrl(path)} alt="" className="size-full object-cover" /> : <ImagePlus size={18} className="text-neutral-500" aria-hidden />}
+          </span>
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-neutral-100">{label}</p>
+          <p className="text-xs text-neutral-500">{hint}</p>
+        </div>
+      </div>
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="secondary" icon={ImagePlus} loading={busy} onClick={() => input.current?.click()}>
-          {path ? 'Cambiar foto' : 'Subir foto'}
+        <Button size="sm" variant="secondary" icon={ImagePlus} loading={busy} onClick={() => input.current?.click()} aria-label={`${path ? 'Cambiar' : 'Subir'}: ${label}`}>
+          {path ? 'Cambiar' : 'Subir imagen'}
         </Button>
         {path && (
-          <Button size="sm" variant="ghost" icon={Trash2} onClick={onRemove}>
+          <Button size="sm" variant="ghost" icon={Trash2} onClick={onRemove} aria-label={`Quitar: ${label}`}>
             Quitar
           </Button>
         )}
       </div>
+      {path && children}
       <input ref={input} type="file" accept={ACCEPT_ATTRIBUTE} className="sr-only" onChange={(e) => void pick(e.target.files?.[0])} tabIndex={-1} aria-hidden />
       {error && (
         <p role="alert" className="text-xs text-red-400">
@@ -130,7 +162,9 @@ const LABELS = {
   scale: { S: 'Pequeña', M: 'Normal', L: 'Grande' },
   kind: { solid: 'Color', gradient: 'Degradado', texture: 'Textura', image: 'Foto' },
   texture: { paper: 'Papel', dots: 'Puntos', lines: 'Líneas' },
-  header: { compact: 'Compacta', centered: 'Centrada', cover: 'Con portada', logo: 'Logo grande' },
+  header: { compact: 'Compacta', centered: 'Centrada', cover: 'Portada grande', logo: 'Clásica' },
+  coverPosition: { top: 'Arriba', center: 'Centro', bottom: 'Abajo' },
+  overlay: { light: 'Suave', medium: 'Medio', strong: 'Fuerte' },
   layout: { list: 'Lista', grid: 'Cuadrícula', large: 'Foto grande', compact: 'Compacta', carousel: 'Carrusel', menu: 'Carta' },
   style: { flat: 'Plana', shadow: 'Con sombra', outline: 'Borde', rough: 'Artesanal', glass: 'Translúcida' },
   shape: { square: 'Cuadrada', rounded: 'Redondeada', circle: 'Circular' },
@@ -146,7 +180,7 @@ const options = <T extends string>(labels: Record<T, string>) => (Object.keys(la
  * The appearance editor (ADR 0053, D4): one section per part of the page.
  * Every change goes straight to the preview; prices and dishes are not here.
  */
-export function DesignControls({ theme, set, onUpload }: { theme: ResolvedTheme; set: Set; onUpload: (file: File, kind: 'cover' | 'background') => Promise<string> }) {
+export function DesignControls({ theme, set, onUpload }: { theme: ResolvedTheme; set: Set; onUpload: (file: File, kind: BrandImageKind) => Promise<string> }) {
   const issues = contrastIssues(theme)
   const setColors = (colors: Partial<ThemeColors>) => set((t) => ({ ...t, colors: { ...t.colors, ...colors } }))
   const setFonts = (fonts: Partial<ResolvedTheme['fonts']>) => set((t) => ({ ...t, fonts: { ...t.fonts, ...fonts } }))
@@ -154,8 +188,40 @@ export function DesignControls({ theme, set, onUpload }: { theme: ResolvedTheme;
   const setHeader = (header: Partial<ResolvedTheme['header']>) => set((t) => ({ ...t, header: { ...t.header, ...header } }))
   const setCards = (cards: Partial<ResolvedTheme['cards']>) => set((t) => ({ ...t, cards: { ...t.cards, ...cards } }))
 
+  const brandCount = [theme.header.logo, theme.header.cover, theme.background.kind === 'image' ? theme.background.image : null].filter(Boolean).length
+
   return (
     <div className="space-y-2">
+      {/* ADR 0058: the business's own images first, in plain sight, whatever the template. */}
+      <Group title="Imágenes de tu marca" summary={brandCount ? `${brandCount} de 3` : 'Logo, cabecera y fondo'} defaultOpen>
+        <BrandImage
+          label="Logo"
+          hint="Reemplaza el ícono de la cuenta en la cabecera. Mejor cuadrado y sobre fondo claro."
+          shape="square"
+          path={theme.header.logo}
+          onUpload={async (file) => setHeader({ logo: await onUpload(file, 'logo') })}
+          onRemove={() => setHeader({ logo: null })}
+        />
+        <BrandImage
+          label="Imagen de cabecera"
+          hint="Tu local, tu plato estrella o tu equipo. Se ve arriba con cualquier estilo de cabecera."
+          path={theme.header.cover}
+          onUpload={async (file) => setHeader({ cover: await onUpload(file, 'cover') })}
+          onRemove={() => setHeader({ cover: null })}
+        >
+          <Options label="Encuadre en el celular" value={theme.header.coverPosition} options={options(LABELS.coverPosition)} onChange={(coverPosition) => setHeader({ coverPosition })} />
+        </BrandImage>
+        <BrandImage
+          label="Imagen de fondo"
+          hint="Va detrás de todo el menú, con un velo de tu color de fondo para que se lea."
+          path={theme.background.kind === 'image' ? theme.background.image : null}
+          onUpload={async (file) => setBackground({ image: await onUpload(file, 'background'), kind: 'image' })}
+          onRemove={() => setBackground({ image: null, kind: 'solid' })}
+        >
+          <Options label="Velo sobre la foto" value={theme.background.overlay} options={options(LABELS.overlay)} onChange={(overlay) => setBackground({ overlay })} />
+        </BrandImage>
+      </Group>
+
       <Group title="Colores" summary={issues.length ? 'Revisa el contraste' : undefined} defaultOpen>
         <div>
           <p className="mb-1.5 text-xs font-medium text-neutral-400">Paletas sugeridas</p>
@@ -231,26 +297,14 @@ export function DesignControls({ theme, set, onUpload }: { theme: ResolvedTheme;
       <Group title="Fondo" summary={LABELS.kind[theme.background.kind]}>
         <Options label="Tipo de fondo" value={theme.background.kind} options={options(LABELS.kind)} onChange={(kind) => setBackground({ kind })} />
         {theme.background.kind === 'texture' && <Options label="Textura" value={theme.background.texture} options={options(LABELS.texture)} onChange={(texture) => setBackground({ texture })} />}
-        {theme.background.kind === 'image' && (
-          <BrandImage
-            label="Foto de fondo (se aclara para que el menú se lea)"
-            path={theme.background.image}
-            onUpload={async (file) => setBackground({ image: await onUpload(file, 'background') })}
-            onRemove={() => setBackground({ image: null })}
-          />
+        {theme.background.kind === 'image' && !theme.background.image && (
+          <p className="text-xs text-amber-300">Sube la foto en «Imágenes de tu marca»; mientras tanto se ve el color de fondo.</p>
         )}
       </Group>
 
       <Group title="Cabecera" summary={LABELS.header[theme.header.style]}>
         <Options label="Estilo" value={theme.header.style} options={options(LABELS.header)} onChange={(style) => setHeader({ style })} />
-        {theme.header.style === 'cover' && (
-          <BrandImage
-            label="Portada (sin foto, un degradado con tu color principal)"
-            path={theme.header.cover}
-            onUpload={async (file) => setHeader({ cover: await onUpload(file, 'cover') })}
-            onRemove={() => setHeader({ cover: null })}
-          />
-        )}
+        {!theme.header.cover && <p className="text-xs text-neutral-500">Sin imagen de cabecera, la portada es un degradado con tu color principal.</p>}
         <Toggle label="Mostrar la frase del negocio" checked={theme.header.showTagline} onChange={(showTagline) => setHeader({ showTagline })} />
         <Toggle label="Mostrar si está abierto" checked={theme.header.showHours} onChange={(showHours) => setHeader({ showHours })} />
       </Group>

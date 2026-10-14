@@ -3,6 +3,7 @@ export const HELP_PATHS: Record<string, string> = {
   "ask-copilot": "/help/assistant/ask-copilot",
   "copilot-limits": "/help/assistant/copilot-limits",
   "oye-quanela": "/help/assistant/oye-quanela",
+  "dish-composition": "/help/catalog/dish-composition",
   "dishes-and-menu": "/help/catalog/dishes-and-menu",
   "public-menu": "/help/catalog/public-menu",
   "quanela-consumer": "/help/catalog/quanela-consumer",

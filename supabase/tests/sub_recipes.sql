@@ -89,16 +89,20 @@ insert into dk_ingredients (id, kitchen_id, code, name, base_unit_id) values
   ('61000000-0000-0000-0000-000000057b05', pg_temp.k('A'), 'PAPA', 'Papa', pg_temp.unit('g')),
   ('61000000-0000-0000-0000-000000057b06', pg_temp.k('A'), 'TORTILLA', 'Tortilla', pg_temp.unit('unidad')),
   ('61000000-0000-0000-0000-000000057b07', pg_temp.k('A'), 'LECHUGA', 'Lechuga', pg_temp.unit('g')),
-  ('61000000-0000-0000-0000-000000057b08', pg_temp.k('A'), 'TOMATE', 'Tomate', pg_temp.unit('g'));
+  ('61000000-0000-0000-0000-000000057b08', pg_temp.k('A'), 'TOMATE', 'Tomate', pg_temp.unit('g')),
+  ('61000000-0000-0000-0000-000000057b09', pg_temp.k('A'), 'PANELA', 'Panela', pg_temp.unit('g')),
+  ('61000000-0000-0000-0000-000000057b10', pg_temp.k('A'), 'AGUA', 'Agua', pg_temp.unit('ml'));
 insert into _ctx (key, id) values ('mayo', '61000000-0000-0000-0000-000000057b01'), ('ajo', '61000000-0000-0000-0000-000000057b02'),
   ('sal', '61000000-0000-0000-0000-000000057b03'), ('pan', '61000000-0000-0000-0000-000000057b04'), ('papa', '61000000-0000-0000-0000-000000057b05'),
   ('tortilla', '61000000-0000-0000-0000-000000057b06'), ('lechuga', '61000000-0000-0000-0000-000000057b07'), ('tomate', '61000000-0000-0000-0000-000000057b08'),
+  ('panela', '61000000-0000-0000-0000-000000057b09'), ('agua', '61000000-0000-0000-0000-000000057b10'), ('vaso', '52000000-0000-0000-0000-000000057b05'),
   ('hamb', '52000000-0000-0000-0000-000000057b01'), ('papas', '52000000-0000-0000-0000-000000057b02'), ('wrap', '52000000-0000-0000-0000-000000057b03');
 insert into dk_products (id, kitchen_id, code, name, price, uses_inventory) values
   ('52000000-0000-0000-0000-000000057b01', pg_temp.k('A'), 'HAMB', 'Hamburguesa', 18000, true),
   ('52000000-0000-0000-0000-000000057b02', pg_temp.k('A'), 'PAPAS', 'Papas con salsa', 9000, true),
   ('52000000-0000-0000-0000-000000057b03', pg_temp.k('A'), 'WRAP', 'Wrap', 14000, true),
-  ('52000000-0000-0000-0000-000000057b04', pg_temp.k('A'), 'EXTRA', 'Salsa extra', 2000, true);
+  ('52000000-0000-0000-0000-000000057b04', pg_temp.k('A'), 'EXTRA', 'Salsa extra', 2000, true),
+  ('52000000-0000-0000-0000-000000057b05', pg_temp.k('A'), 'VASO', 'Aguapanela en vaso', 3000, true);
 
 -- ---------------------------------------------------------------------------
 -- 0. Purchases in kg (kg → g)
@@ -117,7 +121,9 @@ begin
     (v_p, pg_temp.k('papa'), 2, pg_temp.unit('kg'), 3000),
     (v_p, pg_temp.k('tortilla'), 10, pg_temp.unit('unidad'), 500),
     (v_p, pg_temp.k('lechuga'), 1, pg_temp.unit('kg'), 4000),
-    (v_p, pg_temp.k('tomate'), 1, pg_temp.unit('kg'), 6000);
+    (v_p, pg_temp.k('tomate'), 1, pg_temp.unit('kg'), 6000),
+    (v_p, pg_temp.k('panela'), 1, pg_temp.unit('kg'), 6000),
+    (v_p, pg_temp.k('agua'), 10, pg_temp.unit('l'), 500);
   perform dk_confirm_purchase(v_p, '{"mode": "cash", "method": "Efectivo"}');
   insert into _t (area, test, expected, got) values
     ('kg → g', 'Comprar 1 kg de ajo a $8.000/kg → 1000 g a $8/g', '1000 / 1000 · 8', pg_temp.stock(pg_temp.k('ajo')) || ' · ' || pg_temp.n(pg_temp.avg(pg_temp.k('ajo')))),
@@ -426,6 +432,58 @@ begin
     ('Ritmo', 'Copilot: a una preparación no le sugiere compra', 'true · null',
       (select (x ->> 'isPreparation') || ' · ' || coalesce(x ->> 'suggestedPurchase', 'null')
        from jsonb_array_elements(dk_copilot_ingredients('Salsa') -> 'ingredients') x limit 1));
+end $$;
+reset role;
+
+-- ---------------------------------------------------------------------------
+-- 10b. A preparation kept in LITRES: written in g and ml, yield and real yield in ml, a dish in ml
+-- ---------------------------------------------------------------------------
+select pg_temp.act_as(pg_temp.k('owner'), pg_temp.k('A'));
+set local role authenticated;
+do $$
+declare v_ag uuid; v_r jsonb;
+begin
+  v_ag := dk_create_preparation('Aguapanela', pg_temp.unit('l'));
+  insert into _ctx (key, id) values ('aguapanela', v_ag);
+  -- 250 g of panela + 2.000 ml of water; yields 2.000 ml = 2 l.
+  perform dk_create_preparation_version(v_ag, jsonb_build_array(
+    jsonb_build_object('ingredient_id', pg_temp.k('panela'), 'quantity', 0.25, 'unit_id', pg_temp.unit('kg')),
+    jsonb_build_object('ingredient_id', pg_temp.k('agua'), 'quantity', 2000)), 2000, pg_temp.unit('ml'));
+  insert into _t (area, test, expected, got) values
+    ('Litros', 'Se guarda en l: la receta lleva 250 g de panela y 2000 ml de agua; rinde 2000 ml = 2 l', 'l · AGUA 2000 · PANELA 250 · 2 l (2000 ml)',
+      (select code from dk_units where id = (select base_unit_id from dk_ingredients where id = v_ag)) || ' · ' ||
+      (select string_agg(i.code || ' ' || pg_temp.n(ri.quantity), ' · ' order by i.code) from dk_recipes r join dk_recipe_items ri on ri.recipe_id = r.id
+       join dk_ingredients i on i.id = ri.ingredient_id where r.ingredient_id = v_ag and r.is_active) || ' · ' ||
+      (select pg_temp.n(yield_quantity) || ' l (' || pg_temp.n(yield_unit_quantity) || ' ml)' from dk_recipes where ingredient_id = v_ag and is_active)),
+    ('Litros', 'Costo por litro: (250 × $6 + 2000 × $0,5) / 2 l = $1.250/l', '1250', pg_temp.n(pg_temp.avg(v_ag)));
+  -- The real yield written in ml.
+  v_r := dk_register_production(v_ag, 1, 1900, pg_temp.unit('ml'));
+  insert into _t (area, test, expected, got) values
+    ('Litros', 'Rinde 1900 ml → entra 1,9 l a $1.315,79/l', '1.9 / 1.9 · 1315.7895', pg_temp.stock(v_ag) || ' · ' || pg_temp.n(pg_temp.avg(v_ag)));
+  perform dk_create_recipe_version(pg_temp.k('vaso'), jsonb_build_array(
+    jsonb_build_object('ingredient_id', v_ag, 'quantity', 300, 'unit_id', pg_temp.unit('ml'))));
+  insert into _t (area, test, expected, got) values
+    ('Litros', 'Un vaso lleva 300 ml → se guarda 0,3 l (recuerda «300 ml»); cuesta 0,3 × $1.315,79', '0.3 · 300 ml · 394.7368',
+      (select pg_temp.n(ri.quantity) || ' · ' || pg_temp.n(ri.unit_quantity) || ' ' || u.code from dk_recipe_items ri join dk_products p on p.active_recipe_id = ri.recipe_id
+       join dk_units u on u.id = ri.unit_id where p.id = pg_temp.k('vaso')) || ' · ' || pg_temp.n(pg_temp.cost(pg_temp.k('vaso'))));
+end $$;
+reset role;
+insert into dk_orders (id, kitchen_id, customer_id, channel) values ('40000000-0000-0000-0000-000000057b03', pg_temp.k('A'), '30000000-0000-0000-0000-000000057b01', 'MANUAL');
+insert into dk_order_items (id, order_id, product_id, quantity, unit_price) values
+  ('41000000-0000-0000-0000-000000057b05', '40000000-0000-0000-0000-000000057b03', '52000000-0000-0000-0000-000000057b05', 2, 3000);
+select pg_temp.act_as(pg_temp.k('owner'), pg_temp.k('A'));
+set local role authenticated;
+do $$ begin
+  perform dk_confirm_order('40000000-0000-0000-0000-000000057b03');
+  perform dk_advance_kitchen_item('41000000-0000-0000-0000-000000057b05');
+  perform dk_advance_kitchen_item('41000000-0000-0000-0000-000000057b05');
+  insert into _t (area, test, expected, got) values
+    ('Litros', 'Vender 2 vasos: sale 0,6 l (600 ml) de aguapanela → quedan 1,3 l; panela y agua no se mueven al vender', '-0.6 · 1.3 / 1.3 · PRODUCCION -250 · PRODUCCION -2000',
+      (select pg_temp.n(sum(quantity_base_unit)) from dk_inventory_movements where ingredient_id = pg_temp.k('aguapanela') and movement_type = 'CONSUMO') || ' · ' ||
+      pg_temp.stock(pg_temp.k('aguapanela')) || ' · ' || pg_temp.moves(pg_temp.k('panela'), array['PRODUCCION', 'CONSUMO']) || ' · ' ||
+      pg_temp.moves(pg_temp.k('agua'), array['PRODUCCION', 'CONSUMO'])),
+    ('Litros', 'Unidades para escribirla: l, ml (y nada que no convierta)', 'l,ml',
+      (select string_agg(o ->> 'code', ',' order by o ->> 'code') from jsonb_array_elements(dk_unit_options(array[pg_temp.k('aguapanela')]) -> pg_temp.k('aguapanela')::text) o));
 end $$;
 reset role;
 

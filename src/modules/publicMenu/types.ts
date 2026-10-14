@@ -1,3 +1,4 @@
+import type { OptionGroup } from '@/shared/composition/composition'
 /** ADR 0052 — the public menu (what the database returns) and its cart. */
 import type { ThemeDesign } from './lib/themes'
 
@@ -26,6 +27,8 @@ export interface PublicMenuItem {
   availableUntil: string | null
   remaining: number | null
   availability: Availability
+  /** ADR 0059: the dish's options (soup, protein, sides…); empty or missing for a plain dish. */
+  groups?: OptionGroup[]
 }
 
 export interface PublicMenu {
@@ -64,6 +67,8 @@ export interface CartLine {
   productId: string
   quantity: number
   note: string
+  /** ADR 0059: what was chosen (a plain dish has none). The same dish chosen two ways is two lines. */
+  options?: { optionId: string; quantity: number }[]
 }
 
 export interface PlaceOrderInput {
@@ -106,7 +111,8 @@ export interface OrderStatus {
   subtotal: number
   deliveryFee: number
   total: number
-  items: { name: string; quantity: number; unitPrice: number; lineTotal: number; note: string | null }[]
+  /** ADR 0059: `options` = what was chosen, «Sancocho · Res · Patacones ×2». */
+  items: { name: string; quantity: number; unitPrice: number; lineTotal: number; note: string | null; options?: string | null }[]
   business: { name: string; slug: string; iconKey: string | null; whatsapp: string | null; transferInstructions: string | null; theme?: ThemeDesign | null }
 }
 

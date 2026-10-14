@@ -46,7 +46,7 @@ export const NAV_ITEMS: NavItem[] = [
     modules: ['menuPlanner'],
     icon: Soup,
     group: 'daily',
-    matchPrefixes: ['/menu-planner', '/recipes'],
+    matchPrefixes: ['/menu-planner', '/recipes', '/dishes'],
   },
   {
     to: '/supply',

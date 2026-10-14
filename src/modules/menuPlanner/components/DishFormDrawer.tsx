@@ -247,6 +247,11 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
               <Link to={`/recipes/${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
                 <BookOpen size={13} aria-hidden /> {shared ? 'Ver receta' : product.activeRecipeVersion ? `Receta v${product.activeRecipeVersion}` : 'Crear receta'}
               </Link>
+              {!shared && (
+                <Link to={`/dishes/${product.id}/composition`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
+                  <Layers size={13} aria-hidden /> Composición
+                </Link>
+              )}
               {can('reports.view') && (
                 <Link to={`/insights?tab=products&product=${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
                   <BarChart3 size={13} aria-hidden /> Ventas y rentabilidad

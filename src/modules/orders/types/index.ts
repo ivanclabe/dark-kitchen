@@ -26,6 +26,17 @@ export interface OrderItem {
   lineTotal: number
   observation: string | null
   kitchenStatus: KitchenItemStatus
+  /** ADR 0059: what was chosen in a configurable dish (names and prices of that moment). */
+  options?: OrderItemOption[]
+}
+
+export interface OrderItemOption {
+  groupName: string
+  name: string
+  quantity: number
+  pricing: 'included' | 'extra' | 'courtesy'
+  /** The extra per unit of the option (0 when included or courtesy). */
+  unitPrice: number
 }
 
 export interface Order {
@@ -90,8 +101,10 @@ export interface OrderInput {
 export interface OrderItemInput {
   productId: string
   quantity: number
+  /** The dish's base price (the cashier may change it); the extras come from the server's rule (ADR 0059). */
   unitPrice: number
   observation?: string | null
+  options?: { optionId: string; quantity: number }[]
 }
 
 export interface OrderStatusHistoryEntry {

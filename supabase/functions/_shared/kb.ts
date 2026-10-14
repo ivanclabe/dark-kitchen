@@ -361,6 +361,64 @@ export const KB: KbArticle[] = [
     "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Arriba elige Persona o Empresa . Persona: el Nombre (obligatorio) y, si quieres, su Documento (por ejemplo, para facturar). Empresa: el Nombre comercial (obligatorio: es el que se ve en pedidos, despacho y cartera), la Razón social , el NIT y la Persona de contacto . Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Correo , Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Tampoco con el mismo NIT o documento, aunque se escriba con o sin puntos y guion. Si es un Cliente preferencial , actívalo y escribe el Motivo si quieres (por ejemplo, «Convenio corporativo»). Lo marca quien puede editar clientes. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos (como persona). Bueno saber: «Preferencial» es una marca para que todo el equipo lo reconozca (una ⭐ en la lista, en su ficha y al tomarle un pedido). No cambia precios ni aplica descuentos solo. Encontrar un cliente Escribe en el buscador (nombre, NIT, razón social, persona de contacto, teléfono en cualquier formato, correo o dirección) o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). En Más filtros eliges Solo personas o Solo empresas y Solo preferenciales ; también tocando la cifra Preferenciales . Toca el encabezado de una columna para ordenar. En la lista, las empresas llevan un 🏢 y su NIT, y los preferenciales una ⭐. La ficha del cliente (360°) Toca un cliente. Arriba: si es Empresa o Preferencial , su estado (activo si pidió en los últimos 90 días, saldo vencido, quejas abiertas), su teléfono y su correo, y los botones Editar , Registrar queja , Registrar pago y Nuevo pedido . Las pestañas: Pestaña Qué ves --- Resumen Lo más importante junto: cuántos pedidos, total comprado, cada cuánto pide, su último pedido y lo que más pide ; lo que le gusta y lo que no ; qué recomendarle; su contacto (en empresas, razón social, NIT y persona de contacto; y el motivo si es preferencial); la última dirección de envío; las quejas abiertas y la nota general Pedidos Todos sus pedidos Preferencias y recomendaciones Platos favoritos, ingredientes que le gustan y que no, y preferencias alimentarias (los platos e ingredientes se eligen del catálogo); y qué r"
   },
   {
+    "id": "dish-composition",
+    "section": "catalog",
+    "url": "/help/catalog/dish-composition",
+    "title": "Platos configurables (opciones y acompañantes)",
+    "summary": "Opciones que el cliente elige en un plato (sopa, proteína, bebida, acompañantes): incluidas, extra o de cortesía, con su consumo de inventario. Precio y costo se calculan solos.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager",
+      "cashier"
+    ],
+    "permissions": [
+      "products.edit",
+      "orders.edit"
+    ],
+    "appPath": "/menu-planner",
+    "questions": [
+      "¿Cómo hago un corrientazo con sopa, proteína y bebida a elegir?",
+      "¿Cómo cobro un acompañante extra?",
+      "¿Cómo doy algo de cortesía?",
+      "¿El inventario descuenta lo que el cliente eligió?",
+      "¿Cómo agrego opciones a un plato?"
+    ],
+    "keywords": [
+      "opciones",
+      "acompañantes",
+      "corrientazo",
+      "almuerzo",
+      "combo",
+      "extra",
+      "adición",
+      "cortesía",
+      "obligatorio",
+      "opcional",
+      "sopa",
+      "proteína",
+      "bebida",
+      "patacones",
+      "personalizar",
+      "configurable",
+      "modificadores"
+    ],
+    "steps": [
+      "En Catálogo , abre el plato ( Editar plato ) y toca Composición .",
+      "Empieza con una plantilla («Corrientazo» o «Combo») o con un grupo en blanco.",
+      "En cada grupo : escribe el nombre; marca si es Obligatorio ; elige hasta cuántas opciones se pueden tomar; marca Permite repetir si se puede pedir la misma dos veces, por ejemplo «Patacones ×2».",
+      "En cada opción , elige su tipo de precio: Incluido: viene con el plato; Extra: suma su precio, por ejemplo «Res +$3.000»; Cortesía: no se cobra, pero sí sale del inventario.",
+      "En Qué consume , elige un insumo o preparación con su cantidad, en la unidad que quieras (350 ml de sancocho aunque se guarde en litros). También puedes elegir otro plato , por ejemplo la limonada, y entonces se descuenta su receta.",
+      "Marca la Predeterminada de cada grupo obligatorio: es la que se usa si nadie elige, por ejemplo en un pedido por WhatsApp.",
+      "Toca Guardar composición ."
+    ],
+    "headings": [
+      "Armar la composición",
+      "Lo que pasa con un pedido"
+    ],
+    "body": "Un plato configurable tiene grupos de opciones que el cliente elige. Por ejemplo, un corrientazo: Sopa , Proteína , Bebida y Acompañantes . Armar la composición En Catálogo , abre el plato ( Editar plato ) y toca Composición . Empieza con una plantilla («Corrientazo» o «Combo») o con un grupo en blanco. En cada grupo : escribe el nombre; marca si es Obligatorio ; elige hasta cuántas opciones se pueden tomar; marca Permite repetir si se puede pedir la misma dos veces, por ejemplo «Patacones ×2». En cada opción , elige su tipo de precio: Incluido: viene con el plato; Extra: suma su precio, por ejemplo «Res +$3.000»; Cortesía: no se cobra, pero sí sale del inventario. En Qué consume , elige un insumo o preparación con su cantidad, en la unidad que quieras (350 ml de sancocho aunque se guarde en litros). También puedes elegir otro plato , por ejemplo la limonada, y entonces se descuenta su receta. Marca la Predeterminada de cada grupo obligatorio: es la que se usa si nadie elige, por ejemplo en un pedido por WhatsApp. Toca Guardar composición . A la derecha ves Así lo ve el cliente y Precio y costo : el costo de lo elegido y el margen. Cada opción también muestra su costo, y los extras su margen. Lo que pasa con un pedido Menú público: el cliente toca el plato y elige. Ve el precio de cada opción y un resumen con el total antes de agregarlo. «Agregar» no se activa hasta que elige lo obligatorio. Caja: al elegir un plato configurable en el pedido, aparecen sus opciones con el total por unidad. El precio base lo puedes cambiar; los extras los calcula Quanela. Cocina: el tablero y el detalle del pedido muestran lo elegido («Sancocho · Res · Patacones ×2»). Inventario: al confirmar se reserva lo que lleva el plato y lo que se eligió, en la unidad correcta. La cocina lo descuenta al marcarlo listo, y si se cancela, todo vuelve. Una preparación (por ejemplo, los patacones) sale de su stock: el plátano ya salió cuando se preparó el lote. Costos: Insights y Finanzas usan el costo de lo que el cliente eligió. Bueno saber: si una opción no tiene stock para una porción, el menú público la muestra Agotada . Si al pedir falta algo, el pedido no se confirma y dice qué falta. Bueno saber: el precio siempre lo calcula Quanela con tu menú de hoy y la composición: lo que ve el cliente en su celular es solo una vista previa."
+  },
+  {
     "id": "dishes-and-menu",
     "section": "catalog",
     "url": "/help/catalog/dishes-and-menu",
@@ -1326,6 +1384,10 @@ export const KB: KbArticle[] = [
       "No puedo confirmar un pedido, dice que falta una preparación"
     ],
     "keywords": [
+      "litros",
+      "kilos",
+      "aguapanela",
+      "fondo",
       "sub-receta",
       "subreceta",
       "preparación",
@@ -1343,10 +1405,10 @@ export const KB: KbArticle[] = [
     ],
     "steps": [
       "Abre Abastecimiento → Preparaciones y toca Nueva .",
-      "Escribe el Nombre y elige dónde se guarda: gramos, mililitros o unidades. Toca Crear y escribir su receta .",
+      "Escribe el Nombre y elige dónde se guarda: gramos, kilogramos, mililitros, litros o unidades (una aguapanela o un fondo que haces por litros puede guardarse en litros ). Toca Crear y escribir su receta .",
       "Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones.",
-      "En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg ). Si quieres, define Una porción (por ejemplo 25 g).",
-      "Toca Guardar como nueva versión . Ves el costo del lote , el costo por gramo y el costo por porción ."
+      "En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg , o 2.000 ml de una preparación en litros). Si quieres, define Una porción (por ejemplo 25 g).",
+      "Toca Guardar como nueva versión . Ves el costo del lote , el costo por su unidad (gramo, litro…) y el costo por porción ."
     ],
     "headings": [
       "Crear una preparación",
@@ -1354,7 +1416,7 @@ export const KB: KbArticle[] = [
       "Usarla en los platos",
       "Dependencias"
     ],
-    "body": "Una preparación (o sub-receta) es algo que haces en tu cocina y luego usas en varios platos: una salsa de ajo, una ensalada base, un fondo. Tiene su propia receta, lo que rinde un lote y su costo , y se guarda en el inventario como cualquier insumo. Crear una preparación Abre Abastecimiento → Preparaciones y toca Nueva . Escribe el Nombre y elige dónde se guarda: gramos, mililitros o unidades. Toca Crear y escribir su receta . Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones. En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg ). Si quieres, define Una porción (por ejemplo 25 g). Toca Guardar como nueva versión . Ves el costo del lote , el costo por gramo y el costo por porción . Preparar un lote En la preparación, toca Preparar lote . Escribe cuántos Lotes hiciste. Antes de confirmar ves lo que sale del inventario, cuánto hay de cada insumo y el costo del lote. En Rendimiento real , escribe lo que realmente salió (por ejemplo 0,82 kg). Si lo dejas vacío, se toma lo de la receta. Toca Registrar lote . Los insumos salen del inventario una sola vez , en el lote. La preparación entra al costo real : el costo del lote dividido entre lo que rindió. Si rinde menos de lo esperado, cada gramo cuesta más, y lo ves en el historial de Lotes («−3,5 %»). Usarla en los platos En la receta de un plato, busca la preparación como cualquier insumo (dice Preparación ) y escribe la cantidad: 30 g , o 1 porción si definiste una. El plato toma el costo real de la preparación, así que no copias costos a mano. Cuando preparas otro lote con precios nuevos, el costo de todos los platos que la llevan se actualiza solo. Al vender, el plato descuenta solo la preparación : sus insumos ya salieron cuando preparaste el lote. Dependencias La preparación muestra Se usa en (los platos y otras preparaciones que la llevan) y, si lleva otras preparaciones, Lleva con todo lo que hay detrás. La ficha de un insumo en Stock también dice en qué preparaciones está y qué platos lo usan a través de ellas. Cuidado: si un pedido lleva una preparación y no hay suficiente, no se puede confirmar: el mensaje dice cuál falta y cuánto. Prepara un lote primero. Las preparaciones bajo su mínimo aparecen como Por preparar . Bueno saber: un lote registrado por error se anula desde el historial de Lotes : la preparación sale y sus insumos vuelven, cada uno a su costo. Si ya se usó parte, no se puede anular; registra una me"
+    "body": "Una preparación (o sub-receta) es algo que haces en tu cocina y luego usas en varios platos: una salsa de ajo, una ensalada base, un fondo. Tiene su propia receta, lo que rinde un lote y su costo , y se guarda en el inventario como cualquier insumo. Crear una preparación Abre Abastecimiento → Preparaciones y toca Nueva . Escribe el Nombre y elige dónde se guarda: gramos, kilogramos, mililitros, litros o unidades (una aguapanela o un fondo que haces por litros puede guardarse en litros ). Toca Crear y escribir su receta . Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones. En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg , o 2.000 ml de una preparación en litros). Si quieres, define Una porción (por ejemplo 25 g). Toca Guardar como nueva versión . Ves el costo del lote , el costo por su unidad (gramo, litro…) y el costo por porción . Guardada en litros o kilos, la puedes seguir escribiendo en mililitros o gramos en su receta y en los platos (un vaso de 300 ml se descuenta como 0,3 l): se convierte sola. Preparar un lote En la preparación, toca Preparar lote . Escribe cuántos Lotes hiciste. Antes de confirmar ves lo que sale del inventario, cuánto hay de cada insumo y el costo del lote. En Rendimiento real , escribe lo que realmente salió (por ejemplo 0,82 kg). Si lo dejas vacío, se toma lo de la receta. Toca Registrar lote . Los insumos salen del inventario una sola vez , en el lote. La preparación entra al costo real : el costo del lote dividido entre lo que rindió. Si rinde menos de lo esperado, cada gramo cuesta más, y lo ves en el historial de Lotes («−3,5 %»). Usarla en los platos En la receta de un plato, busca la preparación como cualquier insumo (dice Preparación ) y escribe la cantidad: 30 g , o 1 porción si definiste una. El plato toma el costo real de la preparación, así que no copias costos a mano. Cuando preparas otro lote con precios nuevos, el costo de todos los platos que la llevan se actualiza solo. Al vender, el plato descuenta solo la preparación : sus insumos ya salieron cuando preparaste el lote. Dependencias La preparación muestra Se usa en (los platos y otras preparaciones que la llevan) y, si lleva otras preparaciones, Lleva con todo lo que hay detrás. La ficha de un insumo en Stock también dice en qué preparaciones está y qué platos lo usan a través de ellas. Cuidado: si un pedido lleva una preparación y no hay suficiente, no se puede confi"
   },
   {
     "id": "product-profitability",
@@ -1491,6 +1553,9 @@ export const KB: KbArticle[] = [
       "letra",
       "portada",
       "fondo",
+      "logo",
+      "imagen de cabecera",
+      "imagen de fondo",
       "apariencia",
       "diseñador con ia",
       "ia",
@@ -1761,6 +1826,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "13 de octubre de 2026",
       "12 de octubre de 2026",
       "11 de octubre de 2026",
       "10 de octubre de 2026",
@@ -1773,7 +1839,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Preparaciones y sub-recetas. En Abastecimiento → Preparaciones creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción. Preparar lote: los insumos salen del inventario una sola vez y la preparación entra a su costo real, según lo que realmente rindió. En los platos: la agregas como cualquier insumo (30 g o «1 porción»). El plato toma su costo sin copiarlo, y al vender descuenta solo la preparación. Ves en qué platos se usa cada preparación y cada insumo, el historial de lotes y puedes anular un lote registrado por error. Ver Preparaciones y sub-recetas. Conversión automática de unidades. Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas. Compras: compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una caja o bolsa dices una vez cuántas trae. Recetas: escribe 150 g aunque compres por kilo, o media docena de huevos. La receta recuerda la unidad y el costo sigue exacto. Mermas y ajustes: también en kg, g, l, ml o docenas. Stock y movimientos se leen más fácil: «1,45 kg» en vez de «1450 g». Para cuidar tu historial, la unidad base de un insumo con movimientos o recetas ya no se puede cambiar. Ver Recetas y costo de un plato y Registrar una compra. de octubre de 2026 WhatsApp e Integraciones. Un módulo nuevo para conectar el número oficial de WhatsApp de tu negocio. Avisos de pedidos: tus clientes reciben por WhatsApp el estado de su pedido (confirmado, listo, en camino o cancelado) con su enlace de seguimiento, solo si lo aceptaron. Escribiendo «BAJA» dejan de recibirlos. Pedidos por WhatsApp: los atiende tu equipo desde Mensajes , el asistente de Quanela (entiende el pedido, usa tu menú de hoy y el total real, y nunca inventa) o tu n8n . n8n: recibe eventos firmados y puede responder y crear pedidos con las reglas de Quanela. Ver WhatsApp e Integraciones. Menú público y pedidos online. En Menú público publicas el menú de hoy en quanela.com/menu/tu-negocio . Lo compartes por WhatsApp o con un código QR, y tus clientes piden desde el celular. El menú sale del planificador, con precios, horarios, límites y agotados. Los pedidos llegan con el canal Menú web y entran directo a Cocina, con domicilio o para recoger. El cliente sigue su pedido en vivo. Ver Menú público y pedidos online. Diseño del menú público. En Menú público → Diseño eliges entre seis plantillas (Moderna, Elegante, Artesan"
+    "body": "de octubre de 2026 Platos configurables. Un plato puede tener opciones que el cliente elige: sopa, proteína, bebida, acompañantes. Cada opción es incluida , extra (con su precio) o de cortesía , y descuenta del inventario lo que lleva, en cualquier unidad, incluso otra receta o una preparación. Menú público: el cliente ve el plato con sus opciones y precios, y un resumen con el total antes de agregarlo. Caja, cocina y seguimiento: muestran lo que se eligió. Costos: cada opción y cada plato muestran su costo y su margen, e Insights usa el costo de lo elegido. Ver Platos configurables. Menú público renovado. Las seis plantillas tienen un diseño nuevo, más moderno: Moderna, Elegante, Artesanal, Noche (antes Dark premium), Fresca y Clásica (antes Carta tradicional). Se ven bien aunque tus platos no tengan foto: ya no aparece un recuadro gris. Arriba, una franja dice si estás abierto, el costo del domicilio, si se puede recoger y el pedido mínimo. Botón + para agregar, etiqueta Oferta en los precios especiales y barra de categorías que sigue lo que el cliente está viendo. Tu logo y tus imágenes. En Menú público → Diseño , la sección Imágenes de tu marca te deja subir tu logo , una imagen de cabecera (con cualquier estilo de cabecera y el encuadre que elijas) y una imagen de fondo con un velo para que el menú se lea. Ver Menú público y pedidos online. Preparaciones en litros o kilos. Una aguapanela o un fondo se puede guardar en litros y usar en mililitros en sus recetas y en los platos. de octubre de 2026 Preparaciones y sub-recetas. En Abastecimiento → Preparaciones creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción. Preparar lote: los insumos salen del inventario una sola vez y la preparación entra a su costo real, según lo que realmente rindió. En los platos: la agregas como cualquier insumo (30 g o «1 porción»). El plato toma su costo sin copiarlo, y al vender descuenta solo la preparación. Ves en qué platos se usa cada preparación y cada insumo, el historial de lotes y puedes anular un lote registrado por error. Ver Preparaciones y sub-recetas. Conversión automática de unidades. Compra en la unidad de la factura y usa la que quieras en la cocina; Quanela hace las cuentas. Compras: compras 2 kg de carne y entran 2.000 g a su costo por gramo. Ves la equivalencia antes de agregar la línea, y para una caja o bolsa dices una vez cuántas trae. Recetas: escribe 150 g aunque compres por kilo, o media docena"
   },
   {
     "id": "roles",

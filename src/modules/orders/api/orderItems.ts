@@ -3,13 +3,18 @@ import type { OrderItemInput } from '../types'
 
 // The items are read with their order (orders/api/orders.ts); here only what changes them.
 
+/**
+ * ADR 0059: one way to add a line — through the server's rule, which validates the options and adds their
+ * extras to the base price (the cashier may still change the base price).
+ */
 export async function addOrderItem(orderId: string, input: OrderItemInput): Promise<void> {
-  const { error } = await supabase.from('dk_order_items').insert({
-    order_id: orderId,
-    product_id: input.productId,
-    quantity: input.quantity,
-    unit_price: input.unitPrice,
-    observation: input.observation || null,
+  const { error } = await supabase.rpc('dk_order_add_item', {
+    p_order_id: orderId,
+    p_product_id: input.productId,
+    p_quantity: input.quantity,
+    p_options: input.options ?? [],
+    p_base_price: input.unitPrice,
+    p_observation: input.observation || undefined,
   })
   if (error) throw error
 }

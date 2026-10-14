@@ -20,10 +20,11 @@ import {
 
 // ADR 0053: a design is a template plus adjustments, presentation only.
 describe('themes (ADR 0053)', () => {
-  it('without a design the page keeps its previous look', () => {
+  it('without a design the page is the renewed «Moderna» (ADR 0058)', () => {
     expect(resolveTheme(null)).toEqual(DEFAULT_THEME)
-    expect(DEFAULT_THEME.cards.layout).toBe('list')
-    expect(DEFAULT_THEME.header.style).toBe('compact')
+    expect(DEFAULT_THEME).toEqual(TEMPLATES.modern.theme)
+    expect(DEFAULT_THEME.cards).toMatchObject({ layout: 'list', imagePosition: 'right' })
+    expect(DEFAULT_THEME.header).toMatchObject({ style: 'cover', cover: null, logo: null, coverPosition: 'center' })
   })
 
   it('each template resolves to itself and they differ in structure, not only color', () => {
@@ -61,10 +62,34 @@ describe('themes (ADR 0053)', () => {
     expect(designKey(normalizeDesign(null))).toBe(designKey(normalizeDesign(designFrom('modern', DEFAULT_THEME))))
   })
 
-  it('a template change keeps the brand photos', () => {
-    const mine = { ...DEFAULT_THEME, header: { ...DEFAULT_THEME.header, cover: 'kitchens/k/branding/cover.webp' } }
-    expect(withTemplate('artisan', mine).header.cover).toBe('kitchens/k/branding/cover.webp')
-    expect(withTemplate('artisan', mine).cards.style).toBe('rough')
+  it('a template change keeps the brand images: logo, header image with its framing, and a photo background (ADR 0058)', () => {
+    const mine = {
+      ...DEFAULT_THEME,
+      header: { ...DEFAULT_THEME.header, cover: 'kitchens/k/branding/cover.webp', coverPosition: 'top' as const, logo: 'kitchens/k/branding/logo.webp' },
+      background: { ...DEFAULT_THEME.background, kind: 'image' as const, image: 'kitchens/k/branding/bg.webp', overlay: 'strong' as const },
+    }
+    const next = withTemplate('artisan', mine)
+    expect(next.header).toMatchObject({ style: 'centered', cover: 'kitchens/k/branding/cover.webp', coverPosition: 'top', logo: 'kitchens/k/branding/logo.webp' })
+    expect(next.background).toMatchObject({ kind: 'image', image: 'kitchens/k/branding/bg.webp', overlay: 'strong' })
+    expect(next.cards.style).toBe('shadow')
+  })
+
+  it('the new options resolve, and anything unknown falls back to the template (ADR 0058)', () => {
+    const t = resolveTheme({ template: 'fresh', header: { logo: 'kitchens/k/branding/l.webp', coverPosition: 'bottom' }, background: { overlay: 'light' }, fonts: { heading: 'Bricolage Grotesque' } })
+    expect(t.header).toMatchObject({ logo: 'kitchens/k/branding/l.webp', coverPosition: 'bottom' })
+    expect(t.background.overlay).toBe('light')
+    expect(t.fonts.heading).toBe('Bricolage Grotesque')
+    const odd = resolveTheme({ template: 'fresh', header: { coverPosition: 'left' as never }, background: { overlay: 'none' as never } })
+    expect(odd.header.coverPosition).toBe('center')
+    expect(odd.background.overlay).toBe('medium')
+  })
+
+  it('the veil over a background photo follows its strength', () => {
+    const photo = (overlay: 'light' | 'strong') =>
+      themeStyle({ ...DEFAULT_THEME, background: { kind: 'image', texture: 'dots', image: 'kitchens/k/branding/bg.webp', overlay } }, (p) => `/img/${p}`) as Record<string, string>
+    expect(photo('light').backgroundImage).toContain('rgba(255, 255, 255, 0.62)')
+    expect(photo('strong').backgroundImage).toContain('rgba(255, 255, 255, 0.92)')
+    expect(photo('strong').backgroundImage).toContain('url("/img/kitchens/k/branding/bg.webp")')
   })
 
   it('warns about unreadable pairs and «Corregir» fixes them', () => {
@@ -80,10 +105,10 @@ describe('themes (ADR 0053)', () => {
   it('loads only the two chosen fonts and gives CSS variables', () => {
     const href = fontsHref(TEMPLATES.elegant.theme)
     expect(href).toContain('family=Cormorant+Garamond')
-    expect(href).toContain('family=Lora')
+    expect(href).toContain('family=Outfit')
     expect(href.match(/family=/g)).toHaveLength(2)
     const style = themeStyle(TEMPLATES.dark.theme, (p) => `/img/${p}`) as Record<string, string>
-    expect(style['--pm-primary']).toBe('#D4A64A')
+    expect(style['--pm-primary']).toBe('#E8B04B')
     expect(style['--pm-on-primary']).toBe('#111111')
     expect(style.backgroundImage).toContain('linear-gradient')
   })

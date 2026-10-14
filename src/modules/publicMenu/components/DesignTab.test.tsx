@@ -78,14 +78,15 @@ describe('DesignTab (ADR 0053)', () => {
   it('shows the six templates and example dishes when today is empty', async () => {
     renderTab()
     expect(await screen.findByText('Platos de ejemplo: hoy no hay menú en el planificador.')).toBeTruthy()
-    for (const name of ['Moderna', 'Elegante', 'Artesanal', 'Dark premium', 'Fresca', 'Carta tradicional']) expect(screen.getByRole('button', { name: new RegExp(name) })).toBeTruthy()
+    // ADR 0058: the renewed names (Dark premium → Noche, Carta tradicional → Clásica); each button is a template's name and description.
+    for (const name of ['Moderna', 'Elegante', 'Artesanal', 'Noche', 'Fresca', 'Clásica']) expect(screen.getByRole('button', { name: new RegExp(`^${name}\\s*[A-ZÁÉÍÓÚ]`) })).toBeTruthy()
     expect(screen.getByText('Igual al publicado')).toBeTruthy()
   })
 
   it('a template or a control changes the preview at once, and the draft saves itself', async () => {
     renderTab()
     await screen.findByTestId('design-preview')
-    fireEvent.click(screen.getByRole('button', { name: /Carta tradicional/ }))
+    fireEvent.click(screen.getByRole('button', { name: /^Clásica\s*Una carta/ }))
     expect(previewRoot().dataset.template).toBe('classic')
     expect(screen.getByText('Cambios sin publicar')).toBeTruthy()
 

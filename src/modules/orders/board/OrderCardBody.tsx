@@ -7,6 +7,7 @@ import { useSlaSettings } from '../hooks/useSlaSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, formatElapsed, minutesAgoSince, TIME_TIER_STYLE, timeTier, orderAddress } from '../lib/orderVisuals'
 import { PAYMENT_STATE_LABEL, paymentSummary } from '../lib/payment'
 import { isKitchenStage } from '../lib/transitions'
+import { chosenSummary } from '@/shared/composition/composition'
 import type { KitchenItemStatus, Order } from '../types'
 
 function summarizeItems(items: Order['items']): string {
@@ -64,6 +65,8 @@ export function OrderCardBody({
   const isDispatched = ticket.status === 'DESPACHADO'
 
   const notes = [...ticket.items.filter((i) => i.observation).map((i) => `${i.productName}: ${i.observation}`), ...(ticket.notes ? [ticket.notes] : [])]
+  // ADR 0059: what was chosen in each configurable dish — the kitchen needs it as much as the dish.
+  const choices = ticket.items.filter((i) => i.options?.length).map((i) => `${i.productName}: ${chosenSummary(i.options ?? [])}`)
 
   // En ruta el reloj que importa es desde que salió, no desde que se creó.
   const minutesAgo = minutesAgoSince(isDispatched && ticket.delivery?.dispatchedAt ? ticket.delivery?.dispatchedAt : ticket.createdAt, now)
@@ -75,6 +78,10 @@ export function OrderCardBody({
         <p className={clsx('line-clamp-2 font-medium text-neutral-100', big ? 'text-lg leading-snug' : 'text-sm')}>{summarizeItems(ticket.items)}</p>
       ) : (
         <p className={clsx('font-medium text-amber-400', big ? 'text-base' : 'text-sm')}>Sin platos todavía</p>
+      )}
+
+      {choices.length > 0 && (
+        <p className={clsx('mt-1 text-neutral-300', big ? 'text-sm' : 'text-xs', big ? 'line-clamp-4' : 'line-clamp-2')}>{choices.join(' · ')}</p>
       )}
 
       {notes.length > 0 && (

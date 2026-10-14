@@ -96,6 +96,7 @@ export function OrderTrackingPage() {
                   <li key={n} className="flex justify-between gap-3">
                     <span>
                       {i.quantity} × {i.name}
+                      {i.options && <span className="block text-xs text-(--pm-muted)">{i.options}</span>}
                       {i.note && <span className="block text-xs text-(--pm-muted)">{i.note}</span>}
                     </span>
                     <span className="tabular-nums">{formatMoney(Number(i.lineTotal))}</span>

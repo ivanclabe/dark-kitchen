@@ -3,6 +3,7 @@
  * arithmetic the server does), what changed against today's menu, and the
  * labels the customer reads. The server recalculates everything anyway.
  */
+import { fromPayload, lineSignature, unitPrice } from '@/shared/composition/composition'
 import { formatMoney } from '@/shared/utils/format'
 import type { CartLine, Fulfillment, OpenState, PublicMenu, PublicMenuItem } from '../types'
 
@@ -17,21 +18,62 @@ export function maxQuantity(item: Pick<PublicMenuItem, 'remaining'>): number {
   return Math.min(MAX_UNITS_PER_LINE, item.remaining ?? MAX_UNITS_PER_LINE)
 }
 
-export function setQuantity(lines: CartLine[], item: Pick<PublicMenuItem, 'id' | 'remaining'>, quantity: number): CartLine[] {
-  const q = Math.max(0, Math.min(Math.floor(quantity), maxQuantity(item)))
-  const existing = lines.find((l) => l.productId === item.id)
-  if (q === 0) return lines.filter((l) => l.productId !== item.id)
-  if (existing) return lines.map((l) => (l.productId === item.id ? { ...l, quantity: q } : l))
-  if (lines.length >= MAX_LINES) return lines
-  return [...lines, { productId: item.id, quantity: q, note: '' }]
-}
+/** A line's identity: the dish and what was chosen (ADR 0059; a plain dish is just its id). */
+export const lineKey = (line: Pick<CartLine, 'productId' | 'options'>) => lineSignature(line.productId, line.options)
 
-export function setNote(lines: CartLine[], productId: string, note: string): CartLine[] {
-  return lines.map((l) => (l.productId === productId ? { ...l, note: note.slice(0, 200) } : l))
-}
-
+/** Units of a dish across all its lines (limits count them all). */
 export function quantityOf(lines: CartLine[], productId: string): number {
-  return lines.find((l) => l.productId === productId)?.quantity ?? 0
+  return lines.filter((l) => l.productId === productId).reduce((sum, l) => sum + l.quantity, 0)
+}
+
+/** Sets the quantity of one line (0 removes it); the dish's limit counts its other lines too. */
+export function setLineQuantity(lines: CartLine[], key: string, item: Pick<PublicMenuItem, 'id' | 'remaining'>, quantity: number): CartLine[] {
+  const others = lines.filter((l) => l.productId === item.id && lineKey(l) !== key).reduce((sum, l) => sum + l.quantity, 0)
+  const q = Math.max(0, Math.min(Math.floor(quantity), maxQuantity(item) - others))
+  if (q === 0) return lines.filter((l) => lineKey(l) !== key)
+  return lines.map((l) => (lineKey(l) === key ? { ...l, quantity: q } : l))
+}
+
+/** A plain dish (no options): its single line. */
+export function setQuantity(lines: CartLine[], item: Pick<PublicMenuItem, 'id' | 'remaining'>, quantity: number): CartLine[] {
+  if (lines.some((l) => lineKey(l) === item.id)) return setLineQuantity(lines, item.id, item, quantity)
+  return addLine(lines, item, [], quantity)
+}
+
+/** A dish as chosen: joins the line chosen the same way, or starts a new one. */
+export function addLine(lines: CartLine[], item: Pick<PublicMenuItem, 'id' | 'remaining'>, options: { optionId: string; quantity: number }[], quantity: number): CartLine[] {
+  const key = lineSignature(item.id, options)
+  const existing = lines.find((l) => lineKey(l) === key)
+  if (existing) return setLineQuantity(lines, key, item, existing.quantity + quantity)
+  const room = maxQuantity(item) - quantityOf(lines, item.id)
+  const q = Math.max(0, Math.min(Math.floor(quantity), room))
+  if (q === 0 || lines.length >= MAX_LINES) return lines
+  return [...lines, { productId: item.id, quantity: q, note: '', ...(options.length ? { options } : {}) }]
+}
+
+/** Replaces a line with the dish chosen again (editing from the cart). */
+export function replaceLine(lines: CartLine[], key: string, item: Pick<PublicMenuItem, 'id' | 'remaining'>, options: { optionId: string; quantity: number }[], quantity: number): CartLine[] {
+  const old = lines.find((l) => lineKey(l) === key)
+  const rest = lines.filter((l) => lineKey(l) !== key)
+  const next = addLine(rest, item, options, quantity)
+  const at = lines.findIndex((l) => lineKey(l) === key)
+  if (!old || at < 0) return next
+  // Keep the line where it was, with its note.
+  const added = next.find((l) => lineKey(l) === lineSignature(item.id, options))
+  if (!added) return next
+  const ordered = next.filter((l) => l !== added)
+  ordered.splice(Math.min(at, ordered.length), 0, { ...added, note: added.note || old.note })
+  return ordered
+}
+
+/** The note of a line (`key` = lineKey; a plain dish's key is its id). */
+export function setNote(lines: CartLine[], key: string, note: string): CartLine[] {
+  return lines.map((l) => (lineKey(l) === key ? { ...l, note: note.slice(0, 200) } : l))
+}
+
+/** What one unit of a line costs: the dish's price of today plus its extras. */
+export function lineUnitPrice(item: Pick<PublicMenuItem, 'price' | 'groups'>, line: Pick<CartLine, 'options'>): number {
+  return unitPrice(item.price, item.groups ?? [], fromPayload(line.options))
 }
 
 export interface CartTotals {
@@ -51,7 +93,7 @@ export function cartTotals(lines: CartLine[], menu: Pick<PublicMenu, 'items' | '
     const item = byId.get(l.productId)
     if (!item) continue
     units += l.quantity
-    subtotal += item.price * l.quantity
+    subtotal += lineUnitPrice(item, l) * l.quantity
   }
   const deliveryFee = fulfillment === 'delivery' && units > 0 ? menu.ordering.deliveryFee : 0
   return { units, subtotal, deliveryFee, total: subtotal + deliveryFee, belowMinimum: Math.max(0, menu.ordering.minOrder - subtotal) }
@@ -65,7 +107,16 @@ export function cartIssues(lines: CartLine[], items: PublicMenuItem[]): { produc
     const item = byId.get(l.productId)
     if (!item) issues.push({ productId: l.productId, message: 'Ya no está en el menú de hoy' })
     else if (item.availability !== 'available') issues.push({ productId: l.productId, message: `${item.name}: ${availabilityLabel(item) ?? 'no disponible'}` })
-    else if (item.remaining !== null && l.quantity > item.remaining) issues.push({ productId: l.productId, message: `De ${item.name} solo quedan ${item.remaining}` })
+    else if (item.remaining !== null && quantityOf(lines, item.id) > item.remaining) issues.push({ productId: l.productId, message: `De ${item.name} solo quedan ${item.remaining}` })
+    else {
+      // ADR 0059: an option that ran out (or left the dish) since it went into the cart.
+      const options = (item.groups ?? []).flatMap((g) => g.options)
+      for (const o of l.options ?? []) {
+        const option = options.find((x) => x.id === o.optionId)
+        if (!option) issues.push({ productId: l.productId, message: `${item.name}: una opción ya no está disponible` })
+        else if (option.available === false) issues.push({ productId: l.productId, message: `${item.name}: se agotó «${option.name}»` })
+      }
+    }
   }
   return issues
 }

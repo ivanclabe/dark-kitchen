@@ -19,9 +19,9 @@ questions:
   - ¿La IA puede diseñar mi menú?
   - ¿Dónde están los diseños que hice antes?
   - ¿Puedo comparar dos diseños?
-keywords: [menú público, menú digital, menú web, pedidos online, pedidos en línea, link, enlace, compartir, whatsapp, qr, carta digital, domicilio, recoger, diseño, plantilla, colores, tipografía, letra, portada, fondo, apariencia, diseñador con ia, ia, inteligencia artificial, mis diseños, historial, comparar]
+keywords: [menú público, menú digital, menú web, pedidos online, pedidos en línea, link, enlace, compartir, whatsapp, qr, carta digital, domicilio, recoger, diseño, plantilla, colores, tipografía, letra, portada, fondo, logo, imagen de cabecera, imagen de fondo, apariencia, diseñador con ia, ia, inteligencia artificial, mis diseños, historial, comparar]
 related: [dishes-and-menu, kitchen-hours, create-order, dispatch-deliver]
-updated: 2026-10-11
+updated: 2026-10-13
 order: 4
 ---
 
@@ -71,24 +71,28 @@ En la pestaña **Diseño** decides cómo se ve tu página, de tres formas: el **
 
 ### Editor visual
 
-1. **Plantilla.** Elige una de seis, cada una con su propia forma de mostrar el menú (las miniaturas son tu menú real):
-   - **Moderna:** portada grande y platos en cuadrícula con foto.
-   - **Elegante:** crema y dorado, letra con serifa y fotos pequeñas redondas.
-   - **Artesanal:** papel kraft, títulos escritos a mano y tarjetas de borde irregular.
-   - **Dark premium:** fondo oscuro y dorado, con fotos grandes y el nombre encima.
-   - **Fresca:** menta y coral, con los platos en carrusel.
-   - **Carta tradicional:** como una carta impresa, con marco, platos numerados y sin fotos.
-2. **Apariencia.** Ajusta lo que quieras; cada cambio se ve **al instante** en la vista previa:
+1. **Plantilla.** Elige una de seis, cada una con su propia forma de mostrar el menú (las miniaturas son tu menú real). Todas se ven bien aunque tus platos no tengan foto:
+   - **Moderna:** blanca y directa, como las apps de domicilios, con portada de borde a borde.
+   - **Elegante:** crema y oro, títulos con serifa fina y precios alineados con una línea de puntos.
+   - **Artesanal:** cálida, en tonos tierra, con títulos con carácter.
+   - **Noche:** negro y dorado, con fotos grandes y el nombre encima.
+   - **Fresca:** menta y coral, con los platos en cuadrícula.
+   - **Clásica:** una carta de restaurante, con platos numerados y sin fotos.
+2. **Imágenes de tu marca.** Es la primera sección del editor:
+   - **Logo:** reemplaza el ícono de la cuenta en la cabecera. Mejor cuadrado y sobre fondo claro.
+   - **Imagen de cabecera:** tu local, tu plato estrella o tu equipo. Se ve arriba con **cualquier** estilo de cabecera. En **Encuadre en el celular** eliges qué parte se ve (arriba, centro o abajo).
+   - **Imagen de fondo:** va detrás de todo el menú. En **Velo sobre la foto** eliges cuánto se aclara (suave, medio o fuerte) para que el menú siempre se lea.
+3. **Apariencia.** Ajusta lo que quieras; cada cambio se ve **al instante** en la vista previa:
    - **Colores:** una paleta sugerida o tus propios colores.
    - **Tipografía:** la letra de los títulos y del texto, y su tamaño.
-   - **Fondo:** color, degradado, textura o una foto.
-   - **Cabecera:** compacta, centrada, con **portada** (una foto tuya) o con el logo grande.
+   - **Fondo:** color, degradado, textura o la foto que subiste.
+   - **Cabecera:** compacta, centrada, portada grande o clásica, y si muestra la frase del negocio y si está abierto.
    - **Platos:** lista, cuadrícula, foto grande, compacta o carrusel; las fotos (mostrar u ocultar, su forma y su posición) y las descripciones (completas, en 2 líneas u ocultas).
    - **Navegación** entre categorías y **forma de los botones**.
-3. Mira la **vista previa** en **celular** o **escritorio**. Puedes probar el carrito; desde ahí nunca se envía un pedido. Si hoy no hay platos en el planificador, verás **platos de ejemplo**.
-4. Toca **Publicar diseño**. Hasta entonces, tus clientes siguen viendo el diseño anterior.
+4. Mira la **vista previa** en **celular** o **escritorio**. Puedes probar el carrito; desde ahí nunca se envía un pedido. Si hoy no hay platos en el planificador, verás **platos de ejemplo**.
+5. Toca **Publicar diseño**. Hasta entonces, tus clientes siguen viendo el diseño anterior.
 
-> **Bueno saber:** lo que cambias se guarda solo como **borrador**; puedes salir y seguir después. **Descartar cambios** vuelve al diseño publicado, y **Volver al anterior** recupera el diseño que tenías antes de la última publicación. **Restablecer a la plantilla** deshace tus ajustes, pero conserva tu portada y tu foto de fondo.
+> **Bueno saber:** lo que cambias se guarda solo como **borrador**; puedes salir y seguir después. **Descartar cambios** vuelve al diseño publicado, y **Volver al anterior** recupera el diseño que tenías antes de la última publicación. **Restablecer a la plantilla** deshace tus ajustes, pero conserva tu logo, tu imagen de cabecera y tu imagen de fondo. Cambiar de plantilla también las conserva.
 
 > **Cuidado:** si un color de texto se lee con dificultad sobre el fondo o las tarjetas, Quanela te avisa; toca **Corregir** para ajustarlo. El **código QR** toma tu color principal cuando se escanea bien; si no, sale negro.
 

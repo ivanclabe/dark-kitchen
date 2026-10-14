@@ -85,9 +85,14 @@ export async function revertTheme(): Promise<void> {
   if (error) throw error
 }
 
-/** A cover or background, shrunk in the browser, to kitchens/{account}/branding/. Returns its path. */
-export async function uploadBrandImage(kitchenId: string, file: File, kind: 'cover' | 'background'): Promise<string> {
-  const image = await prepareImage(file)
+export type BrandImageKind = 'cover' | 'background' | 'logo'
+
+/**
+ * A brand image, shrunk in the browser, to kitchens/{account}/branding/. Returns its path.
+ * ADR 0058: a logo is small (600 px) and sits on white, like the tile it is shown on.
+ */
+export async function uploadBrandImage(kitchenId: string, file: File, kind: BrandImageKind): Promise<string> {
+  const image = kind === 'logo' ? await prepareImage(file, { maxSide: 600, fill: '#FFFFFF' }) : await prepareImage(file)
   const path = `kitchens/${kitchenId}/branding/${kind}-${crypto.randomUUID()}.${image.extension}`
   const { error } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(path, image.blob, {
     contentType: image.extension === 'webp' ? 'image/webp' : 'image/jpeg',

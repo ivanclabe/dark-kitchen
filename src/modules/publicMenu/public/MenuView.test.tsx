@@ -92,3 +92,56 @@ describe('PublicMenuView (ADR 0053)', () => {
     expect(localStorage.length).toBe(0)
   })
 })
+
+// ADR 0058: a modern page that looks finished without dish photos, with the business's own images.
+describe('Renewed canvas (ADR 0058)', () => {
+  it('a dish without a photo has no empty placeholder: only real photos are drawn', () => {
+    const { container } = draw({ template: 'modern' })
+    const images = [...container.querySelectorAll('img')]
+    expect(images).toHaveLength(1)
+    expect(images[0].getAttribute('src')).toContain('kitchens/k/products/p1.webp')
+    expect(screen.getByRole('heading', { name: 'Jugo' })).toBeTruthy()
+  })
+
+  it('the info strip says what matters before ordering: open, delivery and its fee, pickup, minimum', () => {
+    const theme = resolveTheme({ template: 'fresh' })
+    const withDelivery = { ...menu, ordering: { ...menu.ordering, delivery: true, deliveryFee: 4000, minOrder: 15000 } }
+    render(
+      <ThemeRoot theme={theme}>
+        <PublicMenuView slug="sopa" menu={withDelivery} theme={theme} />
+      </ThemeRoot>,
+    )
+    const strip = within(screen.getByRole('list', { name: 'Información del pedido' }))
+    expect(strip.getByText('Abierto · cierra a las 9:00 p. m.')).toBeTruthy()
+    expect(strip.getByText('Domicilio $4.000')).toBeTruthy()
+    expect(strip.getByText('Para recoger')).toBeTruthy()
+    expect(strip.getByText('Mínimo $15.000')).toBeTruthy()
+  })
+
+  it('a special price is marked «Oferta» next to the regular one, and each category says how many dishes it has', () => {
+    draw({ template: 'elegant' })
+    expect(screen.getByText('Oferta')).toBeTruthy()
+    expect(screen.getAllByText('1 plato').length).toBe(2)
+  })
+
+  it('the logo replaces the account icon and the header image works with any header style', () => {
+    const { container } = draw({
+      template: 'elegant',
+      header: { logo: 'kitchens/k/branding/logo.webp', cover: 'kitchens/k/branding/portada.webp', coverPosition: 'top' },
+    })
+    const header = container.querySelector('header') as HTMLElement
+    expect(header.querySelector('img')?.getAttribute('src')).toContain('kitchens/k/branding/logo.webp')
+    const backdrop = header.querySelector('[style*="branding/portada.webp"]') as HTMLElement
+    expect(backdrop).toBeTruthy()
+    expect(backdrop.style.backgroundPosition).toBe('center top')
+  })
+
+  it('the add button is a round «+» that becomes «− n +»; the cart bar says how many and how much', () => {
+    draw({ template: 'modern' })
+    const add = screen.getByRole('button', { name: 'Agregar Sopa' })
+    expect(add.textContent).toBe('')
+    fireEvent.click(add)
+    expect(screen.getByRole('button', { name: 'Quitar un Sopa' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Ver pedido · 1 · $5.000' })).toBeTruthy()
+  })
+})

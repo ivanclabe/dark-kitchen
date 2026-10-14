@@ -16,6 +16,10 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
 import { CheckCircle2, History, Plus, Trash2, UtensilsCrossed, XCircle } from 'lucide-react'
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useComposition } from '@/modules/products/hooks/useComposition'
+import { adminPickerStyle } from '@/shared/composition/adminPickerStyle'
+import { chosenOptions, chosenSummary, defaultSelection, extrasPerUnit, missingGroups, toPayload, type OptionGroup, type Selection } from '@/shared/composition/composition'
+import { OptionPicker } from '@/shared/composition/OptionPicker'
 import { useAddOrderItem, useOrder, useOrderStatusHistory, useRemoveOrderItem } from '../hooks/useOrders'
 import { orderStatusLabel } from '../lib/orderStatus'
 import type { Order, OrderItem } from '../types'
@@ -57,6 +61,8 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
   const [unitPrice, setUnitPrice] = useState<number | null>(null)
   const [observation, setObservation] = useState('')
   const [error, setError] = useState<string | null>(null)
+  // ADR 0059: a configurable dish's options, chosen here with the same rule as the public menu (a new dish starts with its defaults).
+  const [picked, setPicked] = useState<{ productId: string; selection: Selection } | null>(null)
 
   const isNuevo = order?.status === 'NUEVO'
   // Permisos del rol activo (la base los exige igual): editar el borrador, confirmarlo y cancelarlo son acciones distintas.
@@ -65,6 +71,15 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
   const { data: products } = useProducts(canEditItems)
   const canConfirm = isNuevo && can('orders.confirm') && !!onConfirm
   const canCancel = order && !['CANCELADO', 'ENTREGADO'].includes(order.status) && can('orders.cancel') && !!onCancel
+  const { data: composition } = useComposition(productId || null, canEditItems)
+  const groups: OptionGroup[] = useMemo(
+    () => (composition?.productId === productId ? composition.groups.map((g) => ({ ...g, options: g.options.filter((o) => o.active) })).filter((g) => g.options.length) : []),
+    [composition, productId],
+  )
+  const selection = picked?.productId === productId ? picked.selection : defaultSelection(groups)
+  const setSelection = (next: Selection) => setPicked({ productId, selection: next })
+  const missing = missingGroups(groups, selection)
+  const extras = extrasPerUnit(groups, selection)
 
   const productOptions = useMemo(
     () =>
@@ -94,11 +109,13 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
         quantity,
         unitPrice: unitPrice ?? 0,
         observation: observation || undefined,
+        options: groups.length ? toPayload(selection) : undefined,
       })
       setProductId('')
       setQuantity(1)
       setUnitPrice(null)
       setObservation('')
+      setPicked(null)
     } catch (err) {
       setError(getErrorMessage(err, 'Error al agregar el plato'))
     }
@@ -107,7 +124,16 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
   if (isLoading || !order) return <LoadingState variant="block" />
 
   const columns: DataTableColumn<OrderItem>[] = [
-    { key: 'product', header: 'Plato', cell: (item) => <span className="font-medium text-neutral-100">{item.productName}</span> },
+    {
+      key: 'product',
+      header: 'Plato',
+      cell: (item) => (
+        <span className="block">
+          <span className="font-medium text-neutral-100">{item.productName}</span>
+          {item.options && item.options.length > 0 && <span className="block text-xs text-neutral-400">{chosenSummary(item.options)}</span>}
+        </span>
+      ),
+    },
     { key: 'qty', header: 'Cantidad', cell: (item) => <span className="tabular-nums">{item.quantity}</span>, align: 'right' },
     { key: 'unit', header: 'Precio unit.', cell: (item) => <span className="tabular-nums text-neutral-400">{formatMoney(item.unitPrice)}</span>, align: 'right' },
     { key: 'total', header: 'Total', cell: (item) => <span className="tabular-nums">{formatMoney(item.lineTotal)}</span>, align: 'right' },
@@ -172,8 +198,20 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
               )}
             </FormField>
           </FormGrid>
-          <div className="flex justify-end">
-            <Button type="submit" variant="primary" icon={Plus} loading={addItem.isPending}>
+          {groups.length > 0 && (
+            <div className="space-y-3 rounded-xl border border-neutral-800 p-4" style={adminPickerStyle}>
+              <p className="text-sm font-semibold text-neutral-100">Opciones del plato</p>
+              <OptionPicker groups={groups} selection={selection} onChange={setSelection} />
+              <p className="text-sm text-neutral-400 tabular-nums">
+                {chosenSummary(chosenOptions(groups, selection)) || 'Sin opciones elegidas'} · por unidad{' '}
+                <span className="font-semibold text-neutral-100">{formatMoney((unitPrice ?? 0) + extras)}</span>
+                {extras > 0 && ` (${formatMoney(unitPrice ?? 0)} + ${formatMoney(extras)} de extras)`}
+              </p>
+            </div>
+          )}
+          <div className="flex items-center justify-end gap-3">
+            {missing.length > 0 && <p className="text-sm text-amber-300">Elige: {missing.map((g) => g.name).join(', ')}</p>}
+            <Button type="submit" variant="primary" icon={Plus} loading={addItem.isPending} disabled={missing.length > 0}>
               Agregar plato
             </Button>
           </div>

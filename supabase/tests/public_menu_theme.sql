@@ -78,6 +78,22 @@ insert into _t (area, test, expected, got) values
   ('Validación', 'Variante desconocida', 'Forma de las tarjetas no válida', dk_public_menu_theme_problem('{"cards": {"layout": "zigzag"}}', pg_temp.k('A'))),
   ('Validación', 'Portada de otra cuenta', 'La portada no es de esta cuenta',
     dk_public_menu_theme_problem(jsonb_build_object('header', jsonb_build_object('cover', 'kitchens/' || pg_temp.k('B') || '/branding/x.webp')), pg_temp.k('A'))),
+  -- ADR 0058: logo, framing of the header image, veil over the background photo, three modern fonts.
+  ('Validación v2', 'Logo, encuadre, velo y fuentes nuevas', 'válido',
+    coalesce(dk_public_menu_theme_problem(jsonb_build_object(
+      'fonts', jsonb_build_object('heading', 'Bricolage Grotesque', 'body', 'Plus Jakarta Sans'),
+      'background', jsonb_build_object('kind', 'image', 'image', 'kitchens/' || pg_temp.k('A') || '/branding/fondo.webp', 'overlay', 'strong'),
+      'header', jsonb_build_object('style', 'centered', 'cover', 'kitchens/' || pg_temp.k('A') || '/branding/portada.webp', 'coverPosition', 'top',
+                                   'logo', 'kitchens/' || pg_temp.k('A') || '/branding/logo.webp')), pg_temp.k('A')), 'válido')),
+  ('Validación v2', 'Logo de otra cuenta', 'El logo no es de esta cuenta',
+    dk_public_menu_theme_problem(jsonb_build_object('header', jsonb_build_object('logo', 'kitchens/' || pg_temp.k('B') || '/branding/logo.webp')), pg_temp.k('A'))),
+  ('Validación v2', 'Logo externo (URL)', 'El logo no es de esta cuenta',
+    dk_public_menu_theme_problem('{"header": {"logo": "https://evil.example/logo.png"}}', pg_temp.k('A'))),
+  ('Validación v2', 'Encuadre desconocido', 'Encuadre de la portada no válido', dk_public_menu_theme_problem('{"header": {"coverPosition": "left"}}', pg_temp.k('A'))),
+  ('Validación v2', 'Velo desconocido', 'Intensidad del velo no válida', dk_public_menu_theme_problem('{"background": {"overlay": "none"}}', pg_temp.k('A'))),
+  ('Validación v2', 'Outfit sí; una fuente fuera de la lista no', 'válido · Fuente de texto no disponible',
+    coalesce(dk_public_menu_theme_problem('{"fonts": {"heading": "Outfit"}}', pg_temp.k('A')), 'válido') || ' · ' ||
+    dk_public_menu_theme_problem('{"fonts": {"body": "Papyrus"}}', pg_temp.k('A'))),
   ('Validación', 'Imagen fuera de la carpeta de marca', 'La imagen de fondo no es de esta cuenta',
     dk_public_menu_theme_problem(jsonb_build_object('background', jsonb_build_object('image', 'https://otro.sitio/x.png')), pg_temp.k('A'))),
   ('Validación', 'Demasiado grande', 'El diseño es demasiado grande', dk_public_menu_theme_problem(jsonb_build_object('template', 'modern', 'nav', repeat('x', 5000)), pg_temp.k('A')));

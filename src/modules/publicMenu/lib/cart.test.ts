@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { whatsappLink } from '@/shared/utils/whatsapp'
 import type { PublicMenu, PublicMenuItem } from '../types'
-import { availabilityLabel, byCategory, cartIssues, cartTotals, formatHour, maxQuantity, openLabel, setNote, setQuantity, shareText } from './cart'
+import { addLine, availabilityLabel, byCategory, cartIssues, cartTotals, formatHour, lineKey, lineUnitPrice, maxQuantity, openLabel, quantityOf, replaceLine, setLineQuantity, setNote, setQuantity, shareText } from './cart'
 
 // ADR 0052: the cart does the same arithmetic as the server and says what changed.
 const item = (over: Partial<PublicMenuItem>): PublicMenuItem => ({
@@ -70,5 +70,50 @@ describe('labels', () => {
     expect(text).toBe('🍽️ Menú de hoy en Sopa donde Carmen\n• Sopa — $5.000\n• Postre — $4.000\n\nPide aquí: https://quanela.com/menu/x')
     expect(whatsappLink('+57 300 123 4567', 'Hola')).toBe('https://wa.me/573001234567?text=Hola')
     expect(whatsappLink(null, 'a b')).toBe('https://wa.me/?text=a%20b')
+  })
+})
+
+// ADR 0059: configurable dishes — two ways of the same dish are two lines; the extras count; the limit counts every line.
+describe('cart with options', () => {
+  const corr = item({
+    id: 'corr', name: 'Corrientazo', price: 18000, regularPrice: null, remaining: 3,
+    groups: [
+      { id: 'prot', name: 'Proteína', minSelect: 1, maxSelect: 1, allowRepeat: false, options: [
+        { id: 'pollo', name: 'Pollo', pricing: 'included', price: 0, isDefault: true, available: true },
+        { id: 'res', name: 'Res', pricing: 'extra', price: 3000, isDefault: false, available: true },
+      ] },
+      { id: 'acomp', name: 'Acompañantes', minSelect: 0, maxSelect: 3, allowRepeat: true, options: [
+        { id: 'pata', name: 'Patacones', pricing: 'extra', price: 2000, isDefault: false, available: false },
+      ] },
+    ],
+  })
+  const withCorr = { ...menu, items: [...menu.items, corr] }
+
+  it('the same choice joins its line, another choice is another line; prices include extras', () => {
+    let lines = addLine([], corr, [{ optionId: 'res', quantity: 1 }, { optionId: 'pata', quantity: 2 }], 1)
+    lines = addLine(lines, corr, [{ optionId: 'pata', quantity: 2 }, { optionId: 'res', quantity: 1 }], 1)
+    lines = addLine(lines, corr, [{ optionId: 'pollo', quantity: 1 }], 1)
+    expect(lines.map((l) => [lineKey(l), l.quantity])).toEqual([
+      ['corr:patax2,resx1', 2],
+      ['corr:pollox1', 1],
+    ])
+    expect(lineUnitPrice(corr, lines[0])).toBe(25000)
+    expect(cartTotals(lines, withCorr, null).subtotal).toBe(2 * 25000 + 18000)
+    expect(quantityOf(lines, 'corr')).toBe(3)
+  })
+
+  it('the dish limit counts every line; a line changes or goes by its key', () => {
+    let lines = addLine([], corr, [{ optionId: 'res', quantity: 1 }], 2)
+    lines = addLine(lines, corr, [{ optionId: 'pollo', quantity: 1 }], 5)
+    expect(quantityOf(lines, 'corr')).toBe(3)
+    lines = setLineQuantity(lines, 'corr:resx1', corr, 0)
+    expect(lines.map(lineKey)).toEqual(['corr:pollox1'])
+    lines = replaceLine(lines, 'corr:pollox1', corr, [{ optionId: 'res', quantity: 1 }], 1)
+    expect(lines.map((l) => [lineKey(l), l.quantity])).toEqual([['corr:resx1', 1]])
+  })
+
+  it('an option that ran out since it went into the cart is said', () => {
+    const lines = addLine([], corr, [{ optionId: 'pata', quantity: 1 }, { optionId: 'pollo', quantity: 1 }], 1)
+    expect(cartIssues(lines, withCorr.items).map((i) => i.message)).toEqual(['Corrientazo: se agotó «Patacones»'])
   })
 })

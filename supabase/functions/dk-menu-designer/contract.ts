@@ -7,12 +7,19 @@
 // The closed lists mirror src/modules/publicMenu/lib/themes.ts (a test keeps them equal).
 
 export const TEMPLATE_IDS = ["modern", "elegant", "artisan", "dark", "fresh", "classic"] as const;
-export const FONTS = ["Inter", "Poppins", "Nunito", "Montserrat", "Lora", "Playfair Display", "Cormorant Garamond", "DM Serif Display", "Fraunces", "Caveat"] as const;
+export const FONTS = [
+  "Inter", "Poppins", "Nunito", "Montserrat", "Lora", "Playfair Display", "Cormorant Garamond", "DM Serif Display", "Fraunces", "Caveat",
+  // ADR 0058
+  "Plus Jakarta Sans", "Outfit", "Bricolage Grotesque",
+] as const;
 export const COLOR_KEYS = ["primary", "background", "surface", "text", "muted", "price"] as const;
 const SCALES = ["S", "M", "L"] as const;
 const BACKGROUND_KINDS = ["solid", "gradient", "texture", "image"] as const;
 const TEXTURES = ["paper", "dots", "lines"] as const;
 const HEADER_STYLES = ["compact", "centered", "cover", "logo"] as const;
+// ADR 0058: the veil over a background photo and the framing of the header image (the images themselves are the business's).
+const OVERLAYS = ["light", "medium", "strong"] as const;
+const COVER_POSITIONS = ["top", "center", "bottom"] as const;
 const LAYOUTS = ["list", "grid", "large", "compact", "carousel", "menu"] as const;
 const CARD_STYLES = ["flat", "shadow", "outline", "rough", "glass"] as const;
 const IMAGE = ["show", "hide"] as const;
@@ -35,8 +42,8 @@ export interface Design {
   template: TemplateId;
   colors: Colors;
   fonts?: { heading?: string; body?: string; scale?: string };
-  background?: { kind?: string; texture?: string; image?: string };
-  header?: { style?: string; cover?: string; showTagline?: boolean; showHours?: boolean };
+  background?: { kind?: string; texture?: string; image?: string; overlay?: string };
+  header?: { style?: string; cover?: string; coverPosition?: string; logo?: string; showTagline?: boolean; showHours?: boolean };
   cards?: { layout?: string; style?: string; image?: string; imageShape?: string; imagePosition?: string; description?: string };
   nav?: string;
   buttons?: string;
@@ -44,12 +51,12 @@ export interface Design {
 
 /** The colors of each template (what an omitted color falls back to). */
 export const TEMPLATE_COLORS: Record<TemplateId, Colors> = {
-  modern: { primary: "#111111", background: "#FFFFFF", surface: "#F5F5F4", text: "#111111", muted: "#6B6B6B", price: "#111111" },
-  elegant: { primary: "#8C6A3E", background: "#FBF7EF", surface: "#FFFFFF", text: "#2B2622", muted: "#7A6E62", price: "#8C6A3E" },
-  artisan: { primary: "#A8481F", background: "#E9D8BC", surface: "#F7ECDA", text: "#3B2A1E", muted: "#6E5845", price: "#A8481F" },
-  dark: { primary: "#D4A64A", background: "#0E0E10", surface: "#1A1A1E", text: "#F5F2EA", muted: "#A39E93", price: "#E2BD6B" },
-  fresh: { primary: "#F2604F", background: "#EAF8F1", surface: "#FFFFFF", text: "#14342B", muted: "#4D6B62", price: "#0B7A54" },
-  classic: { primary: "#7A1F1F", background: "#F3EAD6", surface: "#FBF6EA", text: "#2A1E14", muted: "#6B5A48", price: "#2A1E14" },
+  modern: { primary: "#E8492B", background: "#FFFFFF", surface: "#F6F5F3", text: "#141414", muted: "#666460", price: "#141414" },
+  elegant: { primary: "#9A7442", background: "#F8F4EC", surface: "#FFFFFF", text: "#1F1A15", muted: "#756A5E", price: "#1F1A15" },
+  artisan: { primary: "#B4532A", background: "#F5EDE1", surface: "#FFFBF5", text: "#2E2118", muted: "#776353", price: "#B4532A" },
+  dark: { primary: "#E8B04B", background: "#0B0B0D", surface: "#17171B", text: "#F4F1EA", muted: "#A39E94", price: "#EDC062" },
+  fresh: { primary: "#F2604F", background: "#EEF8F3", surface: "#FFFFFF", text: "#12352B", muted: "#4F6B62", price: "#0B7A54" },
+  classic: { primary: "#8A2B22", background: "#F6F0E4", surface: "#FFFCF6", text: "#22180F", muted: "#6B5A48", price: "#22180F" },
 };
 
 const enumOf = (values: readonly string[]) => ({ type: "string", enum: [...values] });
@@ -81,8 +88,11 @@ export const DESIGN_TOOL = {
                   required: [...COLOR_KEYS],
                 },
                 fonts: { type: "object", properties: { heading: enumOf(FONTS), body: enumOf(FONTS), scale: enumOf(SCALES) } },
-                background: { type: "object", properties: { kind: enumOf(["solid", "gradient", "texture"]), texture: enumOf(TEXTURES) } },
-                header: { type: "object", properties: { style: enumOf(HEADER_STYLES), showTagline: { type: "boolean" }, showHours: { type: "boolean" } } },
+                background: { type: "object", properties: { kind: enumOf(["solid", "gradient", "texture"]), texture: enumOf(TEXTURES), overlay: enumOf(OVERLAYS) } },
+                header: {
+                  type: "object",
+                  properties: { style: enumOf(HEADER_STYLES), coverPosition: enumOf(COVER_POSITIONS), showTagline: { type: "boolean" }, showHours: { type: "boolean" } },
+                },
                 cards: {
                   type: "object",
                   properties: {
@@ -108,7 +118,9 @@ export const SYSTEM_PROMPT = `Eres el diseñador visual de Quanela. Diseñas la 
 Responde SIEMPRE y SOLO con la herramienta "proponer_disenos". Nunca respondas con texto.
 
 Lo que puedes decidir (y nada más): la plantilla base, los 6 colores, las fuentes, el fondo, la cabecera, cómo se ven los platos, la navegación entre categorías y la forma de los botones, usando solo los valores permitidos por la herramienta.
-Plantillas: modern (portada y cuadrícula con fotos), elegant (crema y dorado, serifa fina, lista), artisan (papel kraft, letra a mano), dark (negro y dorado, fotos grandes), fresh (menta y coral, carrusel), classic (carta impresa con marco, sin fotos).
+Plantillas: modern (blanca, como una app de domicilios: portada y platos con foto a un lado), elegant (crema y oro, serifa fina, precios alineados), artisan (cálida, tonos tierra, títulos con carácter), dark (noche: negro y dorado, fotos grandes), fresh (menta y coral, letra redondeada, cuadrícula), classic (carta de restaurante con serifa, platos numerados, sin fotos).
+La mayoría de los platos no tienen foto: elige diseños que se vean bien solo con texto.
+Imágenes: nunca las propones ni las inventas. El logo, la imagen de cabecera y la imagen de fondo los sube el negocio y se conservan solos; solo puedes elegir el encuadre de la cabecera (coverPosition) y la intensidad del velo sobre el fondo (overlay).
 Colores: primary (botones y acentos), background (fondo), surface (tarjetas), text, muted (texto secundario), price. El texto y el precio deben leerse bien sobre surface y background (contraste alto). Siempre entrega los 6 colores.
 
 Reglas:
@@ -153,8 +165,8 @@ const compact = <T extends Record<string, unknown>>(o: T): T | undefined => {
 
 /**
  * Only known keys and values survive. Images never come from the model: the
- * cover and background photo of the base design are kept. A photo background
- * without a photo becomes a solid color.
+ * logo, cover and background photo of the base design are kept (ADR 0058). A
+ * photo background without a photo becomes a solid color.
  */
 export function sanitizeDesign(raw: unknown, base: Design | null): Design {
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, Record<string, unknown> | unknown>;
@@ -169,14 +181,22 @@ export function sanitizeDesign(raw: unknown, base: Design | null): Design {
 
   const baseImage = base?.background?.image;
   const baseCover = base?.header?.cover;
+  const baseLogo = base?.header?.logo;
   let kind = pick(b.kind, BACKGROUND_KINDS);
   if (kind === "image" && !baseImage) kind = "solid";
   if (kind === undefined && baseImage && base?.background?.kind === "image") kind = "image";
 
   const design: Design = { template, colors };
   const fonts = compact({ heading: pick(f.heading, FONTS), body: pick(f.body, FONTS), scale: pick(f.scale, SCALES) });
-  const background = compact({ kind, texture: pick(b.texture, TEXTURES), image: baseImage || undefined });
-  const header = compact({ style: pick(h.style, HEADER_STYLES), cover: baseCover || undefined, showTagline: bool(h.showTagline), showHours: bool(h.showHours) });
+  const background = compact({
+    kind, texture: pick(b.texture, TEXTURES), image: baseImage || undefined,
+    overlay: pick(b.overlay, OVERLAYS) ?? pick(base?.background?.overlay, OVERLAYS),
+  });
+  const header = compact({
+    style: pick(h.style, HEADER_STYLES), cover: baseCover || undefined,
+    coverPosition: pick(h.coverPosition, COVER_POSITIONS) ?? pick(base?.header?.coverPosition, COVER_POSITIONS),
+    logo: baseLogo || undefined, showTagline: bool(h.showTagline), showHours: bool(h.showHours),
+  });
   const cards = compact({
     layout: pick(c.layout, LAYOUTS), style: pick(c.style, CARD_STYLES), image: pick(c.image, IMAGE),
     imageShape: pick(c.imageShape, SHAPES), imagePosition: pick(c.imagePosition, POSITIONS), description: pick(c.description, DESCRIPTIONS),
@@ -253,8 +273,8 @@ export function designForModel(design: Design | null): Design | null {
   if (!design) return null;
   const { background, header, ...rest } = design;
   const out: Design = { ...rest };
-  if (background) out.background = compact({ kind: background.kind === "image" ? undefined : background.kind, texture: background.texture });
-  if (header) out.header = compact({ style: header.style, showTagline: header.showTagline, showHours: header.showHours });
+  if (background) out.background = compact({ kind: background.kind === "image" ? undefined : background.kind, texture: background.texture, overlay: background.overlay });
+  if (header) out.header = compact({ style: header.style, coverPosition: header.coverPosition, showTagline: header.showTagline, showHours: header.showHours });
   return JSON.parse(JSON.stringify(out));
 }
 
@@ -271,7 +291,9 @@ function sanitizeDesignKeepingImages(stored: Record<string, unknown>): Design {
     template: pick(stored.template, TEMPLATE_IDS) ?? "modern",
     colors: TEMPLATE_COLORS[pick(stored.template, TEMPLATE_IDS) ?? "modern"],
     background: typeof b.image === "string" ? { kind: typeof b.kind === "string" ? b.kind : undefined, image: b.image } : undefined,
-    header: typeof h.cover === "string" ? { cover: h.cover } : undefined,
+    header: typeof h.cover === "string" || typeof h.logo === "string"
+      ? { cover: typeof h.cover === "string" ? h.cover : undefined, logo: typeof h.logo === "string" ? h.logo : undefined }
+      : undefined,
   };
   return sanitizeDesign(stored, images);
 }

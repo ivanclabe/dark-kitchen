@@ -4,7 +4,9 @@ import clsx from 'clsx'
 import { ArrowLeft, Minus, Plus, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { PlaceOrderError, placePublicOrder } from '../api/publicMenu'
-import { cartIssues, cartTotals, formatHour, maxQuantity, openLabel, setNote, setQuantity } from '../lib/cart'
+import { cartIssues, cartTotals, formatHour, lineKey, lineUnitPrice, maxQuantity, openLabel, quantityOf, replaceLine, setLineQuantity, setNote } from '../lib/cart'
+import { chosenOptions, chosenSummary, fromPayload } from '@/shared/composition/composition'
+import { DishSheet } from './DishSheet'
 import type { CartLine, Fulfillment, PublicMenu, PublicPaymentMethod } from '../types'
 
 const inputClass =
@@ -88,10 +90,18 @@ export function CartSheet({
           ? 'Escribe la dirección'
           : null
 
+  // ADR 0059: what was chosen in each line, «Sancocho · Res · Patacones ×2».
+  const summaryOf = (l: CartLine) => {
+    const item = byId.get(l.productId)
+    return item ? chosenSummary(chosenOptions(item.groups ?? [], fromPayload(l.options))) : ''
+  }
+  const [editing, setEditing] = useState<CartLine | null>(null)
+
   function whatsappOrderText() {
     const items = lines.map((l) => {
       const item = byId.get(l.productId)
-      return item ? `• ${l.quantity} × ${item.name}${l.note ? ` (${l.note})` : ''}` : null
+      const chosen = summaryOf(l)
+      return item ? `• ${l.quantity} × ${item.name}${chosen ? ` (${chosen})` : ''}${l.note ? ` — ${l.note}` : ''}` : null
     })
     return [`Hola, quiero pedir en ${menu.business.name}:`, ...items.filter(Boolean), `Total: ${formatMoney(totals.subtotal)}`].join('\n')
   }
@@ -131,6 +141,22 @@ export function CartSheet({
     }
   }
 
+  const editingItem = editing ? byId.get(editing.productId) : undefined
+  if (editing && editingItem)
+    return (
+      <DishSheet
+        item={editingItem}
+        initial={{ options: editing.options, quantity: editing.quantity }}
+        maxQuantity={maxQuantity(editingItem) - quantityOf(lines, editingItem.id) + editing.quantity}
+        confirmLabel="Guardar cambios"
+        onClose={() => setEditing(null)}
+        onConfirm={(options, q) => {
+          onLines(replaceLine(lines, lineKey(editing), editingItem, options, q))
+          setEditing(null)
+        }}
+      />
+    )
+
   return (
     <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/50 pm-wide:items-center" role="dialog" aria-modal="true" aria-label="Tu pedido">
       <div className="flex max-h-[92%] w-full max-w-lg flex-col rounded-t-3xl bg-(--pm-bg) text-(--pm-text) shadow-2xl ring-1 ring-(--pm-border) pm-wide:rounded-3xl">
@@ -157,8 +183,8 @@ export function CartSheet({
             <>
               {issues.length > 0 && (
                 <ul className="space-y-1 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">
-                  {issues.map((i) => (
-                    <li key={i.productId}>• {i.message}</li>
+                  {issues.map((i, n) => (
+                    <li key={`${i.productId}-${n}`}>• {i.message}</li>
                   ))}
                 </ul>
               )}
@@ -166,33 +192,44 @@ export function CartSheet({
                 {lines.map((l) => {
                   const item = byId.get(l.productId)
                   if (!item) return null
+                  const key = lineKey(l)
+                  const unit = lineUnitPrice(item, l)
+                  const chosen = summaryOf(l)
                   return (
-                    <li key={l.productId} className="space-y-2 py-3">
+                    <li key={key} className="space-y-2 py-3">
                       <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
                           <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-(--pm-muted) tabular-nums">{formatMoney(item.price)} c/u</p>
+                          {chosen && <p className="text-sm text-(--pm-muted)">{chosen}</p>}
+                          <p className="text-sm text-(--pm-muted) tabular-nums">
+                            {formatMoney(unit)} c/u
+                            {(item.groups?.length ?? 0) > 0 && (
+                              <button type="button" onClick={() => setEditing(l)} className="ml-2 font-medium text-(--pm-primary) underline-offset-2 hover:underline" aria-label={`Editar ${item.name}`}>
+                                Editar
+                              </button>
+                            )}
+                          </p>
                         </div>
                         <span className="flex items-center gap-1 rounded-full bg-(--pm-soft) p-1">
-                          <button type="button" onClick={() => onLines(setQuantity(lines, item, l.quantity - 1))} className="flex size-8 items-center justify-center rounded-full bg-(--pm-surface) shadow-sm" aria-label={`Quitar un ${item.name}`}>
+                          <button type="button" onClick={() => onLines(setLineQuantity(lines, key, item, l.quantity - 1))} className="flex size-8 items-center justify-center rounded-full bg-(--pm-surface) shadow-sm" aria-label={`Quitar un ${item.name}`}>
                             <Minus size={15} aria-hidden />
                           </button>
                           <span className="min-w-6 text-center text-sm font-semibold tabular-nums">{l.quantity}</span>
                           <button
                             type="button"
-                            onClick={() => onLines(setQuantity(lines, item, l.quantity + 1))}
-                            disabled={l.quantity >= maxQuantity(item)}
+                            onClick={() => onLines(setLineQuantity(lines, key, item, l.quantity + 1))}
+                            disabled={quantityOf(lines, item.id) >= maxQuantity(item)}
                             className="flex size-8 items-center justify-center rounded-full bg-(--pm-primary) text-(--pm-on-primary) disabled:opacity-40"
                             aria-label={`Agregar otro ${item.name}`}
                           >
                             <Plus size={15} aria-hidden />
                           </button>
                         </span>
-                        <span className="w-20 text-right font-semibold tabular-nums">{formatMoney(item.price * l.quantity)}</span>
+                        <span className="w-20 text-right font-semibold tabular-nums">{formatMoney(unit * l.quantity)}</span>
                       </div>
                       <input
                         value={l.note}
-                        onChange={(e) => onLines(setNote(lines, l.productId, e.target.value))}
+                        onChange={(e) => onLines(setNote(lines, key, e.target.value))}
                         placeholder="Nota para la cocina (sin cebolla, salsa aparte…)"
                         aria-label={`Nota para ${item.name}`}
                         className="w-full rounded-lg bg-(--pm-soft) px-3 py-2 text-sm outline-none placeholder:text-(--pm-muted) focus:ring-2 focus:ring-(--pm-primary)/20"

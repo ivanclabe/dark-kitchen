@@ -126,3 +126,7 @@
 - Vitest: 813/813.
 - `tsc`, `oxlint` (13 avisos de base) y las dos builds pasan.
 - Ayuda: artículo «Preparaciones y sub-recetas», enlace desde Recetas y notas de versión. `dk-copilot` desplegado.
+
+**Ajuste (2026-10-13).** «Nueva preparación» también ofrece **kg** y **l** como unidad base (la base de datos ya los aceptaba). Una preparación guardada en litros:
+- se escribe en ml en su receta, su rendimiento y los platos;
+- la suite `sub_recipes` (54/54) lo prueba con una aguapanela: 250 g + 2.000 ml; rinde 2.000 ml = 2 l a $1.250/l; un lote real de 1.900 ml → 1,9 l; un vaso de 300 ml → 0,3 l; vender 2 vasos → −0,6 l.

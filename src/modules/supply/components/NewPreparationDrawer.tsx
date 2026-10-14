@@ -7,10 +7,16 @@ import { CookingPot } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useCreatePreparation } from '../hooks/usePreparations'
 
-/** The base units a preparation is kept in: weighed, measured or counted. */
+/**
+ * The base units a preparation is kept in: weighed, measured or counted. A
+ * stock or a sauce made by the litre can be kept in l (or kg): recipes and
+ * dishes still write it in ml or g, and it converts (ADR 0056).
+ */
 const BASE_CHOICES = [
   { code: 'g', label: 'Gramos (g)' },
+  { code: 'kg', label: 'Kilogramos (kg)' },
   { code: 'ml', label: 'Mililitros (ml)' },
+  { code: 'l', label: 'Litros (l)' },
   { code: 'unidad', label: 'Unidades' },
 ]
 
@@ -51,7 +57,7 @@ export function NewPreparationDrawer({ open, onClose, onCreated }: { open: boole
         <FormField
           label="Se guarda en"
           required
-          info="La unidad de su inventario. Puedes escribir la receta, el rendimiento y los platos en otras compatibles (kg, l, porciones): se convierten solas."
+          info="La unidad de su inventario: su stock y su costo van en ella. La receta, el rendimiento y los platos se pueden escribir en otra compatible (g o kg, ml o l, porciones): se convierten solas."
         >
           {(a11y) => (
             <Select {...a11y} value={baseCode} onChange={(e) => setBaseCode(e.target.value)}>

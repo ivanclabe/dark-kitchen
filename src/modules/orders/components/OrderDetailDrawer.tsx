@@ -102,6 +102,11 @@ function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }
             item.productName
           )}
         </p>
+        {item.options && item.options.length > 0 && (
+          <p className="mt-0.5 text-xs text-neutral-400">
+            {item.options.map((o) => `${o.name}${o.quantity > 1 ? ` ×${o.quantity}` : ''}${o.pricing === 'extra' ? ` (+${formatMoney(o.unitPrice * o.quantity)})` : ''}`).join(' · ')}
+          </p>
+        )}
         {item.observation && (
           <p className="mt-0.5 flex items-center gap-1 text-xs text-amber-300">
             <AlertTriangle size={11} className="shrink-0" aria-hidden /> {item.observation}

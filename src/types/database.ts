@@ -2884,9 +2884,83 @@ export type Database = {
           },
         ]
       }
+      dk_order_item_options: {
+        Row: {
+          component_ingredient_id: string | null
+          component_product_id: string | null
+          component_quantity: number | null
+          created_at: string
+          group_name: string
+          id: string
+          kitchen_id: string
+          option_id: string | null
+          option_name: string
+          order_item_id: string
+          pricing: string
+          quantity: number
+          sort_order: number
+          unit_price: number
+        }
+        Insert: {
+          component_ingredient_id?: string | null
+          component_product_id?: string | null
+          component_quantity?: number | null
+          created_at?: string
+          group_name: string
+          id?: string
+          kitchen_id?: string
+          option_id?: string | null
+          option_name: string
+          order_item_id: string
+          pricing: string
+          quantity: number
+          sort_order?: number
+          unit_price?: number
+        }
+        Update: {
+          component_ingredient_id?: string | null
+          component_product_id?: string | null
+          component_quantity?: number | null
+          created_at?: string
+          group_name?: string
+          id?: string
+          kitchen_id?: string
+          option_id?: string | null
+          option_name?: string
+          order_item_id?: string
+          pricing?: string
+          quantity?: number
+          sort_order?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_order_item_options_item_fkey"
+            columns: ["kitchen_id", "order_item_id"]
+            isOneToOne: false
+            referencedRelation: "dk_order_items"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_order_item_options_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_order_item_options_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "dk_product_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_order_items: {
         Row: {
           created_at: string
+          estimated_unit_cost: number | null
           id: string
           kitchen_id: string
           kitchen_status: Database["public"]["Enums"]["dk_kitchen_item_status"]
@@ -2901,6 +2975,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          estimated_unit_cost?: number | null
           id?: string
           kitchen_id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
@@ -2915,6 +2990,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          estimated_unit_cost?: number | null
           id?: string
           kitchen_id?: string
           kitchen_status?: Database["public"]["Enums"]["dk_kitchen_item_status"]
@@ -3592,6 +3668,153 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_today_menu"
             referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      dk_product_option_groups: {
+        Row: {
+          allow_repeat: boolean
+          created_at: string
+          id: string
+          kitchen_id: string
+          max_select: number
+          min_select: number
+          name: string
+          product_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allow_repeat?: boolean
+          created_at?: string
+          id?: string
+          kitchen_id?: string
+          max_select?: number
+          min_select?: number
+          name: string
+          product_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allow_repeat?: boolean
+          created_at?: string
+          id?: string
+          kitchen_id?: string
+          max_select?: number
+          min_select?: number
+          name?: string
+          product_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_product_option_groups_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_option_groups_product_id_fkey"
+            columns: ["kitchen_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+        ]
+      }
+      dk_product_options: {
+        Row: {
+          active: boolean
+          component_ingredient_id: string | null
+          component_product_id: string | null
+          component_quantity: number | null
+          component_unit_id: string | null
+          component_unit_quantity: number | null
+          created_at: string
+          group_id: string
+          id: string
+          is_default: boolean
+          kitchen_id: string
+          name: string
+          price: number
+          pricing: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          component_ingredient_id?: string | null
+          component_product_id?: string | null
+          component_quantity?: number | null
+          component_unit_id?: string | null
+          component_unit_quantity?: number | null
+          created_at?: string
+          group_id: string
+          id?: string
+          is_default?: boolean
+          kitchen_id?: string
+          name: string
+          price?: number
+          pricing?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          component_ingredient_id?: string | null
+          component_product_id?: string | null
+          component_quantity?: number | null
+          component_unit_id?: string | null
+          component_unit_quantity?: number | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          is_default?: boolean
+          kitchen_id?: string
+          name?: string
+          price?: number
+          pricing?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_product_options_component_unit_id_fkey"
+            columns: ["component_unit_id"]
+            isOneToOne: false
+            referencedRelation: "dk_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_options_group_id_fkey"
+            columns: ["kitchen_id", "group_id"]
+            isOneToOne: false
+            referencedRelation: "dk_product_option_groups"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_product_options_ingredient_fkey"
+            columns: ["kitchen_id", "component_ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "dk_ingredients"
+            referencedColumns: ["kitchen_id", "id"]
+          },
+          {
+            foreignKeyName: "dk_product_options_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "dk_kitchens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_product_options_product_fkey"
+            columns: ["kitchen_id", "component_product_id"]
+            isOneToOne: false
+            referencedRelation: "dk_products"
+            referencedColumns: ["kitchen_id", "id"]
           },
         ]
       }
@@ -5835,6 +6058,10 @@ export type Database = {
         Args: { p_kitchen_id?: string; p_master_product_ids: string[] }
         Returns: undefined
       }
+      dk_dish_configuration: {
+        Args: { p_base_price: number; p_product_id: string; p_selections: Json }
+        Returns: Json
+      }
       dk_dispatch_order: {
         Args: { p_notes?: string; p_order_id: string; p_rider_id: string }
         Returns: undefined
@@ -6314,6 +6541,40 @@ export type Database = {
       dk_normalize_phone: { Args: { p_phone: string }; Returns: string }
       dk_normalize_role_name: { Args: { p_name: string }; Returns: string }
       dk_obligation_balance: { Args: { p_obligation: string }; Returns: number }
+      dk_option_unit_cost: {
+        Args: { p_ingredient: string; p_product: string; p_quantity: number }
+        Returns: number
+      }
+      dk_order_add_item: {
+        Args: {
+          p_base_price?: number
+          p_observation?: string
+          p_options?: Json
+          p_order_id: string
+          p_product_id: string
+          p_quantity: number
+        }
+        Returns: string
+      }
+      dk_order_insert_line: {
+        Args: {
+          p_config: Json
+          p_observation: string
+          p_order_id: string
+          p_product_id: string
+          p_quantity: number
+        }
+        Returns: string
+      }
+      dk_order_line_requirements: {
+        Args: { p_lines: Json }
+        Returns: {
+          ingredient_id: string
+          line_key: string
+          required: number
+        }[]
+      }
+      dk_order_lines: { Args: { p_order_id: string }; Returns: Json }
       dk_order_search: {
         Args: {
           p_channel?: Database["public"]["Enums"]["dk_order_channel"]
@@ -6449,6 +6710,15 @@ export type Database = {
       }
       dk_preparations_can_read: { Args: never; Returns: boolean }
       dk_presence_allowed: { Args: { p_topic: string }; Returns: boolean }
+      dk_product_composition: { Args: { p_product_id: string }; Returns: Json }
+      dk_product_composition_json: {
+        Args: { p_product_id: string; p_public?: boolean }
+        Returns: Json
+      }
+      dk_product_composition_save: {
+        Args: { p_groups: Json; p_product_id: string }
+        Returns: Json
+      }
       dk_provision_organization: {
         Args: {
           p_account_icon?: string

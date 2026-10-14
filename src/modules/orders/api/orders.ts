@@ -13,7 +13,8 @@ const SELECT = `
   dk_customers ( full_name, address, phone, customer_type, preferred, preferred_note ),
   dk_kitchen_tickets ( priority ),
   dk_deliveries ( status, rider_id, dispatched_at, delivered_at, dk_delivery_riders ( full_name ) ),
-  dk_order_items ( id, product_id, quantity, unit_price, line_total, observation, kitchen_status, created_at, dk_products ( name ) ),
+  dk_order_items ( id, product_id, quantity, unit_price, line_total, observation, kitchen_status, created_at, dk_products ( name ),
+    dk_order_item_options ( group_name, option_name, quantity, pricing, unit_price, sort_order ) ),
   dk_order_payments ( id, amount, method, note, created_at, voids_payment_id, dk_users!dk_order_payments_created_by_fkey ( full_name ) )
 `
 
@@ -56,6 +57,7 @@ interface OrderRow {
     kitchen_status: Order['items'][number]['kitchenStatus']
     created_at: string
     dk_products: One<{ name: string }>
+    dk_order_item_options?: { group_name: string; option_name: string; quantity: number; pricing: 'included' | 'extra' | 'courtesy'; unit_price: number; sort_order: number }[]
   }[]
   dk_order_payments?: {
     id: string
@@ -109,6 +111,9 @@ export function mapOrder(row: OrderRow): Order {
         lineTotal: Number(item.line_total),
         observation: item.observation,
         kitchenStatus: item.kitchen_status,
+        options: [...(item.dk_order_item_options ?? [])]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((o) => ({ groupName: o.group_name, name: o.option_name, quantity: o.quantity, pricing: o.pricing, unitPrice: Number(o.unit_price) })),
       })),
     payments: [...(row.dk_order_payments ?? [])]
       .sort((a, b) => a.created_at.localeCompare(b.created_at))

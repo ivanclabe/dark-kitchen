@@ -13,9 +13,9 @@ questions:
   - ¿Qué es el rendimiento de una preparación?
   - ¿Cuánto me cuesta una porción de salsa?
   - No puedo confirmar un pedido, dice que falta una preparación
-keywords: [sub-receta, subreceta, preparación, preparaciones, lote, lotes, producción, salsa, ensalada base, mise en place, rendimiento, porción, costo por porción, anular lote]
+keywords: [litros, kilos, aguapanela, fondo, sub-receta, subreceta, preparación, preparaciones, lote, lotes, producción, salsa, ensalada base, mise en place, rendimiento, porción, costo por porción, anular lote]
 related: [recipes-and-cost, stock, inventory-deduction, waste-adjustments]
-updated: 2026-10-12
+updated: 2026-10-13
 order: 6
 ---
 
@@ -24,10 +24,12 @@ Una **preparación** (o sub-receta) es algo que haces en tu cocina y luego usas 
 ## Crear una preparación
 
 1. Abre **Abastecimiento → Preparaciones** y toca **Nueva**.
-2. Escribe el **Nombre** y elige dónde se guarda: gramos, mililitros o unidades. Toca **Crear y escribir su receta**.
+2. Escribe el **Nombre** y elige dónde se guarda: gramos, kilogramos, mililitros, litros o unidades (una aguapanela o un fondo que haces por litros puede guardarse en **litros**). Toca **Crear y escribir su receta**.
 3. Agrega lo que lleva **un lote**, en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones.
-4. En **Rinde por lote**, escribe lo que sale (por ejemplo **0,85 kg**). Si quieres, define **Una porción** (por ejemplo 25 g).
-5. Toca **Guardar como nueva versión**. Ves el **costo del lote**, el **costo por gramo** y el **costo por porción**.
+4. En **Rinde por lote**, escribe lo que sale (por ejemplo **0,85 kg**, o **2.000 ml** de una preparación en litros). Si quieres, define **Una porción** (por ejemplo 25 g).
+5. Toca **Guardar como nueva versión**. Ves el **costo del lote**, el costo por su unidad (gramo, litro…) y el **costo por porción**.
+
+Guardada en litros o kilos, la puedes seguir escribiendo en mililitros o gramos en su receta y en los platos (un vaso de **300 ml** se descuenta como 0,3 l): se convierte sola.
 
 ## Preparar un lote
 

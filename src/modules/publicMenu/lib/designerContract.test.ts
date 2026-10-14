@@ -54,6 +54,24 @@ describe('AI designer contract (ADR 0054)', () => {
     expect(JSON.stringify(d)).not.toContain('evil')
   })
 
+  it('ADR 0058: keeps the logo, lets the model choose the framing and the veil, never an image', () => {
+    const logo = 'kitchens/k1/branding/logo.webp'
+    const mine: Design = { ...base, header: { style: 'cover', cover, logo, coverPosition: 'top' }, background: { kind: 'image', image: 'kitchens/k1/branding/bg.webp', overlay: 'strong' } }
+    const d = sanitizeDesign(
+      { template: 'fresh', colors: TEMPLATE_COLORS.fresh, header: { logo: 'https://evil.example/l.png', coverPosition: 'bottom' }, background: { overlay: 'light', image: 'https://evil.example/b.png' } },
+      mine,
+    )
+    expect(d.header).toMatchObject({ cover, logo, coverPosition: 'bottom' })
+    expect(d.background).toMatchObject({ kind: 'image', image: 'kitchens/k1/branding/bg.webp', overlay: 'light' })
+    expect(JSON.stringify(d)).not.toContain('evil')
+    // Without a choice, the business's framing and veil stay; the model never sees the images.
+    const kept = sanitizeDesign({ template: 'fresh', colors: TEMPLATE_COLORS.fresh }, mine)
+    expect(kept.header?.coverPosition).toBe('top')
+    expect(kept.background?.overlay).toBe('strong')
+    expect(JSON.stringify(designForModel(mine))).not.toContain('branding')
+    expect(asDesign({ template: 'modern', header: { logo } })?.header?.logo).toBe(logo)
+  })
+
   it('keeps the business photos: the model never sets images', () => {
     const d = sanitizeDesign({ template: 'modern', colors: TEMPLATE_COLORS.modern, background: { kind: 'image' } }, base)
     expect(d.header?.cover).toBe(cover)

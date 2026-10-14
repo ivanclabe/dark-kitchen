@@ -16,6 +16,20 @@ updated: 2026-10-12
 order: 1
 ---
 
+## 13 de octubre de 2026
+
+- **Platos configurables.** Un plato puede tener opciones que el cliente elige: sopa, proteína, bebida, acompañantes. Cada opción es **incluida**, **extra** (con su precio) o de **cortesía**, y descuenta del inventario lo que lleva, en cualquier unidad, incluso otra receta o una preparación.
+  - **Menú público:** el cliente ve el plato con sus opciones y precios, y un resumen con el total antes de agregarlo.
+  - **Caja, cocina y seguimiento:** muestran lo que se eligió.
+  - **Costos:** cada opción y cada plato muestran su costo y su margen, e Insights usa el costo de lo elegido.
+  - Ver [Platos configurables](help:dish-composition).
+- **Menú público renovado.** Las seis plantillas tienen un diseño nuevo, más moderno: Moderna, Elegante, Artesanal, **Noche** (antes Dark premium), Fresca y **Clásica** (antes Carta tradicional).
+  - Se ven bien aunque tus platos no tengan foto: ya no aparece un recuadro gris.
+  - Arriba, una franja dice si estás abierto, el costo del domicilio, si se puede recoger y el pedido mínimo.
+  - Botón **+** para agregar, etiqueta **Oferta** en los precios especiales y barra de categorías que sigue lo que el cliente está viendo.
+- **Tu logo y tus imágenes.** En **Menú público → Diseño**, la sección **Imágenes de tu marca** te deja subir tu **logo**, una **imagen de cabecera** (con cualquier estilo de cabecera y el encuadre que elijas) y una **imagen de fondo** con un velo para que el menú se lea. Ver [Menú público y pedidos online](help:public-menu).
+- **Preparaciones en litros o kilos.** Una aguapanela o un fondo se puede guardar en litros y usar en mililitros en sus recetas y en los platos.
+
 ## 12 de octubre de 2026
 
 - **Preparaciones y sub-recetas.** En **Abastecimiento → Preparaciones** creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción.

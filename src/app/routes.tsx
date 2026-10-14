@@ -6,6 +6,7 @@ import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
 import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
 import { InvoiceImportPage } from '@/modules/supply/pages/InvoiceImportPage'
 import { PreparationRecipePage } from '@/modules/supply/pages/PreparationRecipePage'
+import { CompositionEditorPage } from '@/modules/menuPlanner/pages/CompositionEditorPage'
 import { CatalogPage } from '@/modules/menuPlanner/pages/CatalogPage'
 import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
 import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
@@ -171,6 +172,8 @@ const routes: RouteObject[] = [
           // Catálogo — Planificador de Menús: platos, calendario y recetas; ?view=shared, los platos compartidos (ADR 0024).
           { path: 'menu-planner', element: <CatalogPage /> },
           { path: 'recipes/:productId', element: <RecipeEditorPage /> },
+          // ADR 0059: what the customer chooses in a dish.
+          { path: 'dishes/:productId/composition', element: <CompositionEditorPage /> },
           // Abastecimiento — Stock, Compras y Proveedores. La vista y el elemento seleccionado viven en la URL.
           { path: 'supply', element: <SupplyPage /> },
           { path: 'supply/:view', element: <SupplyPage /> },

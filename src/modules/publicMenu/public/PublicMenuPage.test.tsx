@@ -130,9 +130,11 @@ describe('Menú público con diseño (ADR 0053)', () => {
     expect(screen.getByRole('button', { name: 'Agregar Sopa' })).toBeTruthy()
   })
 
-  it('without a design it keeps the previous look', async () => {
+  it('without a design it shows the renewed «Moderna» (ADR 0058)', async () => {
     const { container } = renderPage()
     await screen.findByRole('heading', { name: 'Sopa donde Carmen' })
-    expect((container.querySelector('[data-template]') as HTMLElement).style.getPropertyValue('--pm-bg')).toBe('#FAFAF9')
+    const root = container.querySelector('[data-template]') as HTMLElement
+    expect(root.dataset.template).toBe('modern')
+    expect(root.style.getPropertyValue('--pm-bg')).toBe('#FFFFFF')
   })
 })

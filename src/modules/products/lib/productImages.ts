@@ -42,20 +42,25 @@ export interface PreparedImage {
  * Phone photos are large: the browser shrinks them to MAX_SIDE and encodes
  * WebP (JPEG where the browser cannot write WebP), usually 150–400 KB.
  */
-export async function prepareImage(file: File): Promise<PreparedImage> {
+export async function prepareImage(file: File, { maxSide = MAX_SIDE, fill }: { maxSide?: number; fill?: string } = {}): Promise<PreparedImage> {
   let bitmap: ImageBitmap
   try {
     bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
   } catch {
     throw new Error('No se pudo leer la foto. Prueba con un JPG o PNG.')
   }
-  const { width, height } = fitWithin(bitmap.width, bitmap.height)
+  const { width, height } = fitWithin(bitmap.width, bitmap.height, maxSide)
   const canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('No se pudo procesar la foto.')
   ctx.imageSmoothingQuality = 'high'
+  // A transparent logo would turn black where the browser can only write JPEG: it sits on a solid color.
+  if (fill) {
+    ctx.fillStyle = fill
+    ctx.fillRect(0, 0, width, height)
+  }
   ctx.drawImage(bitmap, 0, 0, width, height)
   bitmap.close()
   const encode = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.85))
