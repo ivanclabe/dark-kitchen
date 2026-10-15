@@ -19,8 +19,9 @@ const VARIANT: Record<ButtonVariant, string> = {
   secondary:
     'border border-neutral-800 bg-neutral-900 text-neutral-200 hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-50',
   ghost: 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100',
+  // Translucent tints of red (ADR 0061): the same soft red button on the dark, light and neutral themes.
   danger:
-    'border border-red-900/50 bg-red-950/30 text-red-400 hover:border-red-800 hover:bg-red-950/60 hover:text-red-300',
+    'border border-red-500/40 bg-red-500/10 text-red-400 hover:border-red-500/60 hover:bg-red-500/15 hover:text-red-300',
   link: 'text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4 !h-auto !px-0 !py-0 !rounded-none',
 }
 

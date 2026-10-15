@@ -74,7 +74,11 @@ export function DayCell({
         )}
       </button>
 
-      <div className={clsx('min-h-0 flex-1 space-y-1 overflow-y-auto px-1.5 pb-1.5', compact ? 'max-h-28' : 'max-h-[440px]')}>
+      {/*
+        The list fills its column (it stretches to the calendar's height) and scrolls inside it: no empty space at
+        the foot. On phones the calendar grows with its content, so each day shows its dishes (up to a limit).
+      */}
+      <div className={clsx('min-h-0 flex-1 space-y-1 overflow-y-auto px-1.5 pb-1.5', compact ? 'max-h-28' : 'max-md:max-h-72 max-md:flex-none')}>
         {sorted.length === 0 ? (
           compact ? null : (
             <p

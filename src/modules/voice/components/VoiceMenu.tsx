@@ -38,7 +38,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
       : handsFree.paused
         ? { icon: EarOff, text: 'En pausa', className: 'border-neutral-800 bg-neutral-900 text-neutral-500' }
         : handsFree.state === 'error'
-          ? { icon: AlertTriangle, text: 'Oye Quanela', className: 'border-red-800 bg-red-500/10 text-red-400' }
+          ? { icon: AlertTriangle, text: 'Oye Quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
           : handsFree.state === 'loading'
             ? { icon: Loader2, text: 'Preparando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-400', iconClassName: 'animate-spin' }
             : { icon: Ear, text: 'Oye Quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }

@@ -240,7 +240,8 @@ export function MenuPlannerPage() {
             />
           </div>
 
-          <div className="min-h-0 min-w-0 flex-1">{calendar}</div>
+          {/* On phones the calendar goes under the catalog with its own height (it does not squeeze into what is left). */}
+          <div className="min-w-0 flex-1 md:min-h-0">{calendar}</div>
         </div>
       </Page>
 

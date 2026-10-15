@@ -43,7 +43,7 @@ export function WeekCalendar({
         </Button>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-4 md:min-h-0 lg:grid-cols-7">
         {dates.map((date) => (
           <DayCell
             key={date}

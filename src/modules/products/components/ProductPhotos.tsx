@@ -171,7 +171,7 @@ function SavedSlot({
         const f = e.dataTransfer.files?.[0]
         if (f && canEdit && !disabled) void upload(f)
       }}
-      className={clsx('group relative aspect-[4/3] overflow-hidden rounded-xl border', error ? 'border-red-800' : 'border-neutral-800')}
+      className={clsx('group relative aspect-[4/3] overflow-hidden rounded-xl border', error ? 'border-red-500/60' : 'border-neutral-800')}
     >
       <input
         ref={inputRef}
@@ -213,10 +213,10 @@ function SavedSlot({
       )}
 
       {error && !save.isPending && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-red-950/90 px-2 py-1.5 text-[11px] text-red-200" role="alert">
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-red-600/95 px-2 py-1.5 text-[11px] text-white" role="alert">
           <span className="min-w-0 truncate">{error}</span>
           {file && (
-            <button type="button" onClick={() => void upload(file)} className="inline-flex shrink-0 items-center gap-1 font-semibold text-red-200 hover:underline">
+            <button type="button" onClick={() => void upload(file)} className="inline-flex shrink-0 items-center gap-1 font-semibold text-white hover:underline">
               <RefreshCw size={10} aria-hidden /> Reintentar
             </button>
           )}
@@ -278,7 +278,7 @@ function PendingSlot({ position, file, disabled, onChange }: { position: Product
         const f = e.dataTransfer.files?.[0]
         if (f && !disabled) choose(f)
       }}
-      className={clsx('group relative aspect-[4/3] overflow-hidden rounded-xl border', error ? 'border-red-800' : 'border-neutral-800')}
+      className={clsx('group relative aspect-[4/3] overflow-hidden rounded-xl border', error ? 'border-red-500/60' : 'border-neutral-800')}
     >
       <input
         ref={inputRef}
@@ -307,7 +307,7 @@ function PendingSlot({ position, file, disabled, onChange }: { position: Product
       ) : (
         <EmptySlot label={position === 1 ? 'Agregar foto' : 'Segunda foto'} hint={disabled ? 'Primero la principal' : 'Toca o arrastra'} disabled={disabled} onPick={() => inputRef.current?.click()} />
       )}
-      {error && <p className="absolute inset-x-0 bottom-0 bg-red-950/90 px-2 py-1.5 text-[11px] text-red-200">{error}</p>}
+      {error && <p className="absolute inset-x-0 bottom-0 bg-red-600/95 px-2 py-1.5 text-[11px] text-white">{error}</p>}
     </div>
   )
 }
