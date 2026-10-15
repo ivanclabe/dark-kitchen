@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { FullScreenLoading } from '@/app/FullScreenLoading'
 import { useMyContext } from '@/shared/kitchen/activeKitchenContext'
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, Building2, Flame, LogOut, SearchX } from 'lucide-react'
@@ -17,7 +18,7 @@ import { TenantContext, useTenant, type TenantValue } from './tenantContext'
 export function TenantProvider({ children }: { children: ReactNode }) {
   const host = useMemo(() => currentHost(), [])
   const code = host.kind === 'tenant' ? host.code : null
-  const { session, profile, loading } = useAuth()
+  const { session, profile, loading, profileLoading } = useAuth()
   const publicQuery = useQuery({
     queryKey: ['tenant-public', code],
     queryFn: () => fetchTenantPublic(code!),
@@ -33,7 +34,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     if (publicQuery.isLoading || loading) return { ...base, status: 'loading' }
     if (publicQuery.isError || !publicQuery.data) return { ...base, status: 'error' }
     const tenant = publicQuery.data
-    // Signed in with an active profile: wait for the memberships before deciding.
+    // Signed in: wait for the profile and then the memberships before deciding (right after signing in there is a
+    // session without a profile yet, and «no access» flashed on slow connections).
+    if (session && !profile && profileLoading) return { ...base, status: 'loading' }
     if (session && profile?.active && ctxQuery.isLoading) return { ...base, status: 'loading' }
     const access = tenantAccess(tenant, Boolean(session), ctxQuery.data)
     return {
@@ -43,7 +46,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
       membership: access.membership,
       accounts: access.accounts,
     }
-  }, [host, code, publicQuery, loading, session, profile?.active, ctxQuery.isLoading, ctxQuery.data])
+  }, [host, code, publicQuery, loading, session, profile, profileLoading, ctxQuery.isLoading, ctxQuery.data])
 
   return <TenantContext value={value}>{children}</TenantContext>
 }
@@ -86,7 +89,7 @@ export function TenantGate() {
 
   switch (tenant.status) {
     case 'loading':
-      return <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-400">Cargando…</div>
+      return <FullScreenLoading stage="session" />
     case 'error':
       return (
         <Screen icon={AlertTriangle} title="No pudimos abrir este espacio">

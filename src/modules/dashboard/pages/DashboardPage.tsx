@@ -1,4 +1,5 @@
 import { useCustomersSummary } from '@/modules/customers/hooks/useCustomers'
+import { TipOfTheDay } from '../components/TipOfTheDay'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { useNotifications } from '@/modules/notifications/hooks'
@@ -404,6 +405,8 @@ export function DashboardPage() {
         <CarteraCard summary={data} liveOps={canSeeLiveOps} />
         {can('staff.view') && <OnShiftCard />}
       </div>
+
+      <TipOfTheDay />
     </Page>
   )
 }

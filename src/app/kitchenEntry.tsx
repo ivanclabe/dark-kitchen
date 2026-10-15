@@ -35,7 +35,7 @@ export function KitchenEntryRedirect() {
     if (ctx) clearAccountChoice()
   }, [ctx])
 
-  if (isLoading || !ctx || crossHost) return <FullScreenLoading />
+  if (isLoading || !ctx || crossHost) return <FullScreenLoading stage="account" />
   if (choose) return <Navigate to="/cuentas" replace />
   if (kitchen) return <Navigate to={kitchenPath(kitchen.slug, '/')} replace />
   return <Navigate to="/cuentas" replace />
@@ -51,7 +51,7 @@ export function LegacyKitchenRedirect() {
   const { pathname, search } = useLocation()
   const { data: ctx, isLoading } = useMyContext()
   const tenant = useTenant()
-  if (isLoading || !ctx) return <FullScreenLoading />
+  if (isLoading || !ctx) return <FullScreenLoading stage="account" />
   // Short paths on a subdomain (/orders, /kitchen…) open in YOUR account of that organization.
   const kitchen = defaultKitchen(ctx, tenant.mode === 'tenant' ? tenant.organization?.id : null)
   if (!kitchen) return <Navigate to="/cuentas" replace />
@@ -67,7 +67,7 @@ export function LegacyOrgRedirect() {
   const { orgSlug, '*': rest = '' } = useParams<{ orgSlug: string; '*': string }>()
   const { search } = useLocation()
   const { data: ctx, isLoading } = useMyContext()
-  if (isLoading || !ctx) return <FullScreenLoading />
+  if (isLoading || !ctx) return <FullScreenLoading stage="account" />
   const organization = ctx.organizations.find((o) => o.slug === orgSlug) ?? null
   const kitchen = organization ? defaultKitchen(ctx, organization.id) : null
   const target = accountPathForOrgSection(`${rest}${search}`)

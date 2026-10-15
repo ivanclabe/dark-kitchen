@@ -74,7 +74,7 @@ export function SignUpConfirmedPage() {
     setAttempt((a) => a + 1)
   }
 
-  if (loading) return <FullScreenLoading />
+  if (loading) return <FullScreenLoading stage="account" />
   // Sin sesión (enlace vencido o abierto en otro navegador): iniciar sesión termina el proceso.
   if (!session) return <Navigate to={`/login?next=${encodeURIComponent('/registro/confirmado')}`} replace />
   if (created) {

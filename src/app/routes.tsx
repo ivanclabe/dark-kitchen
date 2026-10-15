@@ -1,4 +1,5 @@
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
+import { LoadingState } from '@/shared/ui/LoadingState'
 import { applyRouteDefault } from '@/shared/appearance/appearance'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
@@ -72,7 +73,8 @@ const DashboardPage = lazy(() =>
 )
 const InsightsPage = lazy(() => import('@/modules/insights/pages/InsightsPage').then((m) => ({ default: m.InsightsPage })))
 
-const loading = <p className="text-neutral-400">Cargando…</p>
+// A lazy page (dashboard, Insights) inside the layout: its skeleton, not a bare «Cargando…».
+const loading = <LoadingState variant="cards" rows={3} cols={3} label="Preparando la pantalla…" />
 
 const routes: RouteObject[] = [
   // Pública: presentación del producto, antes de iniciar sesión.

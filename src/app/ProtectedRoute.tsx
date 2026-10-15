@@ -1,4 +1,5 @@
 import { AccountDisabledPage } from '@/modules/auth/pages/AccountDisabledPage'
+import { FullScreenLoading } from './FullScreenLoading'
 import { NoProfilePage } from '@/modules/auth/pages/NoProfilePage'
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { useAuth } from '@/shared/hooks/useAuth'
@@ -17,11 +18,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   // usuario vería la pantalla completa parpadear a "Cargando…" en medio de
   // su trabajo cada vez que el token se renueva.
   if (loading || (profileLoading && !profile)) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-400">
-        Cargando…
-      </div>
-    )
+    return <FullScreenLoading stage="session" />
   }
 
   if (!session) {
