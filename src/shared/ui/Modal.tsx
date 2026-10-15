@@ -1,4 +1,6 @@
 import { useId, useRef, type ReactNode } from 'react'
+import { RobotFace } from '@/shared/robot/RobotFace'
+import type { RobotMood } from '@/shared/robot/expressions'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { useDialogA11y } from '../hooks/useDialogA11y'
@@ -69,6 +71,7 @@ export function ConfirmDialog({
   confirmLabel = 'Confirmar',
   danger = false,
   pending = false,
+  mood,
 }: {
   open: boolean
   onClose: () => void
@@ -78,7 +81,13 @@ export function ConfirmDialog({
   confirmLabel?: string
   danger?: boolean
   pending?: boolean
+  /**
+   * ADR 0060: the robot next to the description. By default the warning one on destructive actions and none
+   * on the rest (`null` turns it off). The buttons and their safety do not change.
+   */
+  mood?: RobotMood | null
 }) {
+  const face = mood === undefined ? (danger ? 'warning' : null) : mood
   return (
     <Modal
       open={open}
@@ -95,7 +104,14 @@ export function ConfirmDialog({
         </>
       }
     >
-      {description}
+      {face ? (
+        <div className="flex items-start gap-3.5">
+          <RobotFace mood={face} size={48} className="mt-0.5" />
+          <div className="min-w-0 flex-1">{description}</div>
+        </div>
+      ) : (
+        description
+      )}
     </Modal>
   )
 }

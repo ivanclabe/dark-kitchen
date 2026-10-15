@@ -1,10 +1,11 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { supabase } from '@/shared/lib/supabase'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
-import { AlertTriangle, CheckCircle2, Flame, KeyRound } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, KeyRound } from 'lucide-react'
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -24,9 +25,7 @@ function Shell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex justify-center">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
-            <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
-          </span>
+          <BrandMark className="size-14 drop-shadow-[0_8px_18px_rgba(249,115,22,0.35)]" />
         </div>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>
       </div>

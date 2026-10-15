@@ -1,4 +1,5 @@
 import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/business'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { emailError } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { PhoneInput } from '@/shared/ui/PhoneInput'
@@ -18,7 +19,7 @@ import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import clsx from 'clsx'
-import { ArrowLeft, ArrowRight, Check, Flame, MailCheck, RotateCw } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, MailCheck, RotateCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { CONFIRMED_PATH, PUBLIC_SIGNUP_ENABLED, resendConfirmation, savePendingBusiness, signUpBusiness, TURNSTILE_SITE_KEY, type PendingOrganization } from '../api'
@@ -40,9 +41,7 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className={clsx('w-full', { sm: 'max-w-sm', md: 'max-w-xl', xl: 'max-w-5xl' }[width])}>
         <Link to="/" className="mb-6 flex items-center justify-center gap-2 text-neutral-100">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
-            <Flame size={20} className="text-white" strokeWidth={2.5} aria-hidden />
-          </span>
+          <BrandMark className="size-10" />
           <span className="text-lg font-semibold">Quanela</span>
         </Link>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>

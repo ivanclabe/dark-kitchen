@@ -1,11 +1,12 @@
 import { supabase } from '@/shared/lib/supabase'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
-import { Flame } from 'lucide-react'
+import {  } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -57,9 +58,7 @@ export function SignUpAdminPage() {
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
-            <Flame size={24} className="text-white" strokeWidth={2.5} aria-hidden />
-          </span>
+          <BrandMark className="size-14 drop-shadow-[0_8px_18px_rgba(249,115,22,0.35)]" />
           <div>
             <h1 className={typography.h1}>Crear el administrador de la plataforma</h1>
             <p className={`mt-1 ${typography.small}`}>Solo para la primera cuenta de una instalación nueva.</p>

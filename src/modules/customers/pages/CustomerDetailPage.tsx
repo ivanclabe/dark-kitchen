@@ -195,7 +195,7 @@ export function CustomerDetailPage() {
     return (
       <Page>
         <PageHeader help="customers" title="Cliente" icon={Users} backTo={back.to} backLabel={back.label} />
-        <EmptyState icon={Users} title="Cliente no encontrado" description="Puede que haya sido eliminado o el enlace esté mal." />
+        <EmptyState icon={Users} mood="noResults" title="Cliente no encontrado" description="Puede que haya sido eliminado o el enlace esté mal." />
       </Page>
     )
   }

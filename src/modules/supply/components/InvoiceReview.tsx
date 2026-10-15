@@ -1,4 +1,5 @@
 import { useUnits } from '@/shared/hooks/useUnits'
+import { Feedback } from '@/shared/ui/Feedback'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { Button } from '@/shared/ui/Button'
@@ -200,16 +201,13 @@ export function InvoiceReview({
         )}
 
         {extraction.warnings.length > 0 && (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-            <p className="flex items-center gap-1.5 font-medium">
-              <AlertTriangle size={14} aria-hidden /> Al leerla, Quanela notó:
-            </p>
-            <ul className="mt-1 list-disc pl-5 text-amber-200/90">
+          <Feedback tone="warning" role={null} title="Al leerla, Quanela notó:">
+            <ul className="mt-1 list-disc pl-5 text-neutral-300">
               {extraction.warnings.map((w) => (
                 <li key={w}>{w}</li>
               ))}
             </ul>
-          </div>
+          </Feedback>
         )}
 
         {match.duplicateInvoice && draft.supplier?.kind === 'existing' && (

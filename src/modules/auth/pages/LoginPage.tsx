@@ -1,4 +1,5 @@
 import { INVALID_CREDENTIALS_MESSAGE } from '@/shared/utils/authErrors'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
@@ -9,7 +10,7 @@ import { useTenant } from '@/shared/tenant/tenantContext'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
-import { ArrowLeft, CircleHelp, Eye, EyeOff, Flame, LogIn } from 'lucide-react'
+import { ArrowLeft, CircleHelp, Eye, EyeOff, LogIn } from 'lucide-react'
 import { useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { OwnerMethodButtons, PhoneSignIn } from '@/modules/signup/components/OwnerMethods'
@@ -24,12 +25,10 @@ const GRID: CSSProperties = {
   backgroundSize: '40px 40px',
 }
 
-function BrandMark({ name }: { name: string }) {
+function PanelBrand({ name }: { name: string }) {
   return (
     <span className="flex items-center gap-3">
-      <span className="flex size-11 items-center justify-center rounded-xl border border-white/20 bg-white/15 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
-        <Flame size={20} className="text-white" strokeWidth={2.5} aria-hidden />
-      </span>
+      <BrandMark className="size-12 rounded-[0.9rem] ring-2 ring-white/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]" />
       <span className="text-base font-semibold text-white">{name}</span>
     </span>
   )
@@ -88,7 +87,7 @@ export function LoginPage() {
         <div className="pointer-events-none absolute -top-32 -left-32 size-[28rem] rounded-full bg-brasa-500/30 blur-3xl" aria-hidden />
 
         <div className="relative">
-          <BrandMark name="Quanela" />
+          <PanelBrand name="Quanela" />
         </div>
 
         <div className="relative max-w-xl space-y-4">
@@ -107,9 +106,7 @@ export function LoginPage() {
           {/* The brand, on phones and tablets (the side panel is hidden). */}
           <div className="mb-10 flex justify-center lg:hidden">
             <span className="flex items-center gap-3">
-              <span className="flex size-11 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_8px_24px_-8px_var(--color-brasa-500)]">
-                <Flame size={20} className="text-white" strokeWidth={2.5} aria-hidden />
-              </span>
+              <BrandMark className="size-12" />
               <span className="text-base font-semibold text-neutral-50">Quanela</span>
             </span>
           </div>

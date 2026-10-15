@@ -1,6 +1,7 @@
 import { Tooltip } from '@/shared/ui/Tooltip'
+import { RobotFace } from '@/shared/robot/RobotFace'
 import clsx from 'clsx'
-import { Clock, KeyRound, Loader2, RefreshCw, Sparkles, TriangleAlert } from 'lucide-react'
+import { Clock, KeyRound, RefreshCw, Sparkles, TriangleAlert } from 'lucide-react'
 import { useRefreshAiInsight } from '../hooks/useAi'
 import { useToast } from '@/shared/ui/Toast'
 import { ACTION_LABEL, retryLabel } from '../lib/catalog'
@@ -38,13 +39,18 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
   function reanalyze() {
     refresh.mutate(undefined, {
       onSuccess: (r) => {
-        if (r.kind === 'rate_limited') show(`${r.message} Vuelve a intentarlo ${retryLabel(r.retryAfter)}.`, 'error')
+        if (r.kind === 'rate_limited') show(`${r.message} Vuelve a intentarlo ${retryLabel(r.retryAfter)}.`, 'warning')
       },
     })
   }
 
   let body: ReactNode
-  if (busy) body = <span className="inline-flex items-center gap-1.5 text-neutral-400"><Loader2 size={12} className="animate-spin" /> Analizando con IA…</span>
+  if (busy)
+    body = (
+      <span role="status" className="inline-flex items-center gap-1.5 text-neutral-400">
+        <RobotFace mood="ai" size={28} animated className="-my-1.5" /> Analizando con IA…
+      </span>
+    )
   else if (!result) body = null
   else if (result.kind === 'not_configured')
     body = <span className="inline-flex items-center gap-1.5 text-neutral-500"><KeyRound size={12} /> IA no conectada: se muestran solo los datos calculados.</span>

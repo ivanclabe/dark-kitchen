@@ -129,6 +129,7 @@ export function SupplyPage() {
     ) : (
       <EmptyState
         icon={CookingPot}
+        mood={null}
         title="Selecciona una preparación"
         description="Una salsa de la casa o una ensalada base: escribe su receta con lo que rinde, prepárala por lotes y úsala en tus platos sin copiar su costo."
       />
@@ -139,6 +140,7 @@ export function SupplyPage() {
     ) : (
       <EmptyState
         icon={ShoppingCart}
+        mood={null}
         title="Selecciona una compra"
         description="Elige una factura de la lista o crea una nueva: a mano o importándola desde la foto o el PDF de la factura."
       />
@@ -151,7 +153,7 @@ export function SupplyPage() {
         onSelectPurchase={(p) => go('compras', p.id)}
       />
     ) : (
-      <EmptyState icon={Truck} title="Selecciona un proveedor" description="Elige un proveedor de la lista para ver sus compras e insumos." />
+      <EmptyState icon={Truck} mood={null} title="Selecciona un proveedor" description="Elige un proveedor de la lista para ver sus compras e insumos." />
     )
   }
 

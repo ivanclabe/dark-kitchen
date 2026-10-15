@@ -103,7 +103,7 @@ export function DispatchView({ orders, isLoading, now }: { orders: Order[] | und
 
   if (isLoading) return <LoadingState variant="cards" rows={3} cols={2} />
   if (ready.length === 0 && onRoute.length === 0) {
-    return <EmptyState icon={Bike} title="Nada por despachar" description="Cuando cocina marque un pedido como listo, aparece aquí para salir." />
+    return <EmptyState icon={Bike} mood="idle" title="Nada por despachar" description="Cuando cocina marque un pedido como listo, aparece aquí para salir." />
   }
 
   return (

@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { Feedback } from '@/shared/ui/Feedback'
 import { Card } from '@/shared/ui/Card'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -7,7 +8,7 @@ import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { AlertTriangle, Calculator, Info, Lock } from 'lucide-react'
+import { Calculator, Info, Lock } from 'lucide-react'
 import { usePnl, useSetVatDeductible } from '../hooks'
 import { coverageNotes, statementRows } from '../lib/finance'
 import { usePeriod } from '../lib/usePeriod'
@@ -29,7 +30,7 @@ export function ProfitTab() {
   const { show } = useToast()
 
   if (!allowed) {
-    return <EmptyState icon={Lock} title="Sin acceso a la rentabilidad" description="Ver costos y utilidad necesita el permiso de rentabilidad (Insights)." />
+    return <EmptyState mood={null} icon={Lock} title="Sin acceso a la rentabilidad" description="Ver costos y utilidad necesita el permiso de rentabilidad (Insights)." />
   }
 
   const data = pnl.data
@@ -58,16 +59,13 @@ export function ProfitTab() {
 
           <div className="space-y-4">
             {notes.length > 0 && (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-                <p className="flex items-center gap-1.5 font-medium">
-                  <AlertTriangle size={14} aria-hidden /> Para que la utilidad sea completa
-                </p>
-                <ul className="mt-1 list-disc space-y-0.5 pl-5 text-amber-200/90">
+              <Feedback tone="warning" role={null} title="Para que la utilidad sea completa">
+                <ul className="mt-1 list-disc space-y-0.5 pl-5 text-neutral-300">
                   {notes.map((n) => (
                     <li key={n}>{n}</li>
                   ))}
                 </ul>
-              </div>
+              </Feedback>
             )}
             <div className="space-y-2 rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-3 text-sm text-neutral-300">
               <p className="flex items-center gap-1.5 font-medium text-neutral-100">

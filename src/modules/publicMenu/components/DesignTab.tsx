@@ -93,7 +93,7 @@ function DesignEditor({ settings, onReset }: { settings: PublicMenuSettings; onR
     if (!(await flush())) return
     try {
       await publish.mutateAsync()
-      show('Diseño publicado: tus clientes ya ven el menú así.')
+      show('Diseño publicado: tus clientes ya ven el menú así.', 'success', { mood: 'celebrate' })
     } catch (err) {
       show(getErrorMessage(err, 'No se pudo publicar el diseño'), 'error')
     }

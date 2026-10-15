@@ -175,6 +175,7 @@ export function PurchasePanel({
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={ShoppingCart}
+            mood={query || filter !== 'TODAS' ? 'noResults' : 'empty'}
             title={query || filter !== 'TODAS' ? 'Sin resultados' : 'Todavía no hay compras'}
             description={query || filter !== 'TODAS' ? 'Ajusta la búsqueda o el filtro.' : 'Crea un borrador para registrar la primera factura.'}
             compact

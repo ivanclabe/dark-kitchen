@@ -195,7 +195,7 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
           isLoading={isLoading}
           error={error}
           onRetry={() => void refetch()}
-          emptyState={<EmptyState icon={ClipboardList} title="Sin pedidos" description="Ningún pedido coincide con la búsqueda y los filtros." compact />}
+          emptyState={<EmptyState icon={ClipboardList} mood="noResults" title="Sin pedidos" description="Ningún pedido coincide con la búsqueda y los filtros." compact />}
         />
         {hasNextPage && (
           <div className="flex justify-center py-3">

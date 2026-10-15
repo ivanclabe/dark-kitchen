@@ -115,6 +115,7 @@ export function IngredientPanel({
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Boxes}
+            mood={query || filter !== 'TODOS' ? 'noResults' : 'empty'}
             title={query || filter !== 'TODOS' ? 'Sin resultados' : 'Todavía no hay insumos'}
             description={query || filter !== 'TODOS' ? 'Ajusta la búsqueda o el filtro.' : 'Registra el primero para empezar a controlar el stock.'}
             compact

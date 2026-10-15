@@ -157,6 +157,21 @@ body {
   animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* The robot during long work (ADR 0060): a slow bob. Used with motion-safe:, so it stops with reduced motion. */
+@keyframes robot-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@utility animate-robot-bob {
+  animation: robot-bob 2.4s ease-in-out infinite;
+}
+
 /* ---------------------------------------------------------------------------
    Apariencia (ADR 0023). data-theme / data-text-size los pone en <html> el
    script de index.html (antes del primer pintado) y useAppearance.
@@ -170,8 +185,11 @@ html[data-text-size='large'] {
 /* Tema claro (beta): la app entera usa la escala neutral, así que basta
    invertirla aquí — fondos claros, texto oscuro. Los tonos 300/400 de los
    acentos (pensados para fondo oscuro) pasan a sus versiones 600/700 para
-   mantener el contraste sobre blanco. La marca (brasa-500) no cambia. */
-html[data-theme='light'] {
+   mantener el contraste sobre blanco. La marca (brasa-500) no cambia.
+   .theme-light aplica la misma paleta a una sola parte de la página (las
+   secciones claras de la landing, que reutilizan componentes de la app). */
+html[data-theme='light'],
+.theme-light {
   color-scheme: light;
   --color-neutral-50: oklch(14.5% 0 0);
   --color-neutral-100: oklch(20.5% 0 0);

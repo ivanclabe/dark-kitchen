@@ -1,4 +1,5 @@
 import { useVoiceFlag } from '@/modules/voice/prefs'
+import { RobotFace } from '@/shared/robot/RobotFace'
 import { helpHref } from '@/shared/help/helpUrl'
 import { useVoice, useVoiceHandler } from '@/modules/voice/voiceContext'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -446,10 +447,13 @@ function CopilotPanel({
       <div className="space-y-4" aria-live="polite">
         {messages.length === 0 && (
           <div className="space-y-3">
-            <p className="flex items-start gap-2 text-sm text-neutral-300">
-              <Sparkles size={15} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden /> Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, cobros, entregas o turnos,
-              o dónde se hace algo en Quanela.
-            </p>
+            {/* ADR 0060: the robot greets an empty conversation (it is Quanela's AI). */}
+            <div className="flex items-center gap-3">
+              <RobotFace mood="ai" size={72} className="h-16 w-auto" />
+              <p className="text-sm text-neutral-300">
+                Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, cobros, entregas o turnos, o dónde se hace algo en Quanela.
+              </p>
+            </div>
             <div className="flex flex-col gap-2">
               {suggestions.map((s) => (
                 <button

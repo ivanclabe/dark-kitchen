@@ -1,8 +1,10 @@
-import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react'
+import { RobotFace } from '@/shared/robot/RobotFace'
+import type { RobotMood } from '@/shared/robot/expressions'
+import { X } from 'lucide-react'
 import { createContext, use, useCallback, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-type ToastTone = 'success' | 'error' | 'info'
+type ToastTone = 'success' | 'error' | 'warning' | 'info'
 
 interface ToastAction {
   label: string
@@ -14,12 +16,15 @@ interface ToastItem {
   tone: ToastTone
   message: string
   action?: ToastAction
+  mood?: RobotMood
 }
 
 export interface ToastOptions {
   /** One button next to the message (e.g. "Deshacer"); clicking it also closes the toast. */
   action?: ToastAction
   durationMs?: number
+  /** Another robot than the tone's, e.g. `celebrate` when the menu goes live (ADR 0060). */
+  mood?: RobotMood
 }
 
 interface ToastContextValue {
@@ -28,10 +33,15 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
-const TONE_STYLES: Record<ToastTone, { border: string; icon: ReactNode }> = {
-  success: { border: 'border-emerald-800 bg-emerald-950/90', icon: <CheckCircle2 size={18} className="text-emerald-400" /> },
-  error: { border: 'border-red-800 bg-red-950/90', icon: <AlertCircle size={18} className="text-red-400" /> },
-  info: { border: 'border-neutral-700 bg-neutral-900/95', icon: <Info size={18} className="text-neutral-300" /> },
+/**
+ * Each tone with its frame and its robot (ADR 0060: the robot replaces the generic icon). The surface follows
+ * the theme (neutral-900 is white in the light one) and the tone colors the border, so the text always reads.
+ */
+const TONE_STYLES: Record<ToastTone, { border: string; mood: RobotMood }> = {
+  success: { border: 'border-emerald-500/50 bg-neutral-900/95', mood: 'success' },
+  error: { border: 'border-red-500/50 bg-neutral-900/95', mood: 'error' },
+  warning: { border: 'border-amber-500/50 bg-neutral-900/95', mood: 'warning' },
+  info: { border: 'border-neutral-700 bg-neutral-900/95', mood: 'info' },
 }
 
 let nextId = 1
@@ -46,7 +56,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback(
     (message: string, tone: ToastTone = 'success', options?: ToastOptions) => {
       const id = nextId++
-      setToasts((t) => [...t, { id, tone, message, action: options?.action }])
+      setToasts((t) => [...t, { id, tone, message, action: options?.action, mood: options?.mood }])
       setTimeout(() => dismiss(id), options?.durationMs ?? (options?.action ? 6000 : 4000))
     },
     [dismiss],
@@ -60,9 +70,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           {toasts.map((toast) => (
             <div
               key={toast.id}
-              className={`shadow-float flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-sm text-neutral-100 backdrop-blur ${TONE_STYLES[toast.tone].border}`}
+              role={toast.tone === 'error' || toast.tone === 'warning' ? 'alert' : 'status'}
+              className={`shadow-float flex items-center gap-2.5 rounded-lg border py-2.5 pr-3.5 pl-2.5 text-sm text-neutral-100 backdrop-blur ${TONE_STYLES[toast.tone].border}`}
             >
-              {TONE_STYLES[toast.tone].icon}
+              <RobotFace mood={toast.mood ?? TONE_STYLES[toast.tone].mood} size={30} />
               <p className="flex-1">{toast.message}</p>
               {toast.action && (
                 <button

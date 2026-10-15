@@ -82,6 +82,7 @@ export function PreparationPanel({
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={CookingPot}
+            mood={query || filter !== 'TODAS' ? 'noResults' : 'empty'}
             title={query || filter !== 'TODAS' ? 'Sin resultados' : 'Todavía no hay preparaciones'}
             description={
               query || filter !== 'TODAS'

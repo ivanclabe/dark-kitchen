@@ -1,4 +1,5 @@
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
+import { Feedback } from '@/shared/ui/Feedback'
 import { Button, buttonClass } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { CurrencyInput } from '@/shared/ui/CurrencyInput'
@@ -9,7 +10,7 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
 import { whatsappLink } from '@/shared/utils/whatsapp'
-import { AlertTriangle, Copy, Download, ExternalLink, Globe, MessageCircle, Palette, QrCode, Save, ShoppingBag } from 'lucide-react'
+import { Copy, Download, ExternalLink, Globe, MessageCircle, Palette, QrCode, Save, ShoppingBag } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { usePublicMenuPreview, useSavePublicMenuSettings } from '../hooks'
 import { openLabel, publicMenuUrl, shareText } from '../lib/cart'
@@ -115,14 +116,13 @@ export function SummaryTab({ settings, onEditDesign }: { settings: PublicMenuSet
   return (
     <div className="space-y-4">
       {warnings.length > 0 && (
-        <ul className="space-y-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-          {warnings.map((w, i) => (
-            <li key={i} className="flex gap-2">
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden />
-              <span>{w}</span>
-            </li>
-          ))}
-        </ul>
+        <Feedback tone="warning" role={null}>
+          <ul className="space-y-1 text-neutral-200">
+            {warnings.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
+        </Feedback>
       )}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

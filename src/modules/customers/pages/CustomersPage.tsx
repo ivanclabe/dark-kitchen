@@ -195,6 +195,7 @@ export function CustomersPage() {
   ) : (
     <EmptyState
       icon={Search}
+      mood="noResults"
       title="No encontramos clientes que coincidan con tu búsqueda"
       description="Prueba con otro nombre, teléfono, correo o dirección, o quita los filtros."
       action={

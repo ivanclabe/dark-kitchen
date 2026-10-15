@@ -29,7 +29,7 @@ export function PayrollTab({ allowed }: { allowed: boolean }) {
   const team = useTeamPay(allowed)
   const payroll = useObligations({ kind: 'payroll' })
   const [editing, setEditing] = useState<TeamMemberPay | null>(null)
-  if (!allowed) return <EmptyState icon={Lock} title="Nómina reservada" description="Ver y liquidar la nómina necesita el permiso de nómina." />
+  if (!allowed) return <EmptyState mood={null} icon={Lock} title="Nómina reservada" description="Ver y liquidar la nómina necesita el permiso de nómina." />
 
   return (
     <div className="space-y-4">

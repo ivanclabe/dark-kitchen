@@ -125,7 +125,7 @@ export function OrderBoard({
 
   const total = columns.reduce((sum, s) => sum + grouped[s].length, 0)
   if (total === 0 && !search.trim()) {
-    return <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyDescription} />
+    return <EmptyState icon={emptyIcon} mood="idle" title={emptyTitle} description={emptyDescription} />
   }
 
   const visibleCount = total

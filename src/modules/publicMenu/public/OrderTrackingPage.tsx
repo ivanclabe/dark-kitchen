@@ -1,4 +1,5 @@
 import { AccountIcon } from '@/shared/avatars/Avatar'
+import { RobotFace } from '@/shared/robot/RobotFace'
 import { formatMoney } from '@/shared/utils/format'
 import { whatsappLink } from '@/shared/utils/whatsapp'
 import { useQuery } from '@tanstack/react-query'
@@ -71,7 +72,19 @@ export function OrderTrackingPage() {
               </p>
             ) : (
               <div className={card}>
-                {o.status === 'NUEVO' && <p className="mb-3 text-sm text-(--pm-muted)">¡Recibido! El negocio lo está revisando y te confirma pronto.</p>}
+                {/* ADR 0060: the robot welcomes the order and thanks the customer when it arrives. */}
+                {o.status === 'NUEVO' && (
+                  <p className="mb-3 flex items-center gap-3 text-sm text-(--pm-muted)">
+                    <RobotFace mood="success" size={40} />
+                    ¡Recibido! El negocio lo está revisando y te confirma pronto.
+                  </p>
+                )}
+                {o.status === 'ENTREGADO' && (
+                  <p className="mb-3 flex items-center gap-3 text-sm font-medium">
+                    <RobotFace mood="thanks" size={40} />
+                    ¡Entregado! Gracias por tu pedido, que lo disfrutes.
+                  </p>
+                )}
                 <ol className="space-y-3" aria-label="Estado del pedido">
                   {stepsFor(o.fulfillment).map((step) => {
                     const done = step.done(o.status)

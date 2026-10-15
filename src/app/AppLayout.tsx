@@ -1,11 +1,12 @@
 import { OnlineIndicator } from './OnlineIndicator'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { canAccessAnyModule } from '@/shared/rbac/roles'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Popover, PopoverItem } from '@/shared/ui/Popover'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
-import { Ellipsis, Flame, Menu } from 'lucide-react'
+import { Ellipsis, Menu } from 'lucide-react'
 import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { ContextIndicator } from './AccountSwitcher'
@@ -114,9 +115,9 @@ export function AppLayout() {
           <Link
             to={path('/')}
             aria-label="Inicio"
-            className="mb-4 flex size-10 shrink-0 items-center justify-center rounded-xl bg-brasa-500 shadow-[0_6px_18px_-8px_var(--color-brasa-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-300"
+            className="mb-4 flex size-10 shrink-0 items-center justify-center rounded-xl shadow-[0_6px_18px_-8px_var(--color-brasa-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-300"
           >
-            <Flame size={19} className="text-white" strokeWidth={2.5} aria-hidden />
+            <BrandMark className="size-10" />
           </Link>
         </Tooltip>
 

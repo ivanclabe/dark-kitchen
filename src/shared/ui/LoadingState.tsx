@@ -1,5 +1,7 @@
 import clsx from 'clsx'
+import type { ReactNode } from 'react'
 import { Loader2 } from 'lucide-react'
+import { Feedback } from './Feedback'
 import { cardClass } from './formClasses'
 import { Skeleton } from './Skeleton'
 
@@ -9,20 +11,30 @@ import { Skeleton } from './Skeleton'
  *   cards  — grilla de tarjetas (KPIs, tickets)
  *   block  — un solo bloque (gráfico, detalle)
  *   inline — spinner + texto, para zonas pequeñas
+ *   ai     — un proceso largo de IA (leer una factura, analizar): el robot
+ *            con su idea y el texto (ADR 0060). Solo para esperas largas;
+ *            las listas siguen con esqueletos
  */
 export function LoadingState({
   variant = 'rows',
   rows = 4,
   cols = 3,
   label = 'Cargando…',
+  hint,
   className,
 }: {
-  variant?: 'rows' | 'cards' | 'block' | 'inline'
+  variant?: 'rows' | 'cards' | 'block' | 'inline' | 'ai'
   rows?: number
   cols?: number
   label?: string
+  /** For `ai`: one line under the label (how long it takes, what it does). */
+  hint?: ReactNode
   className?: string
 }) {
+  if (variant === 'ai') {
+    return <Feedback layout="block" tone="ai" compact title={label} description={hint} role="status" animated className={className} />
+  }
+
   if (variant === 'inline') {
     return (
       <p role="status" className={clsx('inline-flex items-center gap-2 text-sm text-neutral-500', className)}>

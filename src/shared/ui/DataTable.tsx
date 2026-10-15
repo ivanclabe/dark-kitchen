@@ -86,7 +86,7 @@ export function DataTable<T>({
     body = (
       <tr>
         <td colSpan={colCount} className="p-0">
-          {emptyState ?? <EmptyState title="Sin resultados" compact />}
+          {emptyState ?? <EmptyState title="Sin resultados" compact mood="noResults" />}
         </td>
       </tr>
     )

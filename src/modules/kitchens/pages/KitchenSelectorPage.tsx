@@ -1,4 +1,6 @@
 import { lastUsedKitchenId } from '@/app/accountEntry'
+import { Feedback } from '@/shared/ui/Feedback'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { clearActiveKitchen } from '@/app/kitchenEntry'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { setAccountsActive } from '@/modules/organization/api/organization'
@@ -17,7 +19,7 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { ArrowRight, ChefHat, ExternalLink, Flame, History, LogOut, Plus, Power, Store } from 'lucide-react'
+import { ArrowRight, ChefHat, ExternalLink, History, LogOut, Plus, Power, Store } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CreateKitchenDialog } from '../components/CreateKitchenDialog'
@@ -55,9 +57,7 @@ export function KitchenSelectorPage() {
       <div className="mx-auto max-w-4xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-brasa-500">
-              <Flame size={20} className="text-white" strokeWidth={2.5} aria-hidden />
-            </span>
+            <BrandMark className="size-10" />
             <div>
               <h1 className={typography.h1}>Tus cuentas</h1>
               <p className={typography.small}>Hola, {profile?.fullName?.split(' ')[0] ?? 'de nuevo'}. Elige con qué cuenta vas a trabajar.</p>
@@ -76,9 +76,7 @@ export function KitchenSelectorPage() {
         </header>
 
         {missingSlug && (
-          <p role="status" className="rounded-xl border border-amber-800/40 bg-amber-500/5 px-4 py-2.5 text-sm text-amber-300">
-            No tienes acceso a la cuenta “{missingSlug}”, o ya no existe.
-          </p>
+          <Feedback tone="warning" role="status" description={<>No tienes acceso a la cuenta “{missingSlug}”, o ya no existe.</>} />
         )}
 
         {isLoading ? (

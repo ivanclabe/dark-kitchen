@@ -1,11 +1,12 @@
 import { Badge } from '@/shared/ui/Badge'
+import { Feedback } from '@/shared/ui/Feedback'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
 import { Textarea } from '@/shared/ui/FormField'
 import { chipClass } from '@/shared/ui/formClasses'
 import clsx from 'clsx'
-import { AlertTriangle, ArrowRight, PencilRuler, Send, Sparkles, Wand2 } from 'lucide-react'
+import { ArrowRight, PencilRuler, Send, Sparkles, Wand2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DesignerError } from '../../api/publicMenu'
 import { useDesignHistoryAction } from '../../hooks'
@@ -159,10 +160,7 @@ export function AiDesigner({
         </Card>
 
         {error && (
-          <p role="alert" className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden />
-            {error}
-          </p>
+          <Feedback tone="error" description={error} />
         )}
 
         {(pending === 'generate' || proposals.length > 0) && (

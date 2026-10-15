@@ -336,6 +336,7 @@ export function RecipeForm({
         emptyState={
           <EmptyState
             icon={BookOpen}
+            mood="empty"
             title="Sin ingredientes todavía"
             description={prep ? 'Agrega lo que lleva un lote: insumos u otras preparaciones.' : 'Agrega los insumos que lleva este plato para calcular su costo.'}
             action={

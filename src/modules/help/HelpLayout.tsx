@@ -1,7 +1,8 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { BrandMark } from '@/shared/brand/BrandMark'
 import { Drawer } from '@/shared/ui/Drawer'
 import clsx from 'clsx'
-import { ChevronRight, Flame, Menu } from 'lucide-react'
+import { ChevronRight, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
 import { HelpSearch } from './components/HelpSearch'
@@ -101,9 +102,7 @@ export function HelpLayout() {
             <Menu size={20} aria-hidden />
           </button>
           <Link to={helpPath()} className="flex shrink-0 items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-brasa-500">
-              <Flame size={16} className="text-white" strokeWidth={2.5} aria-hidden />
-            </span>
+            <BrandMark className="size-8" />
             <span className="text-sm font-semibold">
               Quanela <span className="hidden font-normal text-neutral-400 sm:inline">· Centro de ayuda</span>
             </span>

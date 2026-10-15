@@ -1,4 +1,6 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { RobotFace } from '@/shared/robot/RobotFace'
+import { Feedback } from '@/shared/ui/Feedback'
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
 import { Button, buttonClass } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -7,7 +9,7 @@ import { LoadingState } from '@/shared/ui/LoadingState'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, CheckCircle2, Copy, FileSearch, Loader2, RefreshCw, ScanText } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, FileSearch, Loader2, RefreshCw, ScanText } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { InvoiceImportError, matchInvoice, reopenInvoiceImport, rereadInvoice, uploadAndReadInvoice } from '../api/invoiceImport'
@@ -82,7 +84,7 @@ export function InvoiceImportPage() {
         backLabel="Volver a Compras"
       />
       {!allowed ? (
-        <EmptyState icon={ScanText} title="No tienes permiso" description="Para importar facturas necesitas poder crear compras y subir facturas." />
+        <EmptyState mood={null} icon={ScanText} title="No tienes permiso" description="Para importar facturas necesitas poder crear compras y subir facturas." />
       ) : importId ? (
         <ImportReview importId={importId} />
       ) : !usable ? (
@@ -138,30 +140,31 @@ function ReadingState({ step }: { step: 'upload' | 'read' }) {
   ]
   const current = step === 'upload' ? 0 : 1
   return (
-    <div className="max-w-md space-y-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5" role="status" aria-live="polite">
-      {steps.map((s, i) => (
-        <p key={s.key} className={i <= current ? 'flex items-center gap-2 text-sm text-neutral-100' : 'flex items-center gap-2 text-sm text-neutral-500'}>
-          {i < current ? <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> : i === current ? <Loader2 size={16} className="animate-spin text-brasa-400" aria-hidden /> : <span className="size-4" />}
-          {s.label}
-        </p>
-      ))}
-      <p className="text-xs text-neutral-500">Puedes salir: la factura queda en Compras → Por revisar.</p>
+    <div className="flex max-w-md items-start gap-4 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5" role="status" aria-live="polite">
+      <RobotFace mood="ai" size={48} animated />
+      <div className="min-w-0 flex-1 space-y-3">
+        {steps.map((s, i) => (
+          <p key={s.key} className={i <= current ? 'flex items-center gap-2 text-sm text-neutral-100' : 'flex items-center gap-2 text-sm text-neutral-500'}>
+            {i < current ? <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> : i === current ? <Loader2 size={16} className="animate-spin text-brasa-400" aria-hidden /> : <span className="size-4" />}
+            {s.label}
+          </p>
+        ))}
+        <p className="text-xs text-neutral-500">Puedes salir: la factura queda en Compras → Por revisar.</p>
+      </div>
     </div>
   )
 }
 
 function DuplicateState({ result, onReadAgain, onOther }: { result: Extract<ReadResult, { kind: 'duplicate' }>; onReadAgain: () => void; onOther: () => void }) {
   return (
-    <div className="max-w-xl space-y-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
-      <p className="flex items-center gap-2 font-medium text-amber-200">
-        <Copy size={16} aria-hidden /> Ya importaste este archivo
-      </p>
-      <p className="text-sm text-neutral-300">
-        {result.purchaseId
-          ? `Se registró como la compra de la factura ${result.invoiceNumber ?? ''}.`
-          : 'Está en Compras → Por revisar.'}
-      </p>
-      <div className="flex flex-wrap gap-2">
+    <Feedback
+      tone="warning"
+      role="status"
+      className="max-w-xl"
+      title="Ya importaste este archivo"
+      description={result.purchaseId ? `Se registró como la compra de la factura ${result.invoiceNumber ?? ''}.` : 'Está en Compras → Por revisar.'}
+    >
+      <div className="mt-3 flex flex-wrap gap-2">
         {result.purchaseId ? (
           <KitchenLink to={`/supply/compras/${result.purchaseId}`} className={buttonClass({ variant: 'primary', size: 'sm' })}>
             Ver la compra
@@ -178,7 +181,7 @@ function DuplicateState({ result, onReadAgain, onOther }: { result: Extract<Read
           Leerla de nuevo
         </Button>
       </div>
-    </div>
+    </Feedback>
   )
 }
 
@@ -266,7 +269,7 @@ function ImportReview({ importId }: { importId: string }) {
     return (
       <div className="max-w-xl space-y-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5">
         {rereading || (invoice.status === 'LEYENDO' && !stale) ? (
-          <LoadingState variant="inline" label="Leyendo la factura…" />
+          <LoadingState variant="ai" label="Leyendo la factura…" hint="Con IA, de 10 a 40 segundos." />
         ) : (
           <>
             <p className="flex items-center gap-2 font-medium text-neutral-100">

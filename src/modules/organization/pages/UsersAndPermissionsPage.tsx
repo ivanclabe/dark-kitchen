@@ -284,6 +284,7 @@ function UsersPanel({
         emptyState={
           <EmptyState
             icon={Users}
+            mood={users.length === 0 ? 'empty' : 'noResults'}
             title={users.length === 0 ? 'Todavía no hay usuarios' : 'Nadie coincide'}
             description={users.length === 0 ? 'Crea los usuarios de tu equipo y asígnales sus roles.' : 'Prueba con otro nombre.'}
             compact

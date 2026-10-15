@@ -120,7 +120,7 @@ export function SlaView({ tickets, now }: { tickets: Order[] | undefined; now: n
 
       <Card title="Pedidos activos por tiempo transcurrido" icon={Clock} description="Del más antiguo al más reciente">
         {activeWithTime.length === 0 ? (
-          <EmptyState icon={ChefHat} title="No hay pedidos activos en cocina" compact />
+          <EmptyState icon={ChefHat} mood="idle" title="No hay pedidos activos en cocina" compact />
         ) : (
           <ul className="divide-y divide-neutral-800/60">
             {activeWithTime.map(({ ticket, minutesAgo }) => {

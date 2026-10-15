@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { display } from '../lib/typography'
 
 /** Solo lo que es cierto hoy en el producto (ADR 0010). */
 const FAQ: { q: string; a: string }[] = [
@@ -30,19 +31,19 @@ const FAQ: { q: string; a: string }[] = [
 
 export function FaqSection() {
   return (
-    <section id="faq" className="scroll-mt-16 border-t border-neutral-800/60 bg-neutral-950" aria-labelledby="landing-faq">
+    <section id="faq" className="theme-light scroll-mt-16 bg-white text-neutral-50" aria-labelledby="landing-faq">
       <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
-        <h2 id="landing-faq" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h2 id="landing-faq" style={display} className="text-3xl font-black tracking-[-0.02em] text-[#1C1310] sm:text-5xl">
           Preguntas frecuentes
         </h2>
-        <div className="mt-8 divide-y divide-neutral-800/60 border-y border-neutral-800/60">
+        <div className="mt-10 divide-y divide-[#1C1310]/10 border-y border-[#1C1310]/10">
           {FAQ.map(({ q, a }) => (
-            <details key={q} className="group py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-neutral-100 [&::-webkit-details-marker]:hidden">
+            <details key={q} className="group py-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-[#1C1310] [&::-webkit-details-marker]:hidden">
                 {q}
-                <ChevronDown size={18} className="shrink-0 text-neutral-500 transition-transform group-open:rotate-180" aria-hidden />
+                <ChevronDown size={18} className="shrink-0 text-brasa-600 transition-transform group-open:rotate-180" aria-hidden />
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-400">{a}</p>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#5B4A42]">{a}</p>
             </details>
           ))}
         </div>

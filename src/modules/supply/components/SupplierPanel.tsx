@@ -65,6 +65,7 @@ export function SupplierPanel({ selectedId, onSelect, onCreate }: { selectedId: 
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Truck}
+            mood={query ? 'noResults' : 'empty'}
             title={query ? 'Sin resultados' : 'Todavía no hay proveedores'}
             description={query ? 'Ajusta la búsqueda.' : 'Registra el primero para poder cargar facturas.'}
             compact

@@ -1,11 +1,12 @@
 import { KitchenLink } from '@/shared/kitchen/KitchenLink'
+import { Feedback } from '@/shared/ui/Feedback'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { FormField, Textarea } from '@/shared/ui/FormField'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import clsx from 'clsx'
-import { AlertTriangle, Bot, Hand, ShieldCheck, Workflow } from 'lucide-react'
+import { Bot, Hand, ShieldCheck, Workflow } from 'lucide-react'
 import { useState } from 'react'
 import { useWaActions } from '../hooks'
 import type { OrderingMode, WaSettings } from '../types'
@@ -52,14 +53,13 @@ export function OrderingTab({ settings }: { settings: WaSettings }) {
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
         {warnings.length > 0 && (
-          <ul className="space-y-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-            {warnings.map((w) => (
-              <li key={w} className="flex gap-2">
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden />
-                {w}
-              </li>
-            ))}
-          </ul>
+          <Feedback tone="warning" role={null}>
+            <ul className="space-y-1 text-neutral-200">
+              {warnings.map((w) => (
+                <li key={w}>{w}</li>
+              ))}
+            </ul>
+          </Feedback>
         )}
         <div className="grid gap-3" role="radiogroup" aria-label="Quién atiende los mensajes">
           {MODES.map((m) => (

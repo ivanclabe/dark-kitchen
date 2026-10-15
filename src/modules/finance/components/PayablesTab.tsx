@@ -91,7 +91,7 @@ export function PayablesTab() {
       ) : obligations.isLoading ? (
         <LoadingState variant="block" label="Cargando lo que se debe…" />
       ) : rows.length === 0 ? (
-        <EmptyState icon={Receipt} title={status === 'open' ? 'No se debe nada' : 'Nada por aquí'} description="Las compras confirmadas, los gastos y las nóminas aparecen aquí." compact />
+        <EmptyState icon={Receipt} mood={status === 'open' ? 'success' : undefined} title={status === 'open' ? 'No se debe nada' : 'Nada por aquí'} description="Las compras confirmadas, los gastos y las nóminas aparecen aquí." compact />
       ) : (
         <ul className="divide-y divide-neutral-800/60 rounded-xl border border-neutral-800/60">
           {rows.map((o) => {

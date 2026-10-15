@@ -1,4 +1,5 @@
 import { Badge } from '@/shared/ui/Badge'
+import { Feedback } from '@/shared/ui/Feedback'
 import { Button, IconButton } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { FormField, FormGrid, Input } from '@/shared/ui/FormField'
@@ -8,7 +9,7 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDateTime } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { AlertTriangle, Copy, ExternalLink, FlaskConical, KeyRound, Link2, Plug, Plus, RefreshCw, ShieldCheck, Unplug, X } from 'lucide-react'
+import { Copy, ExternalLink, FlaskConical, KeyRound, Link2, Plug, Plus, RefreshCw, ShieldCheck, Unplug, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useWaActions } from '../hooks'
 import { prettyPhone, webhookUrl } from '../lib/whatsapp'
@@ -116,10 +117,11 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
         {!settings.featureEnabled && (
-          <p className="flex gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden />
-            Los avisos por WhatsApp no están activos para esta cuenta (plan u organización). Puedes conectar el número, pero no se enviarán avisos.
-          </p>
+          <Feedback
+            tone="warning"
+            role={null}
+            description="Los avisos por WhatsApp no están activos para esta cuenta (plan u organización). Puedes conectar el número, pero no se enviarán avisos."
+          />
         )}
 
         <Card title="Conecta tu número oficial" icon={Plug} description="WhatsApp Business Platform (API de Meta). Tu número, tu cuenta de Meta: Quanela solo envía en tu nombre.">
