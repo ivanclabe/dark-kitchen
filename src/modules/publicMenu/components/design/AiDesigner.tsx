@@ -207,7 +207,7 @@ export function AiDesigner({
                   onChange={(e) => setChange(e.target.value.slice(0, MAX_PROMPT))}
                   placeholder="Por ejemplo: haz el fondo un poco más claro"
                   aria-label="Qué cambiar"
-                  className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-brasa-500"
+                  className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-brasa-500"
                 />
                 <Button type="submit" variant="secondary" icon={Send} loading={pending === 'refine'} disabled={change.trim().length < 3 || pending !== null}>
                   Cambiar

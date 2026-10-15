@@ -50,7 +50,7 @@ export function AccountList({ onDone }: { onDone: () => void }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar cuenta"
             aria-label="Buscar cuenta"
-            className="min-w-0 flex-1 bg-transparent text-neutral-100 outline-none placeholder:text-neutral-600"
+            className="min-w-0 flex-1 bg-transparent text-neutral-100 outline-none placeholder:text-neutral-500"
           />
         </label>
       )}

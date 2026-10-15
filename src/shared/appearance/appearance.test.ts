@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from 'vitest'
-import { applyAppearance, APPEARANCE_KEY, readAppearance, resolveTheme, saveAppearance } from './appearance'
+import { applyAppearance, applyRouteDefault, APPEARANCE_KEY, defaultThemeFor, readAppearance, resolveTheme, saveAppearance, savedTheme } from './appearance'
 
 afterEach(() => localStorage.clear())
 
@@ -11,6 +11,36 @@ describe('appearance (ADR 0023)', () => {
     expect(readAppearance()).toEqual({ theme: 'dark', textSize: 'normal' })
     localStorage.setItem(APPEARANCE_KEY, 'not json')
     expect(readAppearance()).toEqual({ theme: 'dark', textSize: 'normal' })
+  })
+
+  it('neutral is a theme of its own (ADR 0061): saved, restored and applied as a light color scheme', () => {
+    saveAppearance({ theme: 'neutral' })
+    expect(readAppearance().theme).toBe('neutral')
+    const root = document.documentElement
+    expect(root.dataset.theme).toBe('neutral')
+    expect(root.style.colorScheme).toBe('light')
+    expect(resolveTheme('neutral', false)).toBe('neutral')
+    expect(resolveTheme('neutral', true)).toBe('neutral')
+    saveAppearance({ theme: 'dark' })
+    expect(root.style.colorScheme).toBe('dark')
+  })
+
+  it('without a chosen theme: light on sign-in, account creation and help; dark in the app (ADR 0061)', () => {
+    for (const path of ['/login', '/registro', '/registro/confirmado', '/activar/abc', '/set-password', '/help', '/help/orders/x'])
+      expect(defaultThemeFor(path, false), path).toBe('light')
+    for (const path of ['/', '/landing', '/k/centro/operations', '/cuentas', '/menu/brasa', '/loginx'])
+      expect(defaultThemeFor(path, false), path).toBe('dark')
+    expect(defaultThemeFor('/', true)).toBe('light') // doc.quanela.com
+    const root = document.documentElement
+    expect(savedTheme()).toBeNull()
+    applyRouteDefault('/login')
+    expect(root.dataset.theme).toBe('light')
+    applyRouteDefault('/k/centro/operations')
+    expect(root.dataset.theme).toBe('dark')
+    // A chosen theme always wins.
+    saveAppearance({ theme: 'neutral' })
+    applyRouteDefault('/login')
+    expect(root.dataset.theme).toBe('neutral')
   })
 
   it('"system" follows the operating system', () => {

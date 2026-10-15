@@ -170,7 +170,7 @@ export function ReorderPanel({
                                   +{qty} {s.baseUnitCode}
                                 </span>
                               ) : (
-                                <span className="text-xs text-neutral-600">Sin meta</span>
+                                <span className="text-xs text-neutral-500">Sin meta</span>
                               )}
                               <ArrowRight size={13} className="text-neutral-600" aria-hidden />
                             </span>

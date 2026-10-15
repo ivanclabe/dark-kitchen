@@ -91,7 +91,7 @@ export function IngredientPanel({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por nombre o código…"
           aria-label="Buscar insumo"
-          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-600 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
+          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
         />
       </div>
 
@@ -149,7 +149,7 @@ export function IngredientPanel({
                   </span>
                   <span className="text-neutral-700">·</span>
                   <span className="tabular-nums">{formatMoney(ing.avgCost, { decimals: 'auto' })}</span>
-                  {ing.categoryName && <span className="truncate text-neutral-600">· {ing.categoryName}</span>}
+                  {ing.categoryName && <span className="truncate text-neutral-500">· {ing.categoryName}</span>}
                 </p>
                 <div className="mt-2">
                   <StockBar ingredient={ing} />

@@ -6,7 +6,7 @@ import { typography } from './typography'
 // estas constantes en <Link>/<label> o migrar al componente <Button>.
 export const labelClass = `block ${typography.label}`
 export const inputClass =
-  'mt-1.5 w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 px-3.5 py-2.5 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-600 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-red-500/70 aria-[invalid=true]:focus:ring-red-500/15'
+  'mt-1.5 w-full min-w-0 rounded-lg border border-neutral-700/70 bg-neutral-900 px-3.5 py-2.5 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-600 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-red-500/70 aria-[invalid=true]:focus:ring-red-500/15'
 export const primaryButtonClass = buttonClass({ variant: 'primary' })
 export const secondaryButtonClass = buttonClass({ variant: 'secondary' })
 export const dangerButtonClass = buttonClass({ variant: 'danger' })

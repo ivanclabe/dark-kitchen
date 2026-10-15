@@ -12,9 +12,14 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-12
+updated: 2026-10-15
 order: 1
 ---
+
+## 15 de octubre de 2026
+
+- **Tema Neutro.** Un tercer tema, en gris cálido: menos brillo que el Claro y sin la oscuridad del Oscuro, pensado para jornadas largas. Se elige en tu menú de usuario → **Apariencia**, junto a Oscuro, Claro y Según el sistema, y se guarda en tu equipo.
+- **Más legibles los tres temas.** Los textos secundarios, los avisos de color y los gráficos se leen mejor; las casillas, listas y selectores de hora siguen el tema que elegiste.
 
 ## 13 de octubre de 2026
 

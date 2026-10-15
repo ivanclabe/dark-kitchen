@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { chartAxisTick, chartBrand, chartCursor, chartTooltip } from '@/shared/ui/chartTheme'
 import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -62,13 +63,13 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
         <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.orders.byDay.map((d) => ({ ...d, label: d.date.slice(5) }))}>
-              <XAxis dataKey="label" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" tick={chartAxisTick} axisLine={false} tickLine={false} />
               <Tooltip
-                cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                contentStyle={{ background: '#171717', border: '1px solid #262626', borderRadius: 12, fontSize: 12 }}
+                cursor={chartCursor}
+                {...chartTooltip}
                 formatter={(value, name) => (name === 'orders' ? [value, 'Pedidos'] : [formatMoney(Number(value)), 'Ventas'])}
               />
-              <Bar dataKey="orders" fill="#f97316" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="orders" fill={chartBrand} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

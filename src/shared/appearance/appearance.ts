@@ -12,7 +12,11 @@ import { useSyncExternalStore } from 'react'
  * ".quanela.com", así el equipo se ve igual en quanela.com y en todas sus
  * organizaciones.
  */
-export type ThemePreference = 'dark' | 'light' | 'system'
+/** ADR 0061: «neutral» is the third theme, a warm gray between light and dark. */
+export type ThemePreference = 'dark' | 'light' | 'neutral' | 'system'
+export type ResolvedTheme = 'dark' | 'light' | 'neutral'
+
+const THEMES: readonly ThemePreference[] = ['dark', 'light', 'neutral', 'system']
 export type TextSize = 'normal' | 'large'
 
 export interface Appearance {
@@ -30,11 +34,48 @@ function readCookie(): string | null {
   return match ? decodeURIComponent(match.slice(APPEARANCE_KEY.length + 1)) : null
 }
 
+/**
+ * Pages that open in the light theme when the person has not chosen one (ADR 0061): signing in, creating an
+ * account (sign-up, activating an invitation, setting a password) and the help center. Keep in sync with the
+ * same regular expression in index.html (first paint).
+ */
+export const LIGHT_DEFAULT_PATH = /^\/(login|registro|activar|set-password|signup-admin|help)(\/|$)/
+
+/** The theme this device chose, or null when it never chose one (then each page has its default). */
+export function savedTheme(): ThemePreference | null {
+  try {
+    const raw = JSON.parse(readCookie() ?? localStorage.getItem(APPEARANCE_KEY) ?? '{}') as Partial<Appearance>
+    return THEMES.includes(raw.theme as ThemePreference) ? (raw.theme as ThemePreference) : null
+  } catch {
+    return null
+  }
+}
+
+/** The default theme of a page: light on sign-in, account creation and the help center; dark in the app. */
+export function defaultThemeFor(pathname: string, docsHost = isDocsHost()): ResolvedTheme {
+  return docsHost || LIGHT_DEFAULT_PATH.test(pathname) ? 'light' : 'dark'
+}
+
+function isDocsHost(): boolean {
+  return typeof window !== 'undefined' && window.location.hostname.startsWith('doc.')
+}
+
+/**
+ * On every navigation: without a chosen theme, each page shows its default (light on the login, dark once
+ * inside the app). A chosen theme is never overridden.
+ */
+export function applyRouteDefault(pathname: string, root: HTMLElement = document.documentElement) {
+  if (savedTheme() !== null) return
+  const theme = defaultThemeFor(pathname)
+  root.dataset.theme = theme
+  root.style.colorScheme = theme === 'dark' ? 'dark' : 'light'
+}
+
 export function readAppearance(): Appearance {
   try {
     const raw = JSON.parse(readCookie() ?? localStorage.getItem(APPEARANCE_KEY) ?? '{}') as Partial<Appearance>
     return {
-      theme: raw.theme === 'light' || raw.theme === 'system' ? raw.theme : 'dark',
+      theme: THEMES.includes(raw.theme as ThemePreference) ? (raw.theme as ThemePreference) : 'dark',
       textSize: raw.textSize === 'large' ? 'large' : 'normal',
     }
   } catch {
@@ -47,7 +88,7 @@ function systemPrefersLight(): boolean {
 }
 
 /** The theme actually shown ("system" follows the operating system). */
-export function resolveTheme(theme: ThemePreference, prefersLight = systemPrefersLight()): 'dark' | 'light' {
+export function resolveTheme(theme: ThemePreference, prefersLight = systemPrefersLight()): ResolvedTheme {
   return theme === 'system' ? (prefersLight ? 'light' : 'dark') : theme
 }
 
@@ -55,7 +96,7 @@ export function applyAppearance(appearance: Appearance = readAppearance(), root:
   const theme = resolveTheme(appearance.theme)
   root.dataset.theme = theme
   root.dataset.textSize = appearance.textSize
-  root.style.colorScheme = theme
+  root.style.colorScheme = theme === 'dark' ? 'dark' : 'light'
 }
 
 export function saveAppearance(change: Partial<Appearance>) {

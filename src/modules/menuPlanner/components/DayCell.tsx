@@ -63,7 +63,7 @@ export function DayCell({
       >
         <span className="text-[11px] font-semibold tracking-wide uppercase">
           {weekday} <span className="text-neutral-500">{day}</span>
-          {compact && <span className="ml-0.5 text-neutral-600 normal-case">{month}</span>}
+          {compact && <span className="ml-0.5 text-neutral-500 normal-case">{month}</span>}
         </span>
         {blocked ? (
           <span className="inline-flex items-center gap-0.5 rounded-full bg-neutral-800 px-1.5 text-[10px] text-neutral-400">

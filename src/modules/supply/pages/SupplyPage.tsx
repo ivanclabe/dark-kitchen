@@ -177,14 +177,14 @@ export function SupplyPage() {
       </div>
 
       <IngredientFormDrawer
-        key={ingredientDrawerOpen ? (editingIngredient?.id ?? 'new') : 'closed'}
+        key={ingredientDrawerOpen ? `ingredient-${editingIngredient?.id ?? 'new'}` : 'ingredient-closed'}
         ingredient={editingIngredient}
         open={ingredientDrawerOpen}
         onClose={() => setIngredientDrawerOpen(false)}
       />
 
       <SupplierFormDrawer
-        key={supplierDrawer.open ? (supplierDrawer.supplierId ?? 'new') : 'closed'}
+        key={supplierDrawer.open ? `supplier-${supplierDrawer.supplierId ?? 'new'}` : 'supplier-closed'}
         supplier={supplierForDrawer}
         open={supplierDrawer.open}
         onClose={() => setSupplierDrawer({ open: false, supplierId: null })}

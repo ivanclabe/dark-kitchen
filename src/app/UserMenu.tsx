@@ -81,7 +81,8 @@ function useCommonMenu(session: SessionInfo) {
       children: [
         { kind: 'section', id: 'theme', label: 'Tema' },
         { kind: 'item', id: 'theme-dark', label: 'Oscuro', checked: appearance.theme === 'dark', keepOpen: true, onSelect: () => setAppearance({ theme: 'dark' }) },
-        { kind: 'item', id: 'theme-light', label: 'Claro (beta)', checked: appearance.theme === 'light', keepOpen: true, onSelect: () => setAppearance({ theme: 'light' }) },
+        { kind: 'item', id: 'theme-light', label: 'Claro', checked: appearance.theme === 'light', keepOpen: true, onSelect: () => setAppearance({ theme: 'light' }) },
+        { kind: 'item', id: 'theme-neutral', label: 'Neutro', checked: appearance.theme === 'neutral', keepOpen: true, onSelect: () => setAppearance({ theme: 'neutral' }) },
         { kind: 'item', id: 'theme-system', label: 'Según el sistema', checked: appearance.theme === 'system', keepOpen: true, onSelect: () => setAppearance({ theme: 'system' }) },
         { kind: 'separator', id: 'appearance-sep' },
         { kind: 'section', id: 'text', label: 'Tamaño del texto' },

@@ -1,4 +1,5 @@
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
+import { applyRouteDefault } from '@/shared/appearance/appearance'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
@@ -257,3 +258,6 @@ const routes: RouteObject[] = [
 // Every route goes through the gate of the subdomain's organization (ADR 0021);
 // doc.quanela.com is only the help center (ADR 0035).
 export const router = createBrowserRouter(currentHost().kind === 'docs' ? DOCS_ROUTES : [{ element: <TenantGate />, children: routes }])
+
+// ADR 0061: without a chosen theme, the sign-in and the help center are light and the app dark, also when moving between them.
+router.subscribe((state) => applyRouteDefault(state.location.pathname))

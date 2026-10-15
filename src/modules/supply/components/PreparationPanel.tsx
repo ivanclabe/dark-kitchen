@@ -63,7 +63,7 @@ export function PreparationPanel({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por nombre o código…"
           aria-label="Buscar preparación"
-          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-600 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
+          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
         />
       </div>
 
@@ -122,7 +122,7 @@ export function PreparationPanel({
                   <span className="tabular-nums">
                     {portionCost !== null ? `${formatMoney(portionCost)} / porción` : `${formatMoney(p.avgCost, { decimals: 'auto' })} / ${p.baseUnitCode}`}
                   </span>
-                  {p.usedIn > 0 && <span className="text-neutral-600">· en {p.usedIn} {p.usedIn === 1 ? 'receta' : 'recetas'}</span>}
+                  {p.usedIn > 0 && <span className="text-neutral-500">· en {p.usedIn} {p.usedIn === 1 ? 'receta' : 'recetas'}</span>}
                 </p>
               </button>
             )

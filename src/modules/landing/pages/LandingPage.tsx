@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { applyAppearance, applyRouteDefault, savedTheme } from '@/shared/appearance/appearance'
 import { BrandLogo, BrandMark } from '@/shared/brand/BrandMark'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
@@ -7,6 +8,7 @@ import { useEffect, type CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LaptopMockup, PhoneMockup } from '../components/HeroDevices'
 import { FaqSection } from '../components/FaqSection'
+import { GhostHeadline } from '../components/GhostHeadline'
 import { LandingNav } from '../components/LandingNav'
 import { PricingSection } from '../components/PricingSection'
 import { DISPLAY_FONT, display } from '../lib/typography'
@@ -71,10 +73,13 @@ export function LandingPage() {
   // The landing has its own palette: a visitor's light theme of the app (ADR 0023) must not invert it.
   useEffect(() => {
     const root = document.documentElement
-    const previous = root.dataset.theme
     root.dataset.theme = 'dark'
+    // The page itself is light: native controls and the scrollbar too (ADR 0061).
+    root.style.colorScheme = 'light'
     return () => {
-      if (previous) root.dataset.theme = previous
+      // Leaving the landing (to the login, for instance): the chosen theme, or the next page's default.
+      if (savedTheme() !== null) applyAppearance()
+      else applyRouteDefault(window.location.pathname)
     }
   }, [])
   useEffect(() => {
@@ -108,13 +113,10 @@ export function LandingPage() {
           <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-10 sm:px-6 sm:pt-28 lg:flex lg:min-h-[100svh] lg:items-center lg:pt-24 lg:pb-14">
             <div className="relative z-10 max-w-xl lg:max-w-[37rem]">
               <BrandLogo className="animate-landing-rise hidden h-24 lg:block xl:h-28" />
-              <h1
+              <GhostHeadline
                 style={{ ...display, ...delay(60) }}
                 className="animate-landing-rise text-[3.1rem] leading-[1.02] font-black tracking-[-0.02em] text-[#1C1310] sm:text-6xl lg:mt-8 lg:text-[3.6rem] xl:text-[4.1rem] 2xl:text-[4.6rem]"
-              >
-                Tu cocina,
-                <br /> <span className="text-brasa-500">más inteligente</span>
-              </h1>
+              />
               <p className="animate-landing-rise mt-6 max-w-lg text-lg leading-snug text-pretty text-[#5B4A42] sm:text-[1.4rem]" style={delay(120)}>
                 La plataforma con agentes de IA para gestionar pedidos, inventario, menús y mucho más en tu dark kitchen o restaurante.
               </p>

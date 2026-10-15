@@ -85,9 +85,15 @@ describe('UserMenu (ADR 0023)', () => {
   it('Apariencia changes the theme on this device without closing the menu', () => {
     openMenu([])
     fireEvent.click(screen.getByRole('menuitem', { name: 'Apariencia' }))
-    fireEvent.click(screen.getByRole('menuitemradio', { name: 'Claro (beta)' }))
+    fireEvent.click(screen.getByRole('menuitemradio', { name: 'Claro' }))
     expect(document.documentElement.dataset.theme).toBe('light')
-    expect(screen.getByRole('menuitemradio', { name: 'Claro (beta)' }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('menuitemradio', { name: 'Claro' }).getAttribute('aria-checked')).toBe('true')
+    // ADR 0061: the third theme, from the same menu.
+    fireEvent.click(screen.getByRole('menuitemradio', { name: 'Neutro' }))
+    expect(document.documentElement.dataset.theme).toBe('neutral')
+    expect(screen.getByRole('menuitemradio', { name: 'Neutro' }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('menuitemradio', { name: 'Claro' }).getAttribute('aria-checked')).toBe('false')
+    expect(screen.getAllByRole('menuitemradio', { name: /^(Oscuro|Claro|Neutro|Según el sistema)$/ })).toHaveLength(4)
   })
 
   it('Ayuda: shortcuts window and the help center always; support contact hidden while not configured', () => {

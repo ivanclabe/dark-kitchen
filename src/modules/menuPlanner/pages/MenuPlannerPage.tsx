@@ -255,12 +255,12 @@ export function MenuPlannerPage() {
       </DragOverlay>
 
       <DishFormDrawer
-        key={dishDrawerOpen ? (editingProduct?.id ?? 'new') : 'closed'}
+        key={dishDrawerOpen ? `dish-${editingProduct?.id ?? 'new'}` : 'dish-closed'}
         product={editingProduct}
         open={dishDrawerOpen}
         onClose={() => setDishDrawerOpen(false)}
       />
-      <PlanItemRulesDrawer key={rulesItem?.id ?? 'closed'} item={rulesItem} onClose={() => setRulesItem(null)} />
+      <PlanItemRulesDrawer key={`rules-${rulesItem?.id ?? 'closed'}`} item={rulesItem} onClose={() => setRulesItem(null)} />
       <CopyMenuDialog
         open={copyOpen}
         onClose={() => setCopyOpen(false)}

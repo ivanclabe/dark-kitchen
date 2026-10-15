@@ -285,7 +285,7 @@ export function UserDrawer({
                               onClick={() => toggleRole(account.id, role.id)}
                               className={clsx(
                                 'rounded-lg border px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-                                on ? 'border-brasa-500/60 bg-brasa-500/15 text-brasa-100' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600',
+                                on ? 'border-brasa-500/60 bg-brasa-500/15 text-brasa-200' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600',
                               )}
                             >
                               {role.name}

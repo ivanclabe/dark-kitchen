@@ -363,6 +363,8 @@ export function themeStyle(theme: ResolvedTheme, imageUrl: (path: string) => str
     backgroundSize: theme.background.kind === 'texture' && theme.background.texture === 'dots' ? '18px 18px' : theme.background.kind === 'image' ? 'cover' : undefined,
     backgroundAttachment: theme.background.kind === 'image' ? 'fixed' : undefined,
     color: c.text,
+    // Native controls follow the menu's own palette, not the visitor's theme in the app (ADR 0061).
+    colorScheme: readableOn(c.background) === '#FFFFFF' ? 'dark' : 'light',
     fontFamily: FONT_STACK[theme.fonts.body],
     fontSize: SCALE[theme.fonts.scale],
   } as CSSProperties

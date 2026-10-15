@@ -88,7 +88,7 @@ export function CustomerTable({
       cell: (c) => (
         <span className="block min-w-0 text-sm">
           <span className="flex items-center gap-1.5 text-neutral-300">
-            {c.phone ? formatPhone(c.phone) : <span className="text-neutral-600">Sin teléfono</span>}
+            {c.phone ? formatPhone(c.phone) : <span className="text-neutral-500">Sin teléfono</span>}
             {c.hasWhatsapp && <MessageCircle size={13} className="text-emerald-400" aria-label="Vinculado a WhatsApp" />}
           </span>
           {c.email && <span className="block max-w-[14rem] truncate text-xs text-neutral-400">{c.email}</span>}
@@ -107,7 +107,7 @@ export function CustomerTable({
       : []),
     ...(showOrders
       ? ([
-          { key: 'last', header: header('Último pedido', 'last_order'), hideBelow: 'lg', cell: (c) => <span className="text-neutral-300">{c.lastOrderAt ? relativeDay(c.lastOrderAt) : <span className="text-neutral-600">Nunca</span>}</span> },
+          { key: 'last', header: header('Último pedido', 'last_order'), hideBelow: 'lg', cell: (c) => <span className="text-neutral-300">{c.lastOrderAt ? relativeDay(c.lastOrderAt) : <span className="text-neutral-500">Nunca</span>}</span> },
           { key: 'status', header: 'Estado', hideBelow: 'lg', cell: (c) => <ActivityBadge active={c.active ?? false} /> },
         ] satisfies DataTableColumn<CustomerListRow>[])
       : []),

@@ -215,7 +215,7 @@ export function InvoiceReview({
             <p>
               La factura <strong>{match.duplicateInvoice.invoiceNumber}</strong> de este proveedor ya está registrada.
             </p>
-            <KitchenLink to={`/supply/compras/${match.duplicateInvoice.purchaseId}`} className="font-medium text-red-100 underline">
+            <KitchenLink to={`/supply/compras/${match.duplicateInvoice.purchaseId}`} className="font-medium text-red-200 underline">
               Ver la compra
             </KitchenLink>
           </div>

@@ -106,7 +106,7 @@ function EmptySlot({ label, hint, disabled, onPick }: { label: string; hint: str
     >
       <ImagePlus size={18} aria-hidden />
       <span className="text-xs font-medium">{label}</span>
-      <span className="text-[10px] text-neutral-600">{hint}</span>
+      <span className="text-[10px] text-neutral-500">{hint}</span>
     </button>
   )
 }
@@ -196,7 +196,7 @@ function SavedSlot({
       ) : canEdit ? (
         <EmptySlot label={position === 1 ? 'Agregar foto' : 'Segunda foto'} hint={disabled ? 'Primero la principal' : 'Toca o arrastra'} disabled={disabled} onPick={pick} />
       ) : (
-        <div className="flex size-full items-center justify-center bg-neutral-900/40 text-[11px] text-neutral-600">Sin foto</div>
+        <div className="flex size-full items-center justify-center bg-neutral-900/40 text-[11px] text-neutral-500">Sin foto</div>
       )}
 
       {shown && (
@@ -216,7 +216,7 @@ function SavedSlot({
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-red-950/90 px-2 py-1.5 text-[11px] text-red-200" role="alert">
           <span className="min-w-0 truncate">{error}</span>
           {file && (
-            <button type="button" onClick={() => void upload(file)} className="inline-flex shrink-0 items-center gap-1 font-semibold text-red-100 hover:underline">
+            <button type="button" onClick={() => void upload(file)} className="inline-flex shrink-0 items-center gap-1 font-semibold text-red-200 hover:underline">
               <RefreshCw size={10} aria-hidden /> Reintentar
             </button>
           )}

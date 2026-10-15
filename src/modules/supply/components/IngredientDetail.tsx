@@ -188,7 +188,7 @@ export function IngredientDetail({
 
       <Card title="Ficha" icon={Truck}>
         <dl className="divide-y divide-neutral-800/60">
-          <Field label="Proveedor principal" value={ingredient.primarySupplierName ?? <span className="text-neutral-600">Sin definir</span>} />
+          <Field label="Proveedor principal" value={ingredient.primarySupplierName ?? <span className="text-neutral-500">Sin definir</span>} />
           <Field label="Unidad base" value={ingredient.baseUnitCode} />
           <Field label="Reservado" value={formatQuantity(ingredient.stockOnHand - ingredient.stockAvailable, ingredient.baseUnitCode)} />
           <Field

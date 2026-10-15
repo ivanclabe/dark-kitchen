@@ -1,4 +1,5 @@
 import { Card } from '@/shared/ui/Card'
+import { chartAxisTick, chartBrand, chartCursor, chartDanger, chartTooltip } from '@/shared/ui/chartTheme'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
@@ -69,14 +70,14 @@ export function UsageTab() {
         <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.byDay.map((d) => ({ ...d, label: d.date.slice(5) }))}>
-              <XAxis dataKey="label" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+              <XAxis dataKey="label" tick={chartAxisTick} axisLine={false} tickLine={false} interval="preserveStartEnd" />
               <Tooltip
-                cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                contentStyle={{ background: '#171717', border: '1px solid #262626', borderRadius: 12, fontSize: 12 }}
+                cursor={chartCursor}
+                {...chartTooltip}
                 formatter={(value, name) => [value, name === 'runs' ? 'Análisis' : 'Con error']}
               />
-              <Bar dataKey="runs" fill="#f97316" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="errors" fill="#f87171" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="runs" fill={chartBrand} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="errors" fill={chartDanger} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -22,6 +22,12 @@
   --color-brasa-800: #9a3412;
   --color-brasa-900: #7c2d12;
 
+  /* Tema oscuro (por defecto): la escala neutral de Tailwind, con dos ajustes
+     de contraste (ADR 0061): el texto secundario (500) llega a 4.5:1 sobre
+     las tarjetas y las pistas (600) a 3:1. */
+  --color-neutral-500: #858585;
+  --color-neutral-600: #6b6b6b;
+
   /* Tokens semánticos del Design System. Mapean a la escala neutral que ya
      usa toda la app (no cambian el look actual) pero dan un nombre estable
      para componentes nuevos: bg-surface, border-line, text-muted, etc. */
@@ -32,7 +38,7 @@
   --color-line-strong: #404040; /* neutral-700 — bordes con foco/hover */
   --color-text: #fafafa; /* neutral-50 */
   --color-text-secondary: #a3a3a3; /* neutral-400 */
-  --color-text-muted: #737373; /* neutral-500 */
+  --color-text-muted: #858585; /* neutral-500 */
   --color-success: #34d399; /* emerald-400 */
   --color-warning: #fbbf24; /* amber-400 */
   --color-danger: #f87171; /* red-400 */
@@ -157,6 +163,35 @@ body {
   animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Landing headline (GhostHeadline): the blinking caret and the flash of an accepted suggestion. */
+@keyframes caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@utility animate-caret {
+  animation: caret-blink 1s step-end infinite;
+}
+
+@keyframes ghost-accept {
+  from {
+    background-color: rgb(249 115 22 / 0.18);
+  }
+  to {
+    background-color: rgb(249 115 22 / 0);
+  }
+}
+
+@utility animate-ghost-accept {
+  animation: ghost-accept 0.9s ease-out both;
+}
+
 /* The robot during long work (ADR 0060): a slow bob. Used with motion-safe:, so it stops with reduced motion. */
 @keyframes robot-bob {
   0%,
@@ -182,42 +217,79 @@ html[data-text-size='large'] {
   font-size: 112.5%;
 }
 
-/* Tema claro (beta): la app entera usa la escala neutral, así que basta
-   invertirla aquí — fondos claros, texto oscuro. Los tonos 300/400 de los
-   acentos (pensados para fondo oscuro) pasan a sus versiones 600/700 para
-   mantener el contraste sobre blanco. La marca (brasa-500) no cambia.
-   .theme-light aplica la misma paleta a una sola parte de la página (las
-   secciones claras de la landing, que reutilizan componentes de la app). */
+/* ---------------------------------------------------------------------------
+   Temas (ADR 0023, ADR 0061). Toda la app pinta con la escala neutral
+   (bg-neutral-950 es el fondo, 900 las tarjetas, 800 bordes y hovers, 50 el
+   texto principal, 400/500 el secundario). Cada tema redefine esa escala y los
+   tokens semánticos; ningún componente necesita saber qué tema está activo.
+
+   - Oscuro: los valores de @theme (arriba).
+   - Claro y Neutro: la «familia clara». Comparten los acentos ajustados para
+     fondo claro y cada uno define su escala.
+   .theme-light aplica la paleta clara a una sola parte de la página (las
+   secciones claras de la landing, que reutilizan componentes de la app).
+   --------------------------------------------------------------------------- */
+
+/* Oscuro: los controles nativos (radios, casillas, listas de un select,
+   selector de hora o fecha, barras de desplazamiento) también en oscuro. */
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Familia clara: acentos legibles sobre fondo claro. Los tonos 200-400 de los
+   acentos (pensados para fondo oscuro) pasan a sus versiones oscuras; el
+   naranja de los textos y enlaces (brasa-400) llega a 4.5:1. La marca
+   (brasa-500, botones y logo) no cambia. */
 html[data-theme='light'],
+html[data-theme='neutral'],
 .theme-light {
   color-scheme: light;
+  --color-brasa-200: #7c2d12;
+  --color-brasa-300: #9a3412;
+  --color-brasa-400: #c2410c;
+  /* Each accent's pale shades (200-400, text on a soft tint) become its 700. */
+  --color-red-200: oklch(50.5% 0.213 27.518);
+  --color-amber-200: oklch(55.5% 0.163 48.998);
+  --color-emerald-200: oklch(50.8% 0.118 165.612);
+  --color-sky-200: oklch(50% 0.134 242.749);
+  --color-violet-200: oklch(49.1% 0.27 292.581);
+  --color-rose-200: oklch(51.4% 0.222 16.935);
+  --color-rose-300: oklch(51.4% 0.222 16.935);
+  --color-pink-300: oklch(52.5% 0.223 3.958);
+  --color-teal-300: oklch(51.1% 0.096 186.391);
+  --color-indigo-300: oklch(45.7% 0.24 277.023);
+  --color-emerald-300: oklch(50.8% 0.118 165.612);
+  --color-emerald-400: oklch(50.8% 0.118 165.612);
+  --color-amber-300: oklch(55.5% 0.163 48.998);
+  --color-amber-400: oklch(55.5% 0.163 48.998);
+  --color-red-300: oklch(50.5% 0.213 27.518);
+  --color-red-400: oklch(50.5% 0.213 27.518);
+  --color-sky-300: oklch(50% 0.134 242.749);
+  --color-sky-400: oklch(50% 0.134 242.749);
+  --color-violet-300: oklch(49.1% 0.27 292.581);
+  --color-violet-400: oklch(49.1% 0.27 292.581);
+  --color-blue-300: oklch(48.8% 0.243 264.376);
+  --color-blue-400: oklch(48.8% 0.243 264.376);
+  --color-success: #047857;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+  --color-info: #0369a1;
+}
+
+/* Claro: blanco y gris frío, la escala invertida. */
+html[data-theme='light'],
+.theme-light {
   --color-neutral-50: oklch(14.5% 0 0);
   --color-neutral-100: oklch(20.5% 0 0);
   --color-neutral-200: oklch(26.9% 0 0);
   --color-neutral-300: oklch(37.1% 0 0);
-  --color-neutral-400: oklch(46% 0 0);
-  --color-neutral-500: oklch(55.6% 0 0);
-  --color-neutral-600: oklch(70.8% 0 0);
+  --color-neutral-400: oklch(43.9% 0 0);
+  --color-neutral-500: #666666;
+  --color-neutral-600: #8f8f8f;
   --color-neutral-700: oklch(87% 0 0);
   --color-neutral-800: oklch(92.2% 0 0);
   --color-neutral-900: oklch(100% 0 0);
   --color-neutral-950: oklch(97% 0 0);
-
-  --color-brasa-200: #9a3412;
-  --color-brasa-300: #c2410c;
-  --color-brasa-400: #ea580c;
-  --color-emerald-300: oklch(50.8% 0.118 165.612);
-  --color-emerald-400: oklch(59.6% 0.145 163.225);
-  --color-amber-300: oklch(55.5% 0.163 48.998);
-  --color-amber-400: oklch(66.6% 0.179 58.318);
-  --color-red-300: oklch(50.5% 0.213 27.518);
-  --color-red-400: oklch(57.7% 0.245 27.325);
-  --color-sky-300: oklch(50% 0.134 242.749);
-  --color-sky-400: oklch(58.8% 0.158 241.966);
-  --color-violet-300: oklch(49.1% 0.27 292.581);
-  --color-violet-400: oklch(54.1% 0.281 293.009);
-  --color-blue-300: oklch(48.8% 0.243 264.376);
-  --color-blue-400: oklch(54.6% 0.245 262.881);
 
   --color-canvas: #f5f5f5;
   --color-surface: #ffffff;
@@ -226,17 +298,46 @@ html[data-theme='light'],
   --color-line-strong: #d4d4d4;
   --color-text: #171717;
   --color-text-secondary: #525252;
-  --color-text-muted: #737373;
-  --color-success: #059669;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --color-info: #0284c7;
+  --color-text-muted: #666666;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px -12px rgba(0, 0, 0, 0.12);
   --shadow-float: 0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Neutro: gris cálido, entre Claro y Oscuro; para jornadas largas (menos
+   brillo que el blanco, sin la oscuridad total). Mismas reglas de contraste. */
+html[data-theme='neutral'] {
+  --color-neutral-50: #292724;
+  --color-neutral-100: #33302c;
+  --color-neutral-200: #3f3b36;
+  --color-neutral-300: #4f4a44;
+  --color-neutral-400: #5e5a54;
+  --color-neutral-500: #68645e;
+  --color-neutral-600: #938d84;
+  --color-neutral-700: #cfc9c0;
+  --color-neutral-800: #dfdad3;
+  --color-neutral-900: #faf9f7;
+  --color-neutral-950: #f2f0ed;
+
+  --color-canvas: #f2f0ed;
+  --color-surface: #faf9f7;
+  --color-surface-raised: #eae7e2;
+  --color-line: #d8d3cc;
+  --color-line-strong: #cfc9c0;
+  --color-text: #292724;
+  --color-text-secondary: #5e5a54;
+  --color-text-muted: #68645e;
+
+  --shadow-card: 0 1px 2px rgba(28, 19, 16, 0.06), 0 8px 24px -14px rgba(28, 19, 16, 0.14);
+  --shadow-float: 0 12px 40px -10px rgba(28, 19, 16, 0.2), 0 2px 8px rgba(28, 19, 16, 0.08);
+}
+
 html[data-theme='light'] ::-webkit-scrollbar-thumb {
   background: #d4d4d4;
   border-color: #f5f5f5;
+}
+
+html[data-theme='neutral'] ::-webkit-scrollbar-thumb {
+  background: #cfc9c0;
+  border-color: #f2f0ed;
 }

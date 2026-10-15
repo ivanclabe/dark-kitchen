@@ -113,7 +113,7 @@ export function WeeklyHoursPanel({ canEdit }: { canEdit: boolean }) {
                   )}
                 </div>
               ) : (
-                <span className="text-sm text-neutral-600">Cerrado</span>
+                <span className="text-sm text-neutral-500">Cerrado</span>
               )}
 
               {error && (

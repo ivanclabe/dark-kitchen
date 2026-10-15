@@ -210,7 +210,7 @@ function Thread({ conversation: c, canReply, orderingMode }: { conversation: WaC
             maxLength={4096}
             aria-label="Mensaje"
             placeholder={open ? 'Escribe tu respuesta…' : 'Pasaron más de 24 horas: WhatsApp solo deja enviar plantillas.'}
-            className="min-h-10 flex-1 resize-none rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-brasa-500 disabled:opacity-60"
+            className="min-h-10 flex-1 resize-none rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-brasa-500 disabled:opacity-60"
           />
           <Button type="submit" variant="primary" icon={Send} loading={send.isPending} disabled={!open || !text.trim()}>
             Enviar

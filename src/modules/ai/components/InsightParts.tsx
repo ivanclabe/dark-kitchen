@@ -68,7 +68,7 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
     body = (
       <span className="text-neutral-300">
         {result.insight.summary}
-        <span className="ml-1.5 text-[11px] text-neutral-600">· IA {minutesAgo(result.insight.createdAt)}</span>
+        <span className="ml-1.5 text-[11px] text-neutral-500">· IA {minutesAgo(result.insight.createdAt)}</span>
       </span>
     )
 

@@ -30,7 +30,14 @@ export interface TabProps {
   onProduct: (product: ProductRow) => void
 }
 
-const COLORS = { revenue: '#f97316', profit: '#34d399', cogs: '#f87171', margin: '#a3a3a3', orders: '#a3a3a3' }
+/** Theme tokens (ADR 0061): the same series read well in dark, light and neutral. */
+const COLORS = {
+  revenue: 'var(--color-brasa-500)',
+  profit: 'var(--color-emerald-400)',
+  cogs: 'var(--color-red-400)',
+  margin: 'var(--color-neutral-400)',
+  orders: 'var(--color-neutral-400)',
+}
 
 function ChangeCell({ value, goodWhen = 'up' }: { value: number | null; goodWhen?: 'up' | 'down' }) {
   if (value === null) return <span className="text-neutral-600">—</span>

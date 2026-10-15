@@ -156,7 +156,7 @@ export function Combobox({
             setOpen(true)
           }}
           onKeyDown={handleKeyDown}
-          className="mt-1.5 w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pl-9 pr-16 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-600 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-1.5 w-full min-w-0 rounded-lg border border-neutral-700/70 bg-neutral-900 py-2.5 pl-9 pr-16 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-600 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <div className="absolute right-2 top-1/2 mt-[3px] flex -translate-y-1/2 items-center gap-1">
           {value && !disabled && (

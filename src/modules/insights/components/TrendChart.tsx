@@ -1,4 +1,5 @@
 import { formatPercent } from '../lib/format'
+import { chartAxisTick, chartCursor, chartGrid, chartTooltip } from '@/shared/ui/chartTheme'
 import { formatMoneyCompact } from '@/shared/utils/format'
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
@@ -32,17 +33,16 @@ export function TrendChart({
     <div style={{ height }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 8, right: right ? 4 : 8, bottom: 0, left: 0 }}>
-          <CartesianGrid stroke="#262626" strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={16} />
-          <YAxis yAxisId="money" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={formatMoneyCompact} width={52} />
+          <CartesianGrid stroke={chartGrid} strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="label" tick={chartAxisTick} axisLine={false} tickLine={false} minTickGap={16} />
+          <YAxis yAxisId="money" tick={chartAxisTick} axisLine={false} tickLine={false} tickFormatter={formatMoneyCompact} width={52} />
           {right === 'percent' && (
-            <YAxis yAxisId="percent" orientation="right" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${Math.round(v * 100)}%`} width={40} domain={[0, 1]} />
+            <YAxis yAxisId="percent" orientation="right" tick={chartAxisTick} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${Math.round(v * 100)}%`} width={40} domain={[0, 1]} />
           )}
-          {right === 'count' && <YAxis yAxisId="count" orientation="right" tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} width={32} />}
+          {right === 'count' && <YAxis yAxisId="count" orientation="right" tick={chartAxisTick} axisLine={false} tickLine={false} allowDecimals={false} width={32} />}
           <Tooltip
-            cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-            contentStyle={{ background: '#171717', border: '1px solid #262626', borderRadius: 12, fontSize: 12 }}
-            labelStyle={{ color: '#d4d4d4' }}
+            cursor={chartCursor}
+            {...chartTooltip}
             formatter={(value, name) => {
               const s = series.find((x) => x.key === name)
               const n = Number(value)
