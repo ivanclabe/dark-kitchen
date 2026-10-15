@@ -149,7 +149,7 @@ export function LandingPage() {
           {/* The product (wide screens): the orders board on a laptop and the web menu on a phone. */}
           <div className="animate-landing-rise pointer-events-none absolute right-[1.5%] bottom-[2%] hidden w-[min(47vw,78svh)] lg:block" style={delay(380)}>
             <LaptopMockup className="origin-right [transform:perspective(2400px)_rotateY(-9deg)_rotateX(2deg)]" />
-            <PhoneMockup className="absolute bottom-[-4%] left-[1%] w-[25%] -rotate-2" />
+            <PhoneMockup className="absolute bottom-[1%] left-[1%] w-[22%]" />
           </div>
 
           {/* Phones and tablets: the scene, then the product. */}

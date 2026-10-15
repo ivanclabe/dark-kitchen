@@ -1,4 +1,5 @@
 import { PhoneInput } from '@/shared/ui/PhoneInput'
+import clsx from 'clsx'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
@@ -43,7 +44,7 @@ function InstagramIcon() {
 }
 
 const methodButtonClass =
-  'flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+  'flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
 
 /**
  * "Continuar con Google / Instagram / teléfono / email" (ADR 0025): only the
@@ -56,12 +57,15 @@ export function OwnerMethodButtons({
   onPhone,
   onEmail,
   onError,
+  compact = false,
 }: {
   methods: OwnerMethod[]
   returnPath?: string
   onPhone: () => void
   onEmail?: () => void
   onError: (message: string) => void
+  /** One row of short buttons (the login, where the page must fit without scrolling); the name stays complete. */
+  compact?: boolean
 }) {
   const [leaving, setLeaving] = useState<OwnerMethod | null>(null)
 
@@ -88,6 +92,29 @@ export function OwnerMethodButtons({
       {hint && <p className="mt-1 text-center text-[11px] text-neutral-500">{hint}</p>}
     </div>
   )
+
+  if (compact) {
+    const short = (key: string, icon: ReactNode, label: string, name: string, onClick: () => void) => (
+      <button key={key} type="button" aria-label={leaving === key ? undefined : name} className={clsx(methodButtonClass, 'gap-2 px-3 [&_svg]:shrink-0')} onClick={onClick} disabled={leaving !== null}>
+        {icon}
+        {leaving === key ? 'Abriendo…' : label}
+      </button>
+    )
+    const items = [
+      methods.includes('google') && short('google', <GoogleIcon />, 'Google', 'Continuar con Google', () => void oauth('google')),
+      methods.includes('instagram') && short('instagram', <InstagramIcon />, 'Instagram', 'Continuar con Instagram', () => void oauth('instagram')),
+      methods.includes('phone') && short('phone', <Smartphone size={18} className="text-neutral-300" aria-hidden />, 'Teléfono', 'Continuar con teléfono', onPhone),
+      onEmail && short('email', <Mail size={18} className="text-neutral-300" aria-hidden />, 'Email', 'Continuar con email', onEmail),
+    ].filter(Boolean)
+    return (
+      <div>
+        <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
+          {items}
+        </div>
+        {methods.includes('instagram') && <p className="mt-1.5 text-center text-[11px] text-neutral-500">Instagram necesita una cuenta profesional (beta).</p>}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-2.5">
