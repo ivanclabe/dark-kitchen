@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-// La migración con los CHECK de ambas galerías, como texto (Vite ?raw).
+// Las migraciones con los CHECK de las galerías, como texto (Vite ?raw): la de iconos y la última de avatares (ADR 0062).
 import galleriesSql from '../../../supabase/migrations/20260926100000_dk_account_icons_person_avatars.sql?raw'
+import avatarsSql from '../../../supabase/migrations/20261015120000_dk_avatar_robots.sql?raw'
 import {
   ACCOUNT_ICON_KEYS,
   ACCOUNT_ICON_LABELS,
@@ -18,20 +19,20 @@ import {
 } from './catalog'
 
 /** Claves del CHECK de una columna en la migración. */
-function checkKeys(column: string): string[] {
-  const start = galleriesSql.indexOf(`${column} in (`)
-  const block = galleriesSql.slice(start, galleriesSql.indexOf(')', start))
+function checkKeys(column: string, sql = galleriesSql): string[] {
+  const start = sql.indexOf(`${column} in (`)
+  const block = sql.slice(start, sql.indexOf(')', start))
   return [...block.matchAll(/'([a-z0-9-]+)'/g)].map((m) => m[1])
 }
 
 describe('galerías', () => {
-  it('20 avatares de personas y 20 iconos de Cuenta, con nombre y formato válido', () => {
-    for (const [keys, labels] of [
-      [AVATAR_KEYS, AVATAR_LABELS],
-      [ACCOUNT_ICON_KEYS, ACCOUNT_ICON_LABELS],
+  it('25 avatares de personas (5 del robot) y 20 iconos de Cuenta, con nombre y formato válido', () => {
+    for (const [keys, labels, n] of [
+      [AVATAR_KEYS, AVATAR_LABELS, 25],
+      [ACCOUNT_ICON_KEYS, ACCOUNT_ICON_LABELS, 20],
     ] as const) {
-      expect(keys).toHaveLength(20)
-      expect(new Set(keys).size).toBe(20)
+      expect(keys).toHaveLength(n)
+      expect(new Set(keys).size).toBe(n)
       for (const key of keys) {
         expect((labels as Record<string, string>)[key]).toBeTruthy()
         expect(key).toMatch(/^[a-z0-9-]{2,32}$/)
@@ -40,7 +41,7 @@ describe('galerías', () => {
   })
 
   it('son iguales a los CHECK de la base', () => {
-    expect(checkKeys('avatar_key').sort()).toEqual([...AVATAR_KEYS].sort())
+    expect(checkKeys('avatar_key', avatarsSql).sort()).toEqual([...AVATAR_KEYS].sort())
     expect(checkKeys('icon_key').sort()).toEqual([...ACCOUNT_ICON_KEYS].sort())
   })
 
@@ -58,6 +59,17 @@ describe('galerías', () => {
     expect(derivedKey(ACCOUNT_ICONS, null)).toBe('chef')
     expect(new Set(Array.from({ length: 200 }, (_, i) => derivedKey(PERSON_AVATARS, `usuario-${i}`))).size).toBeGreaterThan(10)
     expect(new Set(Array.from({ length: 200 }, (_, i) => derivedKey(ACCOUNT_ICONS, `cuenta-${i}`))).size).toBeGreaterThan(10)
+  })
+
+  it('agregar avatares no cambia la cara por defecto de nadie (ADR 0062)', () => {
+    const original = AVATAR_KEYS.slice(0, 20) as readonly string[]
+    for (let i = 0; i < 300; i++) expect(original).toContain(defaultAvatarKey(`usuario-${i}`))
+    // Same result as the gallery of 20 had (the hash of the id modulo 20).
+    const id = '4f0c1a52-9d1e-4a4b-9c61-3c1f0e2d7a10'
+    let hash = 0
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+    expect(defaultAvatarKey(id)).toBe(original[hash % 20])
+    expect(isAvatarKey('robot-love')).toBe(true)
   })
 
   it('usa la clave guardada solo si es de su galería', () => {

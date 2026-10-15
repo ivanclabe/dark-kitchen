@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react'
 import type { AccountIconKey } from '../catalog'
+import type { Tone } from './palette'
 
 /**
- * Ilustraciones SVG propias (sin bancos de imágenes), planas, sobre una
- * tarjeta oscura con degradado. Cuadrícula de 64×64, igual que los avatares
- * de personas, para verse coherentes en cualquier tamaño.
+ * Ilustraciones SVG propias (sin bancos de imágenes) sobre una tarjeta con uno
+ * de los tonos de la marca (ADR 0062). Cuadrícula de 64×64, igual que los
+ * avatares de personas, para verse coherentes en cualquier tamaño. El volumen
+ * (brillo, sombra) lo pone el renderizador, igual para todos.
  */
 export interface AvatarArt {
-  /** Degradado del fondo: [arriba-izquierda, abajo-derecha]. */
-  bg: [string, string]
+  /** El tono de la tarjeta (palette.ts). */
+  tone: Tone
   art: ReactNode
 }
 
@@ -19,7 +21,7 @@ const steam = (x: number) => (
 /** Iconos de establecimiento (Cuentas): la galería original de Quanela. */
 export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
   chef: {
-    bg: ['#7c2d12', '#c2410c'],
+    tone: 'brasa',
     art: (
       <>
         <circle cx="22" cy="28" r="8" fill="#fff7ed" />
@@ -32,7 +34,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   burger: {
-    bg: ['#431407', '#92400e'],
+    tone: 'cielo',
     art: (
       <>
         <path d="M15 31a17 13 0 0 1 34 0z" fill="#f59e0b" />
@@ -47,7 +49,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   pizza: {
-    bg: ['#450a0a', '#991b1b'],
+    tone: 'salvia',
     art: (
       <>
         <path d="M17 19l31 5-21 27z" fill="#fcd34d" />
@@ -61,7 +63,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   taco: {
-    bg: ['#3f2a00', '#a16207'],
+    tone: 'cielo',
     art: (
       <>
         <circle cx="19" cy="31" r="4.5" fill="#4ade80" />
@@ -77,7 +79,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   sushi: {
-    bg: ['#042f2e', '#0f766e'],
+    tone: 'cafe',
     art: (
       <>
         <circle cx="32" cy="33" r="15" fill="#111827" />
@@ -89,7 +91,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   ramen: {
-    bg: ['#1e1b4b', '#4338ca'],
+    tone: 'terracota',
     art: (
       <>
         <path d="M40 11L26 30M46 13L30 31" stroke="#d6d3d1" strokeWidth="2.5" strokeLinecap="round" />
@@ -103,7 +105,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   donut: {
-    bg: ['#500724', '#be185d'],
+    tone: 'cafe',
     art: (
       <>
         <path fillRule="evenodd" d="M32 17a16 16 0 1 1 0 32 16 16 0 0 1 0-32zm0 10.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z" fill="#f59e0b" />
@@ -118,7 +120,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   croissant: {
-    bg: ['#431407', '#9a3412'],
+    tone: 'crema',
     art: (
       <>
         <path d="M12 40c2-14 14-21 20-21s18 7 20 21c-4-3-8-5-10-5-3 0-6 1-10 1s-7-1-10-1c-2 0-6 2-10 5z" fill="#f59e0b" />
@@ -128,7 +130,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   coffee: {
-    bg: ['#1c1917', '#57534e'],
+    tone: 'brasa',
     art: (
       <>
         {steam(26)}
@@ -142,7 +144,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   icecream: {
-    bg: ['#082f49', '#0369a1'],
+    tone: 'terracota',
     art: (
       <>
         <path d="M23 33h18l-9 20z" fill="#f59e0b" />
@@ -156,7 +158,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   avocado: {
-    bg: ['#052e16', '#15803d'],
+    tone: 'crema',
     art: (
       <>
         <path d="M32 11c-8 0-12 10-13 18-2 12 4 23 13 23s15-11 13-23c-1-8-5-18-13-18z" fill="#365314" />
@@ -167,7 +169,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   chili: {
-    bg: ['#0c0a09', '#44403c'],
+    tone: 'salvia',
     art: (
       <>
         <path d="M20 23c11 0 26 8 28 25-6-8-17-12-26-16-6-3-7-9-2-9z" fill="#dc2626" />
@@ -178,7 +180,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   lemon: {
-    bg: ['#1a2e05', '#4d7c0f'],
+    tone: 'cafe',
     art: (
       <>
         <circle cx="32" cy="32" r="16" fill="#fde047" />
@@ -189,7 +191,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   egg: {
-    bg: ['#172554', '#1d4ed8'],
+    tone: 'terracota',
     art: (
       <>
         <path d="M17 32c-2-10 8-16 16-14 10 2 16 10 12 20-3 8-16 12-23 7-4-3-4-8-5-13z" fill="#fafafa" />
@@ -199,7 +201,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   cheese: {
-    bg: ['#2e1065', '#6d28d9'],
+    tone: 'cielo',
     art: (
       <>
         <path d="M13 37l29-14 9 14z" fill="#fde047" />
@@ -212,7 +214,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   shrimp: {
-    bg: ['#083344', '#0e7490'],
+    tone: 'crema',
     art: (
       <>
         <path d="M23 19c14-4 25 8 20 21-3 8-14 11-20 5" fill="none" stroke="#fb923c" strokeWidth="10" strokeLinecap="round" />
@@ -224,7 +226,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   whisk: {
-    bg: ['#1e1b4b', '#6366f1'],
+    tone: 'brasa',
     art: (
       <>
         <path d="M32 41C20 29 22 11 32 11s12 18 0 30z" fill="none" stroke="#e7e5e4" strokeWidth="2" />
@@ -235,7 +237,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   pot: {
-    bg: ['#0f172a', '#334155'],
+    tone: 'cafe',
     art: (
       <>
         {steam(26)}
@@ -250,7 +252,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   cutlery: {
-    bg: ['#4a044e', '#a21caf'],
+    tone: 'terracota',
     art: (
       <>
         <circle cx="32" cy="32" r="14" fill="#e7e5e4" />
@@ -262,7 +264,7 @@ export const ACCOUNT_ICON_ART: Record<AccountIconKey, AvatarArt> = {
     ),
   },
   flame: {
-    bg: ['#18181b', '#3f3f46'],
+    tone: 'cafe',
     art: (
       <>
         <path d="M32 11c4 8 14 12 14 25 0 9-6 16-14 16s-14-7-14-15c0-7 4-11 7-15 0 6 3 9 5 9-1-7 0-14 2-20z" fill="#f97316" />

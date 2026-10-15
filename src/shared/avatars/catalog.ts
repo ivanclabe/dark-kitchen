@@ -75,6 +75,12 @@ export const PERSON_AVATAR_KEYS = [
   'braids',
   'robot',
   'cat-chef',
+  // ADR 0062: the robot of Quanela with its other faces.
+  'robot-wink',
+  'robot-love',
+  'robot-idea',
+  'robot-surprised',
+  'robot-sleepy',
 ] as const
 
 export type PersonAvatarKey = (typeof PERSON_AVATAR_KEYS)[number]
@@ -98,19 +104,32 @@ export const PERSON_AVATAR_LABELS: Record<PersonAvatarKey, string> = {
   headphones: 'Con audífonos',
   cap: 'Gorra de visera',
   braids: 'Trenzas',
-  robot: 'Robot chef',
+  robot: 'Robot Quanela feliz',
   'cat-chef': 'Gato chef',
+  'robot-wink': 'Robot Quanela guiñando',
+  'robot-love': 'Robot Quanela enamorado',
+  'robot-idea': 'Robot Quanela con una idea',
+  'robot-surprised': 'Robot Quanela sorprendido',
+  'robot-sleepy': 'Robot Quanela dormido',
 }
 
 export interface Gallery<K extends string> {
   keys: readonly K[]
+  /** The keys a default (derived) face is chosen from; growing the gallery must not change anyone's default. */
+  derivedFrom?: readonly K[]
   labels: Record<K, string>
   /** Nombre del grupo para lectores de pantalla. */
   label: string
 }
 
 export const ACCOUNT_ICONS: Gallery<AccountIconKey> = { keys: ACCOUNT_ICON_KEYS, labels: ACCOUNT_ICON_LABELS, label: 'Icono de la cuenta' }
-export const PERSON_AVATARS: Gallery<PersonAvatarKey> = { keys: PERSON_AVATAR_KEYS, labels: PERSON_AVATAR_LABELS, label: 'Avatar' }
+export const PERSON_AVATARS: Gallery<PersonAvatarKey> = {
+  keys: PERSON_AVATAR_KEYS,
+  labels: PERSON_AVATAR_LABELS,
+  label: 'Avatar',
+  // The first 20 (ADR 0009): the default of someone who never chose stays the same.
+  derivedFrom: PERSON_AVATAR_KEYS.slice(0, 20),
+}
 
 export function isGalleryKey<K extends string>(gallery: Gallery<K>, value: unknown): value is K {
   return typeof value === 'string' && (gallery.keys as readonly string[]).includes(value)
@@ -121,10 +140,11 @@ export function isGalleryKey<K extends string>(gallery: Gallery<K>, value: unkno
  * que una persona o una Cuenta no "cambie de cara" entre sesiones.
  */
 export function derivedKey<K extends string>(gallery: Gallery<K>, seed: string | null | undefined): K {
-  if (!seed) return gallery.keys[0]
+  const pool = gallery.derivedFrom ?? gallery.keys
+  if (!seed) return pool[0]
   let hash = 0
   for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
-  return gallery.keys[hash % gallery.keys.length]
+  return pool[hash % pool.length]
 }
 
 /** La clave guardada si es de la galería; si no (o no hay), la derivada del id. */

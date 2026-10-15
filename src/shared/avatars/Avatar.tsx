@@ -1,19 +1,27 @@
 import clsx from 'clsx'
 import { useId } from 'react'
 import { ACCOUNT_ICON_ART, type AvatarArt } from './art/accountIcons'
+import { INK, TONES } from './art/palette'
 import { PERSON_AVATAR_ART } from './art/personAvatars'
 import { ACCOUNT_ICON_LABELS, AVATAR_LABELS, resolveAccountIconKey, resolveAvatarKey, type AccountIconKey, type AvatarKey } from './catalog'
 
 /**
- * Un solo renderizador para las dos galerías (ADR 0009): tarjeta oscura con
- * degradado, brillo sutil arriba a la derecha y la ilustración de 64×64.
+ * Un solo renderizador para las dos galerías (ADR 0009, ADR 0062): la tarjeta
+ * en un tono de la marca, la ilustración con una sombra suave que le da
+ * volumen (el aire «plastilina» del robot de Quanela), un brillo arriba y, en
+ * los iconos de establecimiento, la sombra en el piso.
  */
-function Artwork({ art, artKey, className, label }: { art: AvatarArt; artKey: string; className?: string; label?: string }) {
-  const gradientId = useId()
+function Artwork({ art, artKey, className, label, floor = false }: { art: AvatarArt; artKey: string; className?: string; label?: string; floor?: boolean }) {
+  const id = useId()
+  const gradientId = `${id}-bg`
+  const glossId = `${id}-gloss`
+  const depthId = `${id}-depth`
+  const [from, to] = TONES[art.tone]
   return (
     <svg
       viewBox="0 0 64 64"
-      className={clsx('overflow-hidden', className)}
+      // A hairline ring in the brand's brown: the light tones keep their edge on white (it disappears on dark).
+      className={clsx('overflow-hidden ring-1 ring-[#1c1310]/10', className)}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
@@ -22,13 +30,21 @@ function Artwork({ art, artKey, className, label }: { art: AvatarArt; artKey: st
       {label && <title>{label}</title>}
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={art.bg[0]} />
-          <stop offset="1" stopColor={art.bg[1]} />
+          <stop offset="0" stopColor={from} />
+          <stop offset="1" stopColor={to} />
         </linearGradient>
+        <linearGradient id={glossId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".32" />
+          <stop offset=".5" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <filter id={depthId} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1.6" stdDeviation="1.3" floodColor={INK} floodOpacity=".3" />
+        </filter>
       </defs>
       <rect width="64" height="64" fill={`url(#${gradientId})`} />
-      <circle cx="54" cy="10" r="16" fill="#fff" opacity=".05" />
-      {art.art}
+      {floor && <ellipse cx="32" cy="54.5" rx="17" ry="3" fill={INK} opacity=".16" />}
+      <g filter={`url(#${depthId})`}>{art.art}</g>
+      <rect width="64" height="64" fill={`url(#${glossId})`} />
     </svg>
   )
 }
@@ -44,7 +60,7 @@ export function AvatarArtwork({ avatarKey, className, label }: { avatarKey: Avat
 
 /** Solo el dibujo de un icono de Cuenta (para el selector). */
 export function AccountIconArtwork({ iconKey, className, label }: { iconKey: AccountIconKey; className?: string; label?: string }) {
-  return <Artwork art={ACCOUNT_ICON_ART[iconKey]} artKey={iconKey} className={className} label={label} />
+  return <Artwork art={ACCOUNT_ICON_ART[iconKey]} artKey={iconKey} className={className} label={label} floor />
 }
 
 /**

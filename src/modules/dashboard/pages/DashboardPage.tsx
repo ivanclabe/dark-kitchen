@@ -395,6 +395,8 @@ export function DashboardPage() {
     <Page>
       <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
 
+      <TipOfTheDay />
+
       <NeedsAttention />
 
       {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
@@ -405,8 +407,6 @@ export function DashboardPage() {
         <CarteraCard summary={data} liveOps={canSeeLiveOps} />
         {can('staff.view') && <OnShiftCard />}
       </div>
-
-      <TipOfTheDay />
     </Page>
   )
 }

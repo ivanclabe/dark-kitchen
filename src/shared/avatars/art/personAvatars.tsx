@@ -1,7 +1,7 @@
 import type { PersonAvatarKey } from '../catalog'
 import type { AvatarArt } from './accountIcons'
 import { INK, SKIN } from './palette'
-import { Body, Buttons, ChefHat, Face, Person, ShortHair } from './personParts'
+import { Body, Buttons, ChefHat, Face, Person, QuanelaRobot, ShortHair } from './personParts'
 
 /**
  * Avatares de personas (perfil). Mismo sistema que los iconos de
@@ -13,14 +13,14 @@ import { Body, Buttons, ChefHat, Face, Person, ShortHair } from './personParts'
 
 export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
   'chef-classic': {
-    bg: ['#7c2d12', '#c2410c'],
+    tone: 'brasa',
     art: (
       <Person
         skin={SKIN.medium}
         shirt="#fafaf9"
         face={
           <>
-            <Face smile={false} />
+            <Face eyes="happy" smile={false} />
             <path d="M26.5 35.6c2-1.8 3.9-1.9 5.5-.6 1.6-1.3 3.5-1.2 5.5.6-1.9 1.3-3.8 1.4-5.5.4-1.7 1-3.6.9-5.5-.4z" fill="#57341f" />
           </>
         }
@@ -35,9 +35,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   'chef-bun': {
-    bg: ['#042f2e', '#0f766e'],
+    tone: 'salvia',
     art: (
       <Person
+        face={<Face eyes="happy" mouth="grin" />}
         skin={SKIN.brown}
         shirt="#fafaf9"
         back={<circle cx="32" cy="15.5" r="5.5" fill="#1c1917" />}
@@ -59,9 +60,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   baker: {
-    bg: ['#1e3a8a', '#3b82f6'],
+    tone: 'cielo',
     art: (
       <Person
+        face={<Face eyes="wink" mouth="smile" />}
         skin={SKIN.light}
         shirt="#fde68a"
         back={<path d="M19.5 31c0 7 1 11 3 13h19c2-2 3-6 3-13z" fill="#92400e" />}
@@ -86,9 +88,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   barista: {
-    bg: ['#1c1917', '#57534e'],
+    tone: 'crema',
     art: (
       <Person
+        face={<Face eyes="dot" mouth="smirk" />}
         skin={SKIN.tan}
         shirt="#e7e5e4"
         top={
@@ -109,9 +112,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   rider: {
-    bg: ['#052e16', '#15803d'],
+    tone: 'cafe',
     art: (
       <Person
+        face={<Face eyes="wide" mouth="grin" />}
         skin={SKIN.medium}
         shirt="#f97316"
         top={
@@ -131,9 +135,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   cashier: {
-    bg: ['#2e1065', '#6d28d9'],
+    tone: 'terracota',
     art: (
       <Person
+        face={<Face eyes="dot" mouth="smile" />}
         skin={SKIN.deep}
         shirt="#a78bfa"
         back={<path d="M19 30c0-8 5.5-13 13-13s13 5 13 13v11c0 3-2 5-5 5H24c-3 0-5-2-5-5z" fill="#1c1917" />}
@@ -151,9 +156,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   'grill-master': {
-    bg: ['#0c0a09', '#44403c'],
+    tone: 'cielo',
     art: (
       <Person
+        face={<Face eyes="closed" mouth="grin" />}
         skin={SKIN.light}
         shirt="#b91c1c"
         top={
@@ -174,9 +180,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   'sushi-chef': {
-    bg: ['#083344', '#0e7490'],
+    tone: 'brasa',
     art: (
       <Person
+        face={<Face eyes="dot" mouth="flat" />}
         skin={SKIN.light}
         shirt="#f8fafc"
         top={
@@ -192,14 +199,14 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   pizzaiolo: {
-    bg: ['#450a0a', '#991b1b'],
+    tone: 'salvia',
     art: (
       <Person
         skin={SKIN.medium}
         shirt="#fafaf9"
         face={
           <>
-            <Face smile={false} />
+            <Face eyes="closed" smile={false} />
             <path d="M27.5 35.5c1.6-1.3 3.2-1.4 4.5-.4 1.3-1 2.9-.9 4.5.4-1.5 1-3 1.1-4.5.3-1.5.8-3 .7-4.5-.3z" fill="#292524" />
           </>
         }
@@ -220,9 +227,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   manager: {
-    bg: ['#0f172a', '#334155'],
+    tone: 'crema',
     art: (
       <Person
+        face={<Face eyes="dot" mouth="smirk" />}
         skin={SKIN.tan}
         shirt="#1e293b"
         top={
@@ -243,9 +251,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   waiter: {
-    bg: ['#4a044e', '#a21caf'],
+    tone: 'terracota',
     art: (
       <Person
+        face={<Face eyes="happy" mouth="smile" />}
         skin={SKIN.brown}
         shirt="#fafaf9"
         top={<path d="M20.6 30c-.9-8.5 4.5-13 11.4-13s12.3 4.5 11.4 13c-.8-2.4-2.1-4.4-4-5.6-3.8-.6-9.6-.7-15.4.8-1.7 1-2.9 2.8-3.4 4.8z" fill="#1c1917" />}
@@ -260,9 +269,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   grandma: {
-    bg: ['#500724', '#be185d'],
+    tone: 'cielo',
     art: (
       <Person
+        face={<Face eyes="closed" mouth="smile" />}
         skin={SKIN.light}
         shirt="#fbcfe8"
         back={<circle cx="32" cy="16" r="5.5" fill="#e5e7eb" />}
@@ -285,9 +295,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   curly: {
-    bg: ['#431407', '#92400e'],
+    tone: 'salvia',
     art: (
       <Person
+        face={<Face eyes="happy" mouth="grin" />}
         skin={SKIN.deep}
         shirt="#f59e0b"
         back={
@@ -314,7 +325,7 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   hijab: {
-    bg: ['#083344', '#0e7490'],
+    tone: 'cafe',
     art: (
       <>
         <path d="M17.5 36c0-12 6.5-20 14.5-20s14.5 8 14.5 20v10h-29z" fill="#fda4af" />
@@ -323,15 +334,16 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
         <circle cx="32" cy="31" r="10.5" fill={SKIN.tan} />
         <path d="M21 29.5c1-6.5 5.5-10 11-10s10 3.5 11 10c-3-3-6.5-4.2-11-4.2s-8 1.2-11 4.2z" fill="#fda4af" />
         <g transform="translate(0 1)">
-          <Face />
+          <Face eyes="wink" mouth="smile" />
         </g>
       </>
     ),
   },
   beanie: {
-    bg: ['#172554', '#1d4ed8'],
+    tone: 'crema',
     art: (
       <Person
+        face={<Face eyes="wide" mouth="o" />}
         skin={SKIN.deep}
         shirt="#e11d48"
         top={
@@ -347,9 +359,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   headphones: {
-    bg: ['#1e1b4b', '#4338ca'],
+    tone: 'terracota',
     art: (
       <Person
+        face={<Face eyes="closed" mouth="smile" />}
         skin={SKIN.medium}
         shirt="#10b981"
         top={
@@ -370,9 +383,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   cap: {
-    bg: ['#1a2e05', '#4d7c0f'],
+    tone: 'salvia',
     art: (
       <Person
+        face={<Face eyes="wide" mouth="grin" />}
         skin={SKIN.light}
         shirt="#3b82f6"
         back={<path d="M21 28c0 5 .5 9 2 11l1-10z" fill="#b45309" />}
@@ -389,9 +403,10 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
     ),
   },
   braids: {
-    bg: ['#3f2a00', '#a16207'],
+    tone: 'cielo',
     art: (
       <Person
+        face={<Face eyes="dot" mouth="smirk" />}
         skin={SKIN.deep}
         shirt="#fde047"
         top={
@@ -412,28 +427,14 @@ export const PERSON_AVATAR_ART: Record<PersonAvatarKey, AvatarArt> = {
       />
     ),
   },
-  robot: {
-    bg: ['#164e63', '#0891b2'],
-    art: (
-      <>
-        <Body color="#94a3b8" />
-        <rect x="26" y="50" width="12" height="7" rx="2" fill="#475569" />
-        <circle cx="29" cy="53.5" r="1.2" fill="#22d3ee" />
-        <circle cx="35" cy="53.5" r="1.2" fill="#f97316" />
-        <rect x="28.5" y="39" width="7" height="8" fill="#64748b" />
-        <rect x="18.5" y="28" width="3" height="7" rx="1.5" fill="#64748b" />
-        <rect x="42.5" y="28" width="3" height="7" rx="1.5" fill="#64748b" />
-        <rect x="20.5" y="21" width="23" height="20" rx="6" fill="#cbd5e1" />
-        <rect x="23.5" y="26" width="17" height="8" rx="4" fill="#0f172a" />
-        <circle cx="28" cy="30" r="1.8" fill="#22d3ee" />
-        <circle cx="36" cy="30" r="1.8" fill="#22d3ee" />
-        <path d="M27.5 37.5h9" stroke="#64748b" strokeWidth="1.6" strokeLinecap="round" />
-        <ChefHat y={2.5} scale={0.8} />
-      </>
-    ),
-  },
+  robot: { tone: 'cafe', art: <QuanelaRobot eyes="happy" /> },
+  'robot-wink': { tone: 'cielo', art: <QuanelaRobot eyes="wink" /> },
+  'robot-love': { tone: 'crema', art: <QuanelaRobot eyes="love" /> },
+  'robot-idea': { tone: 'salvia', art: <QuanelaRobot eyes="idea" /> },
+  'robot-surprised': { tone: 'cafe', art: <QuanelaRobot eyes="surprised" /> },
+  'robot-sleepy': { tone: 'crema', art: <QuanelaRobot eyes="sleepy" /> },
   'cat-chef': {
-    bg: ['#312e81', '#6366f1'],
+    tone: 'salvia',
     art: (
       <>
         <Body color="#fafaf9" />
