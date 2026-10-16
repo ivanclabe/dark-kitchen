@@ -1,3 +1,4 @@
+import { BillingBanner } from '@/shared/billing/BillingBanner'
 import { OnlineIndicator } from './OnlineIndicator'
 import { BrandMark } from '@/shared/brand/BrandMark'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -239,6 +240,7 @@ export function AppLayout() {
             igual — su contenido simplemente scrollea dentro de <main>. */}
         {/* scrollbar-gutter: a short page and a long one keep the same width (no sideways jump when the scrollbar appears). */}
         <main id="contenido" tabIndex={-1} className="flex outline-none min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 [scrollbar-gutter:stable] sm:p-6 lg:p-8">
+          <BillingBanner />
           <WelcomeCard />
           <Outlet />
         </main>
