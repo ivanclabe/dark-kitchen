@@ -1,3 +1,4 @@
+import { BILLING_OVERVIEW_KEY, fetchBillingOverview } from '../lib/billing'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { useQuery } from '@tanstack/react-query'
@@ -64,7 +65,12 @@ export function DashboardPage() {
 }
 
 function Alerts({ alerts }: { alerts: NonNullable<Awaited<ReturnType<typeof fetchOverview>>>['alerts'] }) {
+  // ADR 0066: subscriptions that need the platform (failed renewals, bad events, past due).
+  const billing = useQuery({ queryKey: BILLING_OVERVIEW_KEY, queryFn: fetchBillingOverview }).data?.counts
   const items = [
+    { count: billing?.pastDue ?? 0, text: 'suscripciones con pago pendiente', to: '/administration' },
+    { count: billing?.failedRenewals7d ?? 0, text: 'renovaciones automáticas fallaron en 7 días', to: '/administration' },
+    { count: billing?.invalidEvents7d ?? 0, text: 'eventos de Wompi con firma inválida en 7 días', to: '/administration' },
     { count: alerts.aiErrors24h, text: 'análisis de IA fallaron en las últimas 24 h', to: '/ai' },
     { count: alerts.expiredInvitations, text: 'invitaciones vencieron sin activarse', to: '/users?status=pending' },
     { count: alerts.trialsEndingSoon, text: 'pruebas gratis terminan en los próximos 7 días', to: '/organizations' },

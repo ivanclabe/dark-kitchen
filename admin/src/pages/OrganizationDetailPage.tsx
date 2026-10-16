@@ -5,9 +5,10 @@ import { Tabs, type TabItem } from '@/shared/ui/Tabs'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Activity, Building2, Copy, Mail, Power, Settings2, Sparkles, Users } from 'lucide-react'
+import { Activity, Building2, Copy, CreditCard, Mail, Power, Settings2, Sparkles, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
+import { BillingOrgPanel } from '../components/BillingOrgPanel'
 import { PasswordLinkButton } from '../components/PasswordLinkButton'
 import { SubdomainBar } from '../components/SubdomainBar'
 import { ActivityFeed, ConfirmByName, Metric, PageTitle, Panel, StatusPill } from '../components/ui'
@@ -15,7 +16,7 @@ import { fetchOrganization, resendInvitation, setOrganizationActive, type Organi
 import { featureLabel } from '../lib/features'
 import { formatNumber, formatShortDate, timeAgo } from '../lib/format'
 
-type Tab = 'summary' | 'users' | 'activity' | 'configuration'
+type Tab = 'summary' | 'users' | 'billing' | 'activity' | 'configuration'
 
 /**
  * One organization, seen from the platform (ADR 0019): read-only over what
@@ -65,6 +66,7 @@ export function OrganizationDetailPage() {
   const tabs: TabItem<Tab>[] = [
     { value: 'summary', label: 'Resumen', icon: Building2 },
     { value: 'users', label: `Usuarios (${org.userList.length})`, icon: Users },
+    { value: 'billing', label: 'Facturación', icon: CreditCard },
     { value: 'activity', label: 'Actividad', icon: Activity },
     { value: 'configuration', label: 'Configuración', icon: Settings2 },
   ]
@@ -118,6 +120,7 @@ export function OrganizationDetailPage() {
 
       {tab === 'summary' && <Summary org={org} />}
       {tab === 'users' && <UsersTab org={org} />}
+      {tab === 'billing' && <BillingOrgPanel organizationId={org.id} />}
       {tab === 'activity' && (
         <Panel title="Actividad reciente" subtitle="Últimos 40 eventos de la organización">
           <ActivityFeed items={org.activity} empty="La organización todavía no tiene actividad." />

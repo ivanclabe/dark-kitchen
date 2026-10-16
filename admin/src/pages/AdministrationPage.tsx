@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Building2, Pause, Play, Settings, ShieldCheck, Sparkles, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { BillingPlatformPanel } from '../components/BillingPlatformPanel'
 import { PageTitle, Panel, StatusPill } from '../components/ui'
 import { fetchUsers } from '../lib/api'
 import { timeAgo } from '../lib/format'
@@ -44,6 +45,7 @@ export function AdministrationPage() {
       {section === 'platform' && (
         <div className="space-y-4">
           <GlobalAdmins />
+          <BillingPlatformPanel />
           <OrganizationPlansPanel />
           <Accounts />
         </div>
