@@ -1,5 +1,5 @@
 import { Check, ChevronDown, Plus, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 
 export interface ComboboxOption {
   value: string
@@ -29,6 +29,7 @@ interface ComboboxProps {
   'aria-label'?: string
   'aria-invalid'?: boolean
   'aria-describedby'?: string
+  'aria-required'?: boolean
 }
 
 function normalize(s: string) {
@@ -44,13 +45,14 @@ export function Combobox({
   disabled,
   required,
   onCreateNew,
-  createLabel = (q) => `Crear "${q}"`,
+  createLabel = (q) => `Crear «${q}»`,
   onQueryChange,
   filterLocally = true,
   id,
   'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
   'aria-describedby': ariaDescribedBy,
+  'aria-required': ariaRequired,
 }: ComboboxProps) {
   const selected = options.find((o) => o.value === value) ?? null
   const [inputValue, setInputValue] = useState(selected?.label ?? '')
@@ -58,6 +60,9 @@ export function Combobox({
   const [highlighted, setHighlighted] = useState(0)
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  // ARIA combobox (ADR 0065): the list is a listbox and the input points at the highlighted option.
+  const listId = useId()
+  const optionId = (i: number) => `${listId}-option-${i}`
 
   // Sincroniza el texto mostrado cuando el value (o la opción que representa)
   // cambia externamente — reset de formulario, o los `options` se recargan.
@@ -76,6 +81,12 @@ export function Combobox({
 
   const showCreateRow = !!onCreateNew && inputValue.trim().length > 0
   const totalRows = filtered.length + (showCreateRow ? 1 : 0)
+
+  // The highlighted row stays in view while moving with the arrows.
+  useEffect(() => {
+    if (open) document.getElementById(optionId(highlighted))?.scrollIntoView?.({ block: 'nearest' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlighted, open])
 
   useEffect(() => {
     if (!rootRef.current) return
@@ -138,10 +149,15 @@ export function Combobox({
           id={id}
           role="combobox"
           aria-expanded={open}
+          aria-controls={listId}
+          aria-activedescendant={open && totalRows > 0 ? optionId(highlighted) : undefined}
           aria-autocomplete="list"
+          autoComplete="off"
+          spellCheck={false}
           aria-label={ariaLabel}
           aria-invalid={ariaInvalid}
           aria-describedby={ariaDescribedBy}
+          aria-required={ariaRequired}
           value={inputValue}
           disabled={disabled}
           required={required && !value}
@@ -158,7 +174,12 @@ export function Combobox({
             setOpen(true)
           }}
           onKeyDown={handleKeyDown}
-          className="mt-1.5 w-full min-w-0 rounded-lg border border-neutral-700/70 bg-neutral-900 py-2.5 pl-9 pr-16 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-600 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+          // Leaving with Tab closes the list and shows the chosen option again (it used to stay empty).
+          onBlur={() => {
+            setOpen(false)
+            setInputValue(selected?.label ?? '')
+          }}
+          className="mt-1.5 w-full min-w-0 rounded-lg border border-neutral-600 bg-neutral-900 py-2.5 pl-9 pr-16 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-500 focus:border-focus focus:ring-2 focus:ring-focus/25 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-red-500"
         />
         <div className="absolute right-2 top-1/2 mt-[3px] flex -translate-y-1/2 items-center gap-1">
           {value && !disabled && (
@@ -182,20 +203,24 @@ export function Combobox({
       </div>
 
       {open && !disabled && (
-        <div className="animate-fade-in absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-neutral-800 bg-neutral-900 py-1 shadow-float">
+        <div id={listId} role="listbox" className="animate-fade-in absolute z-20 mt-1 max-h-64 w-full overflow-y-auto overscroll-contain rounded-xl border border-neutral-800 bg-neutral-900 py-1 shadow-float">
           {filtered.length === 0 && !showCreateRow && (
-            <p className="px-3 py-2 text-sm text-neutral-500">{emptyMessage}</p>
+            <p role="presentation" className="px-3 py-2 text-sm text-neutral-500">
+              {emptyMessage}
+            </p>
           )}
           {filtered.map((option, i) => (
-            <button
+            <div
               key={option.value}
-              type="button"
+              id={optionId(i)}
+              role="option"
+              aria-selected={option.value === value}
               onMouseDown={(e) => {
                 e.preventDefault()
                 selectOption(option)
               }}
               onMouseEnter={() => setHighlighted(i)}
-              className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm ${
+              className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-sm pointer-coarse:py-3 ${
                 i === highlighted ? 'bg-neutral-800 text-neutral-50' : 'text-neutral-200'
               }`}
             >
@@ -206,23 +231,25 @@ export function Combobox({
                   {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
                 </span>
               </span>
-              {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" />}
-            </button>
+              {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" aria-hidden />}
+            </div>
           ))}
           {showCreateRow && (
-            <button
-              type="button"
+            <div
+              id={optionId(filtered.length)}
+              role="option"
+              aria-selected={false}
               onMouseDown={(e) => {
                 e.preventDefault()
                 handleCreate()
               }}
               onMouseEnter={() => setHighlighted(filtered.length)}
-              className={`flex w-full items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-brasa-400 ${
-                highlighted === filtered.length ? 'bg-neutral-700' : ''
+              className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-brasa-400 pointer-coarse:py-3 ${
+                highlighted === filtered.length ? 'bg-neutral-800' : ''
               }`}
             >
-              <Plus size={14} /> {createLabel(inputValue.trim())}
-            </button>
+              <Plus size={14} aria-hidden /> {createLabel(inputValue.trim())}
+            </div>
           )}
         </div>
       )}

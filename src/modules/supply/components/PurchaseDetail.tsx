@@ -327,8 +327,9 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 ) : undefined
               }
             >
-              {() => (
+              {(a11y) => (
                 <Combobox
+                  {...a11y}
                   value={ingredientId}
                   onChange={chooseIngredient}
                   options={ingredientOptions}
