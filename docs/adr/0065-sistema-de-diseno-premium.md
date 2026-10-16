@@ -1,10 +1,10 @@
 # ADR 0065: Sistema de diseño de calidad premium
 
 ## Estado
-**Fase 2 implementada (2026-10-15), pendiente de aprobación.** Se pidió en la conversación: subir la calidad visual y de experiencia de Quanela por fases, sin tocar lógica de negocio, consultas de Supabase, permisos ni migraciones, y detenerse al final de cada fase.
+**Fases 2 y 3 implementadas (2026-10-15). La Fase 2 está aprobada; la Fase 3 está pendiente de aprobación.** Se pidió en la conversación: subir la calidad visual y de experiencia de Quanela por fases, sin tocar lógica de negocio, consultas de Supabase, permisos ni migraciones, y detenerse al final de cada fase.
 
 - **Fase 1:** auditoría (solo lectura). Aprobada.
-- **Fase 2:** sistema de diseño (este documento).
+- **Fase 2:** sistema de diseño. Aprobada.
 - **Fase 3:** pulido por módulo, empezando por los P0 y P1 de la auditoría.
 - **Fase 4:** movimiento.
 
@@ -61,6 +61,46 @@
 ### Foco
 Todos los `focus-visible:ring-brasa-500`, `focus:border-brasa-500` y similares de la app usan ahora el token `focus` (66 usos).
 
+## Fase 3: qué cambió por módulo
+
+### Operación
+| Problema | Corrección |
+|---|---|
+| Al entrar directo a la Lista, todas las cifras salían en 0 | La Lista también carga los pedidos abiertos. Mientras cargan (o si fallan), cada cifra muestra «—» |
+| En celulares y tabletas, deslizar sobre una tarjeta no movía la columna | El arrastre táctil empieza con una pulsación larga (250 ms); deslizar desplaza la columna |
+| La acción de la tarjeta era un ícono gris de 24 px que cambiaba de sentido en cada columna | Botón con su palabra («Confirmar», «Iniciar», «Marcar listo», «Despachar», «Entregar»). En pantallas táctiles mide 36 px. El tooltip solo aparece cuando la acción no está permitida, para explicar por qué |
+| Al pasar el puntero, la franja de color de la tarjeta (atraso o prioridad) desaparecía | El hover aclara solo los otros tres bordes |
+| La tarjeta de Cocina cortaba los platos a dos líneas | En Cocina: un plato por línea, completo, sin el estado de pago. Las notas y las opciones tampoco se cortan |
+| En el celular, las columnas del tablero quedaban cortadas a la mitad | Una columna al 85 % del ancho, que encaja al deslizar, y se asoma la siguiente |
+| Con poca altura (zoom al 200 %, portátil de 768 px, tableta acostada), las columnas quedaban de unos 70 px | Las pantallas de tablero miden al menos 34 rem; por debajo, se desplaza la página |
+| La línea de estado de Cocina se cortaba en el celular | Una sola línea: los atrasados van primero, la nota se acorta y el reloj se oculta en el celular |
+| Los anuncios del arrastre para lectores de pantalla estaban en inglés | En español y con el número de pedido |
+| En la Lista, un nombre largo empujaba Estado, Pago y Total fuera de la vista | Columnas de ancho fijo que se truncan. En el celular, el estado y el pago van bajo el cliente, y cada grupo de filtros ocupa una fila que se desliza |
+| La Lista vacía decía «ningún pedido coincide» aunque no hubiera filtros | Sin filtros, el mensaje dice que no hubo pedidos en esas fechas |
+| Las filas de las tablas eran `role="button"` y escondían las celdas a los lectores de pantalla | Fila enfocable con su anillo de foco, sin cambiar su rol |
+
+### Abastecimiento
+- Un insumo sin mínimo (0) ya no sale «bajo mínimo». En la cuenta de prueba pasaron de 240 a 48.
+- Las cifras de Stock esperan a los datos: no muestran «$0» ni «Todo con cobertura» mientras cargan.
+- Cantidades legibles en Reponer: «+500 kg» en vez de «+500000 g».
+- Las fechas del conteo físico usan la hora local: antes, de noche, salía el día siguiente.
+- Abrir un adjunto de compra ya no lo bloquea Safari.
+
+### Clientes, Planificador e Inicio
+- Clientes: las cifras muestran un esqueleto mientras cargan.
+- Planificador:
+  - si el catálogo falla, se muestra el error con «Reintentar»;
+  - «Sin platos» distingue un catálogo vacío de una búsqueda sin resultados.
+- Inicio:
+  - «Cocina ahora» muestra «—» hasta tener los pedidos;
+  - «Vencido» no se pinta de verde sin datos;
+  - «En turno ahora» muestra el error si falla;
+  - el reloj va en horas y minutos.
+
+### General
+- Nombres: Insights → «Análisis» y Consumer → «App de clientes» (menú, título, permisos, Copilot e Inicio). Las rutas no cambian.
+- Enlace «Saltar al contenido» con el primer Tab.
+
 ## Qué no cambió
 - Textos funcionales, rutas, permisos, consultas y comportamiento.
 - La landing (página pública) conserva su CTA en `brasa-500`. Se revisa en la Fase 3 con su módulo.
@@ -71,3 +111,6 @@ Todos los `focus-visible:ring-brasa-500`, `focus:border-brasa-500` y similares d
   - `src/shared/utils/errors.test.ts`: error de red;
   - `src/shared/ui/Overlays.test.tsx`: InfoTip dentro de un modal, Tooltip con Escape, StatCard cargando.
 - Capturas antes y después en los temas oscuro, claro y neutro, en escritorio y celular: inicio, tablero, lista, stock, clientes y un modal con foco.
+- Fase 3:
+  - Vitest completo (145 archivos, 903 pruebas). Hay pruebas nuevas para las cifras de Operación, la tarjeta de Cocina y la regla de stock bajo.
+  - Capturas antes y después de Operación (tablero, cocina y lista) en escritorio, celular y pantalla baja, y de Inicio, Stock, Clientes y Planificador.
