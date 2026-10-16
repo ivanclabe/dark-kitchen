@@ -53,7 +53,8 @@ describe('Operación → Lista (ADR 0031)', () => {
   it('the payment: a column and a filter, for whoever sees the receivables', () => {
     renderAt()
     expect(screen.getByText('Pago')).toBeTruthy()
-    expect(screen.getByText('Pago pendiente')).toBeTruthy()
+    // In its column and, for phones, under the customer (CSS shows one or the other).
+    expect(screen.getAllByText('Pago pendiente')).toHaveLength(2)
     fireEvent.click(screen.getByRole('button', { name: 'Pagados' }))
     expect(state.filters.at(-1)?.payment).toBe('paid')
   })
