@@ -3,6 +3,7 @@ import { TrendingDown, TrendingUp } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { cardClass } from './formClasses'
+import { Skeleton } from './Skeleton'
 import { typography } from './typography'
 
 export type StatTone = 'neutral' | 'brand' | 'good' | 'warn'
@@ -29,6 +30,7 @@ export function StatCard({
   emphasis = false,
   to,
   trend,
+  loading = false,
   className,
 }: {
   label: string
@@ -40,6 +42,11 @@ export function StatCard({
   to?: string
   /** Porcentaje de variación vs. el período anterior. */
   trend?: { pct: number; label?: string }
+  /**
+   * ADR 0065: while the data loads (or when it failed) the figure is a placeholder, never a «0» or an
+   * «all good» hint that is not true yet.
+   */
+  loading?: boolean
   className?: string
 }) {
   const content = (
@@ -52,15 +59,19 @@ export function StatCard({
           </span>
         )}
       </div>
-      <p className={clsx('mt-2 tabular-nums', emphasis ? typography.display : 'text-2xl font-semibold tracking-tight text-neutral-50')}>
-        {value}
-      </p>
-      {(hint || trend) && (
+      {loading ? (
+        <Skeleton className={clsx('mt-2', emphasis ? 'h-9 w-32 sm:h-10' : 'h-8 w-24')} />
+      ) : (
+        <p className={clsx('mt-2 tabular-nums', emphasis ? typography.display : 'text-2xl font-semibold tracking-tight text-neutral-50')}>
+          {value}
+        </p>
+      )}
+      {!loading && (hint || trend) && (
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           {trend && (
             <span
               className={clsx(
-                'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums',
+                'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-2xs font-medium tabular-nums',
                 trend.pct >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400',
               )}
             >
@@ -76,13 +87,18 @@ export function StatCard({
   )
 
   const base = clsx(cardClass, 'flex flex-col', className)
+  const busy = loading ? { 'aria-busy': true } : {}
 
   if (to) {
     return (
-      <Link to={to} className={clsx(base, 'transition-colors hover:border-neutral-700 hover:bg-neutral-900')}>
+      <Link to={to} {...busy} className={clsx(base, 'transition-colors hover:border-neutral-700 hover:bg-neutral-900')}>
         {content}
       </Link>
     )
   }
-  return <div className={base}>{content}</div>
+  return (
+    <div {...busy} className={base}>
+      {content}
+    </div>
+  )
 }

@@ -3,23 +3,24 @@ import type { ComponentType, ReactNode } from 'react'
 
 export type BadgeTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'violet'
 
+// ADR 0065: the states are semantic tokens (they follow the theme; ≥ 4.5:1 on their tint in all three).
 const TONE: Record<BadgeTone, string> = {
   neutral: 'bg-neutral-800 text-neutral-300',
   brand: 'bg-brasa-500/15 text-brasa-400',
-  success: 'bg-emerald-500/15 text-emerald-400',
-  warning: 'bg-amber-500/15 text-amber-400',
-  danger: 'bg-red-500/15 text-red-400',
-  info: 'bg-sky-500/15 text-sky-400',
+  success: 'bg-success/15 text-success',
+  warning: 'bg-warning/15 text-warning',
+  danger: 'bg-danger/15 text-danger',
+  info: 'bg-info/15 text-info',
   violet: 'bg-violet-500/15 text-violet-400',
 }
 
 const DOT: Record<BadgeTone, string> = {
   neutral: 'bg-neutral-400',
   brand: 'bg-brasa-400',
-  success: 'bg-emerald-400',
-  warning: 'bg-amber-400',
-  danger: 'bg-red-400',
-  info: 'bg-sky-400',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+  info: 'bg-info',
   violet: 'bg-violet-400',
 }
 
@@ -48,7 +49,8 @@ export function Badge({
     <span
       className={clsx(
         'inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full font-medium',
-        size === 'sm' ? 'px-1.5 py-px text-[10px]' : 'px-2 py-0.5 text-xs',
+        // sm: 11 px, the minimum text of the interface (10 px was unreadable at a kitchen distance).
+        size === 'sm' ? 'px-1.5 py-px text-2xs' : 'px-2 py-0.5 text-xs',
         TONE[tone],
         className,
       )}

@@ -6,7 +6,7 @@ import { typography } from './typography'
 // estas constantes en <Link>/<label> o migrar al componente <Button>.
 export const labelClass = `block ${typography.label}`
 export const inputClass =
-  'mt-1.5 w-full min-w-0 rounded-lg border border-neutral-700/70 bg-neutral-900 px-3.5 py-2.5 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-600 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-red-500/70 aria-[invalid=true]:focus:ring-red-500/15'
+  'mt-1.5 w-full min-w-0 rounded-lg border border-neutral-600 bg-neutral-900 px-3.5 py-2.5 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-500 focus:border-focus focus:ring-2 focus:ring-focus/25 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-red-500 aria-[invalid=true]:focus:ring-red-500/20'
 export const primaryButtonClass = buttonClass({ variant: 'primary' })
 export const secondaryButtonClass = buttonClass({ variant: 'secondary' })
 export const dangerButtonClass = buttonClass({ variant: 'danger' })
@@ -24,8 +24,8 @@ export const tdClass = 'px-4 py-3 text-sm text-neutral-200 align-middle'
 export const tbodyClass = 'divide-y divide-neutral-800/70 [&>tr]:transition-colors [&>tr:hover]:bg-neutral-900/50'
 
 export const chipClass = (active: boolean) =>
-  `inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
+  `inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus pointer-coarse:py-2 ${
     active
-      ? 'bg-brasa-500 text-white'
+      ? 'bg-primary text-on-primary'
       : 'bg-neutral-900 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
   }`

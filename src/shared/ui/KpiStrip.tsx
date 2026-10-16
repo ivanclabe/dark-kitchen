@@ -1,3 +1,4 @@
+import { Skeleton } from './Skeleton'
 import { typography } from './typography'
 import clsx from 'clsx'
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
@@ -44,7 +45,18 @@ function formatChange(ratio: number): string {
  * period and a tiny trend — not a wall of separate cards. A figure with no
  * previous value says so instead of showing a made-up percentage.
  */
-export function KpiStrip({ items, compareLabel = null, columns = 6 }: { items: Kpi[]; compareLabel?: string | null; columns?: 3 | 4 | 5 | 6 }) {
+export function KpiStrip({
+  items,
+  compareLabel = null,
+  columns = 6,
+  loading = false,
+}: {
+  items: Kpi[]
+  compareLabel?: string | null
+  columns?: 3 | 4 | 5 | 6
+  /** ADR 0065: placeholders while loading or after an error, never «0» figures that are not true yet. */
+  loading?: boolean
+}) {
   return (
     // gap-px over the line color draws the dividers between tiles at every breakpoint.
     <div
@@ -64,21 +76,25 @@ export function KpiStrip({ items, compareLabel = null, columns = 6 }: { items: K
         const body = (
           <>
             <p className={typography.label}>{k.label}</p>
-            <p className="mt-1.5 truncate text-xl font-semibold tracking-tight text-neutral-50 tabular-nums sm:text-2xl">{k.value}</p>
-            {compareLabel && (
+            {loading ? (
+              <Skeleton className="mt-2 h-7 w-20" />
+            ) : (
+              <p className="mt-1.5 truncate text-xl font-semibold tracking-tight text-neutral-50 tabular-nums sm:text-2xl">{k.value}</p>
+            )}
+            {!loading && compareLabel && (
               <p className={clsx('mt-1 flex items-center gap-1 text-xs', tone)}>
                 <Arrow size={13} aria-hidden />
                 {k.change === null && !k.changeLabel ? 'sin datos para comparar' : (k.changeLabel ?? formatChange(k.change ?? 0))}
                 {(k.change !== null || k.changeLabel) && <span className="truncate text-neutral-500">vs. {compareLabel}</span>}
               </p>
             )}
-            {k.hint && <p className={clsx('mt-1 truncate', typography.caption)}>{k.hint}</p>}
-            {k.series && <Sparkline values={k.series} />}
+            {!loading && k.hint && <p className={clsx('mt-1 truncate', typography.caption)}>{k.hint}</p>}
+            {!loading && k.series && <Sparkline values={k.series} />}
           </>
         )
         const cell = 'min-w-0 bg-neutral-900 p-4'
         return k.onSelect ? (
-          <button key={k.id} type="button" onClick={k.onSelect} className={clsx(cell, 'text-left transition-colors hover:bg-neutral-800/30 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none')}>
+          <button key={k.id} type="button" onClick={k.onSelect} className={clsx(cell, 'text-left transition-colors hover:bg-neutral-800/30 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none')}>
             {body}
           </button>
         ) : (
