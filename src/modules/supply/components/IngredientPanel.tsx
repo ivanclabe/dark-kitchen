@@ -22,7 +22,7 @@ export function StockBar({ ingredient }: { ingredient: Ingredient }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-800" role="presentation">
       <div
-        className={clsx('h-full rounded-full transition-all', low ? 'bg-red-500' : near ? 'bg-amber-500' : 'bg-emerald-500')}
+        className={clsx('h-full rounded-full', low ? 'bg-red-500' : near ? 'bg-amber-500' : 'bg-emerald-500')}
         style={{ width: `${Math.max(ratio * 100, low ? 6 : 8)}%` }}
       />
     </div>

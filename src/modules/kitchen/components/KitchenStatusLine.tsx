@@ -27,7 +27,6 @@ export function KitchenStatusLine({ lateCount, canConfigure, onConfigure }: { la
     // the late count comes first, the note shortens, the clock is left out on a phone.
     <p className="flex min-w-0 items-center gap-x-1.5 text-sm whitespace-nowrap text-neutral-500">
       <span className="relative flex size-2 shrink-0" aria-hidden>
-        {status.state !== 'closed' && <span className={clsx('absolute inline-flex size-full animate-ping rounded-full opacity-60', dot)} />}
         <span className={clsx('relative inline-flex size-2 rounded-full', dot)} />
       </span>
       <button

@@ -31,7 +31,6 @@ export function OnlineIndicator({ compact = false, placement = 'bottom-end' }: {
           )}
         >
           <span className="relative flex size-2" aria-hidden>
-            {connected && people.length > 1 && <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400/60" />}
             <span className={clsx('relative inline-flex size-2 rounded-full', connected ? 'bg-emerald-400' : 'bg-neutral-600')} />
           </span>
           {compact ? <span className="tabular-nums">{connected ? count : '–'}</span> : <span className="whitespace-nowrap">{label}</span>}

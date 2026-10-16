@@ -115,7 +115,7 @@ function DashboardHeader({
       description={
         <span className="inline-flex flex-wrap items-center gap-x-2">
           <span className="font-medium text-neutral-200">Hola, {firstName}</span>
-          <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" aria-label="En vivo" />
+          <span className="size-1.5 rounded-full bg-emerald-400" aria-label="En vivo" />
           <span>
             {formatDateLong(todayStr())} · <span className="tabular-nums">{clock}</span>
           </span>
