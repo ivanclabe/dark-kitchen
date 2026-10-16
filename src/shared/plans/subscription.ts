@@ -2,9 +2,10 @@ import { supabase } from '@/shared/lib/supabase'
 import type { FeatureKey } from '@/shared/features/features'
 
 /** Suscripción de una organización (ADR 0010). El plan es de la organización, no del usuario. */
-export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired'
+export type SubscriptionStatus = 'incomplete' | 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired'
 
 export const SUBSCRIPTION_STATUS_LABEL: Record<SubscriptionStatus, string> = {
+  incomplete: 'Sin activar',
   trialing: 'Prueba gratis',
   active: 'Activa',
   past_due: 'Pago pendiente',
@@ -21,10 +22,14 @@ export interface Subscription {
     priceYearly: number | null
     currency: string
     highlights: string[]
+    /** ADR 0066: se paga en línea (los de ventas, por transferencia). */
+    selfServe?: boolean
     /** Contacto de ventas para cambiar de plan. */
     contactUrl: string | null
   }
   status: SubscriptionStatus
+  /** ADR 0066: online (Wompi), manual (transferencia) o exempt (sin cobro). */
+  mode?: 'online' | 'manual' | 'exempt'
   isCurrent: boolean
   billingPeriod: 'monthly' | 'annual'
   startedAt: string
@@ -33,8 +38,18 @@ export interface Subscription {
   currentPeriodEnd: string | null
   cancelAtPeriodEnd: boolean
   canceledAt?: string | null
-  /** false mientras no haya un proveedor de pagos conectado. */
+  /** false mientras la plataforma no abra los pagos en línea. */
   paymentsEnabled?: boolean
+  /** ADR 0066 */
+  enforced?: boolean
+  canPay?: boolean
+  graceEndsAt?: string | null
+  /** «Visa •••• 4242» si hay tarjeta guardada para renovar. */
+  paymentMethod?: string | null
+  /** Cambio programado para la renovación. */
+  pendingChange?: { planKey: string; planName: string; billingPeriod: 'monthly' | 'annual' } | null
+  /** La factura que falta pagar (activación, renovación o upgrade). */
+  openInvoice?: { id: string; number: string; kind: 'activation' | 'renewal' | 'upgrade' | 'transfer'; amount: number; currency: string; dueAt: string | null } | null
   /** null = ilimitado. `aiRunsPerDay` es por Cuenta, en 24 h móviles. */
   limits: { accounts: number | null; users: number | null; aiRunsPerDay?: number }
   /** `aiRunsMax24h`: análisis de IA de la Cuenta que más usó en 24 h. */

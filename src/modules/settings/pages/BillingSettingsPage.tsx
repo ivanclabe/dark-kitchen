@@ -2,19 +2,34 @@ import { PlanPanel } from '@/modules/organization/components/PlanPanel'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { EmptyState } from '@/shared/ui/EmptyState'
-import { typography } from '@/shared/ui/typography'
 import { formatDate, formatMoney } from '@/shared/utils/format'
 import { useQuery } from '@tanstack/react-query'
-import { FileText, Wallet } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { fetchInvoices, type Invoice } from '../api'
 import { SettingsPage } from '../ui/SettingsPage'
 import { Section } from '@/shared/ui/Section'
 import { StatusBadge } from '../ui/StatusBadge'
 
+const KIND_LABEL: Record<NonNullable<Invoice['kind']>, string> = {
+  activation: 'Activación',
+  renewal: 'Renovación',
+  upgrade: 'Cambio de plan',
+  transfer: 'Transferencia',
+}
+
+const METHOD_LABEL: Record<string, string> = {
+  CARD: 'Tarjeta',
+  PSE: 'PSE',
+  NEQUI: 'Nequi',
+  BANCOLOMBIA_TRANSFER: 'Bancolombia',
+  BANCOLOMBIA_QR: 'QR Bancolombia',
+  TRANSFER: 'Transferencia',
+}
+
 /**
- * Facturación (ADR 0012, sección 7; ADR 0024): one plan covers all your
- * accounts. Only real data; invoices and payment methods are ready for when a
- * payment provider is connected (nothing is made up today).
+ * Facturación (ADR 0012, sección 7; ADR 0024; ADR 0066): one plan covers all
+ * your accounts. The subscription is paid with Wompi; every payment is an
+ * invoice here (only real data: nothing is made up).
  */
 export function BillingSettingsPage() {
   const { organization } = useActiveKitchen()
@@ -26,6 +41,8 @@ function Billing({ organizationId }: { organizationId: string }) {
   const invoices = useQuery({ queryKey: ['org', organizationId, 'invoices'], queryFn: () => fetchInvoices(organizationId) })
   const columns: DataTableColumn<Invoice>[] = [
     { key: 'number', header: 'Factura', cell: (i) => <span className="font-medium text-neutral-100">{i.number}</span> },
+    { key: 'kind', header: 'Concepto', hideBelow: 'md', cell: (i) => <span className="text-neutral-300">{i.kind ? KIND_LABEL[i.kind] : '—'}</span> },
+    { key: 'method', header: 'Medio', hideBelow: 'lg', cell: (i) => <span className="text-neutral-400">{i.method ? (METHOD_LABEL[i.method] ?? i.method) : '—'}</span> },
     { key: 'date', header: 'Fecha', hideBelow: 'sm', cell: (i) => <span className="text-neutral-400">{formatDate(i.issuedAt)}</span> },
     {
       key: 'amount',
@@ -65,20 +82,8 @@ function Billing({ organizationId }: { organizationId: string }) {
           isLoading={invoices.isLoading}
           error={invoices.isError ? invoices.error : undefined}
           onRetry={() => void invoices.refetch()}
-          emptyState={<EmptyState icon={FileText} title="Aún no hay facturas" description="Los pagos en línea todavía no están activos. Cuando lo estén, aquí verás cada factura." compact />}
+          emptyState={<EmptyState icon={FileText} title="Aún no hay facturas" description="Aquí verás cada pago de tu suscripción." compact />}
         />
-      </Section>
-
-      <Section title="Método de pago" card>
-        <div className="flex items-start gap-3">
-          <Wallet size={18} className="mt-0.5 shrink-0 text-neutral-500" aria-hidden />
-          <div className="min-w-0">
-            <p className="text-sm text-neutral-200">Sin método de pago.</p>
-            <p className={`mt-1 ${typography.caption}`}>
-              Los pagos en línea todavía no están activos: no se guarda ningún dato de tarjetas. Para cambiar de plan o de periodicidad, usa «Cambiar de plan».
-            </p>
-          </div>
-        </div>
       </Section>
     </SettingsPage>
   )

@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { Check } from 'lucide-react'
 import { orgKey } from '../hooks/useOrganization'
+import { SubscriptionCard } from './SubscriptionCard'
 
 function Usage({ label, used, limit, singular, plural }: { label: string; used: number; limit: number | null; singular: string; plural: string }) {
   const pct = limit === null ? 0 : Math.min(100, Math.round((used / Math.max(limit, 1)) * 100))
@@ -34,7 +35,8 @@ function Usage({ label, used, limit, singular, plural }: { label: string; used: 
 
 /**
  * Plan del negocio, compartido por todas tus cuentas (ADR 0010, ADR 0024): qué plan tiene, su estado, límites y
- * uso, y qué incluye. Sin pagos todavía: el cambio de plan es con ventas.
+ * uso, y qué incluye. Con los pagos en línea abiertos (ADR 0066) la tarjeta de arriba es la de la suscripción
+ * (pagar, renovar, cambiar de plan, cancelar); sin ellos, el cambio de plan es con ventas.
  */
 export function PlanPanel({ organizationId }: { organizationId: string }) {
   const now = useNow(60_000)
@@ -52,6 +54,9 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
 
   return (
     <div className="space-y-6">
+      {sub.paymentsEnabled ? (
+        <SubscriptionCard sub={sub} organizationId={organizationId} />
+      ) : (
       <section className={cardClass}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -76,6 +81,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
           </p>
         )}
       </section>
+      )}
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Usage label="Cuentas" used={sub.usage.accounts} limit={sub.limits.accounts} singular="cuenta" plural="cuentas" />
@@ -95,7 +101,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
             <dd className="text-neutral-200">{sub.billingPeriod === 'annual' ? 'Anual' : 'Mensual'}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{sub.status === 'trialing' ? 'Fin de la prueba' : 'Renovación'}</dt>
+            <dt className="text-neutral-500">{sub.status === 'trialing' ? 'Fin de la prueba' : sub.cancelAtPeriodEnd ? 'Termina' : 'Renovación'}</dt>
             <dd className="text-neutral-200">{sub.currentPeriodEnd ? formatDate(sub.currentPeriodEnd) : '—'}</dd>
           </div>
         </dl>
