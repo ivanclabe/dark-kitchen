@@ -129,7 +129,7 @@ function StartCount() {
               <li key={c.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                 <span className="min-w-0 truncate text-neutral-200">{c.scope}</span>
                 <span className="flex shrink-0 items-center gap-2 text-xs text-neutral-500">
-                  {formatDate((c.appliedAt ?? c.createdAt).slice(0, 10))}
+                  {formatDate(c.appliedAt ?? c.createdAt)}
                   {c.status === 'applied' ? (
                     <Badge tone="success" size="sm">
                       Aplicado
@@ -220,7 +220,7 @@ function OpenCount({ countId, scope, createdAt }: { countId: string; scope: stri
     <>
       <Card
         title="Conteo en curso"
-        description={`${scope} · empezó el ${formatDate(createdAt.slice(0, 10))}`}
+        description={`${scope} · empezó el ${formatDate(createdAt)}`}
         icon={ClipboardCheck}
         action={
           <div className="flex flex-wrap gap-2">
