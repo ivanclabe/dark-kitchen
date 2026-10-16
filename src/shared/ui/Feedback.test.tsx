@@ -40,11 +40,15 @@ describe('the robot in messages (ADR 0060)', () => {
 
   it('ErrorState keeps the real cause and the retry', () => {
     const retry = vi.fn()
-    const { container } = render(<ErrorState error={new Error('Failed to fetch')} onRetry={retry} />)
-    expect(screen.getByRole('alert').textContent).toContain('Failed to fetch')
+    const { container, unmount } = render(<ErrorState error={{ message: 'permission denied for table dk_orders' }} onRetry={retry} />)
+    expect(screen.getByRole('alert').textContent).toContain('permission denied for table dk_orders')
     expect(robotOf(container)?.getAttribute('data-robot')).toBe('surprised')
     fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
     expect(retry).toHaveBeenCalledOnce()
+    unmount()
+    // ADR 0065: the browser's network error never reaches the screen in English.
+    render(<ErrorState error={new TypeError('Failed to fetch')} onRetry={retry} />)
+    expect(screen.getByRole('alert').textContent).toContain('No pudimos conectarnos')
   })
 
   it('EmptyState: the robot on a screen state, the icon on a compact one, and the mood when asked', () => {
