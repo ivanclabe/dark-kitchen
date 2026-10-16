@@ -60,6 +60,14 @@ function isDocsHost(): boolean {
   return typeof window !== 'undefined' && window.location.hostname.startsWith('doc.')
 }
 
+/** The page color of each theme: the browser bar on phones follows it (ADR 0065). */
+const PAGE_COLOR: Record<ResolvedTheme, string> = { dark: '#0a0a0a', light: '#f5f5f5', neutral: '#f2f0ed' }
+
+function paintBrowserBar(theme: ResolvedTheme) {
+  if (typeof document === 'undefined') return
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', PAGE_COLOR[theme] ?? PAGE_COLOR.dark)
+}
+
 /**
  * On every navigation: without a chosen theme, each page shows its default (light on the login, dark once
  * inside the app). A chosen theme is never overridden.
@@ -69,6 +77,7 @@ export function applyRouteDefault(pathname: string, root: HTMLElement = document
   const theme = defaultThemeFor(pathname)
   root.dataset.theme = theme
   root.style.colorScheme = theme === 'dark' ? 'dark' : 'light'
+  paintBrowserBar(theme)
 }
 
 export function readAppearance(): Appearance {
@@ -97,6 +106,7 @@ export function applyAppearance(appearance: Appearance = readAppearance(), root:
   root.dataset.theme = theme
   root.dataset.textSize = appearance.textSize
   root.style.colorScheme = theme === 'dark' ? 'dark' : 'light'
+  paintBrowserBar(theme)
 }
 
 export function saveAppearance(change: Partial<Appearance>) {
