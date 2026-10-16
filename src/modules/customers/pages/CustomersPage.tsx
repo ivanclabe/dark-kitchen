@@ -223,7 +223,7 @@ export function CustomersPage() {
         }
       />
 
-      <KpiStrip items={kpis} columns={kpis.length >= 5 ? 5 : 4} />
+      <KpiStrip items={kpis} columns={kpis.length >= 5 ? 5 : 4} loading={!s} />
       {showDebt && <ReceivablesAgingBar />}
 
       <div className="space-y-3">
