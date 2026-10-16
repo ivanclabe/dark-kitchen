@@ -1,6 +1,6 @@
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
+import { MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
 import { useState } from 'react'
 import { useAdvanceOrderItems, useRevertOrderItems } from '../hooks/useOrders'
 import { ACTION_DENIED_REASON } from '../lib/permissions'
@@ -30,8 +30,12 @@ export function useBoardDragDrop(tickets: Order[] | undefined, board: Pick<Board
   const { revertOrderItems } = useRevertOrderItems()
   const { show } = useToast()
 
-  // distance:6 evita que un click/tap sobre el card (o sus botones) se tome como arrastre.
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+  // Mouse: distance 6 so a click on the card (or its button) is not a drag.
+  // Touch (ADR 0065): a long press (250 ms) starts the drag; a swipe scrolls the column as usual.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
+  )
 
   const activeTicket = activeId ? tickets?.find((t) => t.id === activeId) : undefined
 

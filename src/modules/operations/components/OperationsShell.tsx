@@ -70,13 +70,14 @@ export function OperationsShell({
     () => ({
       can,
       density,
+      kitchen: ops.view === 'kitchen',
       scope,
       openDetail: ops.openDetail,
       requestConfirm: ops.requestConfirm,
       requestDispatch: ops.requestDispatch,
       requestCancel: ops.requestCancel,
     }),
-    [can, density, scope, ops.openDetail, ops.requestConfirm, ops.requestDispatch, ops.requestCancel],
+    [can, density, ops.view, scope, ops.openDetail, ops.requestConfirm, ops.requestDispatch, ops.requestCancel],
   )
 
   const tabs = ops.views.map((v) => ({ value: v, label: OPERATIONS_VIEW_LABEL[v], icon: VIEW_ICON[v] }))
