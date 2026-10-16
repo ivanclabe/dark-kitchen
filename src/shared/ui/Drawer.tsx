@@ -36,7 +36,7 @@ export function Drawer({
 
   return createPortal(
     <div className={clsx('fixed inset-0 z-50 flex', side === 'right' ? 'justify-end' : 'justify-start')}>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="motion-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
         ref={panelRef}
         role="dialog"
@@ -46,7 +46,7 @@ export function Drawer({
         className={clsx(
           'shadow-float relative flex h-full w-full flex-col bg-neutral-900 outline-none',
           width,
-          side === 'right' ? 'animate-drawer-in border-l border-neutral-800' : 'animate-drawer-in-left border-r border-neutral-800',
+          side === 'right' ? 'motion-drawer-right border-l border-neutral-800' : 'motion-drawer-left border-r border-neutral-800',
         )}
       >
         <div className="flex items-start justify-between border-b border-neutral-800 px-5 py-4 sm:px-6">

@@ -60,6 +60,9 @@
   --color-focus: #f97316;
 
   /* Texto mínimo de la interfaz: 11 px (antes había 10 y 11 px sueltos). */
+  /* Motion (ADR 0065): a strong ease-out for UI, and the drawer curve for sheets and side panels. */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
 
@@ -129,30 +132,109 @@ html {
   background: #3f3f46;
 }
 
-@keyframes drawer-in {
-  from {
+/* ADR 0065 (Fase 4): entrances as transitions with @starting-style — a burst of toasts or a quick
+   reopen retargets from where it is instead of restarting a keyframe. Only transform and opacity.
+   Closing is instant (the system answering snaps). Reduced motion keeps a short fade, no movement. */
+.motion-backdrop {
+  transition: opacity 200ms var(--ease-snappy);
+}
+.motion-toast {
+  transition:
+    transform 300ms var(--ease-snappy),
+    opacity 300ms var(--ease-snappy);
+}
+.motion-drawer-right,
+.motion-drawer-left {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+/* Modal: a bottom sheet on a phone, a centred dialog from 40 rem. */
+.motion-sheet {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+/* Dropdown anchored to its button (the component sets transform-origin on that side). */
+.motion-pop {
+  transition:
+    transform 150ms var(--ease-snappy),
+    opacity 150ms var(--ease-snappy);
+}
+/* Popover and MenuPanel: a bottom sheet below 48 rem, a dropdown from there. */
+.motion-pop-sheet {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+@media (width >= 48rem) {
+  .motion-pop-sheet {
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-snappy);
+  }
+}
+
+@starting-style {
+  .motion-backdrop {
+    opacity: 0;
+  }
+  .motion-toast {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  .motion-drawer-right {
     transform: translateX(100%);
   }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-drawer-in {
-  animation: drawer-in 0.2s ease-out;
-}
-
-@keyframes drawer-in-left {
-  from {
+  .motion-drawer-left {
     transform: translateX(-100%);
   }
-  to {
-    transform: translateX(0);
+  .motion-sheet,
+  .motion-pop-sheet {
+    transform: translateY(100%);
+  }
+  .motion-pop {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@media (width >= 40rem) {
+  @starting-style {
+    .motion-sheet {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+}
+@media (width >= 48rem) {
+  @starting-style {
+    .motion-pop-sheet {
+      opacity: 0;
+      transform: scale(0.97);
+    }
   }
 }
 
-.animate-drawer-in-left {
-  animation: drawer-in-left 0.2s ease-out;
+/* Reduced motion: gentler, not zero — the fade stays, nothing moves (wins over the 0.01 ms rule above). */
+@media (prefers-reduced-motion: reduce) {
+  .motion-backdrop,
+  .motion-toast,
+  .motion-drawer-right,
+  .motion-drawer-left,
+  .motion-sheet,
+  .motion-pop,
+  .motion-pop-sheet {
+    transition-property: opacity !important;
+    transition-duration: 150ms !important;
+  }
+  /* The sheets and drawers only slide otherwise: here they fade in instead. */
+  @starting-style {
+    .motion-drawer-right,
+    .motion-drawer-left,
+    .motion-sheet,
+    .motion-pop-sheet {
+      opacity: 0;
+    }
+  }
 }
 
 @keyframes fade-in {

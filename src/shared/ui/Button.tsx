@@ -33,7 +33,7 @@ const SIZE: Record<ButtonSize, string> = {
 }
 
 const BASE =
-  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full font-medium transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] disabled:active:scale-100'
+  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full font-medium transition-[color,background-color,border-color,transform] duration-150 ease-snappy select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.97] disabled:active:scale-100'
 
 /** Clases de botón para usar en <Link>/<a> u otros elementos que no puedan ser <Button>. */
 export function buttonClass({ variant = 'secondary', size = 'md' }: { variant?: ButtonVariant; size?: ButtonSize } = {}) {

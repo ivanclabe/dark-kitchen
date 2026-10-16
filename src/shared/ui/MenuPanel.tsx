@@ -238,7 +238,7 @@ export function MenuPanel({
       {trigger({ onClick: () => (open ? close() : setOpen(true)), 'aria-haspopup': 'menu', 'aria-expanded': open, 'aria-controls': id })}
       {open && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/50 md:hidden" aria-hidden onClick={close} />
+          <div className="motion-backdrop fixed inset-0 z-40 bg-black/50 md:hidden" aria-hidden onClick={close} />
           <div
             ref={panelRef}
             id={id}
@@ -247,10 +247,10 @@ export function MenuPanel({
             data-menu-level={0}
             onKeyDown={(e) => onKeyDown(e, phone ? levels.length - 1 : 0)}
             className={clsx(
-              'shadow-float z-50 border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
+              'shadow-float motion-pop-sheet z-50 border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
               'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[85dvh] max-md:overflow-y-auto overscroll-contain max-md:rounded-t-2xl max-md:pb-[max(0.5rem,env(safe-area-inset-bottom))]',
               'md:absolute md:w-72 md:rounded-2xl',
-              placement === 'right-end' ? 'md:bottom-0 md:left-full md:ml-3' : 'md:top-full md:right-0 md:mt-2',
+              placement === 'right-end' ? 'md:bottom-0 md:left-full md:ml-3 md:origin-bottom-left' : 'md:top-full md:right-0 md:mt-2 md:origin-top-right',
             )}
           >
             {phone && levels.length > 1 ? (

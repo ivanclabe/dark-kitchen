@@ -104,7 +104,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={toast.id}
               role={toast.tone === 'error' || toast.tone === 'warning' ? 'alert' : undefined}
-              className={`shadow-float flex items-center gap-2.5 rounded-lg border py-2.5 pr-3.5 pl-2.5 text-sm text-neutral-100 backdrop-blur ${TONE_STYLES[toast.tone].border}`}
+              className={`shadow-float motion-toast flex items-center gap-2.5 rounded-lg border py-2.5 pr-3.5 pl-2.5 text-sm text-neutral-100 backdrop-blur ${TONE_STYLES[toast.tone].border}`}
             >
               <RobotFace mood={toast.mood ?? TONE_STYLES[toast.tone].mood} size={30} />
               <p className="min-w-0 flex-1 break-words">{toast.message}</p>

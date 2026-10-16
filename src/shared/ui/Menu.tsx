@@ -75,8 +75,8 @@ export function Menu({
           role="menu"
           onKeyDown={handleKeyDown}
           className={clsx(
-            'shadow-float absolute top-full z-40 mt-2 min-w-56 rounded-xl border border-neutral-800 bg-neutral-900 p-1',
-            align === 'right' ? 'right-0' : 'left-0',
+            'shadow-float motion-pop absolute top-full z-40 mt-2 min-w-56 rounded-xl border border-neutral-800 bg-neutral-900 p-1',
+            align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left',
           )}
         >
           {items.map((item, i) => {

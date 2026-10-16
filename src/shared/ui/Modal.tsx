@@ -30,14 +30,14 @@ export function Modal({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="motion-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="shadow-float animate-fade-in relative flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-2xl border border-neutral-800 bg-neutral-900 outline-none sm:rounded-2xl"
+        className="shadow-float motion-sheet relative flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-2xl border border-neutral-800 bg-neutral-900 outline-none sm:rounded-2xl"
       >
         <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-3">
           <div className="min-w-0">
