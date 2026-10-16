@@ -84,8 +84,8 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/consumer',
-    label: 'Consumer',
-    description: 'Quanela Consumer: lo que ven los clientes en la app',
+    label: 'App de clientes',
+    description: 'Lo que ven tus clientes en la app de Quanela',
     modules: ['consumer'],
     icon: Store,
     group: 'sales',
@@ -100,7 +100,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/insights',
-    label: 'Insights',
+    label: 'Análisis',
     description: 'Cómo va el negocio: ventas, costos y rentabilidad',
     modules: ['reports'],
     icon: BarChart3,

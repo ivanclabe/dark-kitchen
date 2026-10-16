@@ -35,7 +35,7 @@ const SECTION_LABELS: Record<string, string> = {
   dashboard: 'Inicio',
   operations: 'Operación',
   customers: 'Clientes',
-  insights: 'Insights',
+  insights: 'Análisis',
   'menu-planner': 'Catálogo',
   supply: 'Abastecimiento',
 }

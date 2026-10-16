@@ -300,7 +300,7 @@ export function CostsTab({ data, compareLabel }: TabProps) {
   const { can, path } = useActiveKitchen()
   const navigate = useNavigate()
   // «Volver» from Abastecimiento brings the person back to these figures (ADR 0031).
-  const here = useHere('Insights')
+  const here = useHere('Análisis')
   const openIngredient = can('inventory.view') ? (id: string) => navigate(path(`/supply/stock/${id}`), { state: { from: here } }) : null
   const openSupplier = can('suppliers.view') ? (id: string) => navigate(path(`/supply/proveedores/${id}`), { state: { from: here } }) : null
   const unitCosts = data.products.filter((p) => p.unitCost != null)

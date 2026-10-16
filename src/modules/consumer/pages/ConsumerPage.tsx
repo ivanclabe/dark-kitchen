@@ -38,7 +38,7 @@ export function ConsumerPage() {
     <Page>
       <PageHeader
         help="quanela-consumer"
-        title="Quanela Consumer"
+        title="App de clientes"
         icon={Store}
         description="Lo que ven los clientes en Quanela Consumer, la app donde dicen qué quieren comer y Quanela les recomienda dónde pedir."
       />

@@ -34,7 +34,7 @@ export function ProductOrdersDrawer({
   onOpenOrder: (orderId: string) => void
 }) {
   const { can } = useActiveKitchen()
-  const here = useHere('Insights')
+  const here = useHere('Análisis')
   const { data, isLoading, isError, error, refetch } = useProductOrders(product.id, from, to)
   return (
     <Drawer open onClose={onClose} title={product.name} subtitle={`Pedidos de ${periodLabel}`} size="md">
