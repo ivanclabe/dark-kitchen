@@ -181,7 +181,7 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   placeholder="Ej. Cárnicos"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                       e.preventDefault()
                       void handleAddCategory()
                     }

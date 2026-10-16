@@ -56,7 +56,7 @@ const OPEN_PATHS = ['/login', '/activar/', '/set-password', '/registro', '/landi
 
 function Screen({ icon: Icon, title, children }: { icon: typeof Flame; title: string; children: ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
+    <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className="w-full max-w-md space-y-5 text-center">
         <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-neutral-900 text-brasa-400">
           <Icon size={22} aria-hidden />

@@ -38,7 +38,7 @@ const STEP_NUMBER: Record<Exclude<Step, 'sent'>, number> = { user: 1, plan: 2, b
 
 function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' | 'md' | 'xl' }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
+    <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className={clsx('w-full', { sm: 'max-w-sm', md: 'max-w-xl', xl: 'max-w-5xl' }[width])}>
         <Link to="/" className="mb-6 flex items-center justify-center gap-2 text-neutral-100">
           <BrandMark className="size-10" />

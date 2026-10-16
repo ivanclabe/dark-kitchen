@@ -41,11 +41,12 @@ export function PayrollTab({ allowed }: { allowed: boolean }) {
             {(team.data ?? []).map((m) => (
               <li key={m.userId} className="flex flex-wrap items-center gap-3 py-2">
                 <Avatar avatarKey={m.avatarKey} seed={m.userId} size="sm" />
-                <div className="min-w-0 flex-1">
+                {/* min-w: on a narrow phone the pay goes to the next line instead of crushing the name. */}
+                <div className="min-w-[9rem] flex-1">
                   <p className="truncate text-sm text-neutral-100">
                     {m.fullName} {!m.active && <span className="text-xs text-neutral-500">(inactivo)</span>}
                   </p>
-                  <p className="text-xs text-neutral-500">
+                  <p className="truncate text-xs text-neutral-500">
                     {m.roleName}
                     {m.effectiveFrom && ` · desde el ${formatDate(m.effectiveFrom)}`}
                   </p>
@@ -69,7 +70,7 @@ export function PayrollTab({ allowed }: { allowed: boolean }) {
           <ul className="divide-y divide-neutral-800/60">
             {[...(payroll.data ?? [])].sort((a, b) => b.accrualDate.localeCompare(a.accrualDate)).slice(0, 40).map((o) => (
               <li key={o.id} className="flex flex-wrap items-center gap-3 py-2 text-sm">
-                <span className="min-w-0 flex-1 truncate text-neutral-200">{o.description}</span>
+                <span className="min-w-[9rem] flex-1 truncate text-neutral-200">{o.description}</span>
                 <span className="text-xs text-neutral-500">{STATUS_LABEL[o.status]}</span>
                 <span className="tabular-nums text-neutral-100">{formatMoney(o.amount)}</span>
               </li>

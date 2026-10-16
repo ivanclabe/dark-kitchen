@@ -48,7 +48,7 @@ export function LogTab({ canManage }: { canManage: boolean }) {
             const status = OUTBOX_STATUS[m.status]
             return (
               <li key={m.id} className="flex flex-wrap items-start gap-3 px-4 py-3 text-sm">
-                <div className="min-w-0 flex-1">
+                <div className="min-w-[9rem] flex-1">
                   <p className="text-neutral-100">
                     {eventLabel(m.event)}
                     {m.order && <span className="text-neutral-400"> · pedido #{m.order.order_number}</span>}

@@ -248,7 +248,7 @@ export function MenuPanel({
             onKeyDown={(e) => onKeyDown(e, phone ? levels.length - 1 : 0)}
             className={clsx(
               'shadow-float z-50 border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
-              'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[85vh] max-md:overflow-y-auto max-md:rounded-t-2xl max-md:pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+              'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[85dvh] max-md:overflow-y-auto max-md:rounded-t-2xl max-md:pb-[max(0.5rem,env(safe-area-inset-bottom))]',
               'md:absolute md:w-72 md:rounded-2xl',
               placement === 'right-end' ? 'md:bottom-0 md:left-full md:ml-3' : 'md:top-full md:right-0 md:mt-2',
             )}
@@ -331,7 +331,7 @@ function Flyout({
       data-menu-level={level}
       onKeyDown={onKeyDown}
       style={{ width: PANEL_WIDTH, visibility: 'hidden' }}
-      className="shadow-float fixed z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-2 text-neutral-100"
+      className="shadow-float fixed z-50 max-h-[80dvh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-2 text-neutral-100"
     >
       {children}
     </div>,

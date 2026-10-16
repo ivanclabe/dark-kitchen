@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "help": "node scripts/build-help.ts"
+    "help": "node scripts/build-help.ts",
+    "audit:responsive": "node scripts/responsive-audit.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

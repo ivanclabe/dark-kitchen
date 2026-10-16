@@ -369,7 +369,8 @@ function CopilotPanel({
   }, [messages.length, pending])
 
   function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // isComposing: an Enter that confirms a word (predictive or IME keyboards) does not send.
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
       onSend(draft)
     }

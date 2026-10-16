@@ -81,7 +81,7 @@ export function KitchenScope() {
   if (isLoading || crossHost) return <FullScreenLoading stage="kitchen" />
   if (isError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-950 p-6">
+      <div className="flex min-h-dvh items-center justify-center bg-neutral-950 p-6">
         <ErrorState error={error} onRetry={() => void refetch()} />
       </div>
     )

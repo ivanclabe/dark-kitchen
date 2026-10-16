@@ -53,7 +53,7 @@ export function KitchenSelectorPage() {
   const codeOf = (k: MyKitchen) => organizations.find((o) => o.id === k.organizationId)?.tenantCode ?? null
 
   return (
-    <div className="min-h-screen bg-neutral-950 px-4 py-10 text-neutral-100 sm:px-6">
+    <div className="min-h-dvh bg-neutral-950 px-4 py-10 text-neutral-100 sm:px-6">
       <div className="mx-auto max-w-4xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">

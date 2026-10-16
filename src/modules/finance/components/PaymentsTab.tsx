@@ -44,7 +44,7 @@ export function PaymentsTab() {
             const isVoid = p.amount < 0
             return (
               <li key={p.id} className={clsx('flex flex-wrap items-center gap-3 px-4 py-3', (isVoid || voided.has(p.id)) && 'opacity-60')}>
-                <div className="min-w-0 flex-1">
+                <div className="min-w-[9rem] flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="truncate font-medium text-neutral-100">{o?.payee ?? o?.description ?? 'Obligación'}</span>
                     {o && <Badge tone="neutral">{KIND_LABEL[o.kind]}</Badge>}

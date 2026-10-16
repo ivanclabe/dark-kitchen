@@ -149,7 +149,7 @@ export function FullScreenLoading({ stage = 'session' }: { stage?: LoadingStage 
   const tip = TIPS[shared.tip]
 
   return (
-    <div ref={root} data-loading-screen className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 px-6 py-10 text-center">
+    <div ref={root} data-loading-screen className="flex min-h-dvh flex-col items-center justify-center bg-neutral-950 px-6 py-10 text-center">
       {visible && (
         <div className="flex flex-col items-center motion-safe:animate-fade-in">
           <button

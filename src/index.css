@@ -412,3 +412,27 @@ html[data-theme='neutral'] ::-webkit-scrollbar-thumb {
   background: #cfc9c0;
   border-color: #f2f0ed;
 }
+
+/* ---------------------------------------------------------------------------
+   Safari en iPhone/iPad hace zoom al enfocar un campo con letra de menos de
+   16 px (los campos usan 14 px) y deja la pantalla ampliada y descuadrada.
+   Solo en iOS (-webkit-touch-callout no existe en Android ni en escritorio);
+   fuera de las capas de Tailwind para que gane a text-sm/text-xs.
+   --------------------------------------------------------------------------- */
+@supports (-webkit-touch-callout: none) {
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit']),
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  /* Fecha y hora: vacías, Safari las deja sin alto y con el texto centrado. */
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'] {
+    min-height: 2.75rem;
+  }
+  ::-webkit-date-and-time-value {
+    text-align: left;
+  }
+}

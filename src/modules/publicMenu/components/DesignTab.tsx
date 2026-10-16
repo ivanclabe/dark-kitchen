@@ -168,7 +168,7 @@ function DesignEditor({ settings, onReset }: { settings: PublicMenuSettings; onR
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-950/60 px-4 py-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[12rem] flex-1">
           <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-neutral-100">
             Plantilla {template.name}
             {unpublished ? (

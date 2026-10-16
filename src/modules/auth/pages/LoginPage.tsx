@@ -78,9 +78,9 @@ export function LoginPage() {
   const backLinkClass = 'inline-flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-300'
 
   return (
-    <div className="grid min-h-screen bg-neutral-950 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="grid min-h-dvh bg-neutral-950 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Brand panel: wide screens only. The robot of Quanela at work (ADR 0060), with a shade under the text. */}
-      <aside className="relative hidden overflow-hidden bg-[#c2410c] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:p-12">
+      <aside className="relative hidden overflow-hidden bg-[#c2410c] lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:justify-between lg:p-12">
         <img
           src={LOGIN_IMAGE}
           alt=""
@@ -110,7 +110,7 @@ export function LoginPage() {
         Form. It mirrors the brand panel: the same top and bottom margins, the help link where the logo is,
         the way back at the foot, and the form centered on its own card.
       */}
-      <main className="relative flex min-h-screen flex-col px-4 py-8 sm:px-8 lg:h-screen lg:min-h-0 lg:py-20">
+      <main className="relative flex min-h-dvh flex-col px-4 py-8 sm:px-8 lg:h-dvh lg:min-h-0 lg:py-20">
         <div className="absolute top-12 right-12 hidden h-[3.25rem] items-center lg:flex">
           <a href={helpHref()} className={backLinkClass}>
             <CircleHelp size={14} aria-hidden /> Centro de ayuda

@@ -54,7 +54,7 @@ export function ThemeRoot({ theme, contained = false, className, children }: { t
       </div>
     )
   return (
-    <div ref={ref} data-template={theme.template} data-pm-wide={wide || undefined} style={style} className={clsx('pm-root flow-root min-h-screen', className)}>
+    <div ref={ref} data-template={theme.template} data-pm-wide={wide || undefined} style={style} className={clsx('pm-root flow-root min-h-dvh', className)}>
       {children}
     </div>
   )

@@ -188,7 +188,7 @@ export function InvoiceReview({
     <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       {/* The invoice: beside on large screens, behind a button on phones. */}
       <aside className="hidden lg:block">
-        <div className="sticky top-4 h-[calc(100vh-8rem)]">{preview}</div>
+        <div className="sticky top-4 h-[calc(100dvh-8rem)]">{preview}</div>
       </aside>
 
       <div className="min-w-0 space-y-4">
@@ -196,7 +196,7 @@ export function InvoiceReview({
           <Button variant="secondary" size="sm" icon={FileText} onClick={() => setShowInvoice((v) => !v)}>
             {showInvoice ? 'Ocultar la factura' : 'Ver la factura'}
           </Button>
-          {showInvoice && <div className="mt-3 h-[70vh]">{preview}</div>}
+          {showInvoice && <div className="mt-3 h-[70dvh]">{preview}</div>}
         </div>
 
         {documentKind && (

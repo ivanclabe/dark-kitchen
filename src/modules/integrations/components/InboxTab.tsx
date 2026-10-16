@@ -129,9 +129,9 @@ function Thread({ conversation: c, canReply, orderingMode }: { conversation: WaC
   }
 
   return (
-    <section className="flex h-[min(680px,calc(100vh-220px))] min-h-[440px] flex-col overflow-hidden rounded-xl border border-neutral-800" aria-label={`Conversación con ${c.customer_name ?? c.phone}`}>
+    <section className="flex h-[min(680px,calc(100dvh-220px))] min-h-[440px] flex-col overflow-hidden rounded-xl border border-neutral-800" aria-label={`Conversación con ${c.customer_name ?? c.phone}`}>
       <header className="flex flex-wrap items-center gap-2 border-b border-neutral-800 px-4 py-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[9rem] flex-1">
           <p className="text-sm font-medium text-neutral-100">{c.customer_name ?? prettyPhone(c.phone)}</p>
           <p className="text-xs text-neutral-500 tabular-nums">
             {prettyPhone(c.phone)}
@@ -200,7 +200,7 @@ function Thread({ conversation: c, canReply, orderingMode }: { conversation: WaC
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 void submit()
               }

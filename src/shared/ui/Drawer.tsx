@@ -21,7 +21,8 @@ export function Drawer({
   subtitle?: ReactNode
   children: ReactNode
   side?: 'left' | 'right'
-  size?: 'sm' | 'md' | 'lg'
+  /** xl: a wide two-column form that should fit without scrolling on a laptop. */
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   /** Fixed at the bottom, outside the scroll (e.g. a chat composer). */
   footer?: ReactNode
 }) {
@@ -31,7 +32,7 @@ export function Drawer({
 
   if (!open) return null
 
-  const width = { sm: 'max-w-xs', md: 'max-w-md', lg: 'max-w-2xl' }[size]
+  const width = { sm: 'max-w-xs', md: 'max-w-md', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size]
 
   return createPortal(
     <div className={clsx('fixed inset-0 z-50 flex', side === 'right' ? 'justify-end' : 'justify-start')}>

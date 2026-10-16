@@ -146,7 +146,7 @@ export function PayablesTab() {
                     className="size-4 accent-brasa-500"
                   />
                 )}
-                <div className="min-w-0 flex-1">
+                <div className="min-w-[9rem] flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="truncate font-medium text-neutral-100">{o.payee ?? o.description}</span>
                     <Badge tone="neutral">{o.kind === 'expense' ? (o.categoryName ?? KIND_LABEL.expense) : KIND_LABEL[o.kind]}</Badge>

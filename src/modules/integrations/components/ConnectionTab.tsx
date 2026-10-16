@@ -114,7 +114,7 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
   }
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
         {!settings.featureEnabled && (
           <Feedback
@@ -127,7 +127,7 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
         <Card title="Conecta tu número oficial" icon={Plug} description="WhatsApp Business Platform (API de Meta). Tu número, tu cuenta de Meta: Quanela solo envía en tu nombre.">
           <ol className="space-y-5">
             <Step n={1} title="En Meta, prepara tu app y tu número">
-              <ul className="list-disc space-y-1 pl-4 text-neutral-400">
+              <ul className="list-disc space-y-1 pl-4 break-words text-neutral-400">
                 <li>
                   En <span className="text-neutral-200">developers.facebook.com</span> crea una app de tipo Empresa y agrégale el producto WhatsApp.
                 </li>

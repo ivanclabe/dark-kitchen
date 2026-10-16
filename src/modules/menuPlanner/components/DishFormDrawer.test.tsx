@@ -24,6 +24,8 @@ vi.mock('@/modules/products/hooks/useProducts', () => {
   }
 })
 
+vi.mock('@/modules/products/hooks/useComposition', () => ({ useComposition: () => ({ data: { groups: [] }, isLoading: false }) }))
+
 const { DishFormDrawer } = await import('./DishFormDrawer')
 
 const soda: Product = {

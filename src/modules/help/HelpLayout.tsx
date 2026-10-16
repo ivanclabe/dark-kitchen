@@ -87,7 +87,7 @@ export function HelpLayout() {
   }, [pathname, hash])
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+    <div className="min-h-dvh bg-neutral-950 text-neutral-100">
       <a href="#contenido" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-neutral-900 focus:px-3 focus:py-2">
         Saltar al contenido
       </a>
@@ -123,7 +123,7 @@ export function HelpLayout() {
       </header>
 
       <div className="mx-auto flex max-w-7xl gap-8 px-4 lg:px-6">
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto py-6 pr-2 lg:block">
+        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 overflow-y-auto py-6 pr-2 lg:block">
           <SideNav />
         </aside>
         <main id="contenido" className="min-w-0 flex-1 py-8">

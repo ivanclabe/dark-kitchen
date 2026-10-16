@@ -101,6 +101,8 @@ export function Combobox({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    // A key that confirms a word on a predictive/IME keyboard is not a choice.
+    if (e.nativeEvent.isComposing) return
     if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) {
       setOpen(true)
       return

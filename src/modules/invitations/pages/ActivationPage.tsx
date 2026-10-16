@@ -47,7 +47,7 @@ function verifyAccessLink(tokenHash: string, type: string | null): Promise<boole
 
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10">
+    <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex justify-center">
           <BrandMark className="size-14 drop-shadow-[0_8px_18px_rgba(249,115,22,0.35)]" />

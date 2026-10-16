@@ -2,7 +2,6 @@ import {
   useCreateProduct,
   useCreateProductCategory,
   useProductCategories,
-  useSetProductActive,
   useSetSharedProductPrice,
   useUpdateProduct,
 } from '@/modules/products/hooks/useProducts'
@@ -14,19 +13,18 @@ import { dishMargin } from '@/shared/costs/dishMargin'
 import { formatMoney } from '@/shared/utils/format'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Product } from '@/modules/products/types'
-import { ActiveBadge } from '@/shared/ui/Badge'
-import { Button, buttonClass } from '@/shared/ui/Button'
+import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { CurrencyInput } from '@/shared/ui/CurrencyInput'
 import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BarChart3, BookOpen, Layers, Plus, Power } from 'lucide-react'
+import { Layers, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { z } from 'zod'
+import { DishConnections } from './DishConnections'
 
 const schema = z.object({
   code: z.string().optional(),
@@ -55,7 +53,6 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
   const updateProduct = useUpdateProduct()
   const setSharedPrice = useSetSharedProductPrice()
   const createCategory = useCreateProductCategory()
-  const setActive = useSetProductActive()
   const { can } = useActiveKitchen()
   const queryClient = useQueryClient()
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhotos>({})
@@ -142,155 +139,146 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
   const submitting = createProduct.isPending || updateProduct.isPending || setSharedPrice.isPending || uploadingPending
 
   return (
-    <Drawer open={open} onClose={onClose} title={product ? 'Editar plato' : 'Nuevo plato'} size="sm">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <ProductPhotos
-          productId={product?.id ?? null}
-          productName={product?.name ?? 'Plato nuevo'}
-          canEdit={product ? can('products.edit') : can('products.create')}
-          pending={pendingPhotos}
-          onPendingChange={setPendingPhotos}
-        />
-        {shared && product && (
-          <div className="space-y-1 rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm">
-            <p className="flex items-center gap-1.5 font-medium text-neutral-100">
-              <Layers size={14} className="text-brasa-400" aria-hidden /> Plato del menú maestro
-            </p>
-            <p className="text-xs text-neutral-400">
-              Nombre, categoría y receta los define el menú maestro. Aquí puedes ajustar el precio y, en el calendario, qué días se ofrece.
-            </p>
-            {product.priceIsLocal && (
-              <button
-                type="button"
-                onClick={() =>
-                  setSharedPrice.mutate(
-                    { id: product.id, price: null },
-                    {
-                      onSuccess: () => {
-                        show('Se usa de nuevo el precio del maestro.')
-                        onClose()
+    <Drawer
+      open={open}
+      onClose={onClose}
+      title={product ? 'Editar plato' : 'Nuevo plato'}
+      subtitle={product?.name}
+      size="xl"
+      footer={
+        // Always in sight: the form no longer needs scrolling to reach it.
+        <div className="flex justify-end">
+          <Button type="submit" form="dish-form" variant="primary" icon={product ? undefined : Plus} loading={submitting} className="w-full sm:w-auto sm:min-w-44">
+            {product ? 'Guardar cambios' : 'Crear plato'}
+          </Button>
+        </div>
+      }
+    >
+      {/* Two columns from md up: the dish on the left, what it moves and connects to on the right. */}
+      <form id="dish-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-x-6 gap-y-4 md:grid-cols-2">
+        <div className="min-w-0 space-y-4">
+          <ProductPhotos
+            productId={product?.id ?? null}
+            productName={product?.name ?? 'Plato nuevo'}
+            canEdit={product ? can('products.edit') : can('products.create')}
+            pending={pendingPhotos}
+            onPendingChange={setPendingPhotos}
+          />
+          {shared && product && (
+            <div className="space-y-1 rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm">
+              <p className="flex items-center gap-1.5 font-medium text-neutral-100">
+                <Layers size={14} className="text-brasa-400" aria-hidden /> Plato del menú maestro
+              </p>
+              <p className="text-xs text-neutral-400">
+                Nombre, categoría y receta los define el menú maestro. Aquí puedes ajustar el precio y, en el calendario, qué días se ofrece.
+              </p>
+              {product.priceIsLocal && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSharedPrice.mutate(
+                      { id: product.id, price: null },
+                      {
+                        onSuccess: () => {
+                          show('Se usa de nuevo el precio del maestro.')
+                          onClose()
+                        },
                       },
-                    },
-                  )
-                }
-                className="text-xs font-medium text-brasa-400 hover:underline"
-              >
-                Usar el precio del menú maestro
-              </button>
-            )}
-          </div>
-        )}
-        <FormField label="Nombre" required error={errors.name?.message}>
-          {(a11y) => <Input {...a11y} {...register('name')} disabled={shared} />}
-        </FormField>
-        <FormField label="Código">{(a11y) => <Input {...a11y} {...register('code')} disabled={shared} />}</FormField>
-
-        <FormField label="Categoría">
-          {(a11y) => (
-            <Select {...a11y} {...register('categoryId')} disabled={shared}>
-              <option value="">Sin categoría</option>
-              {categories?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
+                    )
+                  }
+                  className="text-xs font-medium text-brasa-400 hover:underline"
+                >
+                  Usar el precio del menú maestro
+                </button>
+              )}
+            </div>
           )}
-        </FormField>
-        {!shared && (
-          <>
-            {showNewCategory ? (
-              <div className="flex items-end gap-2">
-                <FormField label="Nueva categoría" className="flex-1">
-                  {(a11y) => <Input {...a11y} value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Ej. Hamburguesas" />}
-                </FormField>
-                <Button variant="secondary" size="sm" onClick={handleAddCategory} loading={createCategory.isPending} disabled={!newCategoryName.trim()}>
-                  Crear
+          <div className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-3">
+            <FormField label="Nombre" required error={errors.name?.message}>
+              {(a11y) => <Input {...a11y} {...register('name')} disabled={shared} />}
+            </FormField>
+            <FormField label="Código">{(a11y) => <Input {...a11y} {...register('code')} disabled={shared} />}</FormField>
+          </div>
+
+          <FormField label="Categoría">
+            {(a11y) => (
+              <Select {...a11y} {...register('categoryId')} disabled={shared}>
+                <option value="">Sin categoría</option>
+                {categories?.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </FormField>
+          {!shared && (
+            <>
+              {showNewCategory ? (
+                <div className="flex items-end gap-2">
+                  <FormField label="Nueva categoría" className="flex-1">
+                    {(a11y) => <Input {...a11y} value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Ej. Hamburguesas" />}
+                  </FormField>
+                  <Button variant="secondary" size="sm" onClick={handleAddCategory} loading={createCategory.isPending} disabled={!newCategoryName.trim()}>
+                    Crear
+                  </Button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
+                  + Crear categoría nueva
+                </button>
+              )}
+            </>
+          )}
+
+          <FormField label="Precio de venta" required error={errors.price?.message} info="Lo que paga el cliente por el plato. Con él se calculan el total del pedido y el margen frente al costo de la receta.">
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="price"
+                render={({ field }) => <CurrencyInput {...a11y} name={field.name} value={typeof field.value === 'number' ? field.value : Number(field.value) || null} onValueChange={(v) => field.onChange(v ?? 0)} onBlur={field.onBlur} />}
+              />
+            )}
+          </FormField>
+          {margin && margin.status !== 'no_cost' && (
+            <p className={`-mt-2 flex flex-wrap items-center gap-x-1.5 text-xs tabular-nums ${margin.status === 'ok' ? 'text-neutral-400' : margin.status === 'below_cost' ? 'text-red-400' : 'text-amber-400'}`}>
+              <span>
+                Receta {formatMoney(product!.estimatedCost)}
+                {margin.foodCostPct !== null && ` · costo ${margin.foodCostPct.toLocaleString('es-CO')} % del precio (objetivo ${dishCosts.targetPct} %)`}
+                {margin.status === 'below_cost' && ' · el precio no cubre el costo'}
+              </span>
+              {margin.status !== 'ok' && margin.suggestedPrice !== null && (
+                <Button type="button" variant="link" size="sm" onClick={() => setValue('price', margin.suggestedPrice!, { shouldDirty: true })}>
+                  Usar {formatMoney(margin.suggestedPrice)}
                 </Button>
-              </div>
-            ) : (
-              <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
-                + Crear categoría nueva
-              </button>
-            )}
-          </>
-        )}
-
-        <FormField label="Precio de venta" required error={errors.price?.message} info="Lo que paga el cliente por el plato. Con él se calculan el total del pedido y el margen frente al costo de la receta.">
-          {(a11y) => (
-            <Controller
-              control={control}
-              name="price"
-              render={({ field }) => <CurrencyInput {...a11y} name={field.name} value={typeof field.value === 'number' ? field.value : Number(field.value) || null} onValueChange={(v) => field.onChange(v ?? 0)} onBlur={field.onBlur} />}
-            />
+              )}
+            </p>
           )}
-        </FormField>
-        {margin && margin.status !== 'no_cost' && (
-          <p className={`-mt-2 flex flex-wrap items-center gap-x-1.5 text-xs tabular-nums ${margin.status === 'ok' ? 'text-neutral-400' : margin.status === 'below_cost' ? 'text-red-400' : 'text-amber-400'}`}>
-            <span>
-              Receta {formatMoney(product!.estimatedCost)}
-              {margin.foodCostPct !== null && ` · costo ${margin.foodCostPct.toLocaleString('es-CO')} % del precio (objetivo ${dishCosts.targetPct} %)`}
-              {margin.status === 'below_cost' && ' · el precio no cubre el costo'}
-            </span>
-            {margin.status !== 'ok' && margin.suggestedPrice !== null && (
-              <Button type="button" variant="link" size="sm" onClick={() => setValue('price', margin.suggestedPrice!, { shouldDirty: true })}>
-                Usar {formatMoney(margin.suggestedPrice)}
-              </Button>
-            )}
-          </p>
-        )}
-        <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
-
-        {/* ADR 0048: a dish that does not use inventory is sold without a recipe and never touches the stock. */}
-        <div className="space-y-1 rounded-xl border border-neutral-800/60 px-3 py-2.5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-sm font-medium text-neutral-200">Descuenta inventario</span>
-            <Controller
-              control={control}
-              name="usesInventory"
-              render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label="Descuenta inventario" disabled={shared} />}
-            />
-          </div>
-          <p className="text-xs text-neutral-500">
-            {usesInventory
-              ? 'Al confirmar un pedido se reservan los insumos de su receta y, cuando el plato está listo, se descuentan. Necesita receta.'
-              : 'Se vende sin receta y nunca reserva ni descuenta insumos. Útil para lo que no controlas en el inventario, como bebidas compradas.'}
-            {shared && ' Lo define el menú maestro.'}
-          </p>
+          <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
         </div>
 
-        {product && (
-          <div className="space-y-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-neutral-400">Estado</span>
-              <ActiveBadge active={product.active} />
+        <div className="min-w-0 space-y-4">
+          {/* ADR 0048: a dish that does not use inventory is sold without a recipe and never touches the stock. */}
+          <div className="space-y-1 rounded-xl border border-neutral-800/60 px-3 py-2.5">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-neutral-200">Descuenta inventario</span>
+              <Controller
+                control={control}
+                name="usesInventory"
+                render={({ field }) => <Switch checked={field.value} onChange={field.onChange} label="Descuenta inventario" disabled={shared} />}
+              />
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Link to={`/recipes/${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
-                <BookOpen size={13} aria-hidden /> {shared ? 'Ver receta' : product.activeRecipeVersion ? `Receta v${product.activeRecipeVersion}` : 'Crear receta'}
-              </Link>
-              {!shared && (
-                <Link to={`/dishes/${product.id}/composition`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
-                  <Layers size={13} aria-hidden /> Composición
-                </Link>
-              )}
-              {can('reports.view') && (
-                <Link to={`/insights?tab=products&product=${product.id}`} className={`${buttonClass({ variant: 'secondary', size: 'sm' })} inline-flex items-center gap-1.5`}>
-                  <BarChart3 size={13} aria-hidden /> Ventas y rentabilidad
-                </Link>
-              )}
-              {!shared && (
-                <Button variant="secondary" size="sm" icon={Power} onClick={() => setActive.mutate({ id: product.id, active: !product.active })}>
-                  {product.active ? 'Desactivar' : 'Activar'}
-                </Button>
-              )}
-            </div>
+            <p className="text-xs text-neutral-500">
+              {usesInventory
+                ? 'Al confirmar un pedido se reservan los insumos de su receta y, cuando el plato está listo, se descuentan. Necesita receta.'
+                : 'Se vende sin receta y nunca reserva ni descuenta insumos. Útil para lo que no controlas en el inventario, como bebidas compradas.'}
+              {shared && ' Lo define el menú maestro.'}
+            </p>
           </div>
-        )}
 
-        <Button type="submit" variant="primary" icon={product ? undefined : Plus} loading={submitting} className="w-full">
-          {product ? 'Guardar cambios' : 'Crear plato'}
-        </Button>
+          {/* What this dish is connected to, with each state at a glance. */}
+          {product && <DishConnections product={product} usesInventory={usesInventory} price={watchedPrice} />}
+        </div>
       </form>
     </Drawer>
   )

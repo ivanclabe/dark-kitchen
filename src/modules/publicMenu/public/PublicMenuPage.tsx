@@ -64,7 +64,7 @@ const pillClass = 'inline-flex items-center justify-center gap-1.5 rounded-full 
 
 function Message({ title, text, action }: { title: string; text: string; action?: ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
       <UtensilsCrossed size={32} className="text-(--pm-muted)" aria-hidden />
       <h1 className="text-xl font-semibold">{title}</h1>
       <p className="text-sm text-(--pm-muted)">{text}</p>

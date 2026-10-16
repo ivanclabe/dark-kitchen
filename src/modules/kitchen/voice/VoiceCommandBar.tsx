@@ -33,7 +33,7 @@ export function VoiceCommandBar({ testOpen, onCloseTest }: { testOpen: boolean; 
       <VoiceMicButton phase={routed ? voice.state : 'idle'} onStart={voice.listen} />
 
       {testOpen && (
-        <div className="shadow-float absolute top-full right-0 z-30 mt-2 w-72 rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-xs">
+        <div className="shadow-float absolute top-full right-0 z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-xs">
           <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
             <Input
               value={value}

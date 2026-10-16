@@ -61,7 +61,7 @@ export function ExpensesTab() {
           <ul className="divide-y divide-neutral-800/60">
             {(recurring.data ?? []).map((r) => (
               <li key={r.id} className="flex flex-wrap items-center gap-3 py-2">
-                <div className="min-w-0 flex-1">
+                <div className="min-w-[9rem] flex-1">
                   <p className="text-sm text-neutral-100">
                     {r.description} {!r.active && <Badge tone="neutral">Pausado</Badge>} {r.variableAmount && <Badge tone="info">Monto variable</Badge>}
                   </p>
@@ -91,7 +91,7 @@ export function ExpensesTab() {
           <ul className="divide-y divide-neutral-800/60">
             {recent.map((o) => (
               <li key={o.id} className="flex flex-wrap items-center gap-3 px-5 py-2.5">
-                <div className="min-w-0 flex-1">
+                <div className="min-w-[9rem] flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-sm text-neutral-100">
                     {o.description} <Badge tone="neutral">{o.categoryName}</Badge> <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
                   </p>

@@ -80,7 +80,7 @@ export function SignUpConfirmedPage() {
   if (created) {
     const url = tenantUrl(created.orgCode, `${kitchenPath(created.accountSlug, '/')}?bienvenida=1`)!
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-neutral-100">
+      <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 text-neutral-100">
         <div className="w-full max-w-md space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
           <CheckCircle2 size={28} className="mx-auto text-emerald-400" aria-hidden />
           <div>
@@ -114,7 +114,7 @@ export function SignUpConfirmedPage() {
 
   if (planRejected) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
+      <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
         <div className="w-full max-w-5xl space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">
           <div>
             <h1 className={typography.h2}>Elige el plan para {pending.name}</h1>
@@ -149,7 +149,7 @@ export function SignUpConfirmedPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-neutral-100">
+    <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 text-neutral-100">
       <div className="w-full max-w-sm space-y-4 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 text-center">
         {error ? (
           <>

@@ -10,7 +10,7 @@ export function HelpElsewhere() {
     window.location.replace(target)
   }, [target])
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-400">
+    <div className="flex min-h-dvh items-center justify-center bg-neutral-950 text-neutral-400">
       <a href={target} className="hover:text-neutral-200">
         Abriendo el centro de ayuda…
       </a>

@@ -88,9 +88,9 @@ export function Popover({
               // Celular: hoja inferior a todo lo ancho. Solo con variantes max-md para no competir con
               // la posición de escritorio (antes un "bottom auto" de escritorio anulaba el anclaje abajo
               // de right-end: el menú se abría hacia abajo, fuera de la pantalla, y desplazaba el layout).
-              'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+              'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[85dvh] max-md:rounded-t-2xl max-md:pb-[max(0.5rem,env(safe-area-inset-bottom))]',
               // Escritorio: flotante junto al botón, en la posición pedida.
-              'md:absolute md:max-h-[min(80vh,40rem)] md:w-80 md:rounded-2xl',
+              'md:absolute md:max-h-[min(80dvh,40rem)] md:w-80 md:rounded-2xl',
               PLACEMENT_CLASS[placement],
               className,
             )}

@@ -98,8 +98,9 @@ export function AppLayout() {
   }
 
   return (
-    // h-screen + overflow-hidden (en vez de min-h-screen): fija el shell a
-    // la altura real de la ventana para que el sidebar nunca se desplace
+    // h-dvh + overflow-hidden (en vez de min-h-dvh): fija el shell a
+    // la altura real de la ventana (dvh: en Safari iOS y Chrome Android, la unidad vh
+    // mide sin la barra del navegador y cortaba el borde inferior) para que el sidebar nunca se desplace
     // fuera de vista, y para que <main> tenga una altura acotada real — sin
     // eso, ninguna vista puede "llenar la pantalla" de forma confiable (solo
     // puede crecer con su contenido y dejar que la página entera scrollee).
@@ -107,7 +108,7 @@ export function AppLayout() {
     // Copilot (ADR 0020): one conversation per account — a new account starts a new one.
     <VoiceProvider key={kitchen.id}>
     <CopilotProvider key={kitchen.id}>
-    <div className="flex h-screen overflow-hidden bg-neutral-950 text-neutral-100">
+    <div className="flex h-dvh overflow-hidden bg-neutral-950 text-neutral-100">
       {/* Rail de escritorio compacto: solo íconos. El nombre de cada módulo
           aparece en un tooltip (hover y foco por teclado) y es su aria-label. */}
       <aside className="hidden w-16 shrink-0 flex-col items-center border-r border-neutral-800/60 bg-neutral-950 py-4 md:flex">
@@ -139,7 +140,7 @@ export function AppLayout() {
             <Popover
               placement="right-end"
               label="Más módulos"
-              className="md:w-64 md:max-h-[var(--rail-more-max,80vh)]!"
+              className="md:w-64 md:max-h-[var(--rail-more-max,80dvh)]!"
               trigger={(props) => (
                 <Tooltip label={overflowActive && currentItem ? `Más · ${currentItem.label}` : 'Más módulos'}>
                   <button
@@ -203,7 +204,9 @@ export function AppLayout() {
         </header>
 
         {/* Barra superior móvil: módulos + contexto + menú de usuario. */}
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-neutral-800/60 bg-neutral-950/90 px-3 backdrop-blur md:hidden">
+        {/* No backdrop-blur here: a filter makes the header the box of every position:fixed inside it, and the
+            bottom sheets of the bell, the user menu and the account switcher opened upwards, off the screen. */}
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-neutral-800/60 bg-neutral-950 px-3 md:hidden">
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
@@ -215,7 +218,7 @@ export function AppLayout() {
           <div className="min-w-0 flex-1">
             <ContextIndicator compact />
           </div>
-          <OnlineIndicator compact />
+          {/* Who is online lives in the menu on phones: seven buttons do not fit a 320-390 px bar. */}
           <VoiceMenu compact />
           <CopilotButton compact />
           <NotificationBell placement="bottom-end" />
@@ -235,6 +238,9 @@ export function AppLayout() {
       </div>
 
       <Drawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title={kitchen.name} subtitle={currentItem ? `Estás en ${currentItem.label}` : kitchen.roleName} side="left" size="sm">
+        <div className="mb-4">
+          <OnlineIndicator placement="bottom-start" />
+        </div>
         <nav aria-label="Principal" className="-mx-2 flex flex-col gap-1">
           {allItems.map((item, i) => (
             <Fragment key={item.to}>

@@ -1,0 +1,295 @@
+[
+ {
+  "name": "inicio",
+  "path": "/"
+ },
+ {
+  "name": "menu-movil",
+  "path": "/",
+  "steps": [
+   {
+    "role": [
+     "button",
+     "Abrir menú"
+    ]
+   }
+  ]
+ },
+ {
+  "name": "operacion",
+  "path": "/operations"
+ },
+ {
+  "name": "operacion-lista",
+  "path": "/operations?view=list"
+ },
+ {
+  "name": "operacion-cocina",
+  "path": "/operations?view=kitchen"
+ },
+ {
+  "name": "operacion-despacho",
+  "path": "/operations?view=dispatch"
+ },
+ {
+  "name": "pedido-detalle",
+  "path": "/operations/{order}"
+ },
+ {
+  "name": "planificador",
+  "path": "/menu-planner"
+ },
+ {
+  "name": "plato-editar",
+  "path": "/menu-planner",
+  "steps": [
+   {
+    "eval": "document.querySelector('[aria-label=\"Editar {dish}\"]')?.click()",
+    "wait": 1500
+   }
+  ]
+ },
+ {
+  "name": "receta",
+  "path": "/recipes/{product}"
+ },
+ {
+  "name": "composicion",
+  "path": "/dishes/{product}/composition"
+ },
+ {
+  "name": "stock",
+  "path": "/supply/stock"
+ },
+ {
+  "name": "insumo",
+  "path": "/supply/stock/{ingredient}"
+ },
+ {
+  "name": "conteo",
+  "path": "/supply/stock/conteo"
+ },
+ {
+  "name": "preparaciones",
+  "path": "/supply/preparaciones"
+ },
+ {
+  "name": "compras",
+  "path": "/supply/compras"
+ },
+ {
+  "name": "compra-detalle",
+  "path": "/supply/compras/{purchase}"
+ },
+ {
+  "name": "importar-factura",
+  "path": "/supply/compras/importar"
+ },
+ {
+  "name": "proveedores",
+  "path": "/supply/proveedores"
+ },
+ {
+  "name": "personal-hoy",
+  "path": "/staff"
+ },
+ {
+  "name": "personal-semana",
+  "path": "/staff?view=week"
+ },
+ {
+  "name": "personal-horas",
+  "path": "/staff?view=hours"
+ },
+ {
+  "name": "mis-turnos",
+  "path": "/my-shifts"
+ },
+ {
+  "name": "fin-rentabilidad",
+  "path": "/finance/profit"
+ },
+ {
+  "name": "fin-por-pagar",
+  "path": "/finance/payables"
+ },
+ {
+  "name": "fin-pagos",
+  "path": "/finance/payments"
+ },
+ {
+  "name": "fin-gastos",
+  "path": "/finance/expenses"
+ },
+ {
+  "name": "fin-nomina",
+  "path": "/finance/payroll"
+ },
+ {
+  "name": "fin-flujo",
+  "path": "/finance/cashflow"
+ },
+ {
+  "name": "clientes",
+  "path": "/customers"
+ },
+ {
+  "name": "cliente-ficha",
+  "path": "/customers/{customer}"
+ },
+ {
+  "name": "insights",
+  "path": "/insights"
+ },
+ {
+  "name": "insights-ventas",
+  "path": "/insights?tab=sales"
+ },
+ {
+  "name": "insights-productos",
+  "path": "/insights?tab=products"
+ },
+ {
+  "name": "insights-costos",
+  "path": "/insights?tab=costs"
+ },
+ {
+  "name": "menu-publico",
+  "path": "/public-menu"
+ },
+ {
+  "name": "menu-publico-diseno",
+  "path": "/public-menu/design"
+ },
+ {
+  "name": "integraciones",
+  "path": "/integrations"
+ },
+ {
+  "name": "integraciones-mensajes",
+  "path": "/integrations/inbox"
+ },
+ {
+  "name": "consumer",
+  "path": "/consumer"
+ },
+ {
+  "name": "perfil",
+  "path": "/perfil"
+ },
+ {
+  "name": "conf-general",
+  "path": "/settings/general"
+ },
+ {
+  "name": "conf-plan",
+  "path": "/settings/billing"
+ },
+ {
+  "name": "conf-ia",
+  "path": "/settings/ai"
+ },
+ {
+  "name": "conf-ia-uso",
+  "path": "/settings/ai?tab=usage"
+ },
+ {
+  "name": "conf-integraciones",
+  "path": "/settings/integrations"
+ },
+ {
+  "name": "conf-actividad",
+  "path": "/settings/activity"
+ },
+ {
+  "name": "conf-usuarios",
+  "path": "/settings/users"
+ },
+ {
+  "name": "conf-roles",
+  "path": "/settings/roles"
+ },
+ {
+  "name": "copilot",
+  "path": "/",
+  "steps": [
+   {
+    "role": [
+     "button",
+     "Copilot"
+    ]
+   }
+  ]
+ },
+ {
+  "name": "campana",
+  "path": "/",
+  "steps": [
+   {
+    "eval": "document.querySelector('button[aria-label*=\"otificaciones\"]')?.click()"
+   }
+  ]
+ },
+ {
+  "name": "nueva-compra",
+  "path": "/supply/compras",
+  "steps": [
+   {
+    "role": [
+     "button",
+     "Nueva"
+    ]
+   },
+   {
+    "eval": "[...document.querySelectorAll('[role=menuitem],button')].find(b=>/Manual/.test(b.textContent))?.click()"
+   }
+  ]
+ },
+ {
+  "name": "landing",
+  "path": "{root}/"
+ },
+ {
+  "name": "login",
+  "path": "{root}/login"
+ },
+ {
+  "name": "registro",
+  "path": "{root}/registro"
+ },
+ {
+  "name": "ayuda",
+  "path": "{root}/help"
+ },
+ {
+  "name": "menu-publico-cliente",
+  "path": "{root}/menu/brasa-y-pan"
+ },
+ {
+  "name": "menu-usuario",
+  "path": "/",
+  "steps": [
+   {
+    "eval": "document.querySelector('header button[aria-label*=\"enú de usuario\"],header button[aria-haspopup][aria-label*=\"Laura\"]')?.click()"
+   }
+  ]
+ },
+ {
+  "name": "cambiar-cuenta",
+  "path": "/",
+  "steps": [
+   {
+    "eval": "document.querySelector('header button[aria-label^=\"Cuenta \"]')?.click()"
+   }
+  ]
+ },
+ {
+  "name": "info-borde",
+  "path": "/supply/compras/{purchase}",
+  "steps": [
+   {
+    "eval": "document.querySelector('button[aria-label^=\"Qué es\"]')?.click()"
+   }
+  ]
+ }
+]

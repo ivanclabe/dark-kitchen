@@ -37,6 +37,7 @@ export function HelpSearch({ size = 'md', autoFocus = false, onNavigate }: { siz
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.nativeEvent.isComposing) return
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActive((i) => Math.min(i + 1, hits.length - 1))
@@ -92,7 +93,7 @@ export function HelpSearch({ size = 'md', autoFocus = false, onNavigate }: { siz
         </button>
       )}
       {showResults && (
-        <ul id={listId} role="listbox" aria-label="Resultados" className="shadow-float absolute top-full right-0 left-0 z-40 mt-2 max-h-[70vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-1.5">
+        <ul id={listId} role="listbox" aria-label="Resultados" className="shadow-float absolute top-full right-0 left-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-1.5">
           {hits.length === 0 ? (
             <li className="px-3 py-3 text-sm text-neutral-400">
               Sin resultados para «{query}». Prueba con otras palabras, o pregúntale a Copilot dentro de Quanela.

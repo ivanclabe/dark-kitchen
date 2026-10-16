@@ -66,7 +66,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext value={{ show }}>
       {children}
       {createPortal(
-        <div className="fixed bottom-5 right-5 z-[60] flex w-80 flex-col gap-2">
+        // Phone: full width with margins and above the home bar (iOS); from sm: the 20 rem corner card.
+        <div className="fixed inset-x-4 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-[60] flex flex-col gap-2 sm:inset-x-auto sm:right-5 sm:w-80">
           {toasts.map((toast) => (
             <div
               key={toast.id}
@@ -74,7 +75,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               className={`shadow-float flex items-center gap-2.5 rounded-lg border py-2.5 pr-3.5 pl-2.5 text-sm text-neutral-100 backdrop-blur ${TONE_STYLES[toast.tone].border}`}
             >
               <RobotFace mood={toast.mood ?? TONE_STYLES[toast.tone].mood} size={30} />
-              <p className="flex-1">{toast.message}</p>
+              <p className="min-w-0 flex-1 break-words">{toast.message}</p>
               {toast.action && (
                 <button
                   type="button"

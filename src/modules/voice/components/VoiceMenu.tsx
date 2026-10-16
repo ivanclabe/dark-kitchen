@@ -114,7 +114,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
         {voice.state === 'listening' ? 'Escuchando' : voice.state === 'processing' ? 'Consultando' : voice.lastReply?.message ?? ''}
       </div>
       {showBubble && (
-        <div className="shadow-float absolute top-full right-0 z-40 mt-2 w-72 space-y-0.5 rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-xs">
+        <div className="shadow-float absolute top-full right-0 z-40 mt-2 w-72 max-w-[calc(100vw-1.5rem)] space-y-0.5 rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-xs">
           {voice.state === 'listening' ? (
             <p className="text-neutral-300">{voice.liveTranscript ? `🎤 «${voice.liveTranscript}»` : 'Escuchando…'}</p>
           ) : (

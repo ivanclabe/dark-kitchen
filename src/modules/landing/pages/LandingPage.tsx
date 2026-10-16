@@ -97,7 +97,7 @@ export function LandingPage() {
   }, [hash])
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] text-[#1C1310]">
+    <div className="min-h-dvh bg-[#FBF6EF] text-[#1C1310]">
       <LandingNav />
 
       <main>

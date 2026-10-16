@@ -122,7 +122,8 @@ export function WeekView({
                             aria-label={`Agregar turno a ${m.fullName} el ${DAY_LABEL[i]} ${days[i].getDate()}`}
                             className={clsx(
                               'flex w-full items-center justify-center rounded-md border border-dashed border-neutral-800 py-1 text-neutral-600 transition-opacity hover:border-brasa-500/50 hover:text-brasa-300',
-                              dayShifts.length > 0 ? 'opacity-0 group-hover:opacity-100 focus:opacity-100' : 'opacity-60',
+                              dayShifts.length > 0 ? // On a touch screen there is no hover: the add button is always shown.
+                              'opacity-0 group-hover:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-60' : 'opacity-60',
                             )}
                           >
                             <Plus size={12} aria-hidden />

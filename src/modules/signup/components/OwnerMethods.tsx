@@ -95,9 +95,10 @@ export function OwnerMethodButtons({
 
   if (compact) {
     const short = (key: string, icon: ReactNode, label: string, name: string, onClick: () => void) => (
-      <button key={key} type="button" aria-label={leaving === key ? undefined : name} className={clsx(methodButtonClass, 'gap-2 px-3 [&_svg]:shrink-0')} onClick={onClick} disabled={leaving !== null}>
+      <button key={key} type="button" aria-label={leaving === key ? undefined : name} className={clsx(methodButtonClass, 'gap-2 px-3 [&_svg]:shrink-0 max-[359px]:gap-1.5 max-[359px]:px-2 max-[359px]:text-[13px]')} onClick={onClick} disabled={leaving !== null}>
         {icon}
-        {leaving === key ? 'Abriendo…' : label}
+        {/* 320 px phones: three of these share the row; the label truncates instead of touching the border. */}
+        <span className="min-w-0 truncate">{leaving === key ? 'Abriendo…' : label}</span>
       </button>
     )
     const items = [
