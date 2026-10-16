@@ -93,6 +93,17 @@ export async function copyWeek(fromWeek: string, toWeek: string): Promise<{ copi
   return data as { copied: number; skipped: number }
 }
 
+/** ADR 0063: a manager fixes the clock-in/out of a shift; the reason goes to the activity log. */
+export async function correctClock(input: { shiftId: string; clockInAt: string; clockOutAt: string | null; reason: string }): Promise<void> {
+  const { error } = await supabase.rpc('dk_shift_correct_clock', {
+    p_shift: input.shiftId,
+    p_clock_in: input.clockInAt,
+    p_clock_out: input.clockOutAt as string,
+    p_reason: input.reason,
+  })
+  if (error) throw error
+}
+
 export async function clockIn(): Promise<void> {
   const { error } = await supabase.rpc('dk_clock_in')
   if (error) throw error

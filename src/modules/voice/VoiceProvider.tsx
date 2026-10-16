@@ -78,6 +78,8 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const [handsFreeOn, setHandsFreeOn] = useWakeWordPreference()
   const [replies, setReplies] = useVoiceFlag('replies', true)
   const [followUp, setFollowUp] = useVoiceFlag('followUp', true)
+  // ADR 0063: the account can turn the follow-up listening off for everyone (Configuración → IA → Copilot).
+  const accountFollowUp = feature('copilot')?.settings?.follow_up !== false
   const visible = usePageVisible()
 
   const handlersRef = useRef(new Map<string, VoiceHandler>())
@@ -123,7 +125,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     handlersListRef.current = handlers
     repliesRef.current = replies
-    followUpPrefRef.current = followUp
+    followUpPrefRef.current = followUp && accountFollowUp
     sayRef.current = voice.say
   })
 

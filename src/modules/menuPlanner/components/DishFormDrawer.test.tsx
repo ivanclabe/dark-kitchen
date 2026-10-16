@@ -8,7 +8,7 @@ import type { Product } from '@/modules/products/types'
 // ADR 0048: «Descuenta inventario» on the dish.
 const state = vi.hoisted(() => ({ create: vi.fn(), update: vi.fn() }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
-vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () => ({ can: () => true }) }))
+vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () => ({ can: () => true, feature: () => null }) }))
 vi.mock('@/shared/kitchen/KitchenLink', () => ({ KitchenLink: ({ to, children, ...rest }: { to: string; children: React.ReactNode }) => <a href={to} {...rest}>{children}</a> }))
 vi.mock('@/modules/products/components/ProductPhotos', () => ({ ProductPhotos: () => null }))
 vi.mock('@/modules/products/api/products', () => ({ saveProductImage: vi.fn() }))

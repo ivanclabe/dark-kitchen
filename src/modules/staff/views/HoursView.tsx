@@ -1,6 +1,6 @@
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Timer } from 'lucide-react'
-import { formatHours, plannedHours, workedHours } from '../lib/week'
+import { formatHours, isOpenPastEnd, plannedHours, workedHours } from '../lib/week'
 import type { Shift, StaffMember } from '../types'
 
 /**
@@ -15,7 +15,9 @@ export function HoursView({ shifts, members, now }: { shifts: Shift[]; members: 
       const planned = own.filter((s) => !s.unplanned).reduce((sum, s) => sum + plannedHours(s), 0)
       const worked = own.reduce((sum, s) => sum + (workedHours(s, now) ?? 0), 0)
       const missing = own.filter((s) => !s.clockInAt && new Date(s.endsAt).getTime() < now).length
-      return { member: m, shifts: own.length, planned, worked, missing }
+      // ADR 0063: clocked in and never out — 0 hours until a manager fixes it (tap the shift in Semana).
+      const noOut = own.filter((s) => isOpenPastEnd(s, now)).length
+      return { member: m, shifts: own.length, planned, worked, missing, noOut }
     })
     .filter((r) => r.shifts > 0)
 
@@ -25,7 +27,7 @@ export function HoursView({ shifts, members, now }: { shifts: Shift[]; members: 
 
   return (
     <div className="overflow-x-auto rounded-xl border border-neutral-800/60">
-      <table className="w-full min-w-[560px] text-sm">
+      <table className="w-full min-w-[640px] text-sm">
         <thead>
           <tr className="border-b border-neutral-800/60 bg-neutral-900/60 text-xs text-neutral-400">
             <th className="px-3 py-2 text-left font-medium">Persona</th>
@@ -34,6 +36,7 @@ export function HoursView({ shifts, members, now }: { shifts: Shift[]; members: 
             <th className="px-3 py-2 text-right font-medium">Trabajadas</th>
             <th className="px-3 py-2 text-right font-medium">Diferencia</th>
             <th className="px-3 py-2 text-right font-medium">Sin marcar</th>
+            <th className="px-3 py-2 text-right font-medium">Sin salida</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-800/40">
@@ -49,6 +52,9 @@ export function HoursView({ shifts, members, now }: { shifts: Shift[]; members: 
                   {Math.abs(diff) < 0.25 ? '—' : `${diff > 0 ? '+' : '−'}${formatHours(Math.abs(diff))}`}
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums text-neutral-400">{r.missing || '—'}</td>
+                <td className={`px-3 py-2 text-right tabular-nums ${r.noOut ? 'font-medium text-amber-400' : 'text-neutral-400'}`} title={r.noOut ? 'No suman horas: abre el turno en Semana y corrige la marcación' : undefined}>
+                  {r.noOut || '—'}
+                </td>
               </tr>
             )
           })}
@@ -59,7 +65,7 @@ export function HoursView({ shifts, members, now }: { shifts: Shift[]; members: 
             <td />
             <td className="px-3 py-2 text-right tabular-nums">{formatHours(total.planned)}</td>
             <td className="px-3 py-2 text-right tabular-nums">{formatHours(total.worked)}</td>
-            <td colSpan={2} />
+            <td colSpan={3} />
           </tr>
         </tfoot>
       </table>

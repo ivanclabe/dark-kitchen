@@ -29,7 +29,8 @@ function perishableFacts(s: InventorySignal): { badge: ReactNode; facts: string 
 }
 
 function slowFacts(s: InventorySignal): { badge: ReactNode; facts: string } {
-  const idle = s.daysSinceConsumption === null ? 'sin consumo registrado' : `sin consumo hace ${s.daysSinceConsumption} días`
+  const idle =
+    s.daysSinceConsumption === null ? 'sin consumo registrado' : s.daysSinceConsumption === 0 ? 'se usó hoy' : `sin consumo hace ${s.daysSinceConsumption} ${s.daysSinceConsumption === 1 ? 'día' : 'días'}`
   const lasts = s.overstock && s.coverageDays !== null ? ` · alcanza para ~${Math.round(s.coverageDays)} días` : ''
   return {
     badge: (
@@ -54,6 +55,7 @@ function SignalCard({
   emptyTitle,
   emptyDescription,
   onSelectIngredient,
+  aiEnabled,
 }: {
   feature: AiInsightFeatureKey
   title: string
@@ -67,9 +69,11 @@ function SignalCard({
   emptyTitle: string
   emptyDescription: string
   onSelectIngredient: (ingredientId: string) => void
+  /** ADR 0063: the AI only ranks and explains; the list is the rule and is shown without it. */
+  aiEnabled: boolean
 }) {
-  // Solo se pide el análisis si hay algo que analizar (la función igual lo evita, pero así ni se llama).
-  const { data: aiResult, isLoading: aiLoading } = useAiInsight(feature, !loading && rows.length > 0)
+  // Solo se pide el análisis si la IA está activa y hay algo que analizar (la función igual lo evita, pero así ni se llama).
+  const { data: aiResult, isLoading: aiLoading } = useAiInsight(feature, aiEnabled && !loading && rows.length > 0)
   const aiByRef = useMemo(() => insightItemsByRef(aiResult), [aiResult])
   const sorted = useMemo(() => {
     const rank = (s: InventorySignal) => {
@@ -89,7 +93,7 @@ function SignalCard({
         <EmptyState icon={CheckCircle2} title={emptyTitle} description={emptyDescription} compact />
       ) : (
         <>
-          <InsightSummary feature={feature} result={aiResult} isLoading={aiLoading} />
+          {aiEnabled && <InsightSummary feature={feature} result={aiResult} isLoading={aiLoading} />}
           <ul className="divide-y divide-neutral-800/60">
             {sorted.map((s) => {
               const { badge, facts } = describe(s)
@@ -123,24 +127,24 @@ function SignalCard({
 /**
  * Tarjetas de Perecederos y Poco movimiento en el resumen de Stock. Las
  * listas y cifras salen de dk_inventory_signals (reglas fijas con los
- * umbrales configurados); la IA, si está conectada, prioriza y explica cada
- * caso. Tocar un insumo abre su ficha, donde están Merma, Ajuste y Editar:
- * la IA nunca registra nada por su cuenta.
+ * umbrales configurados) y se ven en todos los planes (ADR 0063); la IA, si
+ * está activa, solo prioriza y explica cada caso. Sin IA, una tarjeta vacía
+ * no se muestra. Tocar un insumo abre su ficha, donde están Merma, Ajuste y
+ * Editar: la IA nunca registra nada por su cuenta.
  */
 export function SupplyAiCards({ onSelectIngredient }: { onSelectIngredient: (ingredientId: string) => void }) {
   const perishables = useAiFeature('supply_perishables')
   const slow = useAiFeature('supply_slow_movers')
-  const anyEnabled = perishables.enabled || slow.enabled
-  const { data: signals, isLoading, error, refetch } = useInventorySignals(anyEnabled)
+  const { data: signals, isLoading, error, refetch } = useInventorySignals(true)
 
   const atRisk = useMemo(() => (signals ?? []).filter((s) => s.perishableRisk), [signals])
   const slowRows = useMemo(() => (signals ?? []).filter((s) => s.slowMover || s.overstock), [signals])
-
-  if (!anyEnabled) return null
+  const showPerishables = perishables.enabled || (!isLoading && atRisk.length > 0)
+  const showSlow = slow.enabled || (!isLoading && slowRows.length > 0)
 
   return (
     <>
-      {perishables.enabled && (
+      {showPerishables && (
         <SignalCard
           feature="supply_perishables"
           title="Perecederos en riesgo"
@@ -154,9 +158,10 @@ export function SupplyAiCards({ onSelectIngredient }: { onSelectIngredient: (ing
           emptyTitle="Sin perecederos en riesgo"
           emptyDescription="Ningún insumo perecedero vence pronto al ritmo de consumo actual. Marca como perecederos los insumos que apliquen y su vida útil."
           onSelectIngredient={onSelectIngredient}
+          aiEnabled={perishables.enabled}
         />
       )}
-      {slow.enabled && (
+      {showSlow && (
         <SignalCard
           feature="supply_slow_movers"
           title="Poco movimiento"
@@ -170,6 +175,7 @@ export function SupplyAiCards({ onSelectIngredient }: { onSelectIngredient: (ing
           emptyTitle="Todo el stock se mueve"
           emptyDescription="Ningún insumo lleva demasiado tiempo quieto ni tiene stock excesivo."
           onSelectIngredient={onSelectIngredient}
+          aiEnabled={slow.enabled}
         />
       )}
     </>

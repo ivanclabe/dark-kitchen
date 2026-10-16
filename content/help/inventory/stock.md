@@ -15,7 +15,7 @@ questions:
   - ¿Qué debo comprar?
 keywords: [inventario, stock, insumos, bajo mínimo, reponer, existencias, bodega, crear insumo, costo promedio, ingrediente nuevo, materia prima]
 related: [purchases, waste-adjustments, inventory-deduction, recipes-and-cost]
-updated: 2026-10-06
+updated: 2026-10-15
 order: 1
 screenshots:
   - id: stock
@@ -38,7 +38,13 @@ screenshots:
 
 ## Qué comprar
 
-Sin ningún insumo elegido, a la derecha está **Reponer**: los insumos bajo el mínimo o con pocos días de cobertura, agrupados por proveedor, con la cantidad sugerida. Toca **Crear compra** y se arma un borrador con esas cantidades. Ver [Registrar una compra](help:purchases).
+Sin ningún insumo elegido, a la derecha está **Reponer**: los insumos bajo el mínimo o con pocos días de cobertura, agrupados por proveedor, con la cantidad sugerida. Toca **Crear compra** y se arma un borrador con esas cantidades, en la unidad y al precio de la última compra. Ver [Registrar una compra](help:purchases).
+
+La **cantidad sugerida** cubre el consumo real de los días de reposición de tu cuenta (7 por defecto, en **Control de costos**), sin pasar del máximo; un insumo sin consumo usa su mínimo y su máximo. Un insumo con mínimo **0** nunca cuenta como «bajo el mínimo».
+
+Debajo están **Perecederos en riesgo** y **Poco movimiento**: son reglas y se ven en todos los planes. Si la IA está activa, además ordena y explica cada caso.
+
+Para contar la bodega y corregir el inventario de una vez, toca **Contar inventario**. Ver [Conteo físico](help:stock-count).
 
 ## Crear un insumo
 

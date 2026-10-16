@@ -9,7 +9,7 @@ import { LoadingState } from '@/shared/ui/LoadingState'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, CheckCircle2, FileSearch, Loader2, RefreshCw, ScanText } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, FileSearch, FileText, Loader2, RefreshCw, ScanText } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { InvoiceImportError, matchInvoice, reopenInvoiceImport, rereadInvoice, uploadAndReadInvoice } from '../api/invoiceImport'
@@ -19,7 +19,7 @@ import { useInvoiceImport } from '../hooks/useInvoiceImport'
 import { takePendingInvoiceFile } from '../lib/invoiceFile'
 import type { InvoiceMatch, ReadResult } from '../types/invoiceImport'
 
-type Stage = { kind: 'idle' } | { kind: 'reading'; step: 'upload' | 'read' } | { kind: 'duplicate'; result: Extract<ReadResult, { kind: 'duplicate' }>; file: File } | { kind: 'error'; message: string; file?: File }
+type Stage = { kind: 'idle' } | { kind: 'ready'; file: File } | { kind: 'reading'; step: 'upload' | 'read' } | { kind: 'duplicate'; result: Extract<ReadResult, { kind: 'duplicate' }>; file: File } | { kind: 'error'; message: string; file?: File }
 
 /** What was matched right after reading, kept so the review opens without asking again. */
 const MATCH_KEY = (importId: string) => ['invoice-imports', importId, 'match'] as const
@@ -36,6 +36,8 @@ export function InvoiceImportPage() {
   const [stage, setStage] = useState<Stage>({ kind: 'idle' })
   const allowed = can('purchasing.create') && can('invoices.upload')
   const usable = feature('invoice_import')?.usable ?? false
+  // ADR 0063: the account can ask to confirm before each read (every read is a paid AI call).
+  const readOnDrop = feature('invoice_import')?.settings?.read_on_drop !== false
 
   async function read(file: File, force = false) {
     setStage({ kind: 'reading', step: 'upload' })
@@ -69,7 +71,10 @@ export function InvoiceImportPage() {
     if (started.current || importId) return
     started.current = true
     const pending = takePendingInvoiceFile()
-    if (pending) void read(pending)
+    if (pending) {
+      if (readOnDrop) void read(pending)
+      else setStage({ kind: 'ready', file: pending })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importId])
 
@@ -120,7 +125,24 @@ export function InvoiceImportPage() {
               )}
             </div>
           )}
-          <InvoiceDropzone onFile={(file) => void read(file)} />
+          {stage.kind === 'ready' ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 py-3 text-sm">
+              <span className="min-w-0 truncate text-neutral-200">
+                <FileText size={15} className="mr-1.5 inline text-neutral-500" aria-hidden />
+                {stage.file.name}
+              </span>
+              <span className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setStage({ kind: 'idle' })}>
+                  Cambiar archivo
+                </Button>
+                <Button variant="primary" size="sm" icon={ScanText} onClick={() => void read(stage.file)}>
+                  Leer con IA
+                </Button>
+              </span>
+            </div>
+          ) : (
+            <InvoiceDropzone onFile={(file) => (readOnDrop ? void read(file) : setStage({ kind: 'ready', file }))} />
+          )}
           <ul className="space-y-1.5 text-sm text-neutral-400">
             <li>• Quanela lee el proveedor, el NIT, el número, la fecha, las líneas y los totales, y busca tus proveedores e insumos.</li>
             <li>• Tú revisas y corriges todo. La compra queda en borrador, o confirmada si lo eliges; el inventario solo se mueve al confirmar.</li>

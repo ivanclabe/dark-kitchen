@@ -5,15 +5,16 @@ import {
   createPurchase,
   deletePurchaseItem,
   getAttachmentUrl,
-  getLastIngredientPrice,
+  fetchPriceReferences,
   getPurchase,
   listAttachments,
   listPurchaseItems,
   listPurchases,
+  updatePurchaseHeader,
   uploadInvoiceAttachment,
 } from '../api/purchases'
 import type { PurchasePayment } from '@/modules/finance/types'
-import type { PurchaseInput, PurchaseItemInput } from '../types'
+import type { PurchaseHeaderInput, PurchaseInput, PurchaseItemInput } from '../types'
 
 /** The page size of the purchases list (ADR 0030 D5). */
 export const PURCHASES_PAGE = 50
@@ -98,10 +99,21 @@ export function useAttachmentUrl() {
   return useMutation({ mutationFn: (filePath: string) => getAttachmentUrl(filePath) })
 }
 
-export function useLastIngredientPrice(ingredientId: string) {
+export function useUpdatePurchaseHeader(purchaseId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: PurchaseHeaderInput) => updatePurchaseHeader(purchaseId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchases'] }),
+  })
+}
+
+/** Price references (ADR 0063 D4) of a set of ingredients; one call for the whole set. */
+export function usePriceReferences(ingredientIds: string[]) {
+  const ids = [...new Set(ingredientIds.filter(Boolean))].sort()
   return useQuery({
-    queryKey: ['last-ingredient-price', ingredientId],
-    queryFn: () => getLastIngredientPrice(ingredientId),
-    enabled: !!ingredientId,
+    queryKey: ['price-references', ids],
+    queryFn: () => fetchPriceReferences(ids),
+    enabled: ids.length > 0,
+    staleTime: 60_000,
   })
 }

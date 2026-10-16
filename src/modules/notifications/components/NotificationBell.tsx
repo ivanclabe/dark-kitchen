@@ -2,37 +2,13 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Popover } from '@/shared/ui/Popover'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
-import {
-  AlarmClock,
-  Bell,
-  BellRing,
-  CheckCheck,
-  ChevronRight,
-  ClipboardList,
-  CreditCard,
-  Gauge,
-  Package,
-  Sparkles,
-  Wallet,
-  XCircle,
-  type LucideIcon,
-} from 'lucide-react'
+import { Bell, BellRing, CheckCheck, ChevronRight, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMarkNotificationsRead, useNotifications } from '../hooks'
 import { badgeLabel, notificationsOf, OPEN_NOTIFICATIONS_EVENT, unreadOf, whenLabel, type NotificationTab } from '../lib'
 import type { AppNotification } from '../types'
-
-const TYPE_ICON: Record<string, LucideIcon> = {
-  late_orders: AlarmClock,
-  to_confirm: ClipboardList,
-  low_stock: Package,
-  overdue_customers: Wallet,
-  ai_error: XCircle,
-  ai_quota: Gauge,
-  trial: CreditCard,
-  plan_limit: CreditCard,
-}
+import { NOTICE_ICON as TYPE_ICON } from '../icons'
 
 /** The tone of the icon chip: what matters most stands out, nothing shouts. */
 const SEVERITY_CHIP: Record<AppNotification['severity'], string> = {
@@ -43,7 +19,7 @@ const SEVERITY_CHIP: Record<AppNotification['severity'], string> = {
 
 function NotificationRow({ n, onOpen }: { n: AppNotification; onOpen: (n: AppNotification) => void }) {
   const Icon = TYPE_ICON[n.type] ?? (n.group === 'ai' ? Sparkles : Bell)
-  const ai = n.group === 'ai' && n.type !== 'ai_error' && n.type !== 'ai_quota'
+  const ai = n.group === 'ai' && n.type !== 'ai_error' && n.type !== 'ai_quota' && n.type !== 'ai_budget'
   return (
     <li>
       <button

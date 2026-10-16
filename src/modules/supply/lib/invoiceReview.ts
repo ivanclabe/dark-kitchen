@@ -9,13 +9,12 @@ import type { Extraction, IngredientSuggestion, InvoiceMatch, ReviewDraft, Revie
 
 // ADR 0056: the conversion rule is shared with recipes, purchases and waste (one place, same as the database).
 import { PACKAGING_UNITS, unitFactor, type IngredientUnitInfo } from '@/shared/units/conversion'
+import { COST_DEFAULTS } from '@/shared/costs/costSettings'
+import { priceChanges, priceChangeText } from '@/shared/costs/priceChange'
 export { PACKAGING_UNITS, type IngredientUnitInfo }
 
 /** A suggestion this sure is chosen for the person (still visible and changeable). */
 export const AUTO_PICK_SCORE = 0.9
-
-/** Price per base unit more than this many times off the usual one: warn. */
-export const PRICE_JUMP = 3
 
 const UNIT_WORDS: Record<string, string> = {
   kg: 'kg', kgs: 'kg', k: 'kg', kilo: 'kg', kilos: 'kg', kilogramo: 'kg', kilogramos: 'kg',
@@ -118,7 +117,11 @@ export function lineUnitInfo(line: ReviewLine, units: Unit[], ingredients: Ingre
   return ingredients.get(line.ingredient.id) ?? null
 }
 
-export type IngredientUnitInfoById = Map<string, IngredientUnitInfo & { avgCost: number; name: string }>
+export type IngredientUnitInfoById = Map<
+  string,
+  // ADR 0063 (D4): last confirmed price and 90-day average per base unit, when known.
+  IngredientUnitInfo & { avgCost: number; name: string; lastPerBase?: number | null; avg90PerBase?: number | null }
+>
 
 /** What blocks saving a line (empty when it is ready). Ignored lines never block. */
 export function lineProblems(line: ReviewLine, units: Unit[], ingredients: IngredientUnitInfoById): string[] {
@@ -136,8 +139,11 @@ export function lineProblems(line: ReviewLine, units: Unit[], ingredients: Ingre
   return problems
 }
 
-/** Odd things worth a second look (they never block). */
-export function lineWarnings(line: ReviewLine, units: Unit[], ingredients: IngredientUnitInfoById): string[] {
+/**
+ * Odd things worth a second look (they never block). ADR 0063 (D4): the price per base unit
+ * against the last purchase and the 90-day average, beyond the account tolerance (0 = no price warning).
+ */
+export function lineWarnings(line: ReviewLine, units: Unit[], ingredients: IngredientUnitInfoById, priceTolerancePct = COST_DEFAULTS.priceChangePct): string[] {
   if (line.ignored) return []
   const warnings: string[] = []
   if (line.confidence !== 'alta') warnings.push(line.confidence === 'baja' ? 'Se leyó con dudas' : 'Revisa: lectura poco clara')
@@ -148,10 +154,9 @@ export function lineWarnings(line: ReviewLine, units: Unit[], ingredients: Ingre
   if (line.ingredient?.kind === 'existing' && line.unitCost !== null && line.unitCost > 0) {
     const info = ingredients.get(line.ingredient.id)
     const factor = knownFactor(line.unitCode, info ?? null, units) ?? line.factor
-    if (info && info.avgCost > 0 && factor && factor > 0) {
-      const ratio = line.unitCost / factor / info.avgCost
-      if (ratio > PRICE_JUMP) warnings.push(`Cuesta ${Math.round(ratio)} veces más que el costo promedio de ${info.name}`)
-      else if (ratio < 1 / PRICE_JUMP) warnings.push(`Cuesta mucho menos que el costo promedio de ${info.name}`)
+    if (info && factor && factor > 0) {
+      const changes = priceChanges(line.unitCost / factor, { lastPerBase: info.lastPerBase ?? null, avg90PerBase: info.avg90PerBase ?? null, avgCost: info.avgCost }, priceTolerancePct)
+      warnings.push(...changes.map(priceChangeText))
     }
   }
   return warnings

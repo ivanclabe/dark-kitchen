@@ -18,6 +18,7 @@ import { NewPurchaseDialog, type PresetLine } from '../components/NewPurchaseDia
 import { PurchaseDetail } from '../components/PurchaseDetail'
 import { PurchasePanel } from '../components/PurchasePanel'
 import { ReorderPanel } from '../components/ReorderPanel'
+import { StockCountPanel } from '../components/StockCountPanel'
 import { SupplierDetail } from '../components/SupplierDetail'
 import { SupplierFormDrawer } from '../components/SupplierFormDrawer'
 import { SupplierPanel } from '../components/SupplierPanel'
@@ -27,6 +28,9 @@ import { setPendingInvoiceFile } from '../lib/invoiceFile'
 import type { Ingredient } from '../types'
 
 type SupplyView = 'stock' | 'preparaciones' | 'compras' | 'proveedores'
+
+/** The physical count lives at /supply/stock/conteo (ADR 0063 D5). */
+const STOCK_COUNT_ID = 'conteo'
 
 /** The help center article of each section (ADR 0034). */
 const SUPPLY_HELP: Record<SupplyView, string> = { stock: 'stock', preparaciones: 'preparations', compras: 'purchases', proveedores: 'suppliers' }
@@ -114,14 +118,21 @@ export function SupplyPage() {
 
   let detail
   if (view === 'stock') {
-    detail = selectedIngredient ? (
+    // ADR 0063 (D5): /supply/stock/conteo is the physical count.
+    detail = selectedId === STOCK_COUNT_ID ? (
+      <StockCountPanel onBack={() => go('stock')} />
+    ) : selectedIngredient ? (
       <IngredientDetail
         ingredient={selectedIngredient}
         onEdit={() => openIngredientDrawer(selectedIngredient)}
         onRegisterMovement={(mode) => setMovementDrawer({ open: true, mode, ingredientId: selectedIngredient.id })}
       />
     ) : (
-      <ReorderPanel onSelectIngredient={(ingredientId) => go('stock', ingredientId)} onCreatePurchaseFor={(supplierId, lines) => setNewPurchase({ open: true, supplierId, lines })} />
+      <ReorderPanel
+        onSelectIngredient={(ingredientId) => go('stock', ingredientId)}
+        onCreatePurchaseFor={(supplierId, lines) => setNewPurchase({ open: true, supplierId, lines })}
+        onStartCount={can('inventory.adjust') ? () => go('stock', STOCK_COUNT_ID) : undefined}
+      />
     )
   } else if (view === 'preparaciones') {
     detail = selectedId ? (

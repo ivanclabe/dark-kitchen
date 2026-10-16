@@ -167,3 +167,23 @@ export function formatUsd(value: number | null): string {
   if (value === null) return '—'
   return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: value < 1 ? 4 : 2 }).format(value)
 }
+
+/** ADR 0063: the consumer assistant (Quanela Consumer) is the platform's, not an account's: its switch and model. */
+export interface ConsumerAiSettings {
+  active: boolean
+  modelKey: string | null
+}
+
+export async function fetchConsumerAi(): Promise<ConsumerAiSettings> {
+  const { data, error } = await supabase.rpc('dk_platform_consumer_ai')
+  if (error) throw error
+  return data as unknown as ConsumerAiSettings
+}
+
+export async function setConsumerAi(change: { active?: boolean; modelKey?: string }): Promise<void> {
+  const { error } = await supabase.rpc('dk_platform_set_consumer_ai', {
+    ...(change.active !== undefined ? { p_active: change.active } : {}),
+    ...(change.modelKey !== undefined ? { p_model_key: change.modelKey } : {}),
+  })
+  if (error) throw error
+}

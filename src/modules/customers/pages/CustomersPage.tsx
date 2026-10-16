@@ -11,6 +11,7 @@ import { Input, Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
 import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { PageHeader } from '@/shared/ui/PageHeader'
+import { ReceivablesAgingBar } from '@/modules/cartera/components/ReceivablesAgingBar'
 import { Pagination } from '@/shared/ui/Pagination'
 import { typography } from '@/shared/ui/typography'
 import { formatDateTime, formatMoney } from '@/shared/utils/format'
@@ -223,6 +224,7 @@ export function CustomersPage() {
       />
 
       <KpiStrip items={kpis} columns={kpis.length >= 5 ? 5 : 4} />
+      {showDebt && <ReceivablesAgingBar />}
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">

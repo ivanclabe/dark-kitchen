@@ -207,6 +207,77 @@ body {
   animation: robot-bob 2.4s ease-in-out infinite;
 }
 
+/* «Oye Quanela» pensando: un anillo que orbita, chispas que van y vienen y un brillo que recorre el texto.
+   Con movimiento reducido, la regla global los deja quietos (el texto sigue diciendo qué pasa). */
+@keyframes think-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-think-orbit {
+  animation: think-orbit 1.6s linear infinite;
+}
+
+@keyframes think-spark {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility animate-think-spark {
+  animation: think-spark 1.2s ease-in-out infinite;
+}
+
+@keyframes think-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* The text keeps its colour and a light band sweeps it (works on dark and light themes). */
+@utility text-think-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    currentColor 0%,
+    currentColor 40%,
+    var(--color-brasa-300) 50%,
+    currentColor 60%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: think-shimmer 2.2s linear infinite;
+}
+
+@keyframes think-swap {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@utility animate-think-swap {
+  animation: think-swap 0.35s ease-out both;
+}
+
 /* ---------------------------------------------------------------------------
    Apariencia (ADR 0023). data-theme / data-text-size los pone en <html> el
    script de index.html (antes del primer pintado) y useAppearance.

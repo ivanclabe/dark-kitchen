@@ -5,11 +5,12 @@ import { FormActions, FormField, FormGrid, Input, Select, Textarea } from '@/sha
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { toDateInput } from '@/shared/utils/format'
-import { XCircle } from 'lucide-react'
+import { Clock, XCircle } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { shiftErrorMessage } from '../api/staff'
-import { useCancelShift, useCreateShift, useUpdateShift } from '../hooks/useStaff'
-import { formatHours, plannedHours, shiftRange, toTimeInput } from '../lib/week'
+import { useCancelShift, useCorrectClock, useCreateShift, useUpdateShift } from '../hooks/useStaff'
+import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { formatHours, isOpenPastEnd, plannedHours, shiftRange, toTimeInput } from '../lib/week'
 import type { Shift, StaffMember } from '../types'
 
 export interface ShiftDraft {
@@ -26,6 +27,7 @@ export interface ShiftDraft {
  */
 export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; members: StaffMember[]; onClose: () => void }) {
   const { show } = useToast()
+  const { can } = useActiveKitchen()
   const editing = draft.shift
   const create = useCreateShift()
   const update = useUpdateShift()
@@ -126,6 +128,8 @@ export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; me
           </FormField>
         </FormGrid>
 
+        {editing?.clockInAt && can('staff.manage') && <ClockCorrection shift={editing} />}
+
         {error && (
           <p role="alert" className="text-sm text-red-400">
             {error}
@@ -147,5 +151,72 @@ export function ShiftDrawer({ draft, members, onClose }: { draft: ShiftDraft; me
         </FormActions>
       </form>
     </Drawer>
+  )
+}
+
+/** «2031-03-03T07:05» for a datetime-local input, in the device time. */
+function toLocalDateTime(iso: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/**
+ * ADR 0063 (D5): a manager fixes the clock-in/out (forgot to clock out, clocked late by mistake).
+ * It asks why, and the change goes to the activity log with the previous times.
+ */
+function ClockCorrection({ shift }: { shift: Shift }) {
+  const { show } = useToast()
+  const correct = useCorrectClock()
+  const [clockIn, setClockIn] = useState(toLocalDateTime(shift.clockInAt))
+  const [clockOut, setClockOut] = useState(toLocalDateTime(shift.clockOutAt))
+  const [reason, setReason] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const openPastEnd = isOpenPastEnd(shift)
+  const changed = clockIn !== toLocalDateTime(shift.clockInAt) || clockOut !== toLocalDateTime(shift.clockOutAt)
+
+  async function save() {
+    setError(null)
+    try {
+      await correct.mutateAsync({
+        shiftId: shift.id,
+        clockInAt: new Date(clockIn).toISOString(),
+        clockOutAt: clockOut ? new Date(clockOut).toISOString() : null,
+        reason: reason.trim(),
+      })
+      show('Marcación corregida: quedó en la bitácora.')
+      setReason('')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo corregir la marcación'))
+    }
+  }
+
+  return (
+    <fieldset className="space-y-3 rounded-xl border border-neutral-800/60 p-3">
+      <legend className="flex items-center gap-1.5 px-1 text-xs font-semibold tracking-wide text-neutral-400 uppercase">
+        <Clock size={13} aria-hidden /> Marcación
+      </legend>
+      {openPastEnd && <p className="text-xs text-amber-400">No marcó salida: este turno no suma horas ni nómina hasta corregirlo.</p>}
+      <FormGrid cols={2}>
+        <FormField label="Entrada" required>
+          {(a11y) => <Input {...a11y} type="datetime-local" value={clockIn} onChange={(e) => setClockIn(e.target.value)} />}
+        </FormField>
+        <FormField label="Salida">
+          {(a11y) => <Input {...a11y} type="datetime-local" value={clockOut} min={clockIn} onChange={(e) => setClockOut(e.target.value)} />}
+        </FormField>
+        <FormField label="Motivo" required className="sm:col-span-2">
+          {(a11y) => <Input {...a11y} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder="Ej. olvidó marcar la salida; salió a las 16:00" />}
+        </FormField>
+      </FormGrid>
+      {error && (
+        <p role="alert" className="text-sm text-red-400">
+          {error}
+        </p>
+      )}
+      <Button type="button" variant="secondary" size="sm" icon={Clock} onClick={() => void save()} loading={correct.isPending} disabled={!changed || !clockIn || reason.trim().length < 3}>
+        Corregir marcación
+      </Button>
+    </fieldset>
   )
 }

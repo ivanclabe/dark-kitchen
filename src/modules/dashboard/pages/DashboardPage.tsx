@@ -4,6 +4,7 @@ import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { useNotifications } from '@/modules/notifications/hooks'
 import { OPEN_NOTIFICATIONS_EVENT, operationNotices, splitCount, unreadAiAdvice } from '@/modules/notifications/lib'
+import { NOTICE_ICON } from '@/modules/notifications/icons'
 import { useSlaSettings } from '@/modules/orders/hooks/useSlaSettings'
 import { alertMinutesFor, DEFAULT_SLA_THRESHOLDS, minutesAgoSince, timeTier } from '@/modules/orders/lib/orderVisuals'
 import { useLiveOrders, useOrderSearch } from '@/modules/orders/hooks/useOrders'
@@ -20,12 +21,10 @@ import { typography } from '@/shared/ui/typography'
 import { formatDateLong, formatDateTime, formatMoney, todayStr } from '@/shared/utils/format'
 import clsx from 'clsx'
 import {
-  AlarmClock,
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
   ChevronRight,
-  Package,
   Sparkles,
   BarChart3,
   CalendarClock,
@@ -312,12 +311,10 @@ function CarteraCard({ summary, liveOps }: { summary: DashboardSummary | undefin
 
 // ---------------------------------------------------------------------------
 
-const NOTICE_ICON: Record<string, LucideIcon> = { late_orders: AlarmClock, to_confirm: ClipboardList, low_stock: Package, overdue_customers: Wallet }
-
 /**
  * «Necesita atención» (ADR 0030, ADR 0037): what to do now, as cards — the
  * figure, what it is and where it leads. The same notices as the bell
- * (dk_my_notifications, operation group), so nothing appears twice; the AI
+ * (dk_my_notifications, operation and admin groups), so nothing appears twice; the AI
  * advice and the plan live in the bell, with one quiet line here.
  */
 function NeedsAttention() {

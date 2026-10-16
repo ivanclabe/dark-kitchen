@@ -92,7 +92,8 @@ export const AI_FEATURES: FeatureDefinition[] = [
     usesModel: true,
     defaults: { frequency_min: 10, voice: false },
     fields: [
-      { ...FREQUENCY, min: 3, max: 120 },
+      // ADR 0063: under 5 min it never pays off.
+      { ...FREQUENCY, min: 5, max: 120 },
       { key: 'voice', label: 'Leer la sugerencia principal en voz alta', type: 'boolean' },
     ],
   },

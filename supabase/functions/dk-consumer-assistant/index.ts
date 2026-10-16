@@ -69,26 +69,36 @@ Deno.serve(async (req: Request) => {
   );
 
   const apiKey = Deno.env.get("DK_ANTHROPIC_API_KEY");
-  const model = Deno.env.get("DK_CONSUMER_MODEL") ?? "claude-haiku-5-5";
   let modelMs = 0;
+  // ADR 0063: the platform switches the assistant on or off and chooses its model (Global Admin → IA);
+  // every call is reserved first and recorded with its tokens.
   const llmIntent = apiKey
     ? async (text: string, state: ConversationState) => {
-      const { data: allowed } = await db.rpc("dk_consumer_ai_allow");
-      if (allowed !== true) return null;
+      const { data: reserved } = await db.rpc("dk_consumer_ai_reserve");
+      const r = (reserved ?? {}) as { allowed?: boolean; model?: string; runId?: number };
+      if (!r.allowed || !r.model || !r.runId) return null;
       const t0 = Date.now();
+      let ok = false;
+      let usage: { input_tokens?: number; output_tokens?: number } = {};
       try {
         const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-          body: JSON.stringify(buildIntentRequest(text, state, model)),
+          body: JSON.stringify(buildIntentRequest(text, state, r.model)),
           signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
         });
         if (!res.ok) return null;
-        return readIntentResponse(await res.json());
+        const data = await res.json();
+        usage = data?.usage ?? {};
+        ok = true;
+        return readIntentResponse(data);
       } catch {
         return null;
       } finally {
         modelMs = Date.now() - t0;
+        await db.rpc("dk_consumer_ai_finish", {
+          p_run_id: r.runId, p_ok: ok, p_input_tokens: usage.input_tokens ?? null, p_output_tokens: usage.output_tokens ?? null, p_latency_ms: modelMs,
+        });
       }
     }
     : undefined;

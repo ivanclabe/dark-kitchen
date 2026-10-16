@@ -11,6 +11,7 @@ import { PhoneInput } from '@/shared/ui/PhoneInput'
 import { phoneError } from '@/shared/utils/phone'
 import { FormField, Input, Textarea } from '@/shared/ui/FormField'
 import { Modal } from '@/shared/ui/Modal'
+import { NumberInput } from '@/shared/ui/NumberInput'
 import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage, isUniqueViolation } from '@/shared/utils/errors'
 import { useState, type FormEvent } from 'react'
@@ -89,6 +90,9 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
   const emailProblem = emailError(email)
   const [address, setAddress] = useState(customer?.address ?? '')
   const [notes, setNotes] = useState(customer?.notes ?? '')
+  // ADR 0063: the payment term is a credit decision — only for whoever edits customers and sees the receivables.
+  const canSetTerms = can('customers.edit') && can('receivables.view')
+  const [paymentTermsDays, setPaymentTermsDays] = useState<number | null>(customer?.paymentTermsDays ?? null)
   const [error, setError] = useState<string | null>(null)
   const pending = createCustomer.isPending || updateCustomer.isPending
 
@@ -109,6 +113,7 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
       contactName: company ? contactName.trim() || null : null,
       preferred,
       preferredNote: preferred ? preferredNote.trim() || null : null,
+      ...(canSetTerms ? { paymentTermsDays: paymentTermsDays || null } : {}),
     }
     try {
       if (customer) {
@@ -165,6 +170,11 @@ function CustomerForm({ customer, initialQuery = '', onClose, onSaved }: FormPro
       </FormField>
       <FormField label="Dirección de envío" info="Queda como su última dirección de envío. Las anteriores se guardan en su ficha, en Direcciones.">{(a11y) => <Input {...a11y} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />}</FormField>
       <FormField label="Notas">{(a11y) => <Textarea {...a11y} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />}</FormField>
+      {canSetTerms && (
+        <FormField label="Plazo de pago" hint="Vacío = paga de contado. Con plazo, cada pedido confirmado vence a los días indicados.">
+          {(a11y) => <NumberInput {...a11y} value={paymentTermsDays} onValueChange={setPaymentTermsDays} min={0} max={365} unit="días" placeholder="Ej. 30" />}
+        </FormField>
+      )}
       {canMarkPreferred && (
         <div className="space-y-3 rounded-xl border border-neutral-800/60 p-3">
           <div className="flex items-start justify-between gap-3">

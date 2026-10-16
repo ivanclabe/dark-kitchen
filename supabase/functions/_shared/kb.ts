@@ -160,6 +160,48 @@ export const KB: KbArticle[] = [
     "body": "Cuántas preguntas tienes Abajo del panel de Copilot ves N preguntas hoy : las que le quedan a esta cuenta. El cupo depende del plan y es de toda la cuenta (lo comparte el equipo). Cuenta las preguntas de las últimas 24 horas: cada una vuelve a estar disponible un día después de hecha. Hablarle a Quanela no gasta nada por sí solo; cada pregunta a Copilot (escrita o por voz) cuenta una. Qué significa cada mensaje Mensaje Qué hacer --- Espera N s antes de la próxima pregunta Hay una pausa corta entre preguntas. Espera y vuelve a enviar Llegaste al límite diario de preguntas a Copilot en esta cuenta Las preguntas se liberan a medida que cumplen 24 horas. Mientras tanto, busca en este centro de ayuda o en Insights Copilot no está disponible en esta cuenta Tu plan, tu organización o tu rol no lo incluyen. Pídele a un administrador que lo revise Copilot no pudo responder Falla temporal: vuelve a intentar de inmediato, sin esperar. El intento fallido sí cuenta en el cupo del día Bueno saber: quien administra la cuenta ve en Configuración → IA y voz cuántas preguntas se han hecho, el tiempo de respuesta y la calificación 👍/👎."
   },
   {
+    "id": "cost-controls",
+    "section": "inventory",
+    "url": "/help/inventory/cost-controls",
+    "title": "Control de costos",
+    "summary": "Reglas sin IA que avisan cuando un insumo cambia de precio y cuando un plato pasa tu costo objetivo o se vende bajo costo, con un precio sugerido; también fijan cuántos días cubre la reposición.",
+    "audience": [
+      "owner",
+      "admin",
+      "manager",
+      "inventory"
+    ],
+    "permissions": [
+      "inventory.view"
+    ],
+    "appPath": "/menu-planner",
+    "questions": [
+      "¿Cuál es el costo de comida de un plato?",
+      "¿Qué precio le pongo a un plato?",
+      "¿Por qué dice que un plato se vende bajo costo?",
+      "¿Cómo cambio el porcentaje del aviso de precio?"
+    ],
+    "keywords": [
+      "food cost",
+      "costo de comida",
+      "margen",
+      "precio sugerido",
+      "costo objetivo",
+      "bajo costo",
+      "subió de precio",
+      "aviso de precio",
+      "reposición",
+      "días de reposición",
+      "control de costos"
+    ],
+    "steps": [],
+    "headings": [
+      "Platos",
+      "Precios de insumos"
+    ],
+    "body": "Control de costos es una función general: no usa IA y viene encendida en todos los planes. Sus tres ajustes están en Configuración → IA y voz → Funciones → Control de costos : Ajuste Por defecto Para qué --- --- Costo de comida objetivo 35 % Costo de la receta ÷ precio. Por encima, el plato se marca y se propone un precio Avisar si un precio cambia más de 10 % Frente a la última compra y al promedio de 90 días, en compras y facturas importadas Reponer para 7 días Cuántos días de consumo cubre la cantidad sugerida en Reponer Platos En el catálogo del Planificador, un plato marca Costo 47 % si pasa el objetivo o Bajo costo si el precio no cubre la receta. Al editar el plato , debajo del precio ves el costo de la receta y el %, y Usar $… pone el precio sugerido (redondeado a $100). Tú decides si lo guardas. Un precio promocional por debajo del costo muestra un aviso en las reglas del día. La campana y Inicio → Necesita atención avisan cuántos platos están bajo costo o sobre el objetivo. Solo lo ve quien ve recetas o la rentabilidad. Precios de insumos Cuando el costo promedio de un insumo sube más del porcentaje configurado en los últimos 7 días, la campana avisa «N insumos subieron de costo». En cada compra, la línea muestra cuánto subió o bajó. Ver Registrar una compra. Bueno saber: ninguna de estas reglas cambia precios por su cuenta: solo avisan y proponen."
+  },
+  {
     "id": "costs-and-purchases",
     "section": "reports",
     "url": "/help/reports/costs-and-purchases",
@@ -313,6 +355,10 @@ export const KB: KbArticle[] = [
       "¿Dónde veo lo que no le gusta a un cliente al tomar el pedido?"
     ],
     "keywords": [
+      "plazo",
+      "días de plazo",
+      "antigüedad de cartera",
+      "vencimiento",
       "cliente",
       "ficha",
       "360",
@@ -356,6 +402,7 @@ export const KB: KbArticle[] = [
       "Direcciones",
       "Quejas",
       "Preferencias y recomendaciones",
+      "Plazo y cartera vencida",
       "Registrar un abono"
     ],
     "body": "Crear un cliente Abre Clientes y toca Nuevo cliente . Arriba elige Persona o Empresa . Persona: el Nombre (obligatorio) y, si quieres, su Documento (por ejemplo, para facturar). Empresa: el Nombre comercial (obligatorio: es el que se ve en pedidos, despacho y cartera), la Razón social , el NIT y la Persona de contacto . Opcional: Teléfono (Colombia 🇨🇴 viene elegida; para otro país, cámbialo en la lista), Correo , Dirección y Notas . Con el teléfono reconocemos al cliente cuando pide por WhatsApp, y no puede haber dos clientes con el mismo número. Tampoco con el mismo NIT o documento, aunque se escriba con o sin puntos y guion. Si es un Cliente preferencial , actívalo y escribe el Motivo si quieres (por ejemplo, «Convenio corporativo»). Lo marca quien puede editar clientes. Toca Crear cliente . También puedes crearlo mientras haces un pedido, y los pedidos que llegan por WhatsApp crean al cliente solos (como persona). Bueno saber: «Preferencial» es una marca para que todo el equipo lo reconozca (una ⭐ en la lista, en su ficha y al tomarle un pedido). No cambia precios ni aplica descuentos solo. Encontrar un cliente Escribe en el buscador (nombre, NIT, razón social, persona de contacto, teléfono en cualquier formato, correo o dirección) o usa los filtros: Todos , Activos (con un pedido en los últimos 90 días), Inactivos , Con deuda , Sin deuda y Vencidos (deben pedidos cuya fecha de pago ya pasó). En Más filtros eliges Solo personas o Solo empresas y Solo preferenciales ; también tocando la cifra Preferenciales . Toca el encabezado de una columna para ordenar. En la lista, las empresas llevan un 🏢 y su NIT, y los preferenciales una ⭐. La ficha del cliente (360°) Toca un cliente. Arriba: si es Empresa o Preferencial , su estado (activo si pidió en los últimos 90 días, saldo vencido, quejas abiertas), su teléfono y su correo, y los botones Editar , Registrar queja , Registrar pago y Nuevo pedido . Las pestañas: Pestaña Qué ves --- Resumen Lo más importante junto: cuántos pedidos, total comprado, cada cuánto pide, su último pedido y lo que más pide ; lo que le gusta y lo que no ; qué recomendarle; su contacto (en empresas, razón social, NIT y persona de contacto; y el motivo si es preferencial); la última dirección de envío; las quejas abiertas y la nota general Pedidos Todos sus pedidos Preferencias y recomendaciones Platos favoritos, ingredientes que le gustan y que no, y preferencias alimentarias (los platos e ingredientes se eligen del catálogo); y qué r"
@@ -555,7 +602,10 @@ export const KB: KbArticle[] = [
       "publicidad",
       "gasto fijo",
       "gasto recurrente",
-      "categoría"
+      "categoría",
+      "monto variable",
+      "luz",
+      "factura variable"
     ],
     "steps": [
       "En Finanzas → Gastos , toca Registrar gasto .",
@@ -568,7 +618,7 @@ export const KB: KbArticle[] = [
     "headings": [
       "Gastos fijos"
     ],
-    "body": "En Finanzas → Gastos , toca Registrar gasto . Elige la Categoría (Arriendo, Servicios públicos, Gas, Internet y telefonía, Empaques y desechables, Domicilios y transporte, Comisiones de plataformas, Publicidad, Mantenimiento y aseo, Impuestos y trámites, Otros gastos; o crea una con + Nueva categoría ). Escribe la Descripción , a quién se le paga (uno de tus proveedores o un nombre) y el Valor . Fecha del gasto , o enciende Corresponde a un periodo (por ejemplo, el arriendo del 1 al 31): en la rentabilidad se reparte por días , así una semana lleva su parte. Si ya lo pagaste, enciende Ya lo pagué y elige cómo. Si no, pon cuándo Vence : queda en Por pagar. Toca Registrar gasto . Bueno saber: el gasto cuenta en la rentabilidad en su fecha o periodo , no cuando lo pagas. Pagarlo no lo vuelve a contar. Cuidado: lo que compras para cocinar (insumos) va en Compras , no aquí: entra al inventario y cuesta cuando se usa. Gastos fijos Para lo que se repite cada mes (arriendo, internet), toca Nuevo gasto fijo : categoría, descripción, valor y el día en que vence. Quanela crea la obligación de cada mes una sola vez , al abrir Finanzas. Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente)."
+    "body": "En Finanzas → Gastos , toca Registrar gasto . Elige la Categoría (Arriendo, Servicios públicos, Gas, Internet y telefonía, Empaques y desechables, Domicilios y transporte, Comisiones de plataformas, Publicidad, Mantenimiento y aseo, Impuestos y trámites, Otros gastos; o crea una con + Nueva categoría ). Escribe la Descripción , a quién se le paga (uno de tus proveedores o un nombre) y el Valor . Fecha del gasto , o enciende Corresponde a un periodo (por ejemplo, el arriendo del 1 al 31): en la rentabilidad se reparte por días , así una semana lleva su parte. Si ya lo pagaste, enciende Ya lo pagué y elige cómo. Si no, pon cuándo Vence : queda en Por pagar. Toca Registrar gasto . Bueno saber: el gasto cuenta en la rentabilidad en su fecha o periodo , no cuando lo pagas. Pagarlo no lo vuelve a contar. Cuidado: lo que compras para cocinar (insumos) va en Compras , no aquí: entra al inventario y cuesta cuando se usa. Gastos fijos Para lo que se repite cada mes (arriendo, internet), toca Nuevo gasto fijo : categoría, descripción, valor y el día en que vence. Quanela crea la obligación de cada mes una sola vez , sola, cada día (no hace falta abrir Finanzas). Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente). Si el valor cambia cada mes (luz, gas, agua), activa Monto variable : cada mes nace con el valor de referencia y la etiqueta Monto por confirmar , y no se puede pagar hasta que escribas el valor real en Por pagar → Confirmar monto . La campana avisa cuando hay montos por confirmar."
   },
   {
     "id": "faq",
@@ -1302,7 +1352,11 @@ export const KB: KbArticle[] = [
       "crédito",
       "vencido",
       "proveedor",
-      "anular pago"
+      "anular pago",
+      "pago en lote",
+      "pagar varias",
+      "monto variable",
+      "confirmar monto"
     ],
     "steps": [
       "Toca Pagar en la obligación.",
@@ -1313,7 +1367,7 @@ export const KB: KbArticle[] = [
       "Pagar",
       "Pagos y anulaciones"
     ],
-    "body": "Por pagar reúne todo lo que el negocio debe: Proveedores: cada compra confirmada crea una deuda con su proveedor, por el total de la factura. Vence en la fecha de la factura más el plazo de pago del proveedor. Gastos: arriendo, servicios y demás. Ver Gastos. Nómina: lo liquidado a cada persona. Ver Nómina. Arriba ves Por pagar , Vencido y Vence en 7 días . Filtra por estado (Por pagar, Vencidas, Pagadas, Anuladas) o por tipo. Pagar Toca Pagar en la obligación. Escribe el Valor (por defecto, todo el saldo; menos es un abono y el resto queda pendiente), la Fecha del pago , Cómo se pagó y, si quieres, la Referencia . Toca Registrar pago . Al confirmar una compra, Quanela pregunta ¿Cómo se pagó? : De contado la deja pagada en ese momento, y A crédito la deja en Por pagar con su vencimiento. Bueno saber: un pago solo saca plata y baja lo que se debe. No es un gasto nuevo ni mueve el inventario. Pagos y anulaciones En Finanzas → Pagos ves cada pago del periodo. Si uno quedó mal, toca Anular y escribe el motivo: se registra una anulación y lo que se debía vuelve a quedar pendiente. Nada se borra. Un gasto se puede anular si no tiene pagos (primero anula sus pagos). La deuda de una compra no se anula: viene de la compra confirmada. Cuidado: las compras confirmadas antes de Finanzas no se volvieron deuda solas. Si todavía debes alguna, toca Agregar compras anteriores y márcala."
+    "body": "Por pagar reúne todo lo que el negocio debe: Proveedores: cada compra confirmada crea una deuda con su proveedor, por el total de la factura. Vence en la fecha de la factura más el plazo de pago del proveedor. Gastos: arriendo, servicios y demás. Ver Gastos. Nómina: lo liquidado a cada persona. Ver Nómina. Arriba ves Por pagar , Vencido y Vence en 7 días . Filtra por estado (Por pagar, Vencidas, Pagadas, Anuladas) o por tipo. Pagar Toca Pagar en la obligación. Escribe el Valor (por defecto, todo el saldo; menos es un abono y el resto queda pendiente), la Fecha del pago , Cómo se pagó y, si quieres, la Referencia . Toca Registrar pago . Pagar varias de un mismo beneficiario: marca las casillas de las obligaciones de ese proveedor o persona (al marcar otro beneficiario, la selección empieza de nuevo) y toca Pagar las N . Se registra un pago por cada una, con la misma fecha, método y referencia. Monto por confirmar: un gasto fijo de monto variable (luz, gas) nace con el valor de referencia y la etiqueta Monto por confirmar . Toca Confirmar monto , escribe el valor real de la factura y ya se puede pagar. Ver Gastos. Al confirmar una compra, Quanela pregunta ¿Cómo se pagó? : De contado la deja pagada en ese momento, y A crédito la deja en Por pagar con su vencimiento. Bueno saber: un pago solo saca plata y baja lo que se debe. No es un gasto nuevo ni mueve el inventario. Pagos y anulaciones En Finanzas → Pagos ves cada pago del periodo. Si uno quedó mal, toca Anular y escribe el motivo: se registra una anulación y lo que se debía vuelve a quedar pendiente. Nada se borra. Un gasto se puede anular si no tiene pagos (primero anula sus pagos). La deuda de una compra no se anula: viene de la compra confirmada. Cuidado: las compras confirmadas antes de Finanzas no se volvieron deuda solas. Si todavía debes alguna, toca Agregar compras anteriores y márcala."
   },
   {
     "id": "payroll",
@@ -1355,7 +1409,7 @@ export const KB: KbArticle[] = [
       "Cómo se le paga a cada persona",
       "Liquidar"
     ],
-    "body": "Cómo se le paga a cada persona En Cómo se le paga a cada persona , toca Configurar (o Cambiar ) junto a cada quien: Por hora: el valor de la hora. La nómina usa las horas reales de sus turnos. Salario mensual: el salario del mes. La nómina toma la parte de los días del periodo. Elige Desde cuándo rige: un cambio no altera lo anterior. Liquidar En Liquidar nómina , elige Desde y Hasta (por ejemplo, la quincena) y toca Calcular . Quanela propone, por persona, las horas trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional. Ajusta A pagar si hay extras, auxilios o deducciones, con una nota. Elige cuándo Se paga y toca Liquidar : queda una obligación por persona en Por pagar . Bueno saber: la nómina cuenta en la rentabilidad en su periodo, repartida por días. Pagarla no la vuelve a contar. Cuidado: Quanela no calcula prestaciones sociales ni seguridad social: súmalas en la nota o regístralas como gasto. Una misma persona no se liquida dos veces en el mismo periodo. Los salarios solo los ve quien tiene el permiso Nómina (ADMIN por defecto). El GERENTE ve el total de nómina en la rentabilidad, pero no lo de cada persona."
+    "body": "Cómo se le paga a cada persona En Cómo se le paga a cada persona , toca Configurar (o Cambiar ) junto a cada quien: Por hora: el valor de la hora. La nómina usa las horas reales de sus turnos. Salario mensual: el salario del mes. La nómina toma la parte de los días del periodo. Elige Desde cuándo rige: un cambio no altera lo anterior. Liquidar En Liquidar nómina , elige Desde y Hasta (por ejemplo, la quincena) y toca Calcular . Quanela propone, por persona, las horas trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional. Ajusta A pagar si hay extras, auxilios o deducciones, con una nota. Elige cuándo Se paga y toca Liquidar : queda una obligación por persona en Por pagar . Bueno saber: un turno con entrada pero sin salida no suma horas. La propuesta lo dice debajo del nombre («1 turno sin salida»): corrígelo en Personal antes de liquidar. Ver Turnos del personal. Bueno saber: la nómina cuenta en la rentabilidad en su periodo, repartida por días. Pagarla no la vuelve a contar. Cuidado: Quanela no calcula prestaciones sociales ni seguridad social: súmalas en la nota o regístralas como gasto. Una misma persona no se liquida dos veces en el mismo periodo. Los salarios solo los ve quien tiene el permiso Nómina (ADMIN por defecto). El GERENTE ve el total de nómina en la rentabilidad, pero no lo de cada persona."
   },
   {
     "id": "preparations",
@@ -1584,7 +1638,7 @@ export const KB: KbArticle[] = [
     "section": "inventory",
     "url": "/help/inventory/purchases",
     "title": "Registrar una compra",
-    "summary": "En Abastecimiento → Compras crea un borrador (proveedor, factura y fecha), agrega las líneas y toca Confirmar compra; solo entonces entra el inventario y se actualiza el costo.",
+    "summary": "En Abastecimiento → Compras crea un borrador (la factura puede esperar), agrega las líneas y toca Confirmar compra; solo entonces entra el inventario. Quanela avisa si un precio cambió mucho.",
     "audience": [
       "owner",
       "admin",
@@ -1603,7 +1657,9 @@ export const KB: KbArticle[] = [
       "¿Cómo cargo una factura de proveedor?",
       "¿Cómo sumo stock?",
       "Compré en kilos pero el insumo está en gramos",
-      "¿Cómo registro una caja?"
+      "¿Cómo registro una caja?",
+      "¿Por qué me avisa que el precio subió?",
+      "¿Cómo pongo el IVA de una compra?"
     ],
     "keywords": [
       "kilos",
@@ -1621,20 +1677,27 @@ export const KB: KbArticle[] = [
       "costo",
       "adjunto",
       "factura del proveedor",
-      "cargar factura"
+      "cargar factura",
+      "IVA",
+      "impuesto",
+      "precio subió",
+      "aviso de precio",
+      "número de factura"
     ],
     "steps": [
       "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura.",
-      "Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador .",
-      "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea .",
+      "Elige el Proveedor (o créalo ahí mismo) y la Fecha . El N.º de factura es opcional en el borrador (se pide al confirmar) y el IVA se propone con el habitual del proveedor. Toca Crear borrador .",
+      "En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Si el costo que escribes cambia más de lo normal frente a la última compra o al promedio de 90 días, Quanela lo avisa («Sube 31 % frente a la última compra»). Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea .",
       "Repite con cada producto de la factura. Para quitar una línea, toca Quitar .",
       "Opcional: en Adjuntos , sube la foto o el PDF de la factura.",
-      "Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar ."
+      "Revisa el total y toca Confirmar compra . Si todavía no escribiste el número de factura, se pide ahí. Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar ."
     ],
     "headings": [
+      "Datos de la factura e IVA",
+      "Avisos de precio",
       "Comprar en otra unidad"
     ],
-    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo), escribe el N.º de factura y la Fecha . Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra . Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Comprar en otra unidad Compra en la unidad de la factura: Quanela convierte a la unidad base del insumo. Si compras 2 kg de carne a $40.000 el kilo y el insumo está en gramos, entran 2.000 g a $20 el gramo . Para un empaque ( caja , bolsa o paquete ), la primera vez Quanela pregunta ¿Cuántos trae? («¿Cuántos unidad trae 1 caja?»). Escribe 12 y queda guardado para ese insumo: la próxima vez ya lo sabe. Cuidado: una compra confirmada no se puede deshacer . Si hubo un error, corrígelo con un ajuste . Ver Mermas y ajustes. Bueno saber: una compra sin líneas no se puede confirmar, y una confirmada ya no cambia su proveedor, su factura ni sus valores (las notas sí). Bueno saber: mientras es borrador , la compra no toca el inventario. La lista muestra las 50 más recientes; Cargar más trae las anteriores."
+    "body": "Abre Abastecimiento → Compras y toca Nueva → Manual . Para que Quanela lea la factura por ti, elige Importar desde factura : ver Importar una compra desde una factura. Elige el Proveedor (o créalo ahí mismo) y la Fecha . El N.º de factura es opcional en el borrador (se pide al confirmar) y el IVA se propone con el habitual del proveedor. Toca Crear borrador . En Agregar línea , elige el Insumo , la Cantidad , la Unidad de compra y el Costo unitario . Si ya le compraste antes, toca la sugerencia Último: $… para usar ese precio. Si el costo que escribes cambia más de lo normal frente a la última compra o al promedio de 90 días, Quanela lo avisa («Sube 31 % frente a la última compra»). Debajo ves cómo entra al inventario («Entra al inventario: 2 kg = 2.000 g · $20/g»). Toca Agregar línea . Repite con cada producto de la factura. Para quitar una línea, toca Quitar . Opcional: en Adjuntos , sube la foto o el PDF de la factura. Revisa el total y toca Confirmar compra . Si todavía no escribiste el número de factura, se pide ahí. Elige ¿Cómo se pagó? : De contado (con el método; queda pagada) o A crédito (con su vencimiento, por defecto la fecha de la factura más el plazo del proveedor; queda en Finanzas → Por pagar). Toca Sí, confirmar . Al confirmar, cada línea suma al inventario y el costo promedio de cada insumo se recalcula con el precio de la compra. Datos de la factura e IVA Mientras es borrador, toca Editar datos junto al proveedor para cambiar el N.º de factura , la Fecha o el IVA . Con un IVA en %, el total muestra el subtotal y el IVA, y al confirmar el IVA se calcula sobre el subtotal. El IVA habitual de cada proveedor se configura en su ficha. Avisos de precio En el borrador, cada línea compara su costo por unidad de inventario con la última compra y con el promedio de los últimos 90 días . Si cambia más del porcentaje configurado (10 % por defecto), aparece un aviso en amarillo. Es solo un aviso: tú decides. El porcentaje se cambia en Configuración → IA y voz → Funciones → Control de costos . Ver Control de costos. Comprar en otra unidad Compra en la unidad de la factura: Quanela convierte a la unidad base del insumo. Si compras 2 kg de carne a $40.000 el kilo y el insumo está en gramos, entran 2.000 g a $20 el gramo . Para un empaque ( caja , bolsa o paquete ), la primera vez Quanela pregunta ¿Cuántos trae? («¿Cuántos unidad trae 1 caja?»). Escribe 12 y queda guardado para ese insumo: la próxima vez ya lo sabe. Cuidado: una compra confirmada no se p"
   },
   {
     "id": "quanela-consumer",
@@ -1840,7 +1903,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Tema Neutro. Un tercer tema, en gris cálido: menos brillo que el Claro y sin la oscuridad del Oscuro, pensado para jornadas largas. Se elige en tu menú de usuario → Apariencia , junto a Oscuro, Claro y Según el sistema, y se guarda en tu equipo. Más legibles los tres temas. Los textos secundarios, los avisos de color y los gráficos se leen mejor; las casillas, listas y selectores de hora siguen el tema que elegiste. de octubre de 2026 Platos configurables. Un plato puede tener opciones que el cliente elige: sopa, proteína, bebida, acompañantes. Cada opción es incluida , extra (con su precio) o de cortesía , y descuenta del inventario lo que lleva, en cualquier unidad, incluso otra receta o una preparación. Menú público: el cliente ve el plato con sus opciones y precios, y un resumen con el total antes de agregarlo. Caja, cocina y seguimiento: muestran lo que se eligió. Costos: cada opción y cada plato muestran su costo y su margen, e Insights usa el costo de lo elegido. Ver Platos configurables. Menú público renovado. Las seis plantillas tienen un diseño nuevo, más moderno: Moderna, Elegante, Artesanal, Noche (antes Dark premium), Fresca y Clásica (antes Carta tradicional). Se ven bien aunque tus platos no tengan foto: ya no aparece un recuadro gris. Arriba, una franja dice si estás abierto, el costo del domicilio, si se puede recoger y el pedido mínimo. Botón + para agregar, etiqueta Oferta en los precios especiales y barra de categorías que sigue lo que el cliente está viendo. Tu logo y tus imágenes. En Menú público → Diseño , la sección Imágenes de tu marca te deja subir tu logo , una imagen de cabecera (con cualquier estilo de cabecera y el encuadre que elijas) y una imagen de fondo con un velo para que el menú se lea. Ver Menú público y pedidos online. Preparaciones en litros o kilos. Una aguapanela o un fondo se puede guardar en litros y usar en mililitros en sus recetas y en los platos. de octubre de 2026 Preparaciones y sub-recetas. En Abastecimiento → Preparaciones creas una salsa de la casa, una ensalada base o un fondo, con su receta, lo que rinde y su costo por porción. Preparar lote: los insumos salen del inventario una sola vez y la preparación entra a su costo real, según lo que realmente rindió. En los platos: la agregas como cualquier insumo (30 g o «1 porción»). El plato toma su costo sin copiarlo, y al vender descuenta solo la preparación. Ves en qué platos se usa cada preparación y cada insumo, el historial de lotes y"
+    "body": "de octubre de 2026 IA sin gastos de más. Las sugerencias de IA ya no vuelven a llamar al modelo si los datos no cambiaron, esperan después de un error y Copilot se puede detener de verdad. En Configuración → IA ves Este mes : consultas, costo estimado, llamadas evitadas y un presupuesto mensual opcional que avisa y, al llegar, pausa solo los análisis automáticos. Compras más flexibles. El número de factura puede esperar hasta confirmar, el IVA va en % (con el habitual de cada proveedor) y cada línea avisa si el precio subió o bajó más de lo normal frente a la última compra y al promedio de 90 días. Ver Registrar una compra. Conteo físico. En Stock → Contar inventario cuentas la bodega (toda, una categoría o un proveedor) y las diferencias quedan como un ajuste «Conteo físico». Ver Conteo físico del inventario. Control de costos. Los platos muestran su costo de comida frente a tu objetivo y un precio sugerido ; la reposición sugiere según tu consumo real. Ver Control de costos. Perecederos y Poco movimiento en todos los planes , como reglas; la IA solo los ordena y explica. Cartera que vence. Cada cliente puede tener plazo de pago : sus pedidos vencen solos, el «saldo vencido» se calcula y ves la antigüedad de la cartera . Ver Clientes. Gastos fijos automáticos. Se crean cada día sin abrir Finanzas; los de monto variable (luz, gas) esperan el valor real antes de pagarse, y puedes pagar varias obligaciones de un mismo proveedor de una vez. Turnos sin salida. Se avisan en la campana, no suman horas hasta corregirlos y quien gestiona el personal puede corregir la marcación (queda en la bitácora). Más avisos útiles en la campana e Inicio: cuentas por pagar vencidas y de la semana, compras en borrador olvidadas, facturas leídas sin guardar, subidas de precio, platos fuera de margen y turnos sin salida; cada uno solo para quien tiene el permiso. Y ya no avisa «bajo el mínimo» un insumo con mínimo 0. Tema Neutro. Un tercer tema, en gris cálido: menos brillo que el Claro y sin la oscuridad del Oscuro, pensado para jornadas largas. Se elige en tu menú de usuario → Apariencia , junto a Oscuro, Claro y Según el sistema, y se guarda en tu equipo. Más legibles los tres temas. Los textos secundarios, los avisos de color y los gráficos se leen mejor; las casillas, listas y selectores de hora siguen el tema que elegiste. de octubre de 2026 Platos configurables. Un plato puede tener opciones que el cliente elige: sopa, proteína, bebida, acompañantes. Cada opción es incluida"
   },
   {
     "id": "roles",
@@ -1969,6 +2032,8 @@ export const KB: KbArticle[] = [
       "¿Dónde está el ID de la cuenta para WhatsApp?"
     ],
     "keywords": [
+      "presupuesto de IA",
+      "costo de IA",
       "configuración",
       "ajustes",
       "zona horaria",
@@ -1992,7 +2057,7 @@ export const KB: KbArticle[] = [
     "headings": [
       "Cambiar el nombre o la zona horaria"
     ],
-    "body": "Abre Configuración en el menú de la izquierda (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) , Zona horaria y Tipo de cocina (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
+    "body": "Abre Configuración en el menú de la izquierda (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) , Zona horaria y Tipo de cocina (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado, el costo estimado del mes , las llamadas evitadas, el presupuesto mensual (función Presupuesto de IA ) y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Operación → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
   },
   {
     "id": "setup-account",
@@ -2064,7 +2129,10 @@ export const KB: KbArticle[] = [
       "marcar salida",
       "horas trabajadas",
       "asistencia",
-      "nómina"
+      "nómina",
+      "olvidó marcar",
+      "corregir marcación",
+      "sin salida"
     ],
     "steps": [
       "Abre Personal y toca Nuevo turno (o el + en el día y la persona, en la pestaña Semana ).",
@@ -2074,9 +2142,10 @@ export const KB: KbArticle[] = [
     "headings": [
       "Programar un turno",
       "Las tres vistas",
-      "Marcar entrada y salida"
+      "Marcar entrada y salida",
+      "Corregir una marcación"
     ],
-    "body": "Programar un turno Abre Personal y toca Nuevo turno (o el + en el día y la persona, en la pestaña Semana ). Elige la Persona , el Rol en este turno , el Día , la hora en que Entra y la hora en que Sale (si sale después de medianoche, termina al día siguiente). Opcional: Descanso (minutos) y una Nota . Toca Crear turno . Para cambiarlo, tócalo, ajusta y toca Guardar ; para anularlo, Cancelar turno . Copiar semana anterior repite los turnos de la semana pasada, mismo día y hora; los que se cruzan con un turno existente se omiten. Las tres vistas Pestaña Qué ves --- Hoy Trabajando ahora , Tarde o sin marcar , Llegan más tarde , Terminaron y No marcaron Semana La grilla de la semana por persona, con sus horas. Filtra por rol Horas Por persona: turnos, horas planificadas y trabajadas , la diferencia y los turnos sin marcar Marcar entrada y salida Cada persona abre Mis turnos (en el menú de su avatar) y toca Marcar entrada al llegar y Marcar salida al irse. Se puede marcar desde 2 horas antes del turno; si alguien trabaja sin turno programado, igual puede marcar su entrada."
+    "body": "Programar un turno Abre Personal y toca Nuevo turno (o el + en el día y la persona, en la pestaña Semana ). Elige la Persona , el Rol en este turno , el Día , la hora en que Entra y la hora en que Sale (si sale después de medianoche, termina al día siguiente). Opcional: Descanso (minutos) y una Nota . Toca Crear turno . Para cambiarlo, tócalo, ajusta y toca Guardar ; para anularlo, Cancelar turno . Copiar semana anterior repite los turnos de la semana pasada, mismo día y hora; los que se cruzan con un turno existente se omiten. Las tres vistas Pestaña Qué ves --- Hoy Trabajando ahora , Tarde o sin marcar , Llegan más tarde , Terminaron y No marcaron Semana La grilla de la semana por persona, con sus horas. Filtra por rol Horas Por persona: turnos, horas planificadas y trabajadas , la diferencia , los turnos sin marcar y los que quedaron sin salida Marcar entrada y salida Cada persona abre Mis turnos (en el menú de su avatar) y toca Marcar entrada al llegar y Marcar salida al irse. Se puede marcar desde 2 horas antes del turno; si alguien trabaja sin turno programado, igual puede marcar su entrada. Corregir una marcación Si alguien olvidó marcar la salida, el turno queda sin salida : 2 horas después del fin del turno aparece un aviso en la campana, no suma horas en Horas ni en la Nómina . Quien gestiona el personal abre ese turno en la grilla de turnos, cambia la Entrada o la Salida en Marcación , escribe el Motivo y toca Corregir marcación . El cambio queda en la bitácora con las horas anteriores."
   },
   {
     "id": "stock",
@@ -2126,7 +2195,48 @@ export const KB: KbArticle[] = [
       "Qué comprar",
       "Crear un insumo"
     ],
-    "body": "Ver el stock Abre Abastecimiento . Entras en Stock . A la izquierda está la lista de Insumos . Usa el buscador o los filtros: Todos , Bajo mínimo , cada categoría, Sin categoría e Inactivos . Cada insumo muestra su stock en la unidad base, su costo promedio y una barra: roja bajo el mínimo, ámbar cerca, verde bien. Toca un insumo para ver su ficha: el stock con su mínimo y máximo, el costo promedio , el valor en stock , lo reservado por pedidos confirmados, en qué platos se usa y sus movimientos . Qué comprar Sin ningún insumo elegido, a la derecha está Reponer : los insumos bajo el mínimo o con pocos días de cobertura, agrupados por proveedor, con la cantidad sugerida. Toca Crear compra y se arma un borrador con esas cantidades. Ver Registrar una compra. Crear un insumo Toca Nuevo . Escribe el Código , el Nombre y elige la Unidad base (en ella se cuentan el stock y las recetas). Opcional: Categoría , Proveedor principal , Stock mínimo (dispara la alerta), Stock máximo (meta de reposición) y si es Perecedero (con su vida útil). Toca Crear insumo . Bueno saber: el stock no se escribe a mano : entra con las compras confirmadas, sale con los platos listos y se corrige con mermas y ajustes. Ver Cómo se descuenta el inventario."
+    "body": "Ver el stock Abre Abastecimiento . Entras en Stock . A la izquierda está la lista de Insumos . Usa el buscador o los filtros: Todos , Bajo mínimo , cada categoría, Sin categoría e Inactivos . Cada insumo muestra su stock en la unidad base, su costo promedio y una barra: roja bajo el mínimo, ámbar cerca, verde bien. Toca un insumo para ver su ficha: el stock con su mínimo y máximo, el costo promedio , el valor en stock , lo reservado por pedidos confirmados, en qué platos se usa y sus movimientos . Qué comprar Sin ningún insumo elegido, a la derecha está Reponer : los insumos bajo el mínimo o con pocos días de cobertura, agrupados por proveedor, con la cantidad sugerida. Toca Crear compra y se arma un borrador con esas cantidades, en la unidad y al precio de la última compra. Ver Registrar una compra. La cantidad sugerida cubre el consumo real de los días de reposición de tu cuenta (7 por defecto, en Control de costos ), sin pasar del máximo; un insumo sin consumo usa su mínimo y su máximo. Un insumo con mínimo 0 nunca cuenta como «bajo el mínimo». Debajo están Perecederos en riesgo y Poco movimiento : son reglas y se ven en todos los planes. Si la IA está activa, además ordena y explica cada caso. Para contar la bodega y corregir el inventario de una vez, toca Contar inventario . Ver Conteo físico. Crear un insumo Toca Nuevo . Escribe el Código , el Nombre y elige la Unidad base (en ella se cuentan el stock y las recetas). Opcional: Categoría , Proveedor principal , Stock mínimo (dispara la alerta), Stock máximo (meta de reposición) y si es Perecedero (con su vida útil). Toca Crear insumo . Bueno saber: el stock no se escribe a mano : entra con las compras confirmadas, sale con los platos listos y se corrige con mermas y ajustes. Ver Cómo se descuenta el inventario."
+  },
+  {
+    "id": "stock-count",
+    "section": "inventory",
+    "url": "/help/inventory/stock-count",
+    "title": "Conteo físico del inventario",
+    "summary": "En Abastecimiento → Stock → Contar inventario cuentas lo que hay en la bodega (todo, una categoría o un proveedor), en kg, l o la unidad que uses, y al aplicar cada diferencia queda como un ajuste «Conteo físico».",
+    "audience": [
+      "owner",
+      "admin",
+      "manager",
+      "inventory"
+    ],
+    "permissions": [
+      "inventory.adjust"
+    ],
+    "appPath": "/supply/stock/conteo",
+    "questions": [
+      "¿Cómo hago un inventario físico?",
+      "¿Cómo cuento la bodega?",
+      "El stock no coincide con lo que hay",
+      "¿Cómo corrijo varios insumos a la vez?"
+    ],
+    "keywords": [
+      "conteo",
+      "conteo físico",
+      "inventario físico",
+      "toma física",
+      "contar bodega",
+      "cuadrar inventario",
+      "diferencia de conteo"
+    ],
+    "steps": [
+      "Abre Abastecimiento → Stock y toca Contar inventario .",
+      "Elige qué contar: Todo el inventario , Una categoría o Un proveedor , y toca Empezar conteo . Quanela guarda lo que dice el sistema en ese momento.",
+      "Escribe lo que hay de cada insumo. Puedes contar en kg o l (vienen propuestos) o en cualquier unidad del insumo, incluidas sus cajas. Se guarda al salir del campo y al lado ves la diferencia y lo que vale.",
+      "Usa Por contar , Contados y el buscador para no perderte. Puedes cerrar y volver después: el conteo queda abierto.",
+      "Toca Aplicar ajustes y confirma."
+    ],
+    "headings": [],
+    "body": "Abre Abastecimiento → Stock y toca Contar inventario . Elige qué contar: Todo el inventario , Una categoría o Un proveedor , y toca Empezar conteo . Quanela guarda lo que dice el sistema en ese momento. Escribe lo que hay de cada insumo. Puedes contar en kg o l (vienen propuestos) o en cualquier unidad del insumo, incluidas sus cajas. Se guarda al salir del campo y al lado ves la diferencia y lo que vale. Usa Por contar , Contados y el buscador para no perderte. Puedes cerrar y volver después: el conteo queda abierto. Toca Aplicar ajustes y confirma. Al aplicar, cada insumo contado que no coincide registra un ajuste «Conteo físico» por la diferencia con el stock de ese momento (si se vendió algo mientras contabas, no se cuenta dos veces). Los insumos que no contaste no cambian. Descartar cierra el conteo sin tocar el inventario. Bueno saber: hay un conteo abierto a la vez por cuenta. Los anteriores aparecen en Conteos anteriores , y cada ajuste queda en los movimientos del insumo. Cuidado: aplicar no se puede deshacer. Si te equivocaste, registra otro ajuste. Ver Mermas y ajustes."
   },
   {
     "id": "suppliers",

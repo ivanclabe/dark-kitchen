@@ -18,6 +18,15 @@ order: 1
 
 ## 15 de octubre de 2026
 
+- **IA sin gastos de más.** Las sugerencias de IA ya no vuelven a llamar al modelo si los datos no cambiaron, esperan después de un error y Copilot se puede detener de verdad. En **Configuración → IA** ves **Este mes**: consultas, costo estimado, llamadas evitadas y un **presupuesto mensual** opcional que avisa y, al llegar, pausa solo los análisis automáticos.
+- **Compras más flexibles.** El número de factura puede esperar hasta confirmar, el **IVA** va en % (con el habitual de cada proveedor) y cada línea avisa si el precio subió o bajó más de lo normal frente a la última compra y al promedio de 90 días. Ver [Registrar una compra](help:purchases).
+- **Conteo físico.** En **Stock → Contar inventario** cuentas la bodega (toda, una categoría o un proveedor) y las diferencias quedan como un ajuste «Conteo físico». Ver [Conteo físico del inventario](help:stock-count).
+- **Control de costos.** Los platos muestran su **costo de comida** frente a tu objetivo y un **precio sugerido**; la reposición sugiere según tu consumo real. Ver [Control de costos](help:cost-controls).
+- **Perecederos y Poco movimiento en todos los planes**, como reglas; la IA solo los ordena y explica.
+- **Cartera que vence.** Cada cliente puede tener **plazo de pago**: sus pedidos vencen solos, el «saldo vencido» se calcula y ves la **antigüedad de la cartera**. Ver [Clientes](help:customers).
+- **Gastos fijos automáticos.** Se crean cada día sin abrir Finanzas; los de **monto variable** (luz, gas) esperan el valor real antes de pagarse, y puedes **pagar varias** obligaciones de un mismo proveedor de una vez.
+- **Turnos sin salida.** Se avisan en la campana, no suman horas hasta corregirlos y quien gestiona el personal puede **corregir la marcación** (queda en la bitácora).
+- **Más avisos útiles en la campana e Inicio:** cuentas por pagar vencidas y de la semana, compras en borrador olvidadas, facturas leídas sin guardar, subidas de precio, platos fuera de margen y turnos sin salida; cada uno solo para quien tiene el permiso. Y ya no avisa «bajo el mínimo» un insumo con mínimo 0.
 - **Tema Neutro.** Un tercer tema, en gris cálido: menos brillo que el Claro y sin la oscuridad del Oscuro, pensado para jornadas largas. Se elige en tu menú de usuario → **Apariencia**, junto a Oscuro, Claro y Según el sistema, y se guarda en tu equipo.
 - **Más legibles los tres temas.** Los textos secundarios, los avisos de color y los gráficos se leen mejor; las casillas, listas y selectores de hora siguen el tema que elegiste.
 

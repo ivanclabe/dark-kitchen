@@ -3,11 +3,12 @@ import clsx from 'clsx'
 import { AlertTriangle, CheckCircle2, Loader2, Mic, MicOff } from 'lucide-react'
 import type { ComponentType } from 'react'
 import type { VoiceState as VoicePhase } from '../types'
+import { RobotThinking } from '@/shared/robot/RobotThinking'
 
 const PHASE_CONTENT: Record<VoicePhase, { icon: ComponentType<{ size?: number; className?: string }>; label: string; className: string; iconClassName?: string }> = {
   idle: { icon: Mic, label: 'Dar un comando por voz', className: 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800' },
   listening: { icon: Mic, label: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-400', iconClassName: 'animate-pulse' },
-  processing: { icon: Loader2, label: 'Procesando…', className: 'border-neutral-700 bg-neutral-900 text-neutral-300', iconClassName: 'animate-spin' },
+  processing: { icon: Loader2, label: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-300' },
   success: { icon: CheckCircle2, label: 'Actualizado', className: 'border-emerald-700 bg-emerald-500/10 text-emerald-400' },
   error: { icon: AlertTriangle, label: 'No entendí', className: 'border-red-500/50 bg-red-500/10 text-red-400' },
 }
@@ -31,7 +32,8 @@ export function VoiceMicButton({ phase, onStart, disabled = false }: { phase: Vo
           className,
         )}
       >
-        <Icon size={16} className={iconClassName} />
+        {/* ADR 0060: thinking is the robot, not a spinner. */}
+        {phase === 'processing' && !disabled ? <RobotThinking size={22} showText={false} /> : <Icon size={16} className={iconClassName} />}
       </button>
     </Tooltip>
   )

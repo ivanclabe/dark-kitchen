@@ -121,3 +121,27 @@ export async function listRecentPayments(limit = 8): Promise<RecentPayment[]> {
     customerName: row.dk_orders?.dk_customers?.full_name ?? '—',
   }))
 }
+
+/** ADR 0063: how old the debt is (not due yet or without a term, 1-30, 31-60, more than 60 days past due). */
+export interface ReceivablesAging {
+  current: number
+  d1_30: number
+  d31_60: number
+  d61: number
+  total: number
+  overdueCustomers: number
+}
+
+export async function fetchReceivablesAging(): Promise<ReceivablesAging> {
+  const { data, error } = await supabase.rpc('dk_receivables_aging')
+  if (error) throw error
+  const r = data as unknown as ReceivablesAging
+  return {
+    current: Number(r.current),
+    d1_30: Number(r.d1_30),
+    d31_60: Number(r.d31_60),
+    d61: Number(r.d61),
+    total: Number(r.total),
+    overdueCustomers: Number(r.overdueCustomers),
+  }
+}

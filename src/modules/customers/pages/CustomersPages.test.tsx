@@ -29,7 +29,7 @@ vi.mock('../hooks/useCustomers', () => ({
   useCreateCustomer: () => ({ mutateAsync: vi.fn() }),
   useUpdateCustomer: () => ({ mutateAsync: vi.fn() }),
 }))
-vi.mock('@/modules/cartera/hooks/useReceivables', () => ({ useRecentPayments: () => ({ data: [] }), useCustomerReceivables: () => ({ data: [] }), useRegisterPayment: () => ({}) }))
+vi.mock('@/modules/cartera/hooks/useReceivables', () => ({ useRecentPayments: () => ({ data: [] }), useReceivablesAging: () => ({ data: undefined }), useCustomerReceivables: () => ({ data: [] }), useRegisterPayment: () => ({}) }))
 
 const { CustomersPage } = await import('./CustomersPage')
 

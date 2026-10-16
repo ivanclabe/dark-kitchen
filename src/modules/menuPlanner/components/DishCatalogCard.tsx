@@ -3,6 +3,7 @@ import type { Product } from '@/modules/products/types'
 import { IconButton } from '@/shared/ui/Button'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { formatMoney } from '@/shared/utils/format'
+import { dishMargin } from '@/shared/costs/dishMargin'
 import { useDraggable } from '@dnd-kit/core'
 import clsx from 'clsx'
 import { Check, GripVertical, Pencil, Plus } from 'lucide-react'
@@ -26,6 +27,7 @@ export function DishCatalogCard({
   onEdit,
   canEdit,
   canPlan,
+  costTargetPct = null,
 }: {
   product: Product
   /** The 7 dates of the visible week. */
@@ -41,7 +43,10 @@ export function DishCatalogCard({
   canEdit: boolean
   /** menus.edit: drag it or add it to the calendar. */
   canPlan: boolean
+  /** ADR 0063 (D6): the account food-cost target, when costs can be shown. */
+  costTargetPct?: number | null
 }) {
+  const margin = costTargetPct !== null && product.usesInventory ? dishMargin(product.price, product.estimatedCost, costTargetPct) : null
   const data: MenuPlanDragData = {
     kind: 'catalog',
     productId: product.id,
@@ -83,6 +88,16 @@ export function DishCatalogCard({
             </span>
           ) : (
             !product.activeRecipeVersion && <span className="shrink-0 text-amber-500">· Sin receta</span>
+          )}
+          {margin?.status === 'below_cost' && (
+            <span className="shrink-0 font-medium text-red-400" title="El precio no cubre el costo de la receta">
+              · Bajo costo
+            </span>
+          )}
+          {margin?.status === 'above_target' && (
+            <span className="shrink-0 text-amber-400" title={`Costo de comida sobre el objetivo de ${costTargetPct} %. Precio sugerido: ${formatMoney(margin.suggestedPrice ?? 0)}`}>
+              · Costo {Math.round(margin.foodCostPct ?? 0)} %
+            </span>
           )}
           {product.masterProductId && (
             <span className="shrink-0 text-brasa-400" title="Plato del menú maestro: nombre y receta los define el maestro">

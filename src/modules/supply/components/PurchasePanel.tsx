@@ -62,7 +62,7 @@ export function PurchasePanel({
     return (purchases ?? []).filter((p) => {
       if (filter !== 'TODAS' && p.status !== filter) return false
       if (!q) return true
-      return p.invoiceNumber.toLowerCase().includes(q) || p.supplierName.toLowerCase().includes(q)
+      return (p.invoiceNumber ?? '').toLowerCase().includes(q) || p.supplierName.toLowerCase().includes(q)
     })
   }, [purchases, query, filter])
 
@@ -196,7 +196,7 @@ export function PurchasePanel({
                 <PurchaseStatusBadge status={p.status} />
               </div>
               <p className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">
-                <span className="tabular-nums">#{p.invoiceNumber}</span>
+                <span className="tabular-nums">{p.invoiceNumber ? `#${p.invoiceNumber}` : 'Sin n.º de factura'}</span>
                 <span className="text-neutral-700">·</span>
                 <span>{formatDate(p.invoiceDate)}</span>
                 <span className="ml-auto font-semibold tabular-nums text-neutral-300">{formatMoney(p.total)}</span>

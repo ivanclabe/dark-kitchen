@@ -211,6 +211,12 @@ function LiquidateCard() {
                     <td className="py-2 pr-2">
                       <span className="text-neutral-100">{l.name}</span>
                       <span className="block text-xs text-neutral-500">{l.liquidated ? 'Ya liquidada en este periodo' : payLabel({ payType: l.payType, rate: l.rate })}</span>
+                      {/* ADR 0063: a shift without clock-out counts 0 hours; it is said, not hidden. */}
+                      {l.openShifts > 0 && (
+                        <span className="block text-xs text-amber-400">
+                          {l.openShifts} {l.openShifts === 1 ? 'turno' : 'turnos'} sin salida (no suman horas): corrígelos en Personal → Horas
+                        </span>
+                      )}
                     </td>
                     <td className="py-2 text-right tabular-nums text-neutral-300">{l.hours.toLocaleString('es-CO')}</td>
                     <td className="py-2 text-right tabular-nums text-neutral-300">{l.amount === null ? '—' : formatMoney(l.amount)}</td>

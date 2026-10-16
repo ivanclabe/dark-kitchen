@@ -126,7 +126,12 @@ describe('a line', () => {
   })
 
   it('warns about a price far from the usual one and a total that does not add up', () => {
-    expect(lineWarnings(line({ unitCode: 'kg', unitCost: 40000 }), units, ingredients)).toEqual(['Cuesta 10 veces más que el costo promedio de Tomate'])
+    expect(lineWarnings(line({ unitCode: 'kg', unitCost: 40000 }), units, ingredients)).toEqual(['Cuesta 10 veces más que el costo promedio'])
+    // ADR 0063: against the last purchase, with the account tolerance (0 = off).
+    const withRefs: typeof ingredients = new Map([['tom', { ...ingredients.get('tom')!, lastPerBase: 4, avg90PerBase: 4 }]])
+    expect(lineWarnings(line({ unitCode: 'kg', unitCost: 4800 }), units, withRefs)).toEqual(['Sube 20 % frente a la última compra'])
+    expect(lineWarnings(line({ unitCode: 'kg', unitCost: 4800 }), units, withRefs, 25)).toEqual([])
+    expect(lineWarnings(line({ unitCode: 'kg', unitCost: 40000 }), units, withRefs, 0)).toEqual([])
     expect(lineWarnings(line({ unitCode: 'kg', unitCost: 4000, quantity: 2, invoiceLineTotal: 9000 }), units, ingredients)).toEqual([
       'Cantidad × costo no da el total de la línea en la factura',
     ])

@@ -27,6 +27,10 @@ export const FEATURE_KEYS = [
   'voice_commands',
   'voice_speech',
   'voice_wake_word',
+  // ADR 0063: the account's monthly AI budget.
+  'ai_budget',
+  // ADR 0063: cost rules (target food cost, price change tolerance, reorder days).
+  'cost_controls',
 ] as const
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number]

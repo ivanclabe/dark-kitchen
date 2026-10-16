@@ -17,6 +17,8 @@ import {
   listRecurring,
   listTeamPay,
   payObligation,
+  payObligationsBatch,
+  confirmObligationAmount,
   saveRecurring,
   setMemberPay,
   setVatDeductible,
@@ -58,6 +60,9 @@ function useFinanceMutation<TArgs, TResult>(fn: (args: TArgs) => Promise<TResult
 }
 
 export const usePayObligation = () => useFinanceMutation(payObligation)
+// ADR 0063: pay several of one payee at once, and confirm a variable amount.
+export const usePayObligationsBatch = () => useFinanceMutation(payObligationsBatch)
+export const useConfirmObligationAmount = () => useFinanceMutation(({ id, amount }: { id: string; amount: number }) => confirmObligationAmount(id, amount))
 export const useVoidPayment = () => useFinanceMutation(({ id, reason }: { id: string; reason: string }) => voidPayment(id, reason))
 export const useVoidObligation = () => useFinanceMutation(({ id, reason }: { id: string; reason: string }) => voidObligation(id, reason))
 export const useCreateExpense = () => useFinanceMutation(createExpense)

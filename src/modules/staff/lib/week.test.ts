@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatHours, formatShiftRange, groupByPersonDay, isLate, plannedHours, shiftRange, startOfWeek, workedHours } from './week'
+import { formatHours, formatShiftRange, groupByPersonDay, isLate, isOpenPastEnd, plannedHours, shiftRange, startOfWeek, workedHours } from './week'
 import type { Shift } from '../types'
 
 const shift = (over: Partial<Shift>): Shift => ({
@@ -52,6 +52,15 @@ describe('hours', () => {
     expect(workedHours(shift({}))).toBeNull()
     const s = shift({ clockInAt: new Date('2031-03-03T07:10:00').toISOString(), clockOutAt: new Date('2031-03-03T15:10:00').toISOString() })
     expect(workedHours(s)).toBe(7.5)
+  })
+
+  it('a shift left open 2 h past its end counts 0 and is flagged (ADR 0063)', () => {
+    const open = shift({ clockInAt: new Date('2031-03-03T07:00:00').toISOString(), clockOutAt: null })
+    const end = new Date(open.endsAt).getTime()
+    expect(isOpenPastEnd(open, end + 60 * 60_000)).toBe(false)
+    expect(workedHours(open, end + 60 * 60_000)).toBeGreaterThan(0)
+    expect(isOpenPastEnd(open, end + 3 * 60 * 60_000)).toBe(true)
+    expect(workedHours(open, end + 3 * 60 * 60_000)).toBe(0)
   })
 
   it('late after 10 minutes without clocking in', () => {

@@ -7,7 +7,7 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney, todayStr } from '@/shared/utils/format'
 import { useState } from 'react'
 import { PRESET_LABEL, presetRange, type DateRange, type PeriodPreset } from '@/modules/insights/lib/periods'
-import { usePayObligation } from '../hooks'
+import { useConfirmObligationAmount, usePayObligation, usePayObligationsBatch } from '../hooks'
 import { PAYMENT_METHODS, type Obligation, type PaymentMethod } from '../types'
 
 /** The period of a tab: the presets of Insights, or custom dates. */
@@ -153,6 +153,127 @@ export function ReasonModal({
     >
       <FormField label="Motivo" required>
         {(a11y) => <Input {...a11y} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder="Ej. se registró dos veces" />}
+      </FormField>
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-red-400">
+          {error}
+        </p>
+      )}
+    </Modal>
+  )
+}
+
+/** ADR 0063: pay the whole balance of several obligations of one payee (one payment each, same date and method). */
+export function BatchPayModal({ obligations, onClose, onPaid }: { obligations: Obligation[]; onClose: () => void; onPaid: () => void }) {
+  const pay = usePayObligationsBatch()
+  const { show } = useToast()
+  const [paidOn, setPaidOn] = useState(todayStr())
+  const [method, setMethod] = useState<PaymentMethod>('Transferencia')
+  const [reference, setReference] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const total = obligations.reduce((sum, o) => sum + o.balance, 0)
+  const payee = obligations[0]?.payee ?? obligations[0]?.description ?? ''
+
+  async function submit() {
+    setError(null)
+    try {
+      const result = await pay.mutateAsync({ obligationIds: obligations.map((o) => o.id), paidOn, method, reference: reference.trim() || null })
+      show(`${result.paid} pago(s) registrados a ${payee} por ${formatMoney(result.amount)}.`)
+      onPaid()
+      onClose()
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo registrar el pago'))
+    }
+  }
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Pagar en lote"
+      description={`${payee} · ${obligations.length} obligaciones · ${formatMoney(total)}`}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={pay.isPending}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={() => void submit()} loading={pay.isPending}>
+            Pagar {formatMoney(total)}
+          </Button>
+        </>
+      }
+    >
+      <ul className="mb-3 max-h-40 space-y-1 overflow-y-auto text-xs text-neutral-400">
+        {obligations.map((o) => (
+          <li key={o.id} className="flex justify-between gap-3">
+            <span className="truncate">{o.description}</span>
+            <span className="shrink-0 tabular-nums text-neutral-200">{formatMoney(o.balance)}</span>
+          </li>
+        ))}
+      </ul>
+      <FormGrid>
+        <FormField label="Fecha del pago" required>
+          {(a11y) => <Input {...a11y} type="date" value={paidOn} onChange={(e) => setPaidOn(e.target.value)} />}
+        </FormField>
+        <FormField label="Cómo se pagó" required>
+          {(a11y) => (
+            <Select {...a11y} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>
+              {PAYMENT_METHODS.map((m) => (
+                <option key={m}>{m}</option>
+              ))}
+            </Select>
+          )}
+        </FormField>
+        <FormField label="Referencia" hint="La misma para todos los pagos (transferencia, recibo…).">
+          {(a11y) => <Input {...a11y} value={reference} onChange={(e) => setReference(e.target.value)} maxLength={80} />}
+        </FormField>
+      </FormGrid>
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-red-400">
+          {error}
+        </p>
+      )}
+    </Modal>
+  )
+}
+
+/** ADR 0063: the real amount of a «monto variable» month (the reference is a starting point). */
+export function ConfirmAmountModal({ obligation, onClose }: { obligation: Obligation; onClose: () => void }) {
+  const confirm = useConfirmObligationAmount()
+  const { show } = useToast()
+  const [amount, setAmount] = useState<number | null>(obligation.amount)
+  const [error, setError] = useState<string | null>(null)
+
+  async function submit() {
+    setError(null)
+    try {
+      await confirm.mutateAsync({ id: obligation.id, amount: amount! })
+      show(`Monto confirmado: ${formatMoney(amount!)}. Ya se puede pagar.`)
+      onClose()
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo confirmar el monto'))
+    }
+  }
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Confirmar monto"
+      description={`${obligation.payee ?? obligation.description} · ${obligation.description}`}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={confirm.isPending}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={() => void submit()} loading={confirm.isPending} disabled={!amount || amount <= 0}>
+            Confirmar
+          </Button>
+        </>
+      }
+    >
+      <FormField label="Valor real de la factura" required hint={`Referencia: ${formatMoney(obligation.amount)}. Cuenta en la rentabilidad con el valor real.`}>
+        {(a11y) => <CurrencyInput {...a11y} value={amount} onValueChange={setAmount} autoFocus />}
       </FormField>
       {error && (
         <p role="alert" className="mt-2 text-sm text-red-400">

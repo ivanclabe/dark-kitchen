@@ -63,7 +63,7 @@ export function ExpensesTab() {
               <li key={r.id} className="flex flex-wrap items-center gap-3 py-2">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-neutral-100">
-                    {r.description} {!r.active && <Badge tone="neutral">Pausado</Badge>}
+                    {r.description} {!r.active && <Badge tone="neutral">Pausado</Badge>} {r.variableAmount && <Badge tone="info">Monto variable</Badge>}
                   </p>
                   <p className="text-xs text-neutral-500">
                     {catName(r.categoryId)} · cada mes, vence el día {r.dayOfMonth}
@@ -300,13 +300,14 @@ function RecurringDrawer({ recurring, onClose }: { recurring: RecurringObligatio
   const [amount, setAmount] = useState<number | null>(recurring?.amount ?? null)
   const [dayOfMonth, setDayOfMonth] = useState<number | null>(recurring?.dayOfMonth ?? 5)
   const [active, setActive] = useState(recurring?.active ?? true)
+  const [variableAmount, setVariableAmount] = useState(recurring?.variableAmount ?? false)
   const [error, setError] = useState<string | null>(null)
   const invalid = !categoryId || description.trim().length < 2 || !amount || amount <= 0 || !dayOfMonth || dayOfMonth < 1 || dayOfMonth > 28
 
   async function submit() {
     setError(null)
     try {
-      await save.mutateAsync({ id: recurring?.id ?? null, categoryId, description: description.trim(), payeeName: payeeName.trim() || null, amount: amount!, dayOfMonth: dayOfMonth!, active })
+      await save.mutateAsync({ id: recurring?.id ?? null, categoryId, description: description.trim(), payeeName: payeeName.trim() || null, amount: amount!, dayOfMonth: dayOfMonth!, active, variableAmount })
       show(recurring ? 'Gasto fijo actualizado.' : 'Gasto fijo creado: el de este mes ya está en Por pagar.')
       onClose()
     } catch (err) {
@@ -327,13 +328,21 @@ function RecurringDrawer({ recurring, onClose }: { recurring: RecurringObligatio
           {(a11y) => <Input {...a11y} value={payeeName} onChange={(e) => setPayeeName(e.target.value)} maxLength={120} />}
         </FormField>
         <FormGrid>
-          <FormField label="Valor mensual" required>
+          <FormField label={variableAmount ? 'Valor de referencia' : 'Valor mensual'} required>
             {(a11y) => <CurrencyInput {...a11y} value={amount} onValueChange={setAmount} />}
           </FormField>
           <FormField label="Vence el día" required hint="Del 1 al 28">
             {(a11y) => <NumberInput {...a11y} value={dayOfMonth} onValueChange={setDayOfMonth} min={1} max={28} />}
           </FormField>
         </FormGrid>
+        {/* ADR 0063: power or gas change every month; the month waits for the real amount before it can be paid. */}
+        <label className="flex items-start justify-between gap-3 rounded-xl border border-neutral-800/60 px-3 py-2.5 text-sm text-neutral-300">
+          <span>
+            Monto variable
+            <span className="block text-xs text-neutral-500">Cada mes nace con el valor de referencia y se confirma el real antes de pagarlo.</span>
+          </span>
+          <Switch checked={variableAmount} onChange={setVariableAmount} label="Monto variable" />
+        </label>
         {recurring && (
           <label className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 px-3 py-2.5 text-sm text-neutral-300">
             Activo

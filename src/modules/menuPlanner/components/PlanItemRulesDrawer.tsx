@@ -9,6 +9,9 @@ import { getErrorMessage } from '@/shared/utils/errors'
 import { formatMoney } from '@/shared/utils/format'
 import { CalendarRange, Power, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useProducts } from '@/modules/products/hooks/useProducts'
+import { useShowDishCosts } from '@/shared/costs/costSettings'
+import { dishMargin } from '@/shared/costs/dishMargin'
 import { useAddMenuPlanItemForDates, useRemoveMenuPlanItem, useUpdateMenuPlanItemRules } from '../hooks/useMenuPlan'
 import { addDays, formatDayHeader } from '../lib/week'
 import type { MenuPlanItem } from '../types'
@@ -34,6 +37,11 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
   const [unitLimit, setUnitLimit] = useState<number | null>(item?.unitLimit ?? null)
   const [whileSuppliesLast, setWhileSuppliesLast] = useState(item?.whileSuppliesLast ?? false)
   const [rangeUntil, setRangeUntil] = useState('')
+  // ADR 0063 (D6): a promotional price under the recipe cost is warned (never blocked).
+  const dishCosts = useShowDishCosts()
+  const { data: products } = useProducts(dishCosts.show)
+  const recipeCost = products?.find((p) => p.id === item?.productId)?.estimatedCost ?? 0
+  const promoMargin = dishCosts.show && specialPrice !== null && specialPrice > 0 ? dishMargin(specialPrice, recipeCost, dishCosts.targetPct) : null
 
   if (!item) return null
 
@@ -108,6 +116,16 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
         <FormField label="Precio promocional" hint={`Vacío = precio normal (${formatMoney(item.productPrice)})`} info="Solo este día, el plato se vende a este precio en los pedidos nuevos.">
           {(a11y) => <CurrencyInput {...a11y} value={specialPrice} onValueChange={setSpecialPrice} placeholder={formatLocaleNumber(item.productPrice)} />}
         </FormField>
+        {promoMargin?.status === 'below_cost' && (
+          <p role="status" className="-mt-2 text-xs text-red-400">
+            Con este precio el plato se vende bajo su costo de receta ({formatMoney(recipeCost)}).
+          </p>
+        )}
+        {promoMargin?.status === 'above_target' && (
+          <p role="status" className="-mt-2 text-xs text-amber-400">
+            Con este precio el costo de comida sube a {promoMargin.foodCostPct?.toLocaleString('es-CO')} % (objetivo {dishCosts.targetPct} %).
+          </p>
+        )}
         <FormField label="Límite de unidades" hint="Vacío = sin límite" info="Cuántas unidades se pueden vender este día.">
           {(a11y) => <NumberInput {...a11y} value={unitLimit} onValueChange={setUnitLimit} min={1} unit="unid." placeholder="Ej. 20" />}
         </FormField>

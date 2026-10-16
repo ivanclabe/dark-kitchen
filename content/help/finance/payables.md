@@ -13,9 +13,9 @@ questions:
   - ¿Puedo pagar una factura por partes?
   - ¿Cómo anulo un pago mal registrado?
   - ¿Qué compras a crédito tengo?
-keywords: [por pagar, cuentas por pagar, deudas, obligaciones, pagos, abono, crédito, vencido, proveedor, anular pago]
+keywords: [por pagar, cuentas por pagar, deudas, obligaciones, pagos, abono, crédito, vencido, proveedor, anular pago, pago en lote, pagar varias, monto variable, confirmar monto]
 related: [profitability, expenses, purchases, suppliers]
-updated: 2026-10-11
+updated: 2026-10-15
 order: 2
 ---
 
@@ -32,6 +32,10 @@ Arriba ves **Por pagar**, **Vencido** y **Vence en 7 días**. Filtra por estado 
 1. Toca **Pagar** en la obligación.
 2. Escribe el **Valor** (por defecto, todo el saldo; menos es un **abono** y el resto queda pendiente), la **Fecha del pago**, **Cómo se pagó** y, si quieres, la **Referencia**.
 3. Toca **Registrar pago**.
+
+**Pagar varias de un mismo beneficiario:** marca las casillas de las obligaciones de ese proveedor o persona (al marcar otro beneficiario, la selección empieza de nuevo) y toca **Pagar las N**. Se registra un pago por cada una, con la misma fecha, método y referencia.
+
+**Monto por confirmar:** un gasto fijo de **monto variable** (luz, gas) nace con el valor de referencia y la etiqueta **Monto por confirmar**. Toca **Confirmar monto**, escribe el valor real de la factura y ya se puede pagar. Ver [Gastos](help:expenses).
 
 Al confirmar una compra, Quanela pregunta **¿Cómo se pagó?**: **De contado** la deja pagada en ese momento, y **A crédito** la deja en Por pagar con su vencimiento.
 

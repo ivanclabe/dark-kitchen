@@ -177,3 +177,33 @@ export async function fetchAccountAiUsage(days = 30): Promise<AccountAiUsage> {
   if (error) throw error
   return data as unknown as AccountAiUsage
 }
+
+// ---------------------------------------------------------------------------
+// ADR 0063: the month's AI use, its estimated cost, the budget and every limit
+// ---------------------------------------------------------------------------
+export interface AiBudgetStatus {
+  enabled: boolean
+  monthStart: string
+  runs: number
+  estimatedUsd: number
+  /** false when some run used a model without prices: the cost is incomplete. */
+  priced: boolean
+  monthlyRuns: number | null
+  monthlyUsd: number | null
+  alertPct: number
+  pct: number
+  alert: boolean
+  exceeded: boolean
+}
+
+export interface AccountAiCost {
+  month: AiBudgetStatus
+  byFeature: { key: string; label: string; runs: number; inputTokens: number; outputTokens: number; estimatedUsd: number | null; avoided: number }[]
+  limits: Record<'analyses' | 'copilot' | 'whatsapp', { perDay: number; used24h: number }>
+}
+
+export async function fetchAccountAiCost(): Promise<AccountAiCost> {
+  const { data, error } = await supabase.rpc('dk_account_ai_cost')
+  if (error) throw error
+  return data as unknown as AccountAiCost
+}

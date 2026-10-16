@@ -116,7 +116,7 @@ export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplie
                   className="-mx-2 flex w-[calc(100%+1rem)] items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-800/50"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-neutral-100">Factura {p.invoiceNumber}</p>
+                    <p className="truncate text-sm font-medium text-neutral-100">{p.invoiceNumber ? `Factura ${p.invoiceNumber}` : 'Compra sin n.º de factura'}</p>
                     <p className="text-xs text-neutral-500">{formatDate(p.invoiceDate)}</p>
                   </div>
                   <span className="flex shrink-0 items-center gap-2">

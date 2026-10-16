@@ -20,6 +20,8 @@ import { InvoiceImportError, matchInvoice } from '../api/invoiceImport'
 import { useIngredients } from '../hooks/useIngredients'
 import { useDiscardImport, useIngredientPurchaseUnits, useSavePurchaseFromImport } from '../hooks/useInvoiceImport'
 import { useSuppliers } from '../hooks/useSuppliers'
+import { usePriceReferences } from '../hooks/usePurchases'
+import { useCostSettings } from '@/shared/costs/costSettings'
 import { AUTO_PICK_SCORE, draftProblems, emptyLine, initialDraft, lineProblems, reconcile, toPayload, type IngredientUnitInfoById } from '../lib/invoiceReview'
 import type { InvoiceImport, InvoiceMatch, ReviewDraft, ReviewLine, SupplierChoice } from '../types/invoiceImport'
 import { InvoicePreview } from './InvoicePreview'
@@ -50,6 +52,7 @@ export function InvoiceReview({
   const { data: suppliers = [] } = useSuppliers()
   const { data: purchaseUnits = [] } = useIngredientPurchaseUnits()
   const save = useSavePurchaseFromImport()
+  const cost = useCostSettings()
   const discard = useDiscardImport()
 
   const [match, setMatch] = useState(initialMatch)
@@ -73,6 +76,9 @@ export function InvoiceReview({
   const [discardOpen, setDiscardOpen] = useState(false)
   const [error, setError] = useState<{ message: string; purchaseId?: string } | null>(null)
 
+  // ADR 0063 (D4): last price and 90-day average of the ingredients chosen in the lines (one call).
+  const chosenIds = draft.lines.flatMap((l) => (l.ingredient?.kind === 'existing' ? [l.ingredient.id] : []))
+  const { data: references } = usePriceReferences(chosenIds)
   const ingredients: IngredientUnitInfoById = useMemo(() => {
     const map: IngredientUnitInfoById = new Map()
     for (const i of allIngredients) {
@@ -84,10 +90,12 @@ export function InvoiceReview({
         avgCost: i.avgCost,
         name: i.name,
         purchaseUnits: purchaseUnits.filter((p) => p.ingredientId === i.id).map((p) => ({ unitCode: p.unitCode, factor: p.factor })),
+        lastPerBase: references?.[i.id]?.last?.perBase ?? null,
+        avg90PerBase: references?.[i.id]?.avg90PerBase ?? null,
       })
     }
     return map
-  }, [allIngredients, units, purchaseUnits])
+  }, [allIngredients, units, purchaseUnits, references])
 
   const ingredientOptions = useMemo(
     () => allIngredients.filter((i) => i.active && !i.isPreparation).map((i) => ({ value: i.id, label: i.name, sublabel: `${i.code} · ${i.baseUnitCode}` })),
@@ -286,6 +294,7 @@ export function InvoiceReview({
                   canCreateIngredient={can('inventory.create')}
                   onChange={(patch) => setLine(l.key, patch)}
                   onRemove={l.added ? () => removeLine(l.key) : undefined}
+                  priceTolerancePct={cost.enabled ? cost.priceChangePct : 0}
                 />
               ))}
             </ul>

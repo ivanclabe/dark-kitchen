@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { listPaymentsByCustomer, listReceivables, listReceivablesByCustomer, listRecentPayments, registerPayment, voidPayment } from '../api/receivables'
+import { fetchReceivablesAging, listPaymentsByCustomer, listReceivables, listReceivablesByCustomer, listRecentPayments, registerPayment, voidPayment } from '../api/receivables'
 import type { RegisterPaymentInput } from '../types'
 
 const RECEIVABLES_KEY = ['receivables'] as const
@@ -7,6 +7,11 @@ const PAYMENTS_KEY = ['payments'] as const
 
 export function useReceivables(enabled = true) {
   return useQuery({ queryKey: RECEIVABLES_KEY, queryFn: listReceivables, enabled })
+}
+
+/** ADR 0063: the age of the debt; under RECEIVABLES_KEY so a payment refreshes it. */
+export function useReceivablesAging(enabled = true) {
+  return useQuery({ queryKey: [...RECEIVABLES_KEY, 'aging'], queryFn: fetchReceivablesAging, enabled })
 }
 
 /** Under RECEIVABLES_KEY: a registered payment refreshes it too. */

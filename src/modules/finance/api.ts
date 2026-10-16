@@ -44,6 +44,7 @@ interface BalanceRow {
   notes: string | null
   void_reason: string | null
   created_at: string
+  amount_pending: boolean | null
 }
 
 function mapObligation(r: BalanceRow): Obligation {
@@ -70,11 +71,12 @@ function mapObligation(r: BalanceRow): Obligation {
     notes: r.notes,
     voidReason: r.void_reason,
     createdAt: r.created_at,
+    amountPending: Boolean(r.amount_pending),
   }
 }
 
 const BALANCE_SELECT =
-  'id, kind, category_id, category_name, purchase_id, invoice_number, supplier_id, member_user_id, payee, description, amount, paid, balance, status, accrual_date, period_start, period_end, due_date, recurring_id, notes, void_reason, created_at'
+  'id, kind, category_id, category_name, purchase_id, invoice_number, supplier_id, member_user_id, payee, description, amount, paid, balance, status, accrual_date, period_start, period_end, due_date, recurring_id, notes, void_reason, created_at, amount_pending'
 
 /** Obligations, the next ones to fall due first; `open` = only those with something to pay. */
 export async function listObligations({ kind, open, limit = 200 }: { kind?: ObligationKind; open?: boolean; limit?: number } = {}): Promise<Obligation[]> {
@@ -159,6 +161,25 @@ export async function payObligation(input: { obligationId: string; amount: numbe
   if (error) throw error
 }
 
+/** ADR 0063: the real amount of a «monto variable» month, before paying it. */
+export async function confirmObligationAmount(obligationId: string, amount: number): Promise<void> {
+  const { error } = await supabase.rpc('dk_finance_confirm_amount', { p_obligation: obligationId, p_amount: amount })
+  if (error) throw error
+}
+
+/** ADR 0063: the whole balance of several obligations of one payee, in one payment each. */
+export async function payObligationsBatch(input: { obligationIds: string[]; paidOn: string; method: PaymentMethod; reference?: string | null }): Promise<{ paid: number; amount: number }> {
+  const { data, error } = await supabase.rpc('dk_finance_pay_batch', {
+    p_obligations: input.obligationIds,
+    p_paid_on: input.paidOn,
+    p_method: input.method,
+    ...(input.reference ? { p_reference: input.reference } : {}),
+  })
+  if (error) throw error
+  const r = data as unknown as { paid: number; amount: number }
+  return { paid: Number(r.paid), amount: Number(r.amount) }
+}
+
 export async function voidPayment(paymentId: string, reason: string): Promise<void> {
   const { error } = await supabase.rpc('dk_finance_void_payment', { p_payment: paymentId, p_reason: reason })
   if (error) throw error
@@ -190,7 +211,7 @@ export async function createCategory(name: string): Promise<ExpenseCategory> {
 export async function listRecurring(): Promise<RecurringObligation[]> {
   const { data, error } = await supabase
     .from('dk_recurring_obligations')
-    .select('id, category_id, supplier_id, payee_name, description, amount, day_of_month, starts_on, active')
+    .select('id, category_id, supplier_id, payee_name, description, amount, day_of_month, starts_on, active, variable_amount')
     .order('active', { ascending: false })
     .order('description')
   if (error) throw error
@@ -204,6 +225,7 @@ export async function listRecurring(): Promise<RecurringObligation[]> {
     dayOfMonth: r.day_of_month,
     startsOn: r.starts_on,
     active: r.active,
+    variableAmount: Boolean(r.variable_amount),
   }))
 }
 
@@ -245,6 +267,7 @@ export async function getPayrollProposal(from: string, to: string): Promise<Payr
     rate: l.rate === null ? null : Number(l.rate),
     hours: Number(l.hours),
     amount: l.amount === null ? null : Number(l.amount),
+    openShifts: Number(l.openShifts ?? 0),
   }))
 }
 

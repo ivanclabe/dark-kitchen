@@ -44,9 +44,20 @@ export function plannedHours(shift: Pick<Shift, 'startsAt' | 'endsAt' | 'breakMi
   return Math.max(0, (new Date(shift.endsAt).getTime() - new Date(shift.startsAt).getTime()) / HOUR - shift.breakMinutes / 60)
 }
 
-/** Worked hours: from clock in to clock out (or `now` if still open), minus the break. null = never clocked in. */
-export function workedHours(shift: Pick<Shift, 'clockInAt' | 'clockOutAt' | 'breakMinutes'>, now = Date.now()): number | null {
+/** ADR 0063: the same rule as the database — clocked in, never out, and 2 h past the planned end. */
+export const OPEN_SHIFT_GRACE_MS = 2 * HOUR
+
+export function isOpenPastEnd(shift: Pick<Shift, 'clockInAt' | 'clockOutAt' | 'endsAt'>, now = Date.now()): boolean {
+  return Boolean(shift.clockInAt && !shift.clockOutAt && new Date(shift.endsAt).getTime() < now - OPEN_SHIFT_GRACE_MS)
+}
+
+/**
+ * Worked hours: from clock in to clock out (or `now` if still open), minus the break. null = never clocked in.
+ * A shift left open past its end counts 0 (as in payroll) until a manager fixes the clock-out (ADR 0063).
+ */
+export function workedHours(shift: Pick<Shift, 'clockInAt' | 'clockOutAt' | 'breakMinutes'> & Partial<Pick<Shift, 'endsAt'>>, now = Date.now()): number | null {
   if (!shift.clockInAt) return null
+  if (shift.endsAt && isOpenPastEnd({ clockInAt: shift.clockInAt, clockOutAt: shift.clockOutAt, endsAt: shift.endsAt }, now)) return 0
   const end = shift.clockOutAt ? new Date(shift.clockOutAt).getTime() : now
   return Math.max(0, (end - new Date(shift.clockInAt).getTime()) / HOUR - shift.breakMinutes / 60)
 }

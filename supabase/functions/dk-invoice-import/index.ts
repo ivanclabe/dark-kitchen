@@ -73,9 +73,9 @@ async function askModel(apiKey: string, model: string, mimeType: string, base64:
   if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = await res.json();
   const block = (data.content ?? []).find((c: { type: string; name?: string }) => c.type === "tool_use" && c.name === INVOICE_TOOL.name);
-  if (!block) throw new Error("El modelo no devolvió la factura");
+  // ADR 0063: an answer without the invoice still cost tokens — returned so the run records them.
   return {
-    raw: block.input as unknown,
+    raw: (block?.input ?? null) as unknown,
     inputTokens: typeof data.usage?.input_tokens === "number" ? data.usage.input_tokens : null,
     outputTokens: typeof data.usage?.output_tokens === "number" ? data.usage.output_tokens : null,
   };
@@ -103,23 +103,38 @@ Deno.serve(async (req: Request) => {
 
   const body = (await req.json().catch(() => ({}))) as ReadBody;
 
-  // 1. The import: a new one for an uploaded file, or an existing one to read again.
+  // 1. The AI quota FIRST (ADR 0063): a refused read leaves no import stuck in «Leyendo».
+  const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_reserve", { p_feature_key: FEATURE, p_input: { importId: body.importId ?? null, fileName: body.fileName ?? null } });
+  if (quotaError) return json({ error: "QUOTA", message: quotaError.message }, 403);
+  if (!quota?.allowed || !quota.runId) {
+    const message = quota?.reason === "daily"
+      ? "Llegaste al límite de lecturas con IA de hoy. Puedes crear la compra a mano."
+      : quota?.reason === "interval"
+        ? `Espera ${quota.retryAfterSeconds ?? 5} segundos para leer otra factura.`
+        : "La lectura de facturas con IA no está disponible en tu plan o para tu rol.";
+    return json({ error: "NOT_ALLOWED", reason: quota?.reason ?? "feature", retryAfterSeconds: quota?.retryAfterSeconds ?? null, message, importId: body.importId ?? null }, 429);
+  }
+  const runId = quota.runId as string;
+  // Nothing was read (a duplicate, a bad request): the reserved run closes without tokens, so it is not billed.
+  const release = () => db.rpc("dk_ai_run_finish", { p_run_id: runId, p_status: "empty" });
+
+  // 2. The import: a new one for an uploaded file, or an existing one to read again.
   let importId = body.importId ?? null;
   let filePath: string;
   let mimeType: string;
   if (importId) {
     const { data: row, error } = await db.from("dk_invoice_imports").select("id, status, file_path, mime_type").eq("id", importId).maybeSingle();
-    if (error) return json({ error: error.message }, 403);
-    if (!row) return json({ error: "NOT_FOUND", message: "No encontramos esa factura." }, 404);
-    if (!["LEYENDO", "ERROR", "LISTA"].includes(row.status)) return json({ error: "USED", message: "Esta factura ya se usó o se descartó." }, 409);
+    if (error) return (await release(), json({ error: error.message }, 403));
+    if (!row) return (await release(), json({ error: "NOT_FOUND", message: "No encontramos esa factura." }, 404));
+    if (!["LEYENDO", "ERROR", "LISTA"].includes(row.status)) return (await release(), json({ error: "USED", message: "Esta factura ya se usó o se descartó." }, 409));
     filePath = row.file_path;
     mimeType = row.mime_type;
   } else {
-    if (!body.filePath || !body.mimeType) return json({ error: "BAD_REQUEST", message: "Falta el archivo." }, 400);
+    if (!body.filePath || !body.mimeType) return (await release(), json({ error: "BAD_REQUEST", message: "Falta el archivo." }, 400));
     if (!(MIME_TYPES as readonly string[]).includes(body.mimeType)) {
-      return json({ error: "BAD_FILE", message: "Sube una foto (JPG, PNG o WebP) o un PDF." }, 400);
+      return (await release(), json({ error: "BAD_FILE", message: "Sube una foto (JPG, PNG o WebP) o un PDF." }, 400));
     }
-    if (body.size && body.size > MAX_FILE_BYTES) return json({ error: "BAD_FILE", message: "El archivo pesa más de 10 MB." }, 400);
+    if (body.size && body.size > MAX_FILE_BYTES) return (await release(), json({ error: "BAD_FILE", message: "El archivo pesa más de 10 MB." }, 400));
     const { data: started, error } = await db.rpc("dk_invoice_import_start", {
       p_file_path: body.filePath,
       p_file_name: body.fileName ?? "factura",
@@ -128,31 +143,23 @@ Deno.serve(async (req: Request) => {
       p_sha256: body.sha256 ?? null,
       p_force: Boolean(body.force),
     });
-    if (error) return json({ error: "START", message: error.message }, 403);
-    if (started?.duplicate) return json({ duplicate: started.duplicate });
+    if (error) return (await release(), json({ error: "START", message: error.message }, 403));
+    if (started?.duplicate) return (await release(), json({ duplicate: started.duplicate }));
     importId = started.importId as string;
     filePath = body.filePath;
     mimeType = body.mimeType;
   }
 
-  // 2. The AI quota (and the model of this feature in the platform catalog).
-  const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_reserve", { p_feature_key: FEATURE, p_input: { importId } });
-  if (quotaError) return json({ error: "QUOTA", message: quotaError.message }, 403);
-  if (!quota?.allowed || !quota.runId) {
-    const message = quota?.reason === "daily"
-      ? "Llegaste al límite de lecturas con IA de hoy. Puedes crear la compra a mano."
-      : quota?.reason === "interval"
-        ? `Espera ${quota.retryAfterSeconds ?? 5} segundos para leer otra factura.`
-        : "La lectura de facturas con IA no está disponible en tu plan o para tu rol.";
-    return json({ error: "NOT_ALLOWED", reason: quota?.reason ?? "feature", retryAfterSeconds: quota?.retryAfterSeconds ?? null, message, importId }, 429);
-  }
-  const runId = quota.runId as string;
   const started = Date.now();
+  let tokens: { input: number | null; output: number | null } = { input: null, output: null };
 
   // `detail` (the technical cause) stays in the AI run log for support; the person sees `message`.
   const fail = async (message: string, status = 422, detail?: string) => {
     await db.rpc("dk_invoice_import_save", { p_import_id: importId, p_status: "ERROR", p_extraction: null, p_ai_run_id: runId, p_error: message });
-    await db.rpc("dk_ai_run_finish", { p_run_id: runId, p_status: "error", p_error: detail ?? message, p_latency_ms: Date.now() - started });
+    await db.rpc("dk_ai_run_finish", {
+      p_run_id: runId, p_status: "error", p_error: detail ?? message, p_latency_ms: Date.now() - started,
+      p_input: { importId }, p_input_tokens: tokens.input, p_output_tokens: tokens.output,
+    });
     return json({ error: "READ_FAILED", message, importId }, status);
   };
 
@@ -167,12 +174,14 @@ Deno.serve(async (req: Request) => {
 
     // 4. The model reads it.
     const answer = await askModel(apiKey, quota.model as string, mimeType, encodeBase64(bytes));
+    tokens = { input: answer.inputTokens, output: answer.outputTokens };
+    if (answer.raw === null) return await fail("No pudimos leer la factura. Intenta de nuevo o crea la compra a mano.", 502, "El modelo no devolvió la factura");
     const extraction = normalizeExtraction(answer.raw);
     const latency = Date.now() - started;
     if (!extraction.isInvoice) {
       await db.rpc("dk_ai_run_finish", {
         p_run_id: runId, p_status: "empty", p_latency_ms: latency, p_input_tokens: answer.inputTokens, p_output_tokens: answer.outputTokens,
-        p_output: { isInvoice: false },
+        p_output: { isInvoice: false }, p_input: { importId },
       });
       // Only when there is nothing to buy in it: a ticket or order with lines is always reviewed (rev. 2).
       await db.rpc("dk_invoice_import_save", { p_import_id: importId, p_status: "ERROR", p_extraction: extraction, p_ai_run_id: runId, p_error: "No se encontraron productos" });
@@ -183,7 +192,7 @@ Deno.serve(async (req: Request) => {
     if (saveError) throw new Error(saveError.message);
     await db.rpc("dk_ai_run_finish", {
       p_run_id: runId, p_status: "ok", p_latency_ms: latency, p_input_tokens: answer.inputTokens, p_output_tokens: answer.outputTokens,
-      p_output: { lines: extraction.lines.length, warnings: extraction.warnings.length },
+      p_output: { lines: extraction.lines.length, warnings: extraction.warnings.length }, p_input: { importId },
     });
 
     // 5. What the database proposes.

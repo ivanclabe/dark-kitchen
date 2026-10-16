@@ -12,8 +12,13 @@
 //   - Cada análisis queda en dk_ai_insights (input + output) para auditoría.
 //   - Respeta la frecuencia configurada: si hay un análisis reciente, lo
 //     devuelve sin llamar al modelo (salvo force).
+//   - ADR 0063: tampoco llama si los datos son los mismos que vio el último
+//     análisis (huella de la entrada), reserva la corrida antes de llamar (nunca
+//     dos a la vez) y, después de un error, no reintenta antes de la frecuencia.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
+import { fingerprint } from "../_shared/aiFingerprint.ts";
+import { decideBeforeInput, sameInputAsLast } from "../_shared/aiReuse.ts";
 
 // ADR 0014: the model of each feature comes from the platform catalog
 // (dk_features.model_key, returned by dk_ai_run_allowed). Nothing is hard-coded.
@@ -338,19 +343,26 @@ Deno.serve(async (req: Request) => {
 
     // Frecuencia: reutiliza el último análisis si todavía es vigente.
     const frequencyMin = Number(settings[feature]?.frequency_min ?? 0);
-    if (!body.force && frequencyMin > 0) {
-      const { data: last } = await db
-        .from("dk_ai_insights")
-        .select("*")
-        .eq("kitchen_id", kitchenId)
-        .eq("feature_key", feature)
-        .in("status", ["ok", "empty"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (last && Date.now() - new Date(last.created_at).getTime() < frequencyMin * 60_000) {
-        return json({ insight: last, cached: true });
-      }
+    const reuse = async (row: unknown) => {
+      await db.rpc("dk_ai_cache_hit", { p_feature_key: feature });
+      return json({ insight: row, cached: true });
+    };
+    const { data: recent } = await db
+      .from("dk_ai_insights")
+      .select("*")
+      .eq("kitchen_id", kitchenId)
+      .eq("feature_key", feature)
+      .in("status", ["ok", "empty", "error"])
+      .order("created_at", { ascending: false })
+      .limit(10);
+    // deno-lint-ignore no-explicit-any
+    const rows = (recent ?? []) as any[];
+    // ADR 0063: the reuse rule lives in _shared/aiReuse.ts (tested, and simulated over a day of use).
+    const before = decideBeforeInput(rows, frequencyMin, Date.now(), Boolean(body.force));
+    if (before.kind === "reuse") return reuse(before.row);
+    // After an error, wait for the configured frequency before trying again (unless the person asks).
+    if (before.kind === "error_backoff") {
+      return json({ error: "AI_ERROR", message: "El último análisis falló. Se intentará de nuevo más tarde, o usa «Volver a analizar»." }, 502);
     }
 
     let candidates: Candidate[];
@@ -364,11 +376,16 @@ Deno.serve(async (req: Request) => {
       payload = { insumos: candidates };
     }
 
+    // ADR 0063: the same data as the last analysis (within a day) → the same answer, without calling the model.
+    const inputHash = await fingerprint(feature, payload);
+    const same = sameInputAsLast(rows, inputHash, Date.now(), frequencyMin, Boolean(body.force));
+    if (same) return reuse(same);
+
     // Sin señales no hay nada que analizar: no se llama al modelo (ni se inventa nada).
     if (candidates.length === 0) {
       const { data: saved, error } = await db
         .from("dk_ai_insights")
-        .insert({ kitchen_id: kitchenId, feature_key: feature, status: "empty", input: payload as Record<string, unknown>, output: { summary: "", items: [] } })
+        .insert({ kitchen_id: kitchenId, feature_key: feature, status: "empty", input: payload as Record<string, unknown>, output: { summary: "", items: [] }, input_hash: inputHash })
         .select()
         .single();
       if (error) return json({ error: error.message }, 403);
@@ -379,14 +396,20 @@ Deno.serve(async (req: Request) => {
       return json({ error: "AI_NOT_CONFIGURED", message: "Falta el secreto DK_ANTHROPIC_API_KEY en Supabase > Edge Functions > Secrets." }, 503);
     }
 
-    // Cuota (ADR 0011): la base decide si esta Cuenta puede llamar al modelo ahora —
-    // intervalo mínimo por función (también con "Analizar ahora") y tope en 24 h del plan.
-    const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_allowed", { p_feature_key: feature });
+    // Cuota (ADR 0011, ADR 0063): la base decide y RESERVA la corrida — intervalo, tope del plan y presupuesto
+    // de la cuenta; dos pantallas a la vez no llaman dos veces.
+    const { data: quota, error: quotaError } = await db.rpc("dk_ai_run_reserve", {
+      p_feature_key: feature,
+      p_input: payload as Record<string, unknown>,
+      p_input_hash: inputHash,
+    });
     if (quotaError) return json({ error: quotaError.message }, 403);
-    const q = (quota ?? {}) as { allowed?: boolean; reason?: string | null; retryAfterSeconds?: number | null; model?: string | null };
+    const q = (quota ?? {}) as { allowed?: boolean; reason?: string | null; retryAfterSeconds?: number | null; model?: string | null; runId?: string };
     if (!q.allowed) {
       const message = q.reason === "daily"
         ? "Esta cuenta llegó al máximo de análisis con IA de su plan en las últimas 24 horas."
+        : q.reason === "budget"
+        ? "Esta cuenta llegó a su presupuesto mensual de IA: los análisis automáticos están en pausa hasta el próximo mes o hasta que se amplíe en Configuración → IA."
         : q.reason === "interval"
         ? "Se acaba de analizar. Espera un momento antes de volver a pedirlo."
         : "Esta función de IA no está disponible.";
@@ -394,41 +417,28 @@ Deno.serve(async (req: Request) => {
     }
 
     const model = q.model;
-    if (!model) {
+    if (!model || !q.runId) {
       return json({ error: "AI_MODEL_UNAVAILABLE", message: "La plataforma no tiene un modelo activo para esta función." }, 503);
     }
     const startedAt = Date.now();
+    const readRun = () => db.from("dk_ai_insights").select("*").eq("id", q.runId!).single();
     try {
       const answer = await askModel(apiKey, model, feature, payload);
       const output = validate(feature, answer.raw, new Set(candidates.map((c) => c.id)));
-      const { data: saved, error } = await db
-        .from("dk_ai_insights")
-        .insert({
-          kitchen_id: kitchenId,
-          feature_key: feature,
-          status: "ok",
-          input: payload as Record<string, unknown>,
-          output,
-          model,
-          input_tokens: answer.inputTokens,
-          output_tokens: answer.outputTokens,
-          latency_ms: Date.now() - startedAt,
-        })
-        .select()
-        .single();
+      const { error } = await db.rpc("dk_ai_run_finish", {
+        p_run_id: q.runId,
+        p_status: "ok",
+        p_output: output,
+        p_input_tokens: answer.inputTokens,
+        p_output_tokens: answer.outputTokens,
+        p_latency_ms: Date.now() - startedAt,
+      });
       if (error) return json({ error: error.message }, 403);
+      const { data: saved } = await readRun();
       return json({ insight: saved, cached: false });
     } catch (e) {
       const message = String(e instanceof Error ? e.message : e).slice(0, 500);
-      await db.from("dk_ai_insights").insert({
-        kitchen_id: kitchenId,
-        feature_key: feature,
-        status: "error",
-        input: payload as Record<string, unknown>,
-        model,
-        error: message,
-        latency_ms: Date.now() - startedAt,
-      });
+      await db.rpc("dk_ai_run_finish", { p_run_id: q.runId, p_status: "error", p_error: message, p_latency_ms: Date.now() - startedAt });
       return json({ error: "AI_ERROR", message }, 502);
     }
   } catch (e) {

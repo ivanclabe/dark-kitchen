@@ -26,13 +26,14 @@ const schema = z.object({
   address: z.string().optional(),
   contactName: z.string().optional(),
   paymentTermsDays: z.number().int().min(0).max(365),
+  defaultVatPct: z.number().min(0).max(100).nullable(),
 })
 
 type FormValues = z.infer<typeof schema>
 
 const legendClass = 'mb-3 text-xs font-semibold tracking-wide text-neutral-400 uppercase'
 
-const emptyValues: FormValues = { name: '', taxId: '', phone: '', email: '', address: '', contactName: '', paymentTermsDays: 0 }
+const emptyValues: FormValues = { name: '', taxId: '', phone: '', email: '', address: '', contactName: '', paymentTermsDays: 0, defaultVatPct: null }
 
 /** Alta y edición de proveedor — mismos campos y validación que la antigua SuppliersPage, en un Drawer. */
 export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supplier | null; open: boolean; onClose: () => void }) {
@@ -56,6 +57,7 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
           address: supplier.address ?? '',
           contactName: supplier.contactName ?? '',
           paymentTermsDays: supplier.paymentTermsDays ?? 0,
+          defaultVatPct: supplier.defaultVatPct ?? null,
         }
       : emptyValues,
   })
@@ -69,6 +71,7 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
       address: values.address || null,
       contactName: values.contactName || null,
       paymentTermsDays: values.paymentTermsDays,
+      defaultVatPct: values.defaultVatPct,
     }
     try {
       if (supplier) {
@@ -139,6 +142,16 @@ export function SupplierFormDrawer({ supplier, open, onClose }: { supplier: Supp
                 control={control}
                 name="paymentTermsDays"
                 render={({ field }) => <NumberInput {...a11y} value={field.value} onValueChange={(v) => field.onChange(v ?? 0)} min={0} max={365} unit="días" />}
+              />
+            )}
+          </FormField>
+          {/* ADR 0063 (D4): proposed in its manual purchases; the tax is computed when the purchase is confirmed. */}
+          <FormField label="IVA habitual" hint="Se propone en sus compras. Vacío = sin IVA por defecto." error={errors.defaultVatPct?.message}>
+            {(a11y) => (
+              <Controller
+                control={control}
+                name="defaultVatPct"
+                render={({ field }) => <NumberInput {...a11y} value={field.value} onValueChange={(v) => field.onChange(v ?? null)} min={0} max={100} decimals={2} unit="%" />}
               />
             )}
           </FormField>

@@ -39,6 +39,7 @@ export function ReviewLineCard({
   canCreateIngredient,
   onChange,
   onRemove,
+  priceTolerancePct,
 }: {
   line: ReviewLine
   number: number
@@ -49,10 +50,12 @@ export function ReviewLineCard({
   onChange: (patch: Partial<ReviewLine>) => void
   /** Only for a line the person added. */
   onRemove?: () => void
+  /** ADR 0063: the account tolerance for a price change (0 = no price warning). */
+  priceTolerancePct?: number
 }) {
   const info = lineUnitInfo(line, units, ingredients)
   const problems = lineProblems(line, units, ingredients)
-  const warnings = lineWarnings(line, units, ingredients)
+  const warnings = lineWarnings(line, units, ingredients, priceTolerancePct)
   const allowedUnits = unitsFor(info, units)
   const asksFactor = needsFactor(line.unitCode, info, units)
   const chosenId = line.ingredient?.kind === 'existing' ? line.ingredient.id : null

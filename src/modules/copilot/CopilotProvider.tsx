@@ -66,10 +66,11 @@ const newRequestId = () => (typeof crypto !== 'undefined' && 'randomUUID' in cry
  * between screens. Shown only where the feature is usable.
  */
 export function CopilotProvider({ children }: { children: ReactNode }) {
-  const { canUseFeature, can, path, kitchen } = useActiveKitchen()
+  const { canUseFeature, feature, can, path, kitchen } = useActiveKitchen()
   const voice = useVoice()
   const [readTyped, setReadTyped] = useVoiceFlag('readTyped', false)
   const available = canUseFeature('copilot')
+  const voiceFallback = feature('copilot')?.settings?.voice_fallback !== false
   const { pathname } = useLocation()
   const section = pathname.startsWith(path('/')) ? pathname.slice(path('/').length) || '/' : '/'
   const screen = Object.entries(SCREEN_NAME).find(([prefix]) => section === prefix || section.startsWith(`${prefix}/`))?.[1] ?? null
@@ -188,7 +189,8 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
 
   // «Oye Quanela»: every phrase no screen took is a question for Copilot.
   useVoiceHandler(
-    available
+    // ADR 0063: the account decides whether a phrase no screen understood becomes a Copilot question.
+    available && voiceFallback
       ? {
           id: 'copilot',
           fallback: true,

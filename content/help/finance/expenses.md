@@ -11,9 +11,9 @@ questions:
   - ¿Dónde anoto los servicios públicos?
   - ¿Cómo registro un gasto que se repite cada mes?
   - ¿Un gasto pagado cuenta dos veces?
-keywords: [gastos, arriendo, servicios públicos, gas, internet, empaques, publicidad, gasto fijo, gasto recurrente, categoría]
+keywords: [gastos, arriendo, servicios públicos, gas, internet, empaques, publicidad, gasto fijo, gasto recurrente, categoría, monto variable, luz, factura variable]
 related: [payables, profitability]
-updated: 2026-10-11
+updated: 2026-10-15
 order: 3
 ---
 
@@ -30,4 +30,6 @@ order: 3
 
 ## Gastos fijos
 
-Para lo que se repite cada mes (arriendo, internet), toca **Nuevo gasto fijo**: categoría, descripción, valor y el **día** en que vence. Quanela crea la obligación de cada mes **una sola vez**, al abrir Finanzas. Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente).
+Para lo que se repite cada mes (arriendo, internet), toca **Nuevo gasto fijo**: categoría, descripción, valor y el **día** en que vence. Quanela crea la obligación de cada mes **una sola vez**, sola, cada día (no hace falta abrir Finanzas). Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente).
+
+Si el valor cambia cada mes (luz, gas, agua), activa **Monto variable**: cada mes nace con el valor de referencia y la etiqueta **Monto por confirmar**, y no se puede pagar hasta que escribas el valor real en **Por pagar → Confirmar monto**. La campana avisa cuando hay montos por confirmar.

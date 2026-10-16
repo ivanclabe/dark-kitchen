@@ -19,9 +19,9 @@ questions:
   - ¿Cómo registro una empresa como cliente?
   - ¿Cómo marco un cliente preferencial?
   - ¿Dónde veo lo que no le gusta a un cliente al tomar el pedido?
-keywords: [cliente, ficha, "360", deuda, saldo, cartera, fiado, crédito, abono, vencido, teléfono, correo, WhatsApp, queja, reclamo, incidencia, preferencias, favoritos, alergia, dirección, recomendación, empresa, NIT, razón social, corporativo, preferencial, VIP, estrella]
+keywords: [plazo, días de plazo, antigüedad de cartera, vencimiento, cliente, ficha, "360", deuda, saldo, cartera, fiado, crédito, abono, vencido, teléfono, correo, WhatsApp, queja, reclamo, incidencia, preferencias, favoritos, alergia, dirección, recomendación, empresa, NIT, razón social, corporativo, preferencial, VIP, estrella]
 related: [register-payment, create-order, search-orders]
-updated: 2026-10-09
+updated: 2026-10-15
 order: 1
 screenshots:
   - id: customers
@@ -90,6 +90,12 @@ Lo que el cliente reportó no se edita ni se borra: cada queja queda en el histo
 En **Preferencias y recomendaciones**, agrega platos favoritos, lo que le gusta o no (si un ingrediente no está en el inventario, anótalo como texto) y lo que dice de su alimentación. Debajo, en **Recomendaciones**, anota qué ofrecerle; se puede descartar cuando ya no aplica.
 
 **Al tomar un pedido**, al elegir el cliente aparece un recuadro con lo que debes saber: primero lo que **no le gusta** y su **dieta** (para no equivocarte), luego **sus favoritos** y qué **recomendarle**; y si es preferencial o empresa. Se edita en la ficha.
+
+## Plazo y cartera vencida
+
+A un cliente que paga a crédito (una empresa, por ejemplo) ponle un **Plazo** en días al crearlo o editarlo (campo «Plazo de pago»). Cada pedido suyo que se confirma **vence** en la fecha del pedido más ese plazo; sin plazo, sus pedidos no vencen. Así funcionan el **saldo vencido**, el filtro **Vencidos** y el aviso de la campana.
+
+En **Clientes**, la barra **Antigüedad de la cartera** reparte lo que te deben en **Al día**, **1-30 días**, **31-60 días** y **Más de 60** días de vencido. El plazo lo pone quien edita clientes y ve la cartera.
 
 ## Registrar un abono
 

@@ -8,6 +8,7 @@ import { typography } from '@/shared/ui/typography'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { fetchAccountAiUsage, type AccountAiUsage } from '../api'
+import { AiMonthCost } from '../components/AiMonthCost'
 import { AiStatusPanel } from '../components/AiStatusPanel'
 import { FeatureStatusCard } from '../components/FeatureStatus'
 import { SettingsPage } from '../ui/SettingsPage'
@@ -108,7 +109,10 @@ function UsageAndState() {
       <Section title="Estado">
         <AiStatusPanel />
       </Section>
-      <Section title="Uso" description="Análisis de IA de esta cuenta en los últimos 30 días.">
+      <Section title="Este mes" description="Consultas a la IA, su costo estimado, lo que se evitó y los topes. Cada consulta es una llamada al modelo.">
+        <AiMonthCost />
+      </Section>
+      <Section title="Últimos 30 días" description="Análisis de IA de esta cuenta y cómo le va a Copilot.">
         {isLoading ? (
           <LoadingState variant="block" />
         ) : isError || !data ? (

@@ -9,6 +9,9 @@ import {
 import { saveProductImage } from '@/modules/products/api/products'
 import { ProductPhotos, type PendingPhotos } from '@/modules/products/components/ProductPhotos'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { useShowDishCosts } from '@/shared/costs/costSettings'
+import { dishMargin } from '@/shared/costs/dishMargin'
+import { formatMoney } from '@/shared/utils/format'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Product } from '@/modules/products/types'
 import { ActiveBadge } from '@/shared/ui/Badge'
@@ -65,6 +68,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormValues, unknown, FormOutput>({
     resolver: zodResolver(schema),
@@ -80,6 +84,10 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
       : emptyValues,
   })
   const usesInventory = useWatch({ control, name: 'usesInventory' })
+  // ADR 0063 (D6): the food cost of the recipe against the account target, with a suggested price.
+  const dishCosts = useShowDishCosts()
+  const watchedPrice = Number(useWatch({ control, name: 'price' })) || 0
+  const margin = dishCosts.show && product && usesInventory ? dishMargin(watchedPrice, product.estimatedCost, dishCosts.targetPct) : null
 
   // Plato de un menú maestro: aquí solo se ajusta el precio (lo demás lo define el maestro).
   const shared = Boolean(product?.masterProductId)
@@ -217,6 +225,20 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
             />
           )}
         </FormField>
+        {margin && margin.status !== 'no_cost' && (
+          <p className={`-mt-2 flex flex-wrap items-center gap-x-1.5 text-xs tabular-nums ${margin.status === 'ok' ? 'text-neutral-400' : margin.status === 'below_cost' ? 'text-red-400' : 'text-amber-400'}`}>
+            <span>
+              Receta {formatMoney(product!.estimatedCost)}
+              {margin.foodCostPct !== null && ` · costo ${margin.foodCostPct.toLocaleString('es-CO')} % del precio (objetivo ${dishCosts.targetPct} %)`}
+              {margin.status === 'below_cost' && ' · el precio no cubre el costo'}
+            </span>
+            {margin.status !== 'ok' && margin.suggestedPrice !== null && (
+              <Button type="button" variant="link" size="sm" onClick={() => setValue('price', margin.suggestedPrice!, { shouldDirty: true })}>
+                Usar {formatMoney(margin.suggestedPrice)}
+              </Button>
+            )}
+          </p>
+        )}
         <FormField label="Descripción">{(a11y) => <Input {...a11y} {...register('description')} disabled={shared} />}</FormField>
 
         {/* ADR 0048: a dish that does not use inventory is sold without a recipe and never touches the stock. */}

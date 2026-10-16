@@ -13,9 +13,9 @@ questions:
   - ¿Cómo activo Copilot o la voz?
   - ¿Quién cambió algo en la cuenta?
   - ¿Dónde está el ID de la cuenta para WhatsApp?
-keywords: [configuración, ajustes, zona horaria, nombre, plan, facturación, IA, voz, integraciones, WhatsApp, n8n, bitácora, auditoría, actividad]
+keywords: [presupuesto de IA, costo de IA, configuración, ajustes, zona horaria, nombre, plan, facturación, IA, voz, integraciones, WhatsApp, n8n, bitácora, auditoría, actividad]
 related: [copilot-limits, oye-quanela, kitchen-hours, users-and-roles]
-updated: 2026-10-09
+updated: 2026-10-15
 order: 1
 ---
 
@@ -25,7 +25,7 @@ Abre **Configuración** en el menú de la izquierda (o en el menú de tu avatar 
 |---|---|
 | **General** | **Tu negocio** (aplica a todas tus cuentas) y **Esta cuenta**: **Nombre**, **Identificador (URL)**, **Zona horaria** y **Tipo de cocina** (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, **Datos fiscales y de contacto** (opcionales) |
 | **Facturación** | Tu **Plan**, cuánto usas de él (cuentas, usuarios, IA) y tus facturas |
-| **IA y voz** | **Funciones**: activa Copilot, la voz y las sugerencias de IA en esta cuenta. **Este dispositivo**: la voz de este equipo. **Uso y estado**: cuánto se ha usado y cómo responde Copilot |
+| **IA y voz** | **Funciones**: activa Copilot, la voz y las sugerencias de IA en esta cuenta. **Este dispositivo**: la voz de este equipo. **Uso y estado**: cuánto se ha usado, el **costo estimado del mes**, las llamadas evitadas, el **presupuesto mensual** (función **Presupuesto de IA**) y cómo responde Copilot |
 | **Integraciones** | El **ID de la cuenta** para conectar sistemas externos, por ejemplo pedidos por WhatsApp |
 | **Actividad** | **Operación**: cómo va hoy y la semana. **Bitácora**: quién cambió qué y cuándo |
 

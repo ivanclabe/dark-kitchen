@@ -5,6 +5,12 @@ import { AlertTriangle, BookOpen, Ear, EarOff, Loader2, MessagesSquare, Mic, Pau
 import { useState } from 'react'
 import { useVoice } from '../voiceContext'
 import { VoiceDeviceSettings } from './VoiceDeviceSettings'
+import { RobotThinking } from '@/shared/robot/RobotThinking'
+
+/** While it wakes up (the phrase detector loading): one phrase, the same robot. */
+const WAKING_STEPS = ['Despertando'] as const
+/** The top bar keeps one word (its width does not jump); the bubble tells the steps. */
+const PILL_STEPS = ['Pensando'] as const
 
 /**
  * «Oye Quanela» in the top bar (ADR 0033), next to Copilot: its state at a
@@ -27,12 +33,12 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
     ? voice.state === 'listening'
       ? { icon: Mic, text: 'Conversación · te escucho', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
       : voice.state === 'processing'
-        ? { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-300', iconClassName: 'animate-spin' }
+        ? { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
         : { icon: MessagesSquare, text: 'Conversación · respondiendo', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
     : active
     ? voice.state === 'listening'
       ? { icon: Mic, text: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
-      : { icon: Loader2, text: 'Pensando…', className: 'border-neutral-700 bg-neutral-900 text-neutral-300', iconClassName: 'animate-spin' }
+      : { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
     : !listeningForPhrase
       ? { icon: Mic, text: 'Oye Quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
       : handsFree.paused
@@ -40,9 +46,11 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
         : handsFree.state === 'error'
           ? { icon: AlertTriangle, text: 'Oye Quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
           : handsFree.state === 'loading'
-            ? { icon: Loader2, text: 'Preparando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-400', iconClassName: 'animate-spin' }
+            ? { icon: Loader2, text: 'Despertando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-300', thinking: 'wake' as const }
             : { icon: Ear, text: 'Oye Quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
   const Icon = view.icon
+  // ADR 0060: while it thinks (or wakes up), the robot itself shows it instead of a spinner.
+  const thinking = 'thinking' in view ? view.thinking : null
 
   const label = conversing
     ? `${view.text}. Di tu siguiente pregunta o «gracias» para terminar.`
@@ -84,13 +92,19 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
               view.className,
             )}
           >
-            <span className="relative inline-flex">
-              <Icon size={compact ? 16 : 13} className={view.iconClassName} aria-hidden />
-              {listeningForPhrase && !handsFree.paused && handsFree.state === 'listening' && !active && (
-                <span className="absolute -top-0.5 -right-0.5 size-1.5 animate-pulse rounded-full bg-brasa-400" aria-hidden />
-              )}
-            </span>
-            {!compact && view.text}
+            {thinking ? (
+              <RobotThinking size={compact ? 22 : 16} steps={thinking === 'wake' ? WAKING_STEPS : PILL_STEPS} showText={!compact} className={compact ? undefined : '-ml-1.5 gap-1.5'} />
+            ) : (
+              <>
+                <span className="relative inline-flex">
+                  <Icon size={compact ? 16 : 13} className={'iconClassName' in view ? view.iconClassName : undefined} aria-hidden />
+                  {listeningForPhrase && !handsFree.paused && handsFree.state === 'listening' && !active && (
+                    <span className="absolute -top-0.5 -right-0.5 size-1.5 animate-pulse rounded-full bg-brasa-400" aria-hidden />
+                  )}
+                </span>
+                {!compact && view.text}
+              </>
+            )}
           </button>
         )}
       />
@@ -106,7 +120,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
           ) : (
             <>
               {voice.lastTranscript && <p className="text-neutral-500">🎤 «{voice.lastTranscript}»</p>}
-              {voice.state === 'processing' && <p className="text-neutral-400">Consultando…</p>}
+              {voice.state === 'processing' && <RobotThinking size={30} className="pt-1.5 text-neutral-300" textClassName="text-sm" />}
               {voice.lastReply && voice.state !== 'processing' && (
                 <p className={clsx(voice.state === 'error' ? 'text-red-400' : voice.lastReply.tone === 'info' ? 'text-neutral-300' : 'text-emerald-400')}>{voice.lastReply.message}</p>
               )}

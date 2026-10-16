@@ -2,7 +2,8 @@
 export interface AppNotification {
   /** Stable key that carries the state: when the state changes, it is new again. */
   key: string
-  group: 'operation' | 'ai' | 'account'
+  /** ADR 0063: «admin» = payables, purchases, costs and shifts. */
+  group: 'operation' | 'admin' | 'ai' | 'account'
   type: string
   severity: 'error' | 'warning' | 'info'
   title: string

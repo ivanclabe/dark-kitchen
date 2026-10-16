@@ -36,15 +36,32 @@ export function splitCount(title: string): { count: number | null; label: string
   return m ? { count: Number(m[1]), label: m[2] } : { count: null, label: title }
 }
 
-/** Inicio shows the operation notices; AI and the plan live in the bell (ADR 0037, D5). */
+/** The order of Inicio's «Necesita atención»: the operation first, then the administration (ADR 0063). */
+const NOTICE_ORDER = [
+  'late_orders',
+  'to_confirm',
+  'low_stock',
+  'overdue_customers',
+  'below_cost',
+  'payables_overdue',
+  'open_shifts',
+  'price_up',
+  'payables_due',
+  'amount_pending',
+  'invoices_unsaved',
+  'old_drafts',
+  'above_target',
+]
+
+/** Inicio shows the operation and administration notices; AI and the plan live in the bell (ADR 0037, D5). */
 export function operationNotices(items: AppNotification[]): AppNotification[] {
-  const order = ['late_orders', 'to_confirm', 'low_stock', 'overdue_customers']
-  return items.filter((n) => n.group === 'operation').toSorted((a, b) => order.indexOf(a.type) - order.indexOf(b.type))
+  const rank = (type: string) => (NOTICE_ORDER.includes(type) ? NOTICE_ORDER.indexOf(type) : NOTICE_ORDER.length)
+  return items.filter((n) => n.group === 'operation' || n.group === 'admin').toSorted((a, b) => rank(a.type) - rank(b.type))
 }
 
 /** The AI advice not seen yet (not the failures or the quota): the line of Inicio. */
 export function unreadAiAdvice(items: AppNotification[]): number {
-  return items.filter((n) => n.group === 'ai' && !n.read && n.type !== 'ai_error' && n.type !== 'ai_quota').length
+  return items.filter((n) => n.group === 'ai' && !n.read && n.type !== 'ai_error' && n.type !== 'ai_quota' && n.type !== 'ai_budget').length
 }
 
 /** Asks the visible bell to open (from Inicio's AI line). */

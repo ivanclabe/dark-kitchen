@@ -23,7 +23,7 @@ const state = vi.hoisted(() => ({
 }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
-  useActiveKitchen: () => ({ canUseFeature: () => true, can: () => true, path: (to: string) => `/k/centro${to}`, kitchen: { id: 'k1', name: 'Centro' } }),
+  useActiveKitchen: () => ({ canUseFeature: () => true, feature: () => null, can: () => true, path: (to: string) => `/k/centro${to}`, kitchen: { id: 'k1', name: 'Centro' } }),
 }))
 vi.mock('@/modules/voice/voiceContext', () => ({
   useVoice: () => ({

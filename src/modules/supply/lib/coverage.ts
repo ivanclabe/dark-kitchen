@@ -26,10 +26,10 @@ export function needsAttention(s: SupplySuggestion, coverageDays = SHORT_COVERAG
   return urgencyOf(s, coverageDays) !== 'ok'
 }
 
-/** Cuánto pedir: la meta configurada o, si no hay meta pero sí ritmo, dos semanas de consumo. */
-export function orderQuantity(s: SupplySuggestion): number {
+/** What to order: the database suggestion, or (short coverage above the target) the consumption of the reorder days (ADR 0063). */
+export function orderQuantity(s: SupplySuggestion, reorderDays = 14): number {
   if (s.suggestedQuantity > 0) return s.suggestedQuantity
-  if (s.dailyBurn > 0) return Math.ceil(s.dailyBurn * 14)
+  if (s.dailyBurn > 0) return Math.ceil(s.dailyBurn * reorderDays)
   return 0
 }
 

@@ -12,12 +12,12 @@ import { useToast } from '@/shared/ui/Toast'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate, formatMoney, todayStr } from '@/shared/utils/format'
 import clsx from 'clsx'
-import { Ban, HandCoins, History, Receipt } from 'lucide-react'
+import { Ban, CheckCircle2, HandCoins, History, Receipt } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useAddPreviousPurchases, useObligations, usePayablesSummary, usePreviousPurchases, useVoidObligation } from '../hooks'
 import { daysUntil, KIND_LABEL, STATUS_LABEL, STATUS_TONE } from '../lib/finance'
 import type { Obligation, ObligationKind } from '../types'
-import { PayObligationModal, ReasonModal } from './FinanceDialogs'
+import { BatchPayModal, ConfirmAmountModal, PayObligationModal, ReasonModal } from './FinanceDialogs'
 
 type StatusFilter = 'open' | 'overdue' | 'paid' | 'voided' | 'all'
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
@@ -27,6 +27,11 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'voided', label: 'Anuladas' },
   { value: 'all', label: 'Todas' },
 ]
+
+/** Who is paid: the supplier, the person or the written name (the batch rule of the database). */
+function payeeKey(o: Obligation): string {
+  return o.supplierId ?? o.memberUserId ?? (o.payee ?? '—').trim().toLowerCase()
+}
 
 /** What the business owes (ADR 0051, D1): to suppliers, expenses and payroll, with what is overdue first. */
 export function PayablesTab() {
@@ -39,6 +44,10 @@ export function PayablesTab() {
   const [paying, setPaying] = useState<Obligation | null>(null)
   const [voiding, setVoiding] = useState<Obligation | null>(null)
   const [previousOpen, setPreviousOpen] = useState(false)
+  // ADR 0063: several obligations of ONE payee are paid together; a variable amount is confirmed first.
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [batchOpen, setBatchOpen] = useState(false)
+  const [confirming, setConfirming] = useState<Obligation | null>(null)
   const today = todayStr()
 
   const rows = useMemo(
@@ -53,6 +62,19 @@ export function PayablesTab() {
       }),
     [obligations.data, status, kind],
   )
+
+  const canPay = (o: Obligation) => o.balance > 0 && o.status !== 'voided' && !o.amountPending && can('finance.pay') && (o.kind !== 'payroll' || can('finance.payroll'))
+  const selectedRows = (obligations.data ?? []).filter((o) => selected.has(o.id) && canPay(o))
+  function toggle(o: Obligation) {
+    setSelected((prev) => {
+      const first = (obligations.data ?? []).find((x) => prev.has(x.id))
+      // Another payee starts a new selection: a batch is always for one payee.
+      const next = first && payeeKey(first) !== payeeKey(o) ? new Set<string>() : new Set(prev)
+      if (next.has(o.id)) next.delete(o.id)
+      else next.add(o.id)
+      return next
+    })
+  }
 
   const s = summary.data
   return (
@@ -86,6 +108,23 @@ export function PayablesTab() {
           ))}
       </div>
 
+      {selectedRows.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm">
+          <span className="text-neutral-200">
+            {selectedRows.length} de <strong>{selectedRows[0].payee ?? selectedRows[0].description}</strong> ·{' '}
+            <span className="tabular-nums">{formatMoney(selectedRows.reduce((sum, o) => sum + o.balance, 0))}</span>
+          </span>
+          <span className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+              Quitar selección
+            </Button>
+            <Button variant="primary" size="sm" icon={HandCoins} onClick={() => setBatchOpen(true)}>
+              Pagar {selectedRows.length === 1 ? 'la seleccionada' : `las ${selectedRows.length}`}
+            </Button>
+          </span>
+        </div>
+      )}
+
       {obligations.isError ? (
         <ErrorState error={obligations.error} onRetry={() => void obligations.refetch()} />
       ) : obligations.isLoading ? (
@@ -98,11 +137,21 @@ export function PayablesTab() {
             const days = daysUntil(o.dueDate, today)
             return (
               <li key={o.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
+                {canPay(o) && (
+                  <input
+                    type="checkbox"
+                    checked={selected.has(o.id)}
+                    onChange={() => toggle(o)}
+                    aria-label={`Seleccionar ${o.description} para pagar en lote`}
+                    className="size-4 accent-brasa-500"
+                  />
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="truncate font-medium text-neutral-100">{o.payee ?? o.description}</span>
                     <Badge tone="neutral">{o.kind === 'expense' ? (o.categoryName ?? KIND_LABEL.expense) : KIND_LABEL[o.kind]}</Badge>
                     <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
+                    {o.amountPending && o.status !== 'voided' && <Badge tone="warning">Monto por confirmar</Badge>}
                   </p>
                   <p className="mt-0.5 text-xs text-neutral-500">
                     {o.purchaseId ? (
@@ -124,7 +173,12 @@ export function PayablesTab() {
                   {o.paid > 0 && o.balance > 0 && <p className="text-xs text-neutral-500">de {formatMoney(o.amount)}</p>}
                 </div>
                 <div className="flex gap-1.5">
-                  {o.balance > 0 && o.status !== 'voided' && can('finance.pay') && (o.kind !== 'payroll' || can('finance.payroll')) && (
+                  {o.amountPending && o.status !== 'voided' && can('finance.manage') && (
+                    <Button variant="secondary" size="sm" icon={CheckCircle2} onClick={() => setConfirming(o)}>
+                      Confirmar monto
+                    </Button>
+                  )}
+                  {canPay(o) && (
                     <Button variant="secondary" size="sm" icon={HandCoins} onClick={() => setPaying(o)}>
                       Pagar
                     </Button>
@@ -142,6 +196,8 @@ export function PayablesTab() {
       )}
 
       {paying && <PayObligationModal obligation={paying} onClose={() => setPaying(null)} />}
+      {batchOpen && selectedRows.length > 0 && <BatchPayModal obligations={selectedRows} onClose={() => setBatchOpen(false)} onPaid={() => setSelected(new Set())} />}
+      {confirming && <ConfirmAmountModal obligation={confirming} onClose={() => setConfirming(null)} />}
       {voiding && (
         <ReasonModal
           title="Anular obligación"

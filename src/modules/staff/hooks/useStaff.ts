@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { cancelShift, clockIn, clockOut, copyWeek, createShift, listOnShiftNow, listShifts, listStaffMembers, updateShift } from '../api/staff'
+import { cancelShift, clockIn, clockOut, copyWeek, createShift, listOnShiftNow, listShifts, listStaffMembers, updateShift, correctClock } from '../api/staff'
 import type { ShiftInput } from '../types'
 
 export const STAFF_KEY = ['staff'] as const
@@ -30,5 +30,6 @@ export const useCreateShift = () => useStaffMutation((input: ShiftInput) => crea
 export const useUpdateShift = () => useStaffMutation(({ id, input }: { id: string; input: ShiftInput }) => updateShift(id, input))
 export const useCancelShift = () => useStaffMutation((id: string) => cancelShift(id))
 export const useCopyWeek = () => useStaffMutation(({ from, to }: { from: string; to: string }) => copyWeek(from, to))
+export const useCorrectClock = () => useStaffMutation(correctClock)
 export const useClockIn = () => useStaffMutation(() => clockIn())
 export const useClockOut = () => useStaffMutation(() => clockOut())

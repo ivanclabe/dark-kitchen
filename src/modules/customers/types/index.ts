@@ -13,6 +13,8 @@ export interface CustomerIdentity {
   contactName?: string | null
   preferred?: boolean
   preferredNote?: string | null
+  /** ADR 0063: days to pay its orders (null/0 = no term: its orders do not fall due). */
+  paymentTermsDays?: number | null
 }
 
 export interface Customer extends CustomerIdentity {

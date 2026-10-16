@@ -26,7 +26,7 @@ export function AiStatusPanel() {
       <StatusCard
         icon={ShieldCheck}
         title="La IA recomienda, tú decides"
-        body="Las cifras las calcula el sistema; la IA solo prioriza y explica. No crea compras ni cambia pedidos: cada acción es un botón que alguien pulsa."
+        body="Las cifras las calcula el sistema; la IA prioriza y explica. No crea compras ni cambia tus pedidos: cada acción es un botón que alguien pulsa. La excepción es Pedidos por WhatsApp, si lo activas: crea el pedido cuando el cliente lo confirma, con el menú y los precios de hoy."
       />
     </div>
   )

@@ -3,16 +3,16 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { Drawer } from '@/shared/ui/Drawer'
-import { Input } from '@/shared/ui/FormField'
+import { Input, Select } from '@/shared/ui/FormField'
 import { Switch } from '@/shared/ui/Switch'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { CheckCircle2, KeyRound, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { formatUsd, PLATFORM_AI_KEY, setPlatformModel, type PlatformModel } from './api'
+import { fetchConsumerAi, formatUsd, PLATFORM_AI_KEY, setConsumerAi, setPlatformModel, type PlatformModel } from './api'
 
 type ModelDraft = { key: string; label: string; input: string; output: string; active: boolean; isNew: boolean }
 
@@ -157,8 +157,53 @@ export function ProvidersTab({ models, labelOf }: { models: PlatformModel[]; lab
         <DataTable columns={columns} rows={models} getRowId={(m) => m.key} />
       </section>
 
+      <ConsumerAssistantCard models={models} />
+
       <p className={typography.caption}>La voz de cocina usa la voz de cada equipo (sin proveedor externo ni costo). Un proveedor de voz en la nube requeriría su propia Edge Function y secreto.</p>
       {editing && <ModelDrawer model={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
     </div>
+  )
+}
+
+/**
+ * ADR 0063: Quanela Consumer's assistant only calls the model when the rules do not understand a message. It has
+ * no account behind it, so the platform turns it on or off and picks its model here; its use shows in «Uso».
+ */
+function ConsumerAssistantCard({ models }: { models: PlatformModel[] }) {
+  const queryClient = useQueryClient()
+  const { show } = useToast()
+  const key = [...PLATFORM_AI_KEY, 'consumer'] as const
+  const { data } = useQuery({ queryKey: key, queryFn: fetchConsumerAi })
+  const save = useMutation({
+    mutationFn: setConsumerAi,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: key })
+      show('Asistente de Consumer actualizado.')
+    },
+    onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
+  })
+  if (!data) return null
+  return (
+    <section className="space-y-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className={typography.h3}>Asistente de Quanela Consumer</h2>
+          <p className={typography.caption}>Entiende lo que piden los comensales cuando las reglas no alcanzan. Cada mensaje así es una consulta al modelo.</p>
+        </div>
+        <Switch checked={data.active} onChange={(active) => save.mutate({ active })} label="Asistente de Consumer activo" disabled={save.isPending} />
+      </div>
+      <div className="max-w-xs">
+        <label htmlFor="consumer-model" className="text-xs text-neutral-400">
+          Modelo
+        </label>
+        <Select id="consumer-model" value={data.modelKey ?? ''} onChange={(e) => save.mutate({ modelKey: e.target.value })} disabled={save.isPending} className="!mt-1">
+          {models.filter((m) => m.active).map((m) => (
+            <option key={m.key} value={m.key}>
+              {m.label}
+            </option>
+          ))}
+        </Select>
+      </div>
+    </section>
   )
 }

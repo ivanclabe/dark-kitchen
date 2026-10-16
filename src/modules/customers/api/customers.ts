@@ -1,7 +1,7 @@
 import { supabase } from '@/shared/lib/supabase'
 import type { Customer, CustomerDetail, CustomerInput, CustomerListQuery, CustomerPage, CustomersSummary } from '../types'
 
-const COLUMNS = 'id, full_name, phone, email, address, notes, customer_type, legal_name, tax_id, contact_name, preferred, preferred_note'
+const COLUMNS = 'id, full_name, phone, email, address, notes, customer_type, legal_name, tax_id, contact_name, preferred, preferred_note, payment_terms_days'
 
 interface CustomerRow {
   id: string
@@ -16,6 +16,7 @@ interface CustomerRow {
   contact_name: string | null
   preferred: boolean
   preferred_note: string | null
+  payment_terms_days: number | null
 }
 
 function mapRow(row: CustomerRow): Customer {
@@ -32,6 +33,7 @@ function mapRow(row: CustomerRow): Customer {
     contactName: row.contact_name,
     preferred: row.preferred,
     preferredNote: row.preferred_note,
+    paymentTermsDays: row.payment_terms_days,
   }
 }
 
@@ -50,6 +52,8 @@ function toColumns(input: CustomerInput) {
     contact_name: company ? input.contactName || null : null,
     preferred: Boolean(input.preferred),
     preferred_note: input.preferred ? input.preferredNote || null : null,
+    // Only written by whoever sees the form field (undefined keeps the current term).
+    ...(input.paymentTermsDays === undefined ? {} : { payment_terms_days: input.paymentTermsDays || null }),
   }
 }
 

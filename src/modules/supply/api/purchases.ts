@@ -1,16 +1,17 @@
 import { supabase } from '@/shared/lib/supabase'
 import { kitchenFilePath } from '@/shared/lib/kitchenFiles'
 import type { PurchasePayment } from '@/modules/finance/types'
-import type { Attachment, LastIngredientPrice, Purchase, PurchaseInput, PurchaseItem, PurchaseItemInput } from '../types'
+import type { Attachment, Purchase, PurchaseHeaderInput, PurchaseInput, PurchaseItem, PurchaseItemInput, PriceReference } from '../types'
 
 interface PurchaseRow {
   id: string
   supplier_id: string
-  invoice_number: string
+  invoice_number: string | null
   invoice_date: string
   status: Purchase['status']
   subtotal: number
   tax: number
+  tax_pct: number | null
   total: number
   notes: string | null
   dk_suppliers: { name: string } | null
@@ -26,13 +27,14 @@ function mapPurchase(row: PurchaseRow): Purchase {
     status: row.status,
     subtotal: Number(row.subtotal),
     tax: Number(row.tax),
+    taxPct: row.tax_pct == null ? null : Number(row.tax_pct),
     total: Number(row.total),
     notes: row.notes,
   }
 }
 
 const PURCHASE_SELECT = `
-  id, supplier_id, invoice_number, invoice_date, status, subtotal, tax, total, notes,
+  id, supplier_id, invoice_number, invoice_date, status, subtotal, tax, tax_pct, total, notes,
   dk_suppliers ( name )
 `
 
@@ -60,9 +62,9 @@ export async function createPurchase(input: PurchaseInput): Promise<Purchase> {
     .from('dk_purchases')
     .insert({
       supplier_id: input.supplierId,
-      invoice_number: input.invoiceNumber,
+      invoice_number: input.invoiceNumber?.trim() || null,
       invoice_date: input.invoiceDate,
-      tax: input.tax ?? 0,
+      tax_pct: input.taxPct ?? null,
       notes: input.notes ?? null,
     })
     .select(PURCHASE_SELECT)
@@ -70,6 +72,16 @@ export async function createPurchase(input: PurchaseInput): Promise<Purchase> {
 
   if (error) throw error
   return mapPurchase(data as unknown as PurchaseRow)
+}
+
+/** Edits a draft header (RLS lets whoever creates purchases do it; a confirmed one is blocked by the guard). */
+export async function updatePurchaseHeader(id: string, input: PurchaseHeaderInput): Promise<void> {
+  const { error } = await supabase
+    .from('dk_purchases')
+    .update({ invoice_number: input.invoiceNumber?.trim() || null, invoice_date: input.invoiceDate, tax_pct: input.taxPct })
+    .eq('id', id)
+    .eq('status', 'BORRADOR')
+  if (error) throw error
 }
 
 /** Confirms (inventory in) and, ADR 0051, says how it was paid: cash or on credit. */
@@ -133,33 +145,40 @@ export async function deletePurchaseItem(itemId: string): Promise<void> {
   if (error) throw error
 }
 
-interface LastPriceRow {
-  unit_cost: number
-  purchase_unit_id: string
-  dk_units: { code: string } | null
-  dk_purchases: { invoice_date: string; dk_suppliers: { name: string } | null } | null
+interface PriceReferenceRow {
+  avgCost: number | null
+  last: { date: string; supplier: string; unitId: string; unitCode: string; unitCost: number; perBase: number } | null
+  avg90PerBase: number | null
 }
 
-export async function getLastIngredientPrice(ingredientId: string): Promise<LastIngredientPrice | null> {
-  const { data, error } = await supabase
-    .from('dk_purchase_items')
-    .select('unit_cost, purchase_unit_id, dk_units ( code ), dk_purchases!inner ( invoice_date, status, dk_suppliers ( name ) )')
-    .eq('ingredient_id', ingredientId)
-    .eq('dk_purchases.status', 'CONFIRMADA')
-    .order('invoice_date', { ascending: false, referencedTable: 'dk_purchases' })
-    .limit(1)
-    .maybeSingle()
-
+/**
+ * Last confirmed price and 90-day average per base unit (ADR 0063 D4), for several ingredients in one call.
+ * The «last» purchase is the most recent invoice date, across all purchases (the old query sorted per line).
+ */
+export async function fetchPriceReferences(ingredientIds: string[]): Promise<Record<string, PriceReference>> {
+  if (ingredientIds.length === 0) return {}
+  const { data, error } = await supabase.rpc('dk_price_references', { p_ingredient_ids: ingredientIds })
   if (error) throw error
-  if (!data) return null
-  const row = data as unknown as LastPriceRow
-  return {
-    unitCost: Number(row.unit_cost),
-    purchaseUnitId: row.purchase_unit_id,
-    purchaseUnitCode: row.dk_units?.code ?? '',
-    supplierName: row.dk_purchases?.dk_suppliers?.name ?? '—',
-    invoiceDate: row.dk_purchases?.invoice_date ?? '',
-  }
+  const rows = (data as unknown as Record<string, PriceReferenceRow> | null) ?? {}
+  return Object.fromEntries(
+    Object.entries(rows).map(([id, r]) => [
+      id,
+      {
+        avgCost: Number(r.avgCost ?? 0),
+        avg90PerBase: r.avg90PerBase == null ? null : Number(r.avg90PerBase),
+        last: r.last
+          ? {
+              unitCost: Number(r.last.unitCost),
+              purchaseUnitId: r.last.unitId,
+              purchaseUnitCode: r.last.unitCode,
+              supplierName: r.last.supplier,
+              invoiceDate: r.last.date,
+              perBase: Number(r.last.perBase),
+            }
+          : null,
+      },
+    ]),
+  )
 }
 
 export async function listAttachments(purchaseId: string): Promise<Attachment[]> {

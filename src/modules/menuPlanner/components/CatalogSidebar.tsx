@@ -1,4 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
+import { useShowDishCosts } from '@/shared/costs/costSettings'
 import { useProductCategories, useProducts } from '@/modules/products/hooks/useProducts'
 import type { Product } from '@/modules/products/types'
 import { Button } from '@/shared/ui/Button'
@@ -35,6 +36,7 @@ export function CatalogSidebar({
   onCreateDish: () => void
 }) {
   const { can } = useActiveKitchen()
+  const dishCosts = useShowDishCosts()
   const { data: products, isLoading } = useProducts()
   const { data: categories } = useProductCategories()
   const [query, setQuery] = useState('')
@@ -105,6 +107,7 @@ export function CatalogSidebar({
               onEdit={() => onEditDish(product)}
               canEdit={can('products.edit')}
               canPlan={can('menus.edit')}
+              costTargetPct={dishCosts.show ? dishCosts.targetPct : null}
             />
           ))
         )}

@@ -57,7 +57,7 @@ export async function requestInsight(feature: AiInsightFeatureKey, force = false
     if (body.error === 'AI_RATE_LIMITED') {
       return {
         kind: 'rate_limited',
-        reason: body.reason === 'interval' || body.reason === 'daily' ? body.reason : null,
+        reason: body.reason === 'interval' || body.reason === 'daily' || body.reason === 'budget' ? body.reason : null,
         message: body.message ?? 'Límite de análisis con IA alcanzado.',
         retryAfter: typeof body.retryAfter === 'number' ? body.retryAfter : null,
       }

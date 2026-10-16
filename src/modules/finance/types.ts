@@ -27,6 +27,8 @@ export interface Obligation {
   notes: string | null
   voidReason: string | null
   createdAt: string
+  /** ADR 0063: a «monto variable» month whose real amount is not confirmed yet (it cannot be paid). */
+  amountPending: boolean
 }
 
 export interface ObligationPayment {
@@ -57,6 +59,8 @@ export interface RecurringObligation {
   dayOfMonth: number
   startsOn: string
   active: boolean
+  /** ADR 0063: the amount changes each month (power, gas): each month asks for the real one. */
+  variableAmount: boolean
 }
 
 export interface Pnl {
@@ -129,6 +133,8 @@ export interface PayrollProposalLine {
   hours: number
   amount: number | null
   liquidated: boolean
+  /** ADR 0063: shifts of the period clocked in and never out (they count 0 hours). */
+  openShifts: number
 }
 
 export interface ExpenseInput {
@@ -155,6 +161,7 @@ export interface RecurringInput {
   dayOfMonth: number
   startsOn?: string
   active: boolean
+  variableAmount?: boolean
 }
 
 export interface PreviousPurchase {

@@ -19,7 +19,7 @@ vi.mock('../hooks/usePurchases', () => ({
   usePurchases: (limit: number) => {
     state.limits.push(limit)
     const rows: Purchase[] = Array.from({ length: Math.min(limit, state.total) }, (_, i) => ({
-      id: `p${i}`, supplierId: 's1', supplierName: `Proveedor ${i}`, invoiceNumber: `F-${i}`, invoiceDate: '2026-10-01', status: 'CONFIRMADA', subtotal: 1000, tax: 0, total: 1000, notes: null,
+      id: `p${i}`, supplierId: 's1', supplierName: `Proveedor ${i}`, invoiceNumber: `F-${i}`, invoiceDate: '2026-10-01', status: 'CONFIRMADA', subtotal: 1000, tax: 0, taxPct: null, total: 1000, notes: null,
     }))
     return { data: { rows, hasMore: state.total > limit }, isLoading: false, isFetching: false, isError: false, error: null, refetch: vi.fn() }
   },

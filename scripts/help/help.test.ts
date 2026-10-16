@@ -48,7 +48,7 @@ const EVAL: [string, string][] = [
   ['cargar la factura del proveedor', 'purchases'],
   ['agregar un proveedor nuevo', 'suppliers'],
   ['se me dañó la leche, cómo la saco del inventario', 'waste-adjustments'],
-  ['el conteo físico no cuadra con el sistema', 'waste-adjustments'],
+  ['el conteo físico no cuadra con el sistema', 'stock-count'],
   ['en qué momento baja el inventario', 'inventory-deduction'],
   ['crear un plato con su precio', 'dishes-and-menu'],
   ['poner una hamburguesa en promoción el viernes', 'dishes-and-menu'],

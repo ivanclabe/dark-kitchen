@@ -13,7 +13,7 @@ questions:
   - ¿Quién puede ver los salarios?
 keywords: [nómina, salario, sueldo, pago por hora, horas trabajadas, liquidar, quincena, empleados]
 related: [shifts, payables, profitability]
-updated: 2026-10-11
+updated: 2026-10-15
 order: 4
 ---
 
@@ -32,6 +32,8 @@ Elige **Desde** cuándo rige: un cambio no altera lo anterior.
 2. Quanela propone, por persona, las **horas** trabajadas (de la entrada a la salida, menos el descanso) × su tarifa, o el salario proporcional.
 3. Ajusta **A pagar** si hay extras, auxilios o deducciones, con una nota.
 4. Elige cuándo **Se paga** y toca **Liquidar**: queda una obligación por persona en **Por pagar**.
+
+> **Bueno saber:** un turno con entrada pero **sin salida** no suma horas. La propuesta lo dice debajo del nombre («1 turno sin salida»): corrígelo en **Personal** antes de liquidar. Ver [Turnos del personal](help:shifts).
 
 > **Bueno saber:** la nómina cuenta en la rentabilidad en su periodo, repartida por días. Pagarla no la vuelve a contar.
 

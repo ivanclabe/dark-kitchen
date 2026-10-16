@@ -10,7 +10,7 @@ import { Card } from '@/shared/ui/Card'
 import { Combobox } from '@/shared/ui/Combobox'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { FormField, Select } from '@/shared/ui/FormField'
+import { FormField, Input, Select } from '@/shared/ui/FormField'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Modal } from '@/shared/ui/Modal'
 import { Badge } from '@/shared/ui/Badge'
@@ -26,7 +26,7 @@ import { cardClass } from '@/shared/ui/formClasses'
 import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { formatDate, formatMoney } from '@/shared/utils/format'
-import { CheckCircle2, HandCoins, History, Paperclip, Plus, ShoppingCart, Trash2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, HandCoins, History, Paperclip, Pencil, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { CreateIngredientModal } from './CreateIngredientModal'
 import { useIngredients } from '../hooks/useIngredients'
@@ -36,11 +36,15 @@ import {
   useAttachments,
   useConfirmPurchase,
   useDeletePurchaseItem,
-  useLastIngredientPrice,
+  usePriceReferences,
   usePurchase,
   usePurchaseItems,
+  useUpdatePurchaseHeader,
   useUploadAttachment,
 } from '../hooks/usePurchases'
+import { useCostSettings } from '@/shared/costs/costSettings'
+import { priceChanges, priceChangeText } from '@/shared/costs/priceChange'
+import type { PriceReference } from '../types'
 import { PurchaseStatusBadge } from '../lib/purchaseStatus'
 import type { Ingredient } from '../types'
 
@@ -65,6 +69,8 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const deleteItem = useDeletePurchaseItem(purchaseId)
   const confirmPurchase = useConfirmPurchase(purchaseId)
   const uploadAttachment = useUploadAttachment(purchaseId)
+  const updateHeader = useUpdatePurchaseHeader(purchaseId)
+  const cost = useCostSettings()
   const attachmentUrl = useAttachmentUrl()
 
   const [ingredientId, setIngredientId] = useState('')
@@ -80,15 +86,25 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   const { data: suppliers } = useSuppliers()
   const { data: obligation } = usePurchaseObligation(purchaseId, can('finance.view') && purchase?.status === 'CONFIRMADA')
   const [createIngredientQuery, setCreateIngredientQuery] = useState<string | null>(null)
+  // ADR 0063 (D4): the draft header is editable; the invoice number can wait until confirming.
+  const [headerOpen, setHeaderOpen] = useState(false)
+  const [header, setHeader] = useState<{ invoiceNumber: string; invoiceDate: string; taxPct: number | null }>({ invoiceNumber: '', invoiceDate: '', taxPct: null })
+  const [confirmInvoiceNumber, setConfirmInvoiceNumber] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { data: lastPrice } = useLastIngredientPrice(ingredientId)
+  // ADR 0063 (D4): one call for the price references of the lines and of the ingredient being added.
+  const { data: references } = usePriceReferences([ingredientId, ...(items?.map((i) => i.ingredientId) ?? [])])
+  const lastPrice = ingredientId ? (references?.[ingredientId]?.last ?? null) : null
+  const tolerance = cost.enabled ? cost.priceChangePct : 0
 
   const isDraft = purchase?.status === 'BORRADOR'
   // Borradores: los edita quien crea compras; confirmar (entra al inventario) es un permiso aparte.
   const canEditDraft = isDraft && can('purchasing.create')
   const canConfirm = isDraft && can('purchasing.confirm')
-  const total = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
+  const subtotal = items?.reduce((sum, item) => sum + item.lineTotal, 0) ?? 0
+  // A draft shows the tax it will have on confirm; a confirmed one, what was recorded.
+  const tax = !purchase ? 0 : !isDraft ? purchase.tax : purchase.taxPct !== null ? Math.round(subtotal * purchase.taxPct) / 100 : purchase.tax
+  const total = !purchase || isDraft ? subtotal + tax : purchase.total
 
   const ingredientOptions = useMemo(() => ingredients?.filter((i) => !i.isPreparation).map((i) => ({ value: i.id, label: i.name, sublabel: i.code })) ?? [], [ingredients])
   const ingredient = ingredients?.find((i) => i.id === ingredientId)
@@ -103,6 +119,8 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
     ingredient && chosenUnit && factor && chosenUnit.code !== ingredient.baseUnitCode && quantity > 0
       ? `${formatNumber(quantity)} ${chosenUnit.code} = ${formatNumber(quantity * factor)} ${ingredient.baseUnitCode}${unitCost ? ` · ${formatMoney(unitCost / factor, { decimals: 'auto' })}/${ingredient.baseUnitCode}` : ''}`
       : null
+
+  const newLineWarnings = ingredient && factor && unitCost ? priceWarnings(unitCost / factor, references?.[ingredient.id], tolerance) : []
 
   function chooseIngredient(id: string) {
     setIngredientId(id)
@@ -146,9 +164,34 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
     }
   }
 
+  function openHeader() {
+    if (!purchase) return
+    setHeader({ invoiceNumber: purchase.invoiceNumber ?? '', invoiceDate: purchase.invoiceDate, taxPct: purchase.taxPct })
+    setHeaderOpen(true)
+  }
+
+  async function handleSaveHeader(e: FormEvent) {
+    e.preventDefault()
+    try {
+      await updateHeader.mutateAsync({ invoiceNumber: header.invoiceNumber || null, invoiceDate: header.invoiceDate, taxPct: header.taxPct })
+      setHeaderOpen(false)
+      show('Datos de la factura actualizados.')
+    } catch (err) {
+      show(getErrorMessage(err, 'No se pudieron guardar los datos de la factura'), 'error')
+    }
+  }
+
   async function handleConfirm() {
     setError(null)
     try {
+      // The invoice number is required to confirm: asked here when the draft has none.
+      if (!purchase?.invoiceNumber) {
+        if (!confirmInvoiceNumber.trim()) {
+          setError('Escribe el número de la factura antes de confirmar la compra')
+          return
+        }
+        await updateHeader.mutateAsync({ invoiceNumber: confirmInvoiceNumber, invoiceDate: purchase!.invoiceDate, taxPct: purchase!.taxPct })
+      }
       await confirmPurchase.mutateAsync(payment)
       setConfirmOpen(false)
       show(payment.mode === 'cash' ? 'Compra confirmada y pagada — inventario actualizado.' : 'Compra confirmada — inventario actualizado; quedó en Por pagar.')
@@ -191,11 +234,19 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className={typography.h2}>Factura {purchase.invoiceNumber}</h2>
+                <h2 className={typography.h2}>{purchase.invoiceNumber ? `Factura ${purchase.invoiceNumber}` : 'Compra sin n.º de factura'}</h2>
                 <PurchaseStatusBadge status={purchase.status} />
               </div>
-              <p className={`mt-0.5 ${typography.small}`}>
-                {purchase.supplierName} · {formatDate(purchase.invoiceDate)}
+              <p className={`mt-0.5 flex flex-wrap items-center gap-x-2 ${typography.small}`}>
+                <span>
+                  {purchase.supplierName} · {formatDate(purchase.invoiceDate)}
+                  {purchase.taxPct !== null ? ` · IVA ${formatNumber(purchase.taxPct)} %` : ''}
+                </span>
+                {canEditDraft && (
+                  <Button variant="link" size="sm" icon={Pencil} onClick={openHeader}>
+                    Editar datos
+                  </Button>
+                )}
               </p>
             </div>
           </div>
@@ -207,6 +258,8 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 // A supplier with a payment term proposes «a crédito», due on the invoice date plus the term.
                 const terms = suppliers?.find((s) => s.id === purchase.supplierId)?.paymentTermsDays ?? 0
                 setPayment(terms > 0 ? { mode: 'credit', dueDate: addDays(purchase.invoiceDate, terms) } : { mode: 'cash', method: 'Efectivo' })
+                setConfirmInvoiceNumber('')
+                setError(null)
                 setConfirmOpen(true)
               }}
               disabled={!items?.length}
@@ -217,7 +270,15 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         </div>
 
         <div className="flex items-end justify-between gap-3 border-t border-neutral-800/60 pt-3">
-          <span className={typography.small}>Total de la compra</span>
+          <span className={typography.small}>
+            Total de la compra
+            {tax > 0 && (
+              <span className="block text-xs text-neutral-500 tabular-nums">
+                Subtotal {formatMoney(subtotal)} · IVA {formatMoney(tax)}
+                {isDraft && purchase.taxPct !== null ? ' (se calcula al confirmar)' : ''}
+              </span>
+            )}
+          </span>
           <span className="text-2xl font-semibold tabular-nums text-neutral-50">{formatMoney(total, { code: true })}</span>
         </div>
 
@@ -261,7 +322,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
               hint={
                 lastPrice ? (
                   <Button type="button" variant="link" size="sm" icon={History} onClick={applyLastPrice}>
-                    Último: {formatMoney(lastPrice.unitCost, { decimals: 'auto' })}/{lastPrice.purchaseUnitCode} · {lastPrice.supplierName} · usar
+                    Último: {formatMoney(lastPrice.unitCost, { decimals: 'auto' })}/{lastPrice.purchaseUnitCode} · {lastPrice.supplierName} · {formatDate(lastPrice.invoiceDate)} · usar
                   </Button>
                 ) : undefined
               }
@@ -322,6 +383,12 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 Entra al inventario: {equivalenceText}
               </p>
             )}
+            {newLineWarnings.length > 0 && (
+              <p className="flex items-start gap-1.5 text-xs text-amber-400" aria-live="polite">
+                <AlertTriangle size={13} className="mt-px shrink-0" aria-hidden />
+                {newLineWarnings.join(' · ')} — revisa el costo antes de agregar.
+              </p>
+            )}
             <Button type="submit" variant="primary" icon={Plus} loading={addItem.isPending}>
               Agregar línea
             </Button>
@@ -355,6 +422,19 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                       return f ? ` → ${formatNumber(item.quantity * f)} ${base!.baseUnitCode}` : ''
                     })()}
                   </p>
+                  {isDraft &&
+                    (() => {
+                      // ADR 0063 (D4): the price of the line against the last purchase and the 90-day average.
+                      const base = ingredients?.find((i) => i.id === item.ingredientId)
+                      const f = base ? (item.purchaseUnitCode === base.baseUnitCode ? 1 : unitFactor(item.purchaseUnitCode, infoFor(base), units)) : null
+                      const warnings = f && item.unitCost > 0 ? priceWarnings(item.unitCost / f, references?.[item.ingredientId], tolerance) : []
+                      return warnings.length > 0 ? (
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-amber-400">
+                          <AlertTriangle size={12} className="shrink-0" aria-hidden />
+                          {warnings.join(' · ')}
+                        </p>
+                      ) : null
+                    })()}
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <span className="text-sm font-semibold tabular-nums text-neutral-100">{formatMoney(item.lineTotal)}</span>
@@ -430,12 +510,45 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
         }
       >
         <div className="space-y-4">
+          {!purchase.invoiceNumber && (
+            <FormField label="N.º de factura" required hint="Se necesita para confirmar." error={error}>
+              {(a11y) => <Input {...a11y} value={confirmInvoiceNumber} onChange={(e) => setConfirmInvoiceNumber(e.target.value)} autoFocus />}
+            </FormField>
+          )}
           <p className="text-sm text-neutral-300">
             Esto genera movimientos de <strong>entrada de inventario</strong> por cada línea y actualiza el costo promedio de los insumos. No se puede deshacer — para
             corregir un error habría que registrar un ajuste manual después.
           </p>
           <PurchasePaymentChoice value={payment} onChange={setPayment} />
         </div>
+      </Modal>
+      <Modal
+        open={headerOpen}
+        onClose={() => setHeaderOpen(false)}
+        title="Datos de la factura"
+        description="Solo se pueden cambiar mientras la compra es borrador."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setHeaderOpen(false)} disabled={updateHeader.isPending}>
+              Cancelar
+            </Button>
+            <Button type="submit" form="purchase-header-form" variant="primary" loading={updateHeader.isPending} disabled={!header.invoiceDate}>
+              Guardar
+            </Button>
+          </>
+        }
+      >
+        <form id="purchase-header-form" onSubmit={handleSaveHeader} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <FormField label="N.º de factura" hint="Se pide al confirmar.">
+            {(a11y) => <Input {...a11y} value={header.invoiceNumber} onChange={(e) => setHeader((h) => ({ ...h, invoiceNumber: e.target.value }))} />}
+          </FormField>
+          <FormField label="Fecha" required>
+            {(a11y) => <Input {...a11y} type="date" value={header.invoiceDate} onChange={(e) => setHeader((h) => ({ ...h, invoiceDate: e.target.value }))} required />}
+          </FormField>
+          <FormField label="IVA" info="Al confirmar, el IVA se calcula sobre el subtotal. Vacío = el IVA que ya tiene la compra.">
+            {(a11y) => <NumberInput {...a11y} value={header.taxPct} onValueChange={(v) => setHeader((h) => ({ ...h, taxPct: v ?? null }))} min={0} max={100} decimals={2} unit="%" />}
+          </FormField>
+        </form>
       </Modal>
       {paying && obligation && <PayObligationModal obligation={obligation} onClose={() => setPaying(false)} />}
 
@@ -447,4 +560,10 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
       />
     </div>
   )
+}
+
+/** The price warnings of a cost per base unit (ADR 0063 D4); none without references or with the rules off. */
+function priceWarnings(perBase: number, ref: PriceReference | undefined, tolerancePct: number): string[] {
+  if (!ref) return []
+  return priceChanges(perBase, { lastPerBase: ref.last?.perBase ?? null, avg90PerBase: ref.avg90PerBase, avgCost: ref.avgCost }, tolerancePct).map(priceChangeText)
 }

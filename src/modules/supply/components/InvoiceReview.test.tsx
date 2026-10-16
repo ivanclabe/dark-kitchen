@@ -7,7 +7,8 @@ import type { Extraction, InvoiceMatch } from '../types/invoiceImport'
 // ADR 0049: the review proposes, the person decides; nothing is saved until she says so.
 const state = vi.hoisted(() => ({ perms: new Set<string>(), save: vi.fn(), match: vi.fn() }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
-vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () => ({ can: (p: string) => state.perms.has(p) }) }))
+vi.mock('@/shared/kitchen/activeKitchenContext', () => ({ useActiveKitchen: () => ({ can: (p: string) => state.perms.has(p), feature: () => null }) }))
+vi.mock('../hooks/usePurchases', () => ({ usePriceReferences: () => ({ data: {} }) }))
 vi.mock('@/shared/kitchen/KitchenLink', () => ({ KitchenLink: ({ to, children, ...rest }: { to: string; children: React.ReactNode }) => <a href={to} {...rest}>{children}</a> }))
 vi.mock('./InvoicePreview', () => ({ InvoicePreview: () => null }))
 vi.mock('@/shared/hooks/useUnits', () => ({

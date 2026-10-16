@@ -420,12 +420,13 @@ Deno.serve(async (req: Request) => {
   });
   const requestId = typeof body.requestId === "string" ? body.requestId.slice(0, 64) : null;
 
-  // ⏹ — the person cancelled: the run (their own, still running) is closed as cancelled.
+  // ⏹ — the person cancelled (ADR 0063): the run is ASKED to stop. The question running elsewhere sees it before
+  // its next model round, stops calling the model and closes as cancelled WITH the tokens it already used.
   if (body.action === "cancel") {
     if (!requestId) return json({ error: "Falta la consulta a cancelar" }, 400);
     const { data: runs } = await db.from("dk_ai_insights").select("id").eq("feature_key", "copilot").eq("status", "running").eq("input->>requestId", requestId).limit(1);
     const runId = (runs as { id: string }[] | null)?.[0]?.id;
-    if (runId) await db.rpc("dk_ai_run_finish", { p_run_id: runId, p_status: "cancelled" });
+    if (runId) await db.rpc("dk_ai_run_request_cancel", { p_run_id: runId });
     return json({ ok: true });
   }
 
@@ -470,6 +471,10 @@ Deno.serve(async (req: Request) => {
   let spokenMs: number | null = null;
   let inputTokens = 0;
   let outputTokens = 0;
+  // ADR 0063: cache reads and writes are priced differently, so they are recorded apart.
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
+  let cancelled = false;
   const timings = () => ({
     rounds,
     tools: steps.map((s) => ({ tool: s.tool, ms: s.ms, ok: s.ok })),
@@ -480,7 +485,7 @@ Deno.serve(async (req: Request) => {
     ...(client ? { client } : {}),
   });
   // Closed after answering (ADR 0041, D5): the person does not wait for it.
-  const finish = (status: "ok" | "error", extra: { output?: Json; error?: string; answer?: Answer }) =>
+  const finish = (status: "ok" | "error" | "cancelled", extra: { output?: Json; error?: string; answer?: Answer }) =>
     background(
       Promise.resolve(db.rpc("dk_ai_run_finish", {
         p_run_id: runId,
@@ -494,6 +499,8 @@ Deno.serve(async (req: Request) => {
         p_intent: extra.answer?.intent ?? null,
         p_scope: extra.answer?.scope ?? null,
         p_timings: timings(),
+        p_cache_read_tokens: cacheReadTokens,
+        p_cache_write_tokens: cacheWriteTokens,
       })),
     );
 
@@ -523,12 +530,22 @@ Deno.serve(async (req: Request) => {
       for (let round = 0; round <= MAX_TOOL_ROUNDS && !result; round++) {
         const left = DEADLINE_MS - (Date.now() - startedAt);
         if (left < 1_500) break;
+        // ⏹ pressed? Do not pay for another round (the first one always runs: there is nothing to check yet).
+        if (round > 0) {
+          const { data: stop } = await db.rpc("dk_ai_run_cancel_requested", { p_run_id: runId });
+          if (stop === true) {
+            cancelled = true;
+            break;
+          }
+        }
         // Last round, or little time left: the model must answer now with what it has.
         const forceAnswer = round === MAX_TOOL_ROUNDS || left < ANSWER_RESERVE_MS;
         const roundStart = Date.now();
         const res = await callModel(apiKey, model, system, tools, messages, { forceAnswer, timeoutMs: left - 500, onSpoken: spoken });
         rounds.push(Date.now() - roundStart);
-        inputTokens += (res.usage?.input_tokens ?? 0) + (res.usage?.cache_read_input_tokens ?? 0) + (res.usage?.cache_creation_input_tokens ?? 0);
+        inputTokens += res.usage?.input_tokens ?? 0;
+        cacheReadTokens += res.usage?.cache_read_input_tokens ?? 0;
+        cacheWriteTokens += res.usage?.cache_creation_input_tokens ?? 0;
         outputTokens += res.usage?.output_tokens ?? 0;
         const content = res.content ?? [];
         const uses = content.filter((c) => c.type === "tool_use");
@@ -561,6 +578,10 @@ Deno.serve(async (req: Request) => {
           }),
         );
         messages.push({ role: "user", content: results });
+      }
+      if (cancelled) {
+        finish("cancelled", { error: "cancelada por la persona" });
+        return { status: 499, body: { error: "CANCELLED", message: "Consulta cancelada." } };
       }
       if (!result) result = PARTIAL;
       result = { ...result, answer: sanitizeLinks(result.answer, ids) };

@@ -263,7 +263,7 @@ Los platos agotados o de negocios cerrados no se recomiendan. Si no hay nada abi
 | D2 | Capa publicada opt-in (`dk_storefronts`, `dk_storefront_products`) + lectura solo por `dk_public_*` |
 | D3 | Métricas operativas solo con `share_metrics` y con mínimo de 10 pedidos |
 | D4 | Pipeline puro en `supabase/functions/_consumer/`, Edge Function `dk-consumer-assistant` |
-| D5 | Claude solo para la intención (modelo por `DK_CONSUMER_MODEL`, por defecto `claude-haiku-5-5`); las respuestas con datos son deterministas |
+| D5 | Claude solo para la intención (modelo por `DK_CONSUMER_MODEL`, por defecto `claude-haiku-5-5`; desde el ADR 0063 se elige en Plataforma → IA → Proveedores, con interruptor y medición); las respuestas con datos son deterministas |
 | D6 | Sesión anónima de Supabase para consumidores; perfil solo con consentimiento. **En producción hay que activar «Anonymous sign-ins» en Auth** |
 | D7 | Rating, reseñas, distancia sin ubicación y adiciones con precio: **no se muestran ni pesan** hasta que existan |
 | D8 | Pedido directo: diseñado (§8), pendiente de aprobación |
@@ -334,6 +334,6 @@ La prueba «every figure in a reply comes from the data» verifica que cada cifr
 ### 11.4 Para llevarlo a producción (pendiente de tu aprobación)
 1. Aplicar la migración (ensayo previo: `python3 supabase/tests/run.py consumer_public --with supabase/migrations/20261007120000_dk_consumer_marketplace.sql`).
 2. Activar **Anonymous sign-ins** en Auth (D6). Sin eso la app busca igual, pero no guarda perfil.
-3. Desplegar `dk-consumer-assistant`. `DK_CONSUMER_MODEL` es opcional (`claude-haiku-5-5` por defecto); usa el mismo `DK_ANTHROPIC_API_KEY`.
+3. Desplegar `dk-consumer-assistant`. Usa el mismo `DK_ANTHROPIC_API_KEY`. Desde el ADR 0063, el modelo y el encendido se configuran en Plataforma → IA → Proveedores; `DK_CONSUMER_MODEL` ya no se lee.
 4. Publicar la app de iOS (`quanela-ios`) con la URL y la llave publicable de producción en `Config/Local.xcconfig` (TestFlight / App Store).
 5. Que cada negocio publique en Configuración → Quanela Consumer. Hasta entonces el catálogo público está vacío, como debe ser.

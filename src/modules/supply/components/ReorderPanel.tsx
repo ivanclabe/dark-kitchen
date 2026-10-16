@@ -8,7 +8,8 @@ import { StatCard } from '@/shared/ui/StatCard'
 import { Tooltip } from '@/shared/ui/Tooltip'
 import { typography } from '@/shared/ui/typography'
 import { formatMoney } from '@/shared/utils/format'
-import { AlertTriangle, ArrowRight, CheckCircle2, Clock, History, PackagePlus, Settings2, Trash2, Wallet } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle2, ClipboardCheck, Clock, History, PackagePlus, Settings2, Trash2, Wallet } from 'lucide-react'
+import { useCostSettings } from '@/shared/costs/costSettings'
 import { useMemo } from 'react'
 import { InsightExplanation, InsightSummary } from '@/modules/ai/components/InsightParts'
 import { insightItemsByRef } from '@/modules/ai/lib/insightItems'
@@ -56,10 +57,14 @@ function UrgencyBadge({ suggestion, coverageDays }: { suggestion: SupplySuggesti
 export function ReorderPanel({
   onSelectIngredient,
   onCreatePurchaseFor,
+  onStartCount,
 }: {
   onSelectIngredient: (ingredientId: string) => void
   onCreatePurchaseFor: (supplierId: string | null, lines: PresetLine[]) => void
+  /** ADR 0063 (D5): only for whoever can adjust the inventory. */
+  onStartCount?: () => void
 }) {
+  const { reorderDays } = useCostSettings()
   const { data: suggestions, isLoading, isError, error, refetch } = useSupplySuggestions()
   const { data: ingredients } = useIngredients()
   // El umbral de cobertura corta es configurable (Configuración → IA → Sugerencias de compra).
@@ -94,7 +99,7 @@ export function ReorderPanel({
     return items
       .map((s) => {
         const ingredient = active.find((i) => i.id === s.ingredientId)
-        return ingredient ? { ingredient, quantity: orderQuantity(s) } : null
+        return ingredient ? { ingredient, quantity: orderQuantity(s, reorderDays) } : null
       })
       .filter((l): l is PresetLine => l !== null)
   }
@@ -113,6 +118,17 @@ export function ReorderPanel({
         <StatCard label="Merma (30 días)" value={formatMoney(wasted30d)} hint="Valorizada al costo promedio" icon={Trash2} tone={wasted30d > 0 ? 'warn' : 'neutral'} />
       </div>
 
+      {onStartCount && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-3">
+          <p className="text-sm text-neutral-300">
+            <span className="font-medium text-neutral-100">Conteo físico.</span> Cuenta la bodega y corrige el inventario con un solo ajuste.
+          </p>
+          <Button variant="secondary" size="sm" icon={ClipboardCheck} onClick={onStartCount}>
+            Contar inventario
+          </Button>
+        </div>
+      )}
+
       <Card title="Reponer" description={`Bajo mínimo o con menos de ${coverageDays} días de cobertura, agrupado por proveedor`} icon={PackagePlus}>
         {isError ? (
           <ErrorState error={error} onRetry={() => void refetch()} compact />
@@ -124,7 +140,7 @@ export function ReorderPanel({
           <div className="space-y-5">
             {reorderAi.enabled && <InsightSummary feature="supply_reorder" result={aiResult} isLoading={aiLoading} />}
             {bySupplier.map((group) => {
-              const orderable = group.items.filter((s) => orderQuantity(s) > 0)
+              const orderable = group.items.filter((s) => orderQuantity(s, reorderDays) > 0)
               return (
                 <div key={group.supplierId ?? 'SIN_PROVEEDOR'}>
                   <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
@@ -145,7 +161,7 @@ export function ReorderPanel({
                   </div>
                   <ul className="divide-y divide-neutral-800/60">
                     {group.items.map((s) => {
-                      const qty = orderQuantity(s)
+                      const qty = orderQuantity(s, reorderDays)
                       const ai = aiByRef.get(s.ingredientId)
                       return (
                         <li key={s.ingredientId}>
@@ -187,6 +203,7 @@ export function ReorderPanel({
       </Card>
 
       <SupplyAiCards onSelectIngredient={onSelectIngredient} />
+
 
       <Card title="Movimientos recientes" description="Todo el inventario" icon={History}>
         <MovementTimeline showIngredientName />
