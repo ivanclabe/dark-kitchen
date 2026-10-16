@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 
+/**
+ * The open dialogs, newest last (ADR 0065). Only the top one answers Escape and traps Tab, and the page
+ * scroll comes back when the last one closes: a modal opened from a form no longer closes the form too.
+ */
+const openDialogs: symbol[] = []
+
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -36,6 +42,9 @@ export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open:
   useEffect(() => {
     if (!open) return
 
+    const id = Symbol('dialog')
+    openDialogs.push(id)
+    const isTop = () => openDialogs[openDialogs.length - 1] === id
     const container = containerRef.current
     // A field with autoFocus already took it: keep it there. Otherwise, the first focusable.
     if (!container?.contains(document.activeElement)) {
@@ -44,6 +53,7 @@ export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open:
     }
 
     function handleKeyDown(e: KeyboardEvent) {
+      if (!isTop()) return
       if (e.key === 'Escape') {
         onCloseRef.current()
         return
@@ -66,7 +76,8 @@ export function useDialogA11y(containerRef: RefObject<HTMLElement | null>, open:
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
+      openDialogs.splice(openDialogs.indexOf(id), 1)
+      if (openDialogs.length === 0) document.body.style.overflow = ''
       previouslyFocusedRef.current?.focus?.()
     }
   }, [open, containerRef])

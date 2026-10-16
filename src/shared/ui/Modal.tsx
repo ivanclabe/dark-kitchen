@@ -54,7 +54,7 @@ export function Modal({
             <X size={18} />
           </button>
         </div>
-        <div className="overflow-y-auto px-5 py-2 text-sm text-neutral-300">{children}</div>
+        <div className="overflow-y-auto overscroll-contain px-5 py-2 text-sm text-neutral-300">{children}</div>
         {footer && <div className="flex justify-end gap-2 px-5 pt-3 pb-5">{footer}</div>}
       </div>
     </div>,

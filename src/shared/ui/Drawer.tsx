@@ -64,7 +64,7 @@ export function Drawer({
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">{children}</div>
         {footer && <div className="shrink-0 border-t border-neutral-800 px-5 pt-3 pb-4 sm:px-6">{footer}</div>}
       </div>
     </div>,

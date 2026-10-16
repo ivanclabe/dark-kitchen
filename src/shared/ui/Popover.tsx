@@ -84,7 +84,7 @@ export function Popover({
             aria-label={label}
             onKeyDown={handleKeyDown}
             className={clsx(
-              'shadow-float z-50 overflow-y-auto border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
+              'shadow-float z-50 overflow-y-auto overscroll-contain border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
               // Celular: hoja inferior a todo lo ancho. Solo con variantes max-md para no competir con
               // la posición de escritorio (antes un "bottom auto" de escritorio anulaba el anclaje abajo
               // de right-end: el menú se abría hacia abajo, fuera de la pantalla, y desplazaba el layout).
@@ -126,7 +126,7 @@ export function PopoverItem({
       aria-current={checked ? 'true' : undefined}
       onClick={onSelect}
       className={clsx(
-        'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-none',
+        'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus',
         tone === 'danger'
           ? 'text-red-300 hover:bg-red-500/10 focus-visible:bg-red-500/10'
           : 'text-neutral-200 hover:bg-neutral-800 focus-visible:bg-neutral-800',

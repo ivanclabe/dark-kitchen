@@ -96,7 +96,7 @@ export function Menu({
                     close()
                     item.onSelect()
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-neutral-200 outline-none hover:bg-neutral-800 focus-visible:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-neutral-200 outline-none hover:bg-neutral-800 focus-visible:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {Icon && <Icon size={15} className="shrink-0 text-neutral-500" />}
                   <span className="flex-1">{item.label}</span>
