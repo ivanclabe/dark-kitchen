@@ -23,7 +23,9 @@ export function KitchenStatusLine({ lateCount, canConfigure, onConfigure }: { la
   const label = status.state === 'unconfigured' ? 'En vivo' : describeStatus(status, new Date(now))
 
   return (
-    <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
+    // One line that never wraps (the header keeps it at one line's height, and a wrap was cut off on phones):
+    // the late count comes first, the note shortens, the clock is left out on a phone.
+    <p className="flex min-w-0 items-center gap-x-1.5 text-sm whitespace-nowrap text-neutral-500">
       <span className="relative flex size-2 shrink-0" aria-hidden>
         {status.state !== 'closed' && <span className={clsx('absolute inline-flex size-full animate-ping rounded-full opacity-60', dot)} />}
         <span className={clsx('relative inline-flex size-2 rounded-full', dot)} />
@@ -32,19 +34,23 @@ export function KitchenStatusLine({ lateCount, canConfigure, onConfigure }: { la
         type="button"
         onClick={onConfigure}
         title="Ver horario de la cocina"
-        className={clsx('rounded hover:text-neutral-300 hover:underline underline-offset-4', status.state === 'open' && 'text-neutral-300')}
+        className={clsx('shrink-0 rounded hover:text-neutral-300 hover:underline underline-offset-4', status.state === 'open' && 'text-neutral-300')}
       >
         {label}
       </button>
-      {note && <span className="text-amber-300/90">· {note}</span>}
-      <span className="tabular-nums">· {clock(now)}</span>
       {lateCount > 0 && (
-        <span className="font-medium text-red-400">
+        <span className="shrink-0 font-medium text-red-400">
           · {lateCount} {lateCount === 1 ? 'atrasado' : 'atrasados'}
         </span>
       )}
+      {note && (
+        <span className="min-w-0 truncate text-amber-300/90" title={note}>
+          · {note}
+        </span>
+      )}
+      <span className="hidden shrink-0 tabular-nums sm:inline">· {clock(now)}</span>
       {status.state === 'unconfigured' && canConfigure && (
-        <button type="button" onClick={onConfigure} className="text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4">
+        <button type="button" onClick={onConfigure} className="min-w-0 truncate text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4">
           · Configurar horario
         </button>
       )}

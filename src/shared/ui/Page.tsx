@@ -13,7 +13,9 @@ import type { ReactNode } from 'react'
 export type PageVariant = 'board' | 'default'
 
 const VARIANT: Record<PageVariant, string> = {
-  board: 'flex h-full min-h-0 w-full flex-col gap-6',
+  // ADR 0065: never shorter than 34 rem — at 200 % zoom, on a 768 px laptop or a tablet on its side the
+  // board used to keep ~70 px; below that height <main> scrolls the page instead.
+  board: 'flex h-full min-h-[34rem] w-full flex-col gap-6',
   default: 'w-full space-y-6',
 }
 
