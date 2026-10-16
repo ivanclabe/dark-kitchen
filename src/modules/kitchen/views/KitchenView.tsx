@@ -80,6 +80,8 @@ export function KitchenView() {
     if (!soundEnabled) deviceSpeech.clear()
   }, [soundEnabled])
 
+  // ADR 0065: «—» until the orders arrive, not «0».
+  const known = prepOrders !== undefined
   const kpis = useMemo(() => {
     const orders = prepOrders ?? []
     const count = (status: PrepStatus) => orders.filter((o) => o.status === status).length
@@ -133,10 +135,10 @@ export function KitchenView() {
         figures={
           <OperationsFigures
             items={[
-              { id: 'queue', label: 'En cola', value: kpis.cola },
-              { id: 'preparing', label: 'Preparando', value: kpis.preparando },
-              { id: 'ready', label: 'Listos', value: kpis.listo },
-              { id: 'late', label: 'Atrasados', value: kpis.late, tone: 'warn' },
+              { id: 'queue', label: 'En cola', value: known ? kpis.cola : null },
+              { id: 'preparing', label: 'Preparando', value: known ? kpis.preparando : null },
+              { id: 'ready', label: 'Listos', value: known ? kpis.listo : null },
+              { id: 'late', label: 'Atrasados', value: known ? kpis.late : null, tone: 'warn' },
             ]}
           />
         }

@@ -3,7 +3,8 @@ import clsx from 'clsx'
 export interface OperationsFigure {
   id: string
   label: string
-  value: number
+  /** null while it is not known (loading or failed): shown as «—». */
+  value: number | null
   /** Red when above zero (late, unpaid…). */
   tone?: 'warn'
   /** Opens where those orders are (a view, already filtered). */
@@ -25,7 +26,14 @@ export function OperationsFigures({ items }: { items: OperationsFigure[] }) {
       {items.map((f) => {
         const body = (
           <>
-            <span className={clsx('block text-xl leading-none font-semibold tabular-nums', f.tone === 'warn' && f.value > 0 ? 'text-red-400' : 'text-neutral-50')}>{f.value}</span>
+            <span
+              className={clsx(
+                'block text-xl leading-none font-semibold tabular-nums',
+                f.value === null ? 'text-neutral-600' : f.tone === 'warn' && f.value > 0 ? 'text-red-400' : 'text-neutral-50',
+              )}
+            >
+              {f.value ?? '—'}
+            </span>
             <span className="mt-1.5 block truncate text-xs text-neutral-500">{f.label}</span>
           </>
         )

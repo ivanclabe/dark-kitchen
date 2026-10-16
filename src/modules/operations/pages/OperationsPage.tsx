@@ -35,7 +35,9 @@ function useOrderFigures(): OperationsFigure[] {
   const ops = useOperations()
   const seesOrders = can('orders.view')
   const { data: deliveredToday } = useDeliveredTodayCount(seesOrders)
-  const count = (status: OrderStatus) => (ops.live ?? []).filter((o) => o.status === status).length
+  // ADR 0065: without the live orders yet (loading, or failed) a figure is «—», never a «0» that is not true.
+  const live = ops.live
+  const count = (status: OrderStatus) => (live ? live.filter((o) => o.status === status).length : null)
   const toList = (status: string, range?: string) => (ops.view === 'board' && !range ? undefined : () => ops.setView('list', { status, range: range ?? 'all' }))
 
   if (!seesOrders) {
@@ -51,14 +53,14 @@ function useOrderFigures(): OperationsFigure[] {
     { id: 'preparing', label: 'Preparando', value: count('EN_PREPARACION'), onSelect: toList('EN_PREPARACION') },
     { id: 'ready', label: 'Listos', value: count('LISTO'), onSelect: toList('LISTO') },
     { id: 'route', label: 'En ruta', value: count('DESPACHADO'), onSelect: toList('DESPACHADO') },
-    { id: 'delivered', label: 'Entregados hoy', value: deliveredToday ?? 0, onSelect: toList('delivered', 'today') },
+    { id: 'delivered', label: 'Entregados hoy', value: deliveredToday ?? null, onSelect: toList('delivered', 'today') },
     // ADR 0031: the other dimension — open orders still to collect (only for whoever sees the receivables).
     ...(can('receivables.view')
       ? [
           {
             id: 'unpaid',
             label: 'Por cobrar',
-            value: (ops.live ?? []).filter((o) => paymentSummary(o)?.state !== 'paid').length,
+            value: live ? live.filter((o) => paymentSummary(o)?.state !== 'paid').length : null,
             onSelect: () => ops.setView('list', { status: 'open', range: 'all', payment: 'pending' }),
           },
         ]
@@ -123,7 +125,8 @@ export function OperationsPage() {
   const view = resolveOperationsView(can, params.get('view'))
   const defaultView = defaultOperationsView(can)
 
-  const { data: live, isLoading } = useLiveOrders(view !== 'list')
+  // Also in Lista: its figures count the open orders (they showed 0 when entering Lista directly).
+  const { data: live, isLoading } = useLiveOrders()
   const sorted = useMemo(
     () => (live ? [...live].sort((a, b) => b.priority - a.priority || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : undefined),
     [live],
