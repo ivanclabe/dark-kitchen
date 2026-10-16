@@ -1,11 +1,11 @@
 # ADR 0065: Sistema de diseño de calidad premium
 
 ## Estado
-**Fases 2 y 3 implementadas (2026-10-15). La Fase 2 está aprobada; la Fase 3 está pendiente de aprobación.** Se pidió en la conversación: subir la calidad visual y de experiencia de Quanela por fases, sin tocar lógica de negocio, consultas de Supabase, permisos ni migraciones, y detenerse al final de cada fase.
+**Fases 2, 3 y 4 implementadas (2026-10-15). Las fases 2 y 3 están aprobadas; la Fase 4 está pendiente de aprobación.** Se pidió en la conversación: subir la calidad visual y de experiencia de Quanela por fases, sin tocar lógica de negocio, consultas de Supabase, permisos ni migraciones, y detenerse al final de cada fase.
 
 - **Fase 1:** auditoría (solo lectura). Aprobada.
 - **Fase 2:** sistema de diseño. Aprobada.
-- **Fase 3:** pulido por módulo, empezando por los P0 y P1 de la auditoría.
+- **Fase 3:** pulido por módulo, empezando por los P0 y P1 de la auditoría. Aprobada.
 - **Fase 4:** movimiento.
 
 ## Decisiones del usuario
@@ -100,6 +100,43 @@ Todos los `focus-visible:ring-brasa-500`, `focus:border-brasa-500` y similares d
 ### General
 - Nombres: Insights → «Análisis» y Consumer → «App de clientes» (menú, título, permisos, Copilot e Inicio). Las rutas no cambian.
 - Enlace «Saltar al contenido» con el primer Tab.
+
+## Fase 4: movimiento
+
+Se buscaron oportunidades con el criterio de Emil Kowalski (find-animation-opportunities): animar solo lo que tiene un propósito y no se repite cientos de veces al día. El usuario aprobó las cinco propuestas.
+
+| # | Dónde | Cambio |
+|---|---|---|
+| 1 | Inicio («En vivo»), línea de estado de Cocina, quién está en línea | Se quitó el pulso infinito: el punto queda fijo y el color sigue diciendo el estado |
+| 2 | Toasts | Entran desde el borde inferior: 300 ms, `--ease-snappy` |
+| 3 | Modal, cajón, Popover y MenuPanel | Celular: la hoja sube desde abajo (300 ms, `--ease-drawer`). Escritorio: el modal aparece con escala 0,97 + opacidad (200 ms) y el cajón se desliza desde su lado. El fondo oscuro aparece en 200 ms |
+| 4 | Button | Escala 0,97 al presionar, 150 ms, `--ease-snappy` |
+| 5 | Menús y popovers en escritorio | Escala 0,97 + opacidad desde el botón que los abre (`transform-origin`), 150 ms |
+
+**Reglas que se respetan:**
+- Solo se animan `transform` y `opacity`, siempre con transiciones y `@starting-style`: si algo se vuelve a abrir enseguida, la animación parte de donde está en vez de reiniciarse.
+- Cerrar es instantáneo.
+- Con movimiento reducido no se mueve nada; queda un fundido de 150 ms.
+- Tokens nuevos: `--ease-snappy` (`cubic-bezier(0.23, 1, 0.32, 1)`) y `--ease-drawer` (`cubic-bezier(0.32, 0.72, 0, 1)`).
+
+**Descartado:**
+- Tarjetas del tablero que entran o cambian de columna: pantalla operativa que se actualiza cada 15 s.
+- Cifras que cuentan hacia arriba: son datos que se leen.
+- Atajos de teclado y cambio de vista: uso constante.
+- Acordeón de Configuración: habría que animar la altura, y se usa poco.
+
+**Rendimiento:** la barra de stock ya no usa `transition-all` sobre `width`; no necesita animación.
+
+**Verificación:** se midió fotograma a fotograma en Chrome (escritorio, celular y movimiento reducido).
+- Modal: en escritorio va de escala 0,97 y opacidad 0 al reposo; en el celular sube desde 776 px abajo.
+- Cajón: entra desde la derecha.
+- Menús: en escritorio, escala 0,97 desde la esquina del botón; en el celular, hoja que sube.
+- Con movimiento reducido: transform `none` y opacidad de 0 a 1.
+
+El contrato de movimiento (`scripts/responsive/responsiveContract.test.ts`) impide que vuelvan:
+- los pulsos en pantallas operativas;
+- `transition-all`;
+- entradas que animen la maquetación (`width`, `height`, `top`, `left`, `margin`, `padding`).
 
 ## Qué no cambió
 - Textos funcionales, rutas, permisos, consultas y comportamiento.

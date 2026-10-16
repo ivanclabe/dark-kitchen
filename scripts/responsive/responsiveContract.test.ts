@@ -56,3 +56,24 @@ describe('responsive contract (ADR 0064)', () => {
     expect(source('shared/ui/Toast.tsx')).toMatch(/fixed inset-x-4[^"]*sm:w-80/)
   })
 })
+
+/** ADR 0065 (Fase 4): motion only where it explains something, never endless on the screens that run the day. */
+describe('motion contract (ADR 0065)', () => {
+  it('no endless pulse or ping on the operational screens', () => {
+    for (const path of ['modules/dashboard/pages/DashboardPage.tsx', 'modules/kitchen/components/KitchenStatusLine.tsx', 'app/OnlineIndicator.tsx']) {
+      // A loading skeleton may pulse; a status dot may not.
+      expect(source(path), path).not.toMatch(/animate-ping|animate-pulse rounded-full/)
+    }
+  })
+
+  it('never animates every property', () => {
+    expect(offenders(/\btransition-all\b/)).toEqual([])
+  })
+
+  it('entrances are transitions on transform and opacity, with a fade-only fallback for reduced motion', () => {
+    const motion = indexCss.slice(indexCss.indexOf('.motion-backdrop {'))
+    expect(motion).toContain('@starting-style')
+    expect(motion).not.toMatch(/transition:[^;]*\b(width|height|top|left|margin|padding|all)\b/)
+    expect(motion).toMatch(/prefers-reduced-motion: reduce\)\s*{[^@]*transition-property: opacity !important/)
+  })
+})
