@@ -249,7 +249,7 @@ function OpenCount({ countId, scope, createdAt }: { countId: string; scope: stri
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por nombre o código…"
               aria-label="Buscar insumo del conteo"
-              className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
+              className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-focus focus:ring-2 focus:ring-focus/25"
             />
           </div>
           <div className="flex flex-wrap gap-1.5">

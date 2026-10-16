@@ -51,7 +51,7 @@ function TypeChoice({ value, onChange }: { value: CustomerType; onChange: (type:
           aria-checked={value === type}
           onClick={() => onChange(type)}
           className={clsx(
-            'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none',
+            'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
             value === type ? 'bg-neutral-800 font-medium text-neutral-50' : 'text-neutral-400 hover:text-neutral-200',
           )}
         >

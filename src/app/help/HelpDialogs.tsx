@@ -18,7 +18,7 @@ const SHORTCUTS: { keys: string[]; what: string; where: string }[] = [
 ]
 
 function Key({ children }: { children: string }) {
-  return <kbd className="inline-flex min-w-6 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 px-1.5 py-0.5 font-mono text-[11px] text-neutral-200">{children}</kbd>
+  return <kbd className="inline-flex min-w-6 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 px-1.5 py-0.5 font-mono text-2xs text-neutral-200">{children}</kbd>
 }
 
 export function KeyboardShortcutsDialog({ onClose }: { onClose: () => void }) {
@@ -120,7 +120,7 @@ export function ReportProblemDialog({ rows, onClose }: { rows: [string, string][
                 if (!description.trim()) e.preventDefault()
                 else onClose()
               }}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-brasa-500 px-4 text-sm font-semibold text-white hover:bg-brasa-400 aria-disabled:pointer-events-none aria-disabled:opacity-40"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary-hover aria-disabled:pointer-events-none aria-disabled:opacity-40"
             >
               <Mail size={15} aria-hidden /> Enviar por correo
             </a>

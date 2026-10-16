@@ -56,7 +56,7 @@ export function AppLayout() {
           aria-label={item.label}
           aria-current={active ? 'page' : undefined}
           className={clsx(
-            'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+            'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
             active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
           )}
         >
@@ -152,7 +152,7 @@ export function AppLayout() {
                     }}
                     aria-label="Más módulos"
                     className={clsx(
-                      'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+                      'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
                       overflowActive || props['aria-expanded'] ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
                     )}
                   >
@@ -165,7 +165,7 @@ export function AppLayout() {
                 rail.overflow.map((item, i) => (
                   <Fragment key={item.to}>
                     {(i === 0 || item.group !== rail.overflow[i - 1].group) && (
-                      <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">{NAV_GROUP_LABELS[item.group]}</p>
+                      <p className="px-3 pt-2 pb-1 text-2xs font-semibold tracking-wide text-neutral-500 uppercase">{NAV_GROUP_LABELS[item.group]}</p>
                     )}
                     <PopoverItem
                       icon={item.icon}
@@ -245,7 +245,7 @@ export function AppLayout() {
           {allItems.map((item, i) => (
             <Fragment key={item.to}>
               {(i === 0 || item.group !== allItems[i - 1].group) && (
-                <p className={clsx('px-3 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase', i > 0 && 'mt-3')}>{NAV_GROUP_LABELS[item.group]}</p>
+                <p className={clsx('px-3 pb-1 text-2xs font-semibold tracking-wide text-neutral-500 uppercase', i > 0 && 'mt-3')}>{NAV_GROUP_LABELS[item.group]}</p>
               )}
               {drawerLink(item)}
             </Fragment>

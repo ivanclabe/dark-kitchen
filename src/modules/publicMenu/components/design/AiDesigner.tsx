@@ -187,7 +187,7 @@ export function AiDesigner({
                         onClick={() => setSelectedId(v.id)}
                         aria-current={v.id === selected.id}
                         title={v.prompt ?? v.name}
-                        className={clsx('rounded-full px-2 py-0.5', v.id === selected.id ? 'bg-brasa-500 text-white' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700')}
+                        className={clsx('rounded-full px-2 py-0.5', v.id === selected.id ? 'bg-primary text-on-primary' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700')}
                       >
                         v{i + 1}
                       </button>
@@ -207,7 +207,7 @@ export function AiDesigner({
                   onChange={(e) => setChange(e.target.value.slice(0, MAX_PROMPT))}
                   placeholder="Por ejemplo: haz el fondo un poco más claro"
                   aria-label="Qué cambiar"
-                  className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-brasa-500"
+                  className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-focus"
                 />
                 <Button type="submit" variant="secondary" icon={Send} loading={pending === 'refine'} disabled={change.trim().length < 3 || pending !== null}>
                   Cambiar
@@ -280,7 +280,7 @@ function ProposalCard({ design, menu, selected, onSelect }: { design: MenuDesign
       onClick={onSelect}
       aria-pressed={selected}
       className={clsx(
-        'overflow-hidden rounded-xl border text-left transition-colors focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none',
+        'overflow-hidden rounded-xl border text-left transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
         selected ? 'border-brasa-500 ring-2 ring-brasa-500/40' : 'border-neutral-800 hover:border-neutral-600',
       )}
     >

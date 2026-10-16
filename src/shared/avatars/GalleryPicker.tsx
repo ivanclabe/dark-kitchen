@@ -69,7 +69,7 @@ function GalleryPicker<K extends string>({
           >
             {render(key)}
             {selected && (
-              <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full bg-brasa-500 text-white ring-2 ring-neutral-900">
+              <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-neutral-900">
                 <Check size={12} strokeWidth={3} aria-hidden />
               </span>
             )}

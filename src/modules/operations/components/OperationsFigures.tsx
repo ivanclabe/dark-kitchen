@@ -33,7 +33,7 @@ export function OperationsFigures({ items }: { items: OperationsFigure[] }) {
         return (
           <li key={f.id} className="min-w-28 flex-1">
             {f.onSelect ? (
-              <button type="button" onClick={f.onSelect} className={clsx(box, 'transition-colors hover:border-neutral-700 hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500')}>
+              <button type="button" onClick={f.onSelect} className={clsx(box, 'transition-colors hover:border-neutral-700 hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus')}>
                 {body}
               </button>
             ) : (

@@ -252,7 +252,7 @@ function SlotAction({ icon: Icon, label, onClick }: { icon: typeof Trash2; label
       onClick={onClick}
       title={label}
       aria-label={label}
-      className="rounded-md bg-black/50 p-1.5 text-neutral-100 backdrop-blur transition-colors hover:bg-black/80 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none"
+      className="rounded-md bg-black/50 p-1.5 text-neutral-100 backdrop-blur transition-colors hover:bg-black/80 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none"
     >
       <Icon size={13} />
     </button>

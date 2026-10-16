@@ -134,7 +134,7 @@ export function OperationsShell({
                         {...props}
                         aria-label="Más opciones"
                         title="Más opciones"
-                        className="inline-flex size-10 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+                        className="inline-flex size-10 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
                       >
                         <MoreHorizontal size={16} aria-hidden />
                       </button>

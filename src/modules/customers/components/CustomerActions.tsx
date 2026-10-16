@@ -46,7 +46,7 @@ export function CustomerActions({ customer }: { customer: CustomerListRow }) {
             type="button"
             {...props}
             aria-label={`Acciones de ${customer.fullName}`}
-            className="flex size-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none"
+            className="flex size-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none"
           >
             <MoreHorizontal size={16} aria-hidden />
           </button>

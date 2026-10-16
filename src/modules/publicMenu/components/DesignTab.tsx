@@ -300,8 +300,8 @@ function ViewSwitch({ value, onChange, items }: { value: View; onChange: (v: Vie
           aria-label={label}
           onClick={() => onChange(v)}
           className={clsx(
-            'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:flex-none sm:px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none',
-            value === v ? 'bg-brasa-500 text-white' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100',
+            'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:flex-none sm:px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
+            value === v ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100',
           )}
         >
           <Icon size={15} aria-hidden />

@@ -66,7 +66,7 @@ export function OnlineIndicator({ compact = false, placement = 'bottom-end' }: {
               </li>
             ))}
           </ul>
-          <p className="border-t border-neutral-800/60 px-2.5 pt-2 pb-1.5 text-[11px] text-neutral-500">Solo se ve quién está en línea, nunca qué hace.</p>
+          <p className="border-t border-neutral-800/60 px-2.5 pt-2 pb-1.5 text-2xs text-neutral-500">Solo se ve quién está en línea, nunca qué hace.</p>
         </div>
       )}
     </Popover>

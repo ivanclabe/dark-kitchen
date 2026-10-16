@@ -72,7 +72,7 @@ function SliderField({
         onChange={(e) => onChange(Number(e.target.value))}
         className="mt-2 w-full accent-brasa-500 disabled:opacity-50"
       />
-      <div className="flex justify-between text-[11px] text-neutral-500">
+      <div className="flex justify-between text-2xs text-neutral-500">
         <span>{left}</span>
         <span>{right}</span>
       </div>

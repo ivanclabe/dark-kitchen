@@ -109,7 +109,7 @@ function Panel({ close }: { close: () => void }) {
             >
               {t.value === 'ai' && <Sparkles size={12} aria-hidden />}
               {t.label}
-              {count > 0 && <span className="rounded-full bg-brasa-500/20 px-1.5 text-[10px] text-brasa-200 tabular-nums">{count}</span>}
+              {count > 0 && <span className="rounded-full bg-brasa-500/20 px-1.5 text-2xs text-brasa-200 tabular-nums">{count}</span>}
             </button>
           )
         })}
@@ -178,11 +178,11 @@ export function NotificationBell({ placement }: { placement: 'right-end' | 'bott
             type="button"
             {...props}
             aria-label={label}
-            className="relative flex size-10 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-neutral-900 hover:text-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+            className="relative flex size-10 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-neutral-900 hover:text-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
             <Icon size={19} aria-hidden />
             {badge && (
-              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brasa-500 px-1 text-[10px] font-semibold text-white tabular-nums ring-2 ring-neutral-950">
+              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-2xs font-semibold text-on-primary tabular-nums ring-2 ring-neutral-950">
                 {badge}
               </span>
             )}

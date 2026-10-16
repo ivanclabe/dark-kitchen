@@ -28,7 +28,7 @@ export function VoiceMicButton({ phase, onStart, disabled = false }: { phase: Vo
         disabled={disabled || busy}
         aria-label={label}
         className={clsx(
-          'inline-flex size-10 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 disabled:cursor-not-allowed',
+          'inline-flex size-10 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed',
           className,
         )}
       >

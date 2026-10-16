@@ -37,7 +37,7 @@ export function BarList({ items, emptyText = 'Sin datos en este periodo.' }: { i
         return (
           <li key={i.id}>
             {i.onSelect ? (
-              <button type="button" onClick={i.onSelect} className={clsx('w-full rounded-lg text-left transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none')}>
+              <button type="button" onClick={i.onSelect} className={clsx('w-full rounded-lg text-left transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none')}>
                 {row}
               </button>
             ) : (

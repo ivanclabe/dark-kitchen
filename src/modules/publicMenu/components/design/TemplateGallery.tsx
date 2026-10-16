@@ -38,13 +38,13 @@ export function TemplateGallery({ menu, value, onPick }: { menu: PublicMenu; val
             onClick={() => onPick(id)}
             aria-pressed={active}
             className={clsx(
-              'group relative overflow-hidden rounded-xl border text-left transition-colors focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none',
+              'group relative overflow-hidden rounded-xl border text-left transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
               active ? 'border-brasa-500 ring-2 ring-brasa-500/40' : 'border-neutral-800 hover:border-neutral-600',
             )}
           >
             <ThemeThumbnail theme={def.theme} menu={mini} />
             {active && (
-              <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-brasa-500 text-white shadow" aria-hidden>
+              <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-primary text-on-primary shadow" aria-hidden>
                 <Check size={14} />
               </span>
             )}

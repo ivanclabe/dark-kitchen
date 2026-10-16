@@ -29,7 +29,7 @@ export function NumberStepper({
   }
 
   return (
-    <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900 transition-colors hover:border-neutral-700 focus-within:border-brasa-500 focus-within:ring-2 focus-within:ring-brasa-500/15">
+    <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900 transition-colors hover:border-neutral-700 focus-within:border-focus focus-within:ring-2 focus-within:ring-focus/25">
       <button
         type="button"
         onClick={() => onChange(Math.max(min, value - step))}

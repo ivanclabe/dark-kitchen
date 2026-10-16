@@ -87,7 +87,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
             aria-label={label}
             title={label}
             className={clsx(
-              'inline-flex shrink-0 items-center gap-1.5 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+              'inline-flex shrink-0 items-center gap-1.5 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
               compact ? 'size-10 justify-center' : 'h-8 px-3 text-xs font-medium',
               view.className,
             )}

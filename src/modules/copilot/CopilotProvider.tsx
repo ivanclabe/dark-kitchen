@@ -322,7 +322,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 const iconButton =
-  'inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500'
+  'inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus'
 
 function CopilotPanel({
   accountName,
@@ -393,7 +393,7 @@ function CopilotPanel({
               e.preventDefault()
               onSend(draft)
             }}
-            className="flex items-end gap-1.5 rounded-2xl border border-neutral-700/70 bg-neutral-950 p-2 transition-colors focus-within:border-brasa-500/60"
+            className="flex items-end gap-1.5 rounded-2xl border border-neutral-700/70 bg-neutral-950 p-2 transition-colors focus-within:border-focus/60"
           >
             <textarea
               value={draft}
@@ -420,7 +420,7 @@ function CopilotPanel({
                 type="submit"
                 disabled={!draft.trim()}
                 aria-label="Enviar"
-                className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-brasa-500 text-white transition-colors hover:bg-brasa-400 disabled:bg-neutral-800 disabled:text-neutral-500"
+                className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary transition-colors hover:bg-primary-hover disabled:bg-neutral-800 disabled:text-neutral-500"
               >
                 <ArrowUp size={16} aria-hidden />
               </button>
@@ -581,7 +581,7 @@ export function CopilotButton({ compact = false }: { compact?: boolean }) {
       {!compact && 'Copilot'}
       {/* ADR 0038: answers by voice wait here (the voice never opens the panel). */}
       {unseen > 0 ? (
-        <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brasa-500 px-1 text-[10px] font-semibold text-white tabular-nums ring-2 ring-neutral-950" aria-hidden>
+        <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-2xs font-semibold text-on-primary tabular-nums ring-2 ring-neutral-950" aria-hidden>
           {unseen > 9 ? '9+' : unseen}
         </span>
       ) : (
