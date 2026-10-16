@@ -13,9 +13,9 @@ import { display } from '../lib/typography'
 const CTA_BASE = 'flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold transition-colors'
 
 /** Botón de cada plan: registro con el plan elegido, o ventas (ADR 0010, 3.4). */
-function PlanCta({ plan }: { plan: Plan }) {
+function PlanCta({ plan, period }: { plan: Plan; period: BillingPeriod }) {
   const { session } = useAuth()
-  const style = clsx(CTA_BASE, plan.badge ? 'bg-brasa-500 text-white hover:bg-brasa-400' : 'border border-neutral-700 text-neutral-100 hover:border-neutral-500 hover:bg-neutral-800/60')
+  const style = clsx(CTA_BASE, plan.badge ? 'bg-primary text-on-primary hover:bg-primary-hover' : 'border border-neutral-700 text-neutral-100 hover:border-neutral-500 hover:bg-neutral-800/60')
   if (plan.cta === 'contact_sales' && plan.contactUrl) {
     return (
       <a href={plan.contactUrl} className={style}>
@@ -32,7 +32,7 @@ function PlanCta({ plan }: { plan: Plan }) {
     )
   }
   return (
-    <Link to={signupPath(plan.key)} className={style}>
+    <Link to={signupPath(plan.key, period)} className={style}>
       {plan.ctaLabel}
     </Link>
   )
@@ -55,7 +55,7 @@ export function PricingSection() {
           <h2 id="landing-pricing" style={display} className="text-3xl font-black tracking-[-0.02em] text-balance text-[#1C1310] sm:text-5xl">
             Un plan para cada etapa de <span className="text-brasa-500">tu negocio.</span>
           </h2>
-          <p className="mt-4 text-lg text-[#5B4A42]">Empieza gratis, sin tarjeta. Cambia de plan cuando tu operación crezca.</p>
+          <p className="mt-4 text-lg text-[#5B4A42]">Crea tu cuenta, configura tu negocio y paga en línea con tarjeta, PSE o Nequi. Cambia de plan cuando tu operación crezca.</p>
         </div>
 
         {annual && (
@@ -92,7 +92,7 @@ export function PricingSection() {
           <>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
               {data.plans.map((plan) => (
-                <PlanCard key={plan.key} plan={plan} period={period} action={<PlanCta plan={plan} />} />
+                <PlanCard key={plan.key} plan={plan} period={period} action={<PlanCta plan={plan} period={period} />} />
               ))}
             </div>
             <h3 style={display} className="mt-16 text-2xl font-extrabold tracking-[-0.01em] text-[#1C1310]">Compara los planes</h3>

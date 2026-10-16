@@ -61,6 +61,9 @@ describe('planes', () => {
   it('arma la ruta del registro con el plan', () => {
     expect(signupPath('business')).toBe('/registro?plan=business')
     expect(signupPath(null)).toBe('/registro')
+    // ADR 0066: the period chosen in Precios travels too (monthly is the default and is not written).
+    expect(signupPath('business', 'annual')).toBe('/registro?plan=business&periodo=anual')
+    expect(signupPath('business', 'monthly')).toBe('/registro?plan=business')
   })
 
   it('el selector anual solo aparece si algún plan tiene precio anual', () => {

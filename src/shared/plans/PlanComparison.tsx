@@ -46,7 +46,7 @@ export function PlanComparison({ pricing, period = 'monthly' }: { pricing: Publi
         </thead>
         <tbody>
           {row('Precio', plans.map((p) => formatPlanPrice(p, period)), 'price')}
-          {row('Prueba gratis', plans.map((p) => (p.trialDays > 0 ? `${p.trialDays} días` : no)), 'trial')}
+          {plans.some((p) => p.trialDays > 0) && row('Prueba gratis', plans.map((p) => (p.trialDays > 0 ? `${p.trialDays} días` : no)), 'trial')}
           {row('Cuentas (establecimientos)', plans.map((p) => limitLabel(p.limits.accounts, 'cuenta', 'cuentas')), 'accounts')}
           {row('Usuarios', plans.map((p) => limitLabel(p.limits.users, 'usuario', 'usuarios')), 'users')}
           {row('Pedidos, cocina, despacho, menús, inventario, clientes y reportes', plans.map(() => yes), 'modules')}

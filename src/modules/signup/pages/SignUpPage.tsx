@@ -12,8 +12,8 @@ import { FullScreenLoading } from '@/app/FullScreenLoading'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanSummary } from '@/shared/plans/PlanSummary'
-import { isSelectablePlan, type Plan } from '@/shared/plans/plans'
-import { usePublicPricing, useSelectedPlan } from '@/shared/plans/usePlans'
+import { hasAnnualBilling, isSelectablePlan, type BillingPeriod, type Plan } from '@/shared/plans/plans'
+import { usePublicPricing, useSelectedPeriod, useSelectedPlan } from '@/shared/plans/usePlans'
 import { Button } from '@/shared/ui/Button'
 import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
@@ -51,7 +51,7 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
 }
 
 /** Elegir plan (paso 2): las mismas tarjetas que la landing. Los planes de ventas llevan a ventas. */
-function PlanPicker({ plans, selected, onSelect }: { plans: Plan[]; selected: string | null; onSelect: (plan: string) => void }) {
+function PlanPicker({ plans, period, selected, onSelect }: { plans: Plan[]; period: BillingPeriod; selected: string | null; onSelect: (plan: string) => void }) {
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {plans.map((plan) => {
@@ -68,7 +68,7 @@ function PlanPicker({ plans, selected, onSelect }: { plans: Plan[]; selected: st
             {plan.ctaLabel}
           </a>
         )
-        return <PlanCard key={plan.key} plan={plan} action={action} selected={isSelected} />
+        return <PlanCard key={plan.key} plan={plan} period={period} action={action} selected={isSelected} />
       })}
     </div>
   )
@@ -90,6 +90,7 @@ export function SignUpPage() {
   const navigate = useNavigate()
   const { data: pricing, isLoading: plansLoading, isError: plansError, refetch: refetchPlans } = usePublicPricing()
   const { plan: requestedPlan, setPlan } = useSelectedPlan()
+  const { period, setPeriod } = useSelectedPeriod()
   const selectedPlan = isSelectablePlan(pricing?.plans, requestedPlan) ? (pricing?.plans.find((p) => p.key === requestedPlan) ?? null) : null
 
   const methods = enabledOwnerMethods()
@@ -143,7 +144,7 @@ export function SignUpPage() {
     return (
       <Shell>
         <h1 className={typography.h2}>El registro abre pronto</h1>
-        {selectedPlan && <PlanSummary plan={selectedPlan} />}
+        {selectedPlan && <PlanSummary plan={selectedPlan} period={period} />}
         <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de Quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
         <div className="flex flex-col gap-2 text-sm">
           {salesUrl && (
@@ -210,11 +211,11 @@ export function SignUpPage() {
       }
       if (onboarding) {
         // Already signed in (Google, Instagram, phone): the business is created right away.
-        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key })
+        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key, billingPeriod: period })
         navigate(CONFIRMED_PATH, { replace: true })
         return
       }
-      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, captchaToken: captchaToken ?? undefined })
+      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, billingPeriod: period, captchaToken: captchaToken ?? undefined })
       // Si el proyecto no exige confirmar el correo, ya hay sesión: se crea el negocio de una vez.
       if (hasSession) navigate(CONFIRMED_PATH, { replace: true })
       else setStep('sent')
@@ -269,10 +270,10 @@ export function SignUpPage() {
 
   const titles = {
     user: ['Crea tu usuario', entry === 'phone' ? 'Te enviaremos un código por SMS.' : entry === 'choose' ? 'Elige cómo vas a entrar a Quanela.' : 'Con él entrarás a Quanela.'],
-    plan: ['Elige el plan para tu negocio', 'Empieza gratis; puedes cambiar de plan más adelante.'],
+    plan: ['Elige el plan para tu negocio', 'Lo pagas al terminar de crear tu negocio. Puedes cambiar de plan cuando quieras.'],
     business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu espacio y tu primera cuenta.'],
   }[current]
-  const planSummary = selectedPlan && current !== 'plan' ? <PlanSummary plan={selectedPlan} onChange={() => setStep('plan')} /> : null
+  const planSummary = selectedPlan && current !== 'plan' ? <PlanSummary plan={selectedPlan} period={period} onChange={() => setStep('plan')} /> : null
 
   return (
     <Shell width={current === 'plan' ? 'xl' : current === 'business' ? 'md' : 'sm'}>
@@ -347,7 +348,25 @@ export function SignUpPage() {
           </div>
         ) : (
           <>
-            <PlanPicker plans={pricing.plans} selected={selectedPlan?.key ?? null} onSelect={choosePlan} />
+            {hasAnnualBilling(pricing.plans) && (
+              <div role="group" aria-label="Periodicidad" className="inline-flex rounded-full border border-neutral-800 p-1">
+                {(['monthly', 'annual'] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-pressed={period === p}
+                    onClick={() => setPeriod(p)}
+                    className={clsx(
+                      'rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      period === p ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:text-neutral-100',
+                    )}
+                  >
+                    {p === 'monthly' ? 'Mensual' : 'Anual · 2 meses gratis'}
+                  </button>
+                ))}
+              </div>
+            )}
+            <PlanPicker plans={pricing.plans} period={period} selected={selectedPlan?.key ?? null} onSelect={choosePlan} />
             <div className="flex flex-wrap items-center justify-between gap-2">
               {onboarding ? (
                 <span />

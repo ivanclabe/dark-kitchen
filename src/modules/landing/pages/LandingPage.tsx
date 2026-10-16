@@ -123,9 +123,9 @@ export function LandingPage() {
               <div className="animate-landing-rise mt-8 flex flex-wrap items-center gap-3" style={delay(200)}>
                 <Link
                   to={session ? APP_ENTRY : '/registro'}
-                  className="group inline-flex items-center gap-2.5 rounded-2xl bg-brasa-500 px-7 py-4 text-lg font-semibold text-white shadow-[0_16px_30px_-14px_var(--color-brasa-600)] transition-colors hover:bg-brasa-600"
+                  className="group inline-flex items-center gap-2.5 rounded-2xl bg-primary px-7 py-4 text-lg font-semibold text-on-primary shadow-[0_16px_30px_-14px_var(--color-brasa-600)] transition-colors hover:bg-primary-hover"
                 >
-                  {session ? 'Ir a mi cuenta' : 'Comienza gratis'}
+                  {session ? 'Ir a mi cuenta' : 'Crear mi cuenta'}
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
                 </Link>
                 <a

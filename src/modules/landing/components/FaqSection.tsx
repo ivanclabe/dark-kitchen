@@ -4,8 +4,8 @@ import { display } from '../lib/typography'
 /** Solo lo que es cierto hoy en el producto (ADR 0010). */
 const FAQ: { q: string; a: string }[] = [
   {
-    q: '¿Necesito tarjeta para empezar?',
-    a: 'No. Standard y Business empiezan con una prueba gratis. Eliges el plan al crear tu cuenta y entras a trabajar de inmediato.',
+    q: '¿Cómo pago mi plan?',
+    a: 'En línea, al terminar de crear tu cuenta: con tarjeta, PSE, Nequi o el botón Bancolombia, a través de Wompi. Con tarjeta se renueva sola; con los otros medios te avisamos antes de cada renovación. Pagando el año te regalamos dos meses.',
   },
   {
     q: '¿Qué es una cuenta?',
@@ -13,7 +13,11 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: '¿Puedo cambiar de plan después?',
-    a: 'Sí. Escríbenos y lo ajustamos. Al cambiar no se pierde nada: si bajas de plan, tus datos se conservan y solo se limita lo que el nuevo plan no incluye.',
+    a: 'Sí, desde Facturación. Si subes de plan, pagas solo la diferencia hasta tu renovación; si bajas, el cambio se aplica al renovar. Tus datos se conservan siempre.',
+  },
+  {
+    q: '¿Puedo cancelar?',
+    a: 'Sí, cuando quieras, desde Facturación. No hay permanencia: sigues usando Quanela hasta el final del período que pagaste y no se vuelve a cobrar.',
   },
   {
     q: '¿Qué pasa si llego al límite de mi plan?',

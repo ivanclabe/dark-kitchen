@@ -48,7 +48,15 @@ export function PlanCard({
           {plan.currency}/{annual ? 'año' : 'mes'}
         </span>
       </p>
-      <p className="mt-1 h-5 text-xs text-neutral-500">{plan.trialDays > 0 ? `${plan.trialDays} días gratis, sin tarjeta` : 'Con acompañamiento de nuestro equipo'}</p>
+      <p className="mt-1 h-5 text-xs text-neutral-500">
+        {plan.trialDays > 0
+          ? `${plan.trialDays} días gratis, sin tarjeta`
+          : !plan.selfServe
+            ? 'Con acompañamiento de nuestro equipo'
+            : annual
+              ? 'Pagas el año y te regalamos dos meses'
+              : 'Sin permanencia: cancelas cuando quieras'}
+      </p>
 
       <div className="mt-5">{action}</div>
 

@@ -13,7 +13,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, ArrowRight, CheckCircle2, Copy, Loader2, RotateCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { createOrganization, PLAN_NOT_AVAILABLE, pendingOrganizationOf, pendingPlanOf, updatePendingPlan } from '../api'
+import { createOrganization, PLAN_NOT_AVAILABLE, pendingOrganizationOf, pendingPeriodOf, pendingPlanOf, updatePendingPlan } from '../api'
 
 /**
  * Vuelta del enlace de confirmación (y "termina de crear tu negocio" si la
@@ -38,12 +38,13 @@ export function SignUpConfirmedPage() {
   const pending = pendingOrganizationOf(session?.user.user_metadata)
   const plan = planOverride ?? pendingPlanOf(session?.user.user_metadata)
   const fullName = session?.user.user_metadata?.full_name as string | undefined
+  const period = pendingPeriodOf(session?.user.user_metadata)
   const pricing = usePublicPricing()
 
   useEffect(() => {
     if (!session || !pending || planRejected || started.current === attempt) return
     started.current = attempt
-    createOrganization(pending, plan, fullName)
+    createOrganization(pending, plan, fullName, period)
       .then(async (slug) => {
         clearSelectedPlan()
         await refreshProfile()
@@ -60,7 +61,7 @@ export function SignUpConfirmedPage() {
         if (message.includes(PLAN_NOT_AVAILABLE)) setPlanRejected(true)
         else setError(message)
       })
-  }, [session, pending, plan, planRejected, fullName, attempt, refreshProfile, queryClient, navigate])
+  }, [session, pending, plan, period, planRejected, fullName, attempt, refreshProfile, queryClient, navigate])
 
   async function choosePlan(key: string) {
     setError(null)
