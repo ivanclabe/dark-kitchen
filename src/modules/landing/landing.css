@@ -271,6 +271,43 @@
 
 /* ---------------------------------------------------------------- motion */
 
+/* The headline written as an AI completes it (GhostHeadline): the caret, the ghost and the accepted flash. Only
+   with motion: with reduced motion the headline is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-caret {
+    animation: landing-caret-blink 1s step-end infinite;
+  }
+  @keyframes landing-caret-blink {
+    0%,
+    45% {
+      opacity: 1;
+    }
+    55%,
+    100% {
+      opacity: 0;
+    }
+  }
+  .landing-ghost {
+    animation: landing-ghost-in 150ms ease-out;
+  }
+  @keyframes landing-ghost-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .landing-ghost-accept {
+    animation: landing-ghost-flash 900ms ease-out both;
+  }
+  @keyframes landing-ghost-flash {
+    from {
+      background-color: rgb(194 65 12 / 0.16);
+    }
+    to {
+      background-color: rgb(194 65 12 / 0);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .landing-order-swap {
     animation: landing-swap 240ms var(--l-ease-out);

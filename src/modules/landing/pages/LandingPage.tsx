@@ -9,6 +9,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { ClosingSection } from '../components/ClosingSection'
 import { FaqSection } from '../components/FaqSection'
 import { FeatureProofs } from '../components/FeatureProofs'
+import { GhostHeadline } from '../components/GhostHeadline'
 import { LandingNav } from '../components/LandingNav'
 import { MenuPlannerSection } from '../components/MenuPlannerSection'
 import { OrderStory, type StoryStep } from '../components/OrderStory'
@@ -165,10 +166,7 @@ export function LandingPage() {
                 <span className="landing-name-over landing-rise">quanela</span>
               </p>
               <div className="mt-6 max-w-[36rem] lg:mt-0 lg:ml-[clamp(0px,4vw,72px)]">
-                <h1 id="landing-title" className="landing-display landing-rise text-[length:var(--l-size-title)] leading-[1.15] text-balance" style={rise(1)}>
-                  <span className="sr-only">Quanela: </span>
-                  Del pedido a la caja, tu cocina en un solo lugar.
-                </h1>
+                <GhostHeadline id="landing-title" className="landing-display text-[clamp(34px,3.6vw,56px)] leading-[1.02]" />
                 <p className="landing-rise mt-5 max-w-[46ch]" style={rise(2)}>
                   Pedidos por WhatsApp y menú web, cocina, domicilios, inventario, costos y clientes, con agentes de IA que recomiendan sobre tus datos reales.
                 </p>
