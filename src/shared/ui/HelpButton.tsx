@@ -18,7 +18,7 @@ export function HelpButton({ article, label = 'Ayuda de esta pantalla' }: { arti
         target="_blank"
         rel="noopener noreferrer"
         aria-label={label}
-        className="inline-flex size-7 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+        className="inline-flex size-7 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
         <CircleHelp size={16} aria-hidden />
       </a>

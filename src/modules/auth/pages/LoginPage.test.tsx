@@ -6,10 +6,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // ADR 0025: the login keeps email + password for everyone and adds the owner methods below.
 const state = vi.hoisted(() => ({ methods: [] as string[], session: null as null | object }))
-const calls = vi.hoisted(() => ({ requestCode: vi.fn(async (_phone: string, _opts: { create: boolean }) => undefined), signIn: vi.fn(async () => ({ error: null })) }))
+const calls = vi.hoisted(() => ({
+  requestCode: vi.fn(async (_phone: string, _opts: { create: boolean }) => undefined),
+  signIn: vi.fn(async () => ({ error: null })),
+  signOut: vi.fn(async () => ({ error: null as string | null })),
+}))
 
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
-vi.mock('@/shared/hooks/useAuth', () => ({ useAuth: () => ({ session: state.session, signIn: calls.signIn }) }))
+vi.mock('@/shared/hooks/useAuth', () => ({
+  useAuth: () => ({ session: state.session, user: state.session ? { email: 'laura@negocio.co' } : null, profile: null, loading: false, signIn: calls.signIn, signOut: calls.signOut }),
+}))
 vi.mock('@/shared/tenant/tenantContext', () => ({ useTenant: () => ({ mode: 'root', status: 'ready', organization: null, code: null }) }))
 vi.mock('@/modules/signup/ownerAuth', async (original) => ({
   ...(await original<typeof import('@/modules/signup/ownerAuth')>()),
@@ -18,6 +24,7 @@ vi.mock('@/modules/signup/ownerAuth', async (original) => ({
 }))
 
 const { LoginPage } = await import('./LoginPage')
+const { ToastProvider } = await import('@/shared/ui/Toast')
 
 function Where() {
   const location = useLocation()
@@ -26,12 +33,14 @@ function Where() {
 
 function renderLogin(entry: string | { pathname: string; state: unknown } = '/login') {
   return render(
-    <MemoryRouter initialEntries={[entry]}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<Where />} />
-      </Routes>
-    </MemoryRouter>,
+    <ToastProvider>
+      <MemoryRouter initialEntries={[entry]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="*" element={<Where />} />
+        </Routes>
+      </MemoryRouter>
+    </ToastProvider>,
   )
 }
 
@@ -78,15 +87,34 @@ describe('login (ADR 0025)', () => {
     expect(screen.getByRole('status').textContent).toContain('Entra con tu correo y tu contraseña.')
   })
 
-  it('back from an owner method, the sign-up decides; otherwise into the app (ADR 0036: /app, «/» is the landing)', () => {
+  it('back from an owner method, the sign-up decides; a link that asked to come back continues', () => {
     state.session = {}
     sessionStorage.setItem('dk-owner-sign-in', '1')
     renderLogin()
     expect(screen.getByTestId('where').textContent).toBe('/registro?continuar=1')
     cleanup()
     sessionStorage.clear()
+    renderLogin('/login?next=/activar/abc')
+    expect(screen.getByTestId('where').textContent).toBe('/activar/abc')
+  })
+
+  it('arriving with a session already open: continue with it (ADR 0036: /app) or use another account', async () => {
+    state.session = {}
     renderLogin()
-    expect(screen.getByTestId('where').textContent).toBe('/app')
+    expect(screen.getByRole('heading', { name: 'Ya iniciaste sesión' })).toBeTruthy()
+    expect(screen.getByText('laura@negocio.co')).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Continuar con esta cuenta/ }).getAttribute('href')).toBe('/app')
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Usar otra cuenta' }))
+    expect(calls.signOut).toHaveBeenCalledOnce()
+    expect(await screen.findByText(/Cerraste sesión/)).toBeTruthy()
+  })
+
+  it('signing out fails without connection: the person is told and stays', async () => {
+    state.session = {}
+    calls.signOut.mockResolvedValueOnce({ error: 'No pudimos cerrar la sesión. Revisa tu conexión e inténtalo de nuevo.' })
+    renderLogin()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Usar otra cuenta' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('No pudimos cerrar la sesión')
   })
 })
 

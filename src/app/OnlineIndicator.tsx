@@ -31,7 +31,6 @@ export function OnlineIndicator({ compact = false, placement = 'bottom-end' }: {
           )}
         >
           <span className="relative flex size-2" aria-hidden>
-            {connected && people.length > 1 && <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400/60" />}
             <span className={clsx('relative inline-flex size-2 rounded-full', connected ? 'bg-emerald-400' : 'bg-neutral-600')} />
           </span>
           {compact ? <span className="tabular-nums">{connected ? count : '–'}</span> : <span className="whitespace-nowrap">{label}</span>}
@@ -66,7 +65,7 @@ export function OnlineIndicator({ compact = false, placement = 'bottom-end' }: {
               </li>
             ))}
           </ul>
-          <p className="border-t border-neutral-800/60 px-2.5 pt-2 pb-1.5 text-[11px] text-neutral-500">Solo se ve quién está en línea, nunca qué hace.</p>
+          <p className="border-t border-neutral-800/60 px-2.5 pt-2 pb-1.5 text-2xs text-neutral-500">Solo se ve quién está en línea, nunca qué hace.</p>
         </div>
       )}
     </Popover>

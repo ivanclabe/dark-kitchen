@@ -23,7 +23,7 @@ order: 1
 Pasa si **falta stock** de algún insumo, si un plato que descuenta inventario **no tiene receta** o si el pedido **no tiene platos**. El mensaje dice qué falta. Si el plato no usa tus insumos, apaga **Descuenta inventario** en el plato y se vende sin receta. Ver [Confirmar y cancelar un pedido](help:confirm-cancel).
 
 ### ¿Dónde quedaron Pedidos y Cocina?
-Ahora están juntos en **Operación**, con las vistas Tablero, Cocina, Despacho y Lista. Ver [El Centro de operaciones](help:operations-center).
+Ahora están juntos en **Centro de operaciones**, con las vistas Tablero, Cocina, Despacho y Lista. Ver [El Centro de operaciones](help:operations-center).
 
 ### ¿Cómo registro que un cliente pagó?
 Abre el pedido y, en **Pago**, toca **Registrar pago**. Ver [Registrar y anular pagos](help:register-payment).

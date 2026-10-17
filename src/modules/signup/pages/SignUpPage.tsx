@@ -12,8 +12,8 @@ import { FullScreenLoading } from '@/app/FullScreenLoading'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanSummary } from '@/shared/plans/PlanSummary'
-import { isSelectablePlan, type Plan } from '@/shared/plans/plans'
-import { usePublicPricing, useSelectedPlan } from '@/shared/plans/usePlans'
+import { hasAnnualBilling, isSelectablePlan, type BillingPeriod, type Plan } from '@/shared/plans/plans'
+import { usePublicPricing, useSelectedPeriod, useSelectedPlan } from '@/shared/plans/usePlans'
 import { Button } from '@/shared/ui/Button'
 import { FormField, FormGrid, Input, Select } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
@@ -22,11 +22,13 @@ import clsx from 'clsx'
 import { ArrowLeft, ArrowRight, Check, MailCheck, RotateCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { SessionSwitch } from '@/modules/auth/components/SessionSwitch'
 import { CONFIRMED_PATH, PUBLIC_SIGNUP_ENABLED, resendConfirmation, savePendingBusiness, signUpBusiness, TURNSTILE_SITE_KEY, type PendingOrganization } from '../api'
 import { OwnerMethodButtons, PhoneSignIn } from '../components/OwnerMethods'
 import { TurnstileWidget } from '../components/TurnstileWidget'
 import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
-import { NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
+import { hasOwnerSignInMark, NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
+import { selectedFillClass } from '@/shared/ui/formClasses'
 
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
@@ -51,7 +53,7 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
 }
 
 /** Elegir plan (paso 2): las mismas tarjetas que la landing. Los planes de ventas llevan a ventas. */
-function PlanPicker({ plans, selected, onSelect }: { plans: Plan[]; selected: string | null; onSelect: (plan: string) => void }) {
+function PlanPicker({ plans, period, selected, onSelect }: { plans: Plan[]; period: BillingPeriod; selected: string | null; onSelect: (plan: string) => void }) {
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {plans.map((plan) => {
@@ -68,7 +70,7 @@ function PlanPicker({ plans, selected, onSelect }: { plans: Plan[]; selected: st
             {plan.ctaLabel}
           </a>
         )
-        return <PlanCard key={plan.key} plan={plan} action={action} selected={isSelected} />
+        return <PlanCard key={plan.key} plan={plan} period={period} action={action} selected={isSelected} />
       })}
     </div>
   )
@@ -90,6 +92,7 @@ export function SignUpPage() {
   const navigate = useNavigate()
   const { data: pricing, isLoading: plansLoading, isError: plansError, refetch: refetchPlans } = usePublicPricing()
   const { plan: requestedPlan, setPlan } = useSelectedPlan()
+  const { period, setPeriod } = useSelectedPeriod()
   const selectedPlan = isSelectablePlan(pricing?.plans, requestedPlan) ? (pricing?.plans.find((p) => p.key === requestedPlan) ?? null) : null
 
   const methods = enabledOwnerMethods()
@@ -116,16 +119,20 @@ export function SignUpPage() {
   const onboarding = Boolean(session) && !loading && !profileLoading && !profile && step !== 'sent'
   const existingUser = Boolean(session && profile) && step !== 'sent'
 
-  // Someone who already has a user goes to their account (D4). D3: if they came with Google,
-  // Instagram or phone and own no business (an invited user), they sign in with email instead.
+  // Someone who already has a user chooses: their account, or sign out to register another (D4,
+  // revised). D3: if they came back from Google, Instagram or phone and own no business (an invited
+  // user), they sign in with email instead.
   const guarded = useRef(false)
   const [leaving, setLeaving] = useState<'home' | null>(null)
+  // Arrived with a session already open (not back from Google, Instagram or phone): they choose
+  // between their account and creating a new business with another one — it used to send them
+  // home, and registering someone new meant clearing the browser.
+  const choosing = existingUser && leaving === null && !hasOwnerSignInMark()
   useEffect(() => {
-    if (!existingUser || guarded.current) return
+    if (!existingUser || guarded.current || !hasOwnerSignInMark()) return
     guarded.current = true
-    // Without the mark (signed in with email) there is nothing to check.
-    const check = takeOwnerSignInMark() ? ownsABusiness() : Promise.resolve(true)
-    check
+    takeOwnerSignInMark()
+    ownsABusiness()
       .then(async (owner) => {
         if (owner) return setLeaving('home')
         await signOut()
@@ -135,6 +142,22 @@ export function SignUpPage() {
   }, [existingUser, signOut, navigate])
 
   if (leaving === 'home') return <Navigate to={APP_ENTRY} replace />
+  if (choosing) {
+    return (
+      <Shell>
+        <SessionSwitch
+          title="Ya tienes una sesión abierta"
+          description="Para crear un negocio nuevo con otra cuenta, cierra la sesión en este equipo. Tu plan elegido se conserva."
+          continueTo={APP_ENTRY}
+          continueLabel="Ir a mi cuenta"
+          switchLabel="Cerrar sesión y crear cuenta"
+          onSignedOut={() => {
+            guarded.current = false
+          }}
+        />
+      </Shell>
+    )
+  }
   if (session && step !== 'sent' && (loading || profileLoading || existingUser)) return <FullScreenLoading />
 
   const salesUrl = pricing?.plans.find((p) => p.cta === 'contact_sales')?.contactUrl ?? null
@@ -143,7 +166,7 @@ export function SignUpPage() {
     return (
       <Shell>
         <h1 className={typography.h2}>El registro abre pronto</h1>
-        {selectedPlan && <PlanSummary plan={selectedPlan} />}
+        {selectedPlan && <PlanSummary plan={selectedPlan} period={period} />}
         <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de Quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
         <div className="flex flex-col gap-2 text-sm">
           {salesUrl && (
@@ -210,11 +233,11 @@ export function SignUpPage() {
       }
       if (onboarding) {
         // Already signed in (Google, Instagram, phone): the business is created right away.
-        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key })
+        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key, billingPeriod: period })
         navigate(CONFIRMED_PATH, { replace: true })
         return
       }
-      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, captchaToken: captchaToken ?? undefined })
+      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, billingPeriod: period, captchaToken: captchaToken ?? undefined })
       // Si el proyecto no exige confirmar el correo, ya hay sesión: se crea el negocio de una vez.
       if (hasSession) navigate(CONFIRMED_PATH, { replace: true })
       else setStep('sent')
@@ -269,10 +292,10 @@ export function SignUpPage() {
 
   const titles = {
     user: ['Crea tu usuario', entry === 'phone' ? 'Te enviaremos un código por SMS.' : entry === 'choose' ? 'Elige cómo vas a entrar a Quanela.' : 'Con él entrarás a Quanela.'],
-    plan: ['Elige el plan para tu negocio', 'Empieza gratis; puedes cambiar de plan más adelante.'],
+    plan: ['Elige el plan para tu negocio', 'Lo pagas al terminar de crear tu negocio. Puedes cambiar de plan cuando quieras.'],
     business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu espacio y tu primera cuenta.'],
   }[current]
-  const planSummary = selectedPlan && current !== 'plan' ? <PlanSummary plan={selectedPlan} onChange={() => setStep('plan')} /> : null
+  const planSummary = selectedPlan && current !== 'plan' ? <PlanSummary plan={selectedPlan} period={period} onChange={() => setStep('plan')} /> : null
 
   return (
     <Shell width={current === 'plan' ? 'xl' : current === 'business' ? 'md' : 'sm'}>
@@ -347,7 +370,25 @@ export function SignUpPage() {
           </div>
         ) : (
           <>
-            <PlanPicker plans={pricing.plans} selected={selectedPlan?.key ?? null} onSelect={choosePlan} />
+            {hasAnnualBilling(pricing.plans) && (
+              <div role="group" aria-label="Periodicidad" className="inline-flex rounded-full border border-neutral-800 p-1">
+                {(['monthly', 'annual'] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-pressed={period === p}
+                    onClick={() => setPeriod(p)}
+                    className={clsx(
+                      'rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      period === p ? selectedFillClass : 'text-neutral-400 hover:text-neutral-100',
+                    )}
+                  >
+                    {p === 'monthly' ? 'Mensual' : 'Anual · 2 meses gratis'}
+                  </button>
+                ))}
+              </div>
+            )}
+            <PlanPicker plans={pricing.plans} period={period} selected={selectedPlan?.key ?? null} onSelect={choosePlan} />
             <div className="flex flex-wrap items-center justify-between gap-2">
               {onboarding ? (
                 <span />

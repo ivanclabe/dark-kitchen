@@ -180,7 +180,7 @@ export function ContextIndicator({ compact = false }: { compact?: boolean }) {
           type="button"
           {...props}
           aria-label={`Cuenta ${kitchen.name}, rol ${kitchen.roleName}. Cambiar`}
-          className="flex max-w-full min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+          className="flex max-w-full min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           {content}
           <ChevronDown size={14} className="shrink-0 text-neutral-500" aria-hidden />

@@ -5,6 +5,7 @@ import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 export type BillingStatus = SubscriptionStatus | 'paid' | 'open' | 'draft' | 'void' | 'uncollectible'
 
 const STATUS: Record<BillingStatus, { label: string; tone: BadgeTone }> = {
+  incomplete: { label: SUBSCRIPTION_STATUS_LABEL.incomplete, tone: 'warning' },
   trialing: { label: SUBSCRIPTION_STATUS_LABEL.trialing, tone: 'brand' },
   active: { label: SUBSCRIPTION_STATUS_LABEL.active, tone: 'success' },
   past_due: { label: SUBSCRIPTION_STATUS_LABEL.past_due, tone: 'warning' },

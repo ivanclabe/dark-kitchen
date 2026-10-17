@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { NavLink } from 'react-router-dom'
+import { selectedFillClass } from './formClasses'
 
 export interface RouteTabItem {
   to: string
@@ -28,8 +29,8 @@ export function RouteTabs({ items, label = 'Secciones' }: { items: RouteTabItem[
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 ${
-                isActive ? 'bg-brasa-500 text-white' : 'text-neutral-400 hover:bg-neutral-800/60 hover:text-neutral-200'
+              `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                isActive ? selectedFillClass : 'text-neutral-400 hover:bg-neutral-800/60 hover:text-neutral-200'
               }`
             }
           >

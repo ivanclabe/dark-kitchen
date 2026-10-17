@@ -2,7 +2,7 @@
 id: create-order
 section: orders
 title: Crear un pedido
-summary: En Operación toca Nuevo pedido (o la tecla N), elige o crea el cliente, toca Crear pedido y agrega los platos con su cantidad y observación.
+summary: En el Centro de operaciones toca Nuevo pedido (o la tecla N), elige o crea el cliente, toca Crear pedido y agrega los platos con su cantidad y observación.
 audience: [owner, admin, manager, cashier]
 permissions: [orders.create]
 appPath: /operations
@@ -24,7 +24,7 @@ screenshots:
       - "«Agregar plato» lo suma al pedido; con platos aparecen el total y «Confirmar pedido», que lo envía a cocina."
 ---
 
-1. En **Operación**, toca **Nuevo pedido** o presiona la tecla **N**.
+1. En **Centro de operaciones**, toca **Nuevo pedido** o presiona la tecla **N**.
 2. En **Cliente**, escribe el nombre o el teléfono y elígelo. Si no existe, toca **Crear "…"** y guarda sus datos: el pedido se crea solo.
 3. Toca **Crear pedido**. El borrador aparece de inmediato en **Por confirmar**.
 4. Agrega cada plato: elígelo en **Plato**, ajusta la **Cantidad**, revisa el **Precio unitario** y escribe la **Observación** si hace falta (o toca una sugerencia: «Sin cebolla», «Para llevar»…). Toca **Agregar plato**.

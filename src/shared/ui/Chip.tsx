@@ -12,10 +12,11 @@ export function Chip({
   onClick: () => void
 }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active} className={chipClass(active)}>
-      {label}
+    <button type="button" onClick={onClick} aria-pressed={active} title={label} className={chipClass(active)}>
+      {/* A long category name truncates instead of running off a phone screen. */}
+      <span className="min-w-0 truncate">{label}</span>
       {count !== undefined && (
-        <span className={`rounded-full px-1.5 text-[10px] ${active ? 'bg-white/20' : 'bg-neutral-700'}`}>{count}</span>
+        <span className={`shrink-0 rounded-full px-1.5 text-2xs tabular-nums ${active ? 'bg-neutral-950/15' : 'bg-neutral-800 text-neutral-300'}`}>{count}</span>
       )}
     </button>
   )

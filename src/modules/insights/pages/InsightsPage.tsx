@@ -95,7 +95,7 @@ export function InsightsPage() {
   return (
     <Page>
       <PageHeader help="insights"
-        title="Insights"
+        title="Análisis"
         icon={BarChart3}
         description={`Cómo va ${kitchen.name}: ventas, costos y rentabilidad.`}
         actions={

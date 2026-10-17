@@ -63,7 +63,7 @@ Cada pedido llega con el canal **Menú web**, el cliente (queda en **Clientes** 
 
 El cliente recibe el **número de su pedido** y un enlace para seguirlo en vivo: Recibido → En cocina → Listo → En camino → Entregado.
 
-> **Bueno saber:** configura el **horario de la cocina** (Operación → Cocina → Configuración de cocina): sin horario, la página no dice si estás abierto y recibe pedidos a toda hora. Y agrega tu **WhatsApp** en Consumer → Perfil del negocio para que te puedan escribir.
+> **Bueno saber:** configura el **horario de la cocina** (Centro de operaciones → Cocina → Configuración de cocina): sin horario, la página no dice si estás abierto y recibe pedidos a toda hora. Y agrega tu **WhatsApp** en Consumer → Perfil del negocio para que te puedan escribir.
 
 ## El diseño de tu página
 

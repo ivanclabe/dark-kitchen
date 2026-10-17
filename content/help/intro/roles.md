@@ -2,7 +2,7 @@
 id: roles
 section: intro
 title: Qué ve cada rol
-summary: Cada rol abre módulos distintos y empieza en su pantalla; por ejemplo, Caja empieza en Operación y Cocina en la vista Cocina.
+summary: Cada rol abre módulos distintos y empieza en su pantalla; por ejemplo, Caja empieza en el Centro de operaciones y Cocina en la vista Cocina.
 audience: [everyone]
 permissions: []
 appPath: null
@@ -23,10 +23,10 @@ Quanela trae seis **plantillas de rol**. Tu negocio puede crear roles propios co
 |---|---|---|---|
 | **ADMIN** | Todo, incluidos usuarios y configuración | Inicio | Todo |
 | **GERENTE** | Toda la operación, sin administrar usuarios | Inicio | Todo menos Usuarios |
-| **CAJA** | Pedidos, despacho, clientes, cobros y ventas | Operación → Tablero | Inicio, Operación, Catálogo, Clientes, Insights |
-| **COCINA** | Preparación y menú del día | Operación → Cocina | Operación, Catálogo |
+| **CAJA** | Pedidos, despacho, clientes, cobros y ventas | Centro de operaciones → Tablero | Inicio, Centro de operaciones, Planificador de Menús, Clientes, Insights |
+| **COCINA** | Preparación y menú del día | Centro de operaciones → Cocina | Centro de operaciones, Planificador de Menús |
 | **INVENTARIO** | Abastecimiento, recetas y costos | Inicio | Inicio, Catálogo, Abastecimiento, Insights |
-| **DOMICILIARIO** | Sus entregas asignadas | Operación → Despacho | Operación (solo Despacho) |
+| **DOMICILIARIO** | Sus entregas asignadas | Centro de operaciones → Despacho | Centro de operaciones (solo Despacho) |
 
 ## Cosas que conviene saber
 

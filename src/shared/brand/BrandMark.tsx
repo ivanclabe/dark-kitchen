@@ -3,8 +3,8 @@ import clsx from 'clsx'
 /** The app icon of Quanela (public/icons, from the brand package). */
 export const BRAND_ICON = '/icons/quanela-app-icon-128.png'
 const BRAND_ICON_2X = '/icons/quanela-app-icon-256.png'
-/** The horizontal logo (mascot + wordmark), for light backgrounds. */
-export const BRAND_LOGO = '/brand/quanela-logo-horizontal.png'
+/** The horizontal logo (mascot + wordmark), for light backgrounds. WebP: 28 KB instead of the 123 KB PNG, which stays for other uses. */
+export const BRAND_LOGO = '/brand/quanela-logo-horizontal.webp'
 
 /**
  * The brand mark: the app icon, sized by its className (size-8, size-10…). Decorative next to the name

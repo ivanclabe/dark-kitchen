@@ -6,9 +6,9 @@ type Placement = 'bottom-start' | 'bottom-end' | 'right-end'
 const ITEM_SELECTOR = '[role="menuitem"]:not([disabled]), [role="menuitemradio"]:not([disabled])'
 
 const PLACEMENT_CLASS: Record<Placement, string> = {
-  'bottom-start': 'md:top-full md:left-0 md:mt-2',
-  'bottom-end': 'md:top-full md:right-0 md:mt-2',
-  'right-end': 'md:left-full md:bottom-0 md:ml-3',
+  'bottom-start': 'md:top-full md:left-0 md:mt-2 md:origin-top-left',
+  'bottom-end': 'md:top-full md:right-0 md:mt-2 md:origin-top-right',
+  'right-end': 'md:left-full md:bottom-0 md:ml-3 md:origin-bottom-left',
 }
 
 /**
@@ -76,7 +76,7 @@ export function Popover({
       {trigger({ onClick: () => setOpen((v) => !v), 'aria-haspopup': 'menu', 'aria-expanded': open, 'aria-controls': panelId })}
       {open && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/50 md:hidden" aria-hidden onClick={() => setOpen(false)} />
+          <div className="motion-backdrop fixed inset-0 z-40 bg-black/50 md:hidden" aria-hidden onClick={() => setOpen(false)} />
           <div
             ref={panelRef}
             id={panelId}
@@ -84,7 +84,7 @@ export function Popover({
             aria-label={label}
             onKeyDown={handleKeyDown}
             className={clsx(
-              'shadow-float z-50 overflow-y-auto border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
+              'shadow-float motion-pop-sheet z-50 overflow-y-auto overscroll-contain border border-neutral-800 bg-neutral-900 p-2 text-neutral-100',
               // Celular: hoja inferior a todo lo ancho. Solo con variantes max-md para no competir con
               // la posición de escritorio (antes un "bottom auto" de escritorio anulaba el anclaje abajo
               // de right-end: el menú se abría hacia abajo, fuera de la pantalla, y desplazaba el layout).
@@ -126,7 +126,7 @@ export function PopoverItem({
       aria-current={checked ? 'true' : undefined}
       onClick={onSelect}
       className={clsx(
-        'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-none',
+        'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus',
         tone === 'danger'
           ? 'text-red-300 hover:bg-red-500/10 focus-visible:bg-red-500/10'
           : 'text-neutral-200 hover:bg-neutral-800 focus-visible:bg-neutral-800',

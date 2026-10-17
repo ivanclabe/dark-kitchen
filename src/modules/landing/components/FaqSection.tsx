@@ -1,11 +1,11 @@
-import { ChevronDown } from 'lucide-react'
-import { display } from '../lib/typography'
+import { RobotFace } from '@/shared/robot/RobotFace'
+import type { CSSProperties } from 'react'
 
 /** Solo lo que es cierto hoy en el producto (ADR 0010). */
 const FAQ: { q: string; a: string }[] = [
   {
-    q: '¿Necesito tarjeta para empezar?',
-    a: 'No. Standard y Business empiezan con una prueba gratis. Eliges el plan al crear tu cuenta y entras a trabajar de inmediato.',
+    q: '¿Cómo pago mi plan?',
+    a: 'En línea, al terminar de crear tu cuenta: con tarjeta, PSE, Nequi o el botón Bancolombia, a través de Wompi. Con tarjeta se renueva sola; con los otros medios te avisamos antes de cada renovación. Pagando el año te regalamos dos meses.',
   },
   {
     q: '¿Qué es una cuenta?',
@@ -13,7 +13,11 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: '¿Puedo cambiar de plan después?',
-    a: 'Sí. Escríbenos y lo ajustamos. Al cambiar no se pierde nada: si bajas de plan, tus datos se conservan y solo se limita lo que el nuevo plan no incluye.',
+    a: 'Sí, desde Facturación. Si subes de plan, pagas solo la diferencia hasta tu renovación; si bajas, el cambio se aplica al renovar. Tus datos se conservan siempre.',
+  },
+  {
+    q: '¿Puedo cancelar?',
+    a: 'Sí, cuando quieras, desde Facturación. No hay permanencia: sigues usando Quanela hasta el final del período que pagaste y no se vuelve a cobrar.',
   },
   {
     q: '¿Qué pasa si llego al límite de mi plan?',
@@ -29,22 +33,24 @@ const FAQ: { q: string; a: string }[] = [
   },
 ]
 
+/** Questions and answers as reading text, like the notes at the back of a programme: all answered at a glance. */
 export function FaqSection() {
   return (
-    <section id="faq" className="theme-light scroll-mt-16 bg-white text-neutral-50" aria-labelledby="landing-faq">
-      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
-        <h2 id="landing-faq" style={display} className="text-3xl font-black tracking-[-0.02em] text-[#1C1310] sm:text-5xl">
-          Preguntas frecuentes
-        </h2>
-        <div className="mt-10 divide-y divide-[#1C1310]/10 border-y border-[#1C1310]/10">
-          {FAQ.map(({ q, a }) => (
-            <details key={q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-[#1C1310] [&::-webkit-details-marker]:hidden">
-                {q}
-                <ChevronDown size={18} className="shrink-0 text-brasa-600 transition-transform group-open:rotate-180" aria-hidden />
-              </summary>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#5B4A42]">{a}</p>
-            </details>
+    <section id="faq" className="scroll-mt-24 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-faq">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-6">
+        <div className="lg:col-span-3">
+          <h2 id="landing-faq" data-reveal className="landing-display text-[length:var(--l-size-title)]">
+            Preguntas frecuentes
+          </h2>
+          <div data-reveal style={{ '--i': 1 } as CSSProperties}>
+            <RobotFace mood="help" size={120} lazy className="mt-6 h-24 w-auto lg:h-[120px]" />
+          </div>
+        </div>
+        <div className="lg:col-span-8 lg:col-start-5 lg:columns-2 lg:gap-14">
+          {FAQ.map(({ q, a }, i) => (
+            <p key={q} data-reveal style={{ '--i': i % 3 } as CSSProperties} className="mb-5 break-inside-avoid leading-[1.55]">
+              <strong className="font-semibold">{q}</strong> {a}
+            </p>
           ))}
         </div>
       </div>

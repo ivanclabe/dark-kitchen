@@ -29,7 +29,7 @@ Quanela reúne en un solo lugar lo que pasa en un negocio de comida —una cocin
 
 ## Cómo se ve
 
-En el computador, a la izquierda está el menú con los módulos: **Inicio**, **Operación**, **Catálogo**, **Abastecimiento**, **Clientes**, **Personal** e **Insights**; debajo, **Usuarios** y **Configuración**. Arriba están la cuenta en la que estás, **«Oye Quanela»** y **Copilot**. En el celular, el menú se abre con el botón ☰.
+En el computador, a la izquierda está el menú con los módulos: **Inicio**, **Centro de operaciones**, **Planificador de Menús**, **Abastecimiento**, **Clientes**, **Personal** y **Análisis**; debajo, **Usuarios** y **Configuración**. Arriba están la cuenta en la que estás, **«Oye Quanela»** y **Copilot**. En el celular, el menú se abre con el botón ☰.
 
 Cada persona ve solo los módulos que su rol le permite. Ver [Qué ve cada rol](help:roles).
 

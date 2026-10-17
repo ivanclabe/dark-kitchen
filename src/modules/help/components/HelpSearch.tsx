@@ -78,7 +78,7 @@ export function HelpSearch({ size = 'md', autoFocus = false, onNavigate }: { siz
         aria-label="Buscar en el centro de ayuda"
         placeholder={size === 'lg' ? 'Busca: «registrar un pago», «usar la cocina», «stock bajo»…' : 'Buscar en la ayuda (/)'}
         className={clsx(
-          'w-full rounded-full border border-neutral-800 bg-neutral-900 pr-9 text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15',
+          'w-full rounded-full border border-neutral-800 bg-neutral-900 pr-9 text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-focus focus:ring-2 focus:ring-focus/25',
           size === 'lg' ? 'h-13 pl-11 text-base' : 'h-10 pl-9 text-sm',
         )}
       />

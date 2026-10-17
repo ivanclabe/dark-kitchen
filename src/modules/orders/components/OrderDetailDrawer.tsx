@@ -134,7 +134,7 @@ function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }
               type="button"
               onClick={() => void run(() => advance.mutateAsync(item.id), 'avanzar')}
               disabled={pending || !canAdvance}
-              className="inline-flex items-center gap-1 rounded-lg bg-neutral-800 px-2 py-1 text-xs font-medium text-neutral-100 hover:bg-brasa-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-1 rounded-lg bg-neutral-800 px-2 py-1 text-xs font-medium text-neutral-100 hover:bg-primary hover:text-on-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <forward.icon size={12} aria-hidden /> {forward.label}
             </button>

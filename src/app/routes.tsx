@@ -5,46 +5,22 @@ import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { LoginPage } from '@/modules/auth/pages/LoginPage'
 import { SetPasswordPage } from '@/modules/auth/pages/SetPasswordPage'
 import { SignUpAdminPage } from '@/modules/auth/pages/SignUpAdminPage'
-import { SupplyPage } from '@/modules/supply/pages/SupplyPage'
-import { InvoiceImportPage } from '@/modules/supply/pages/InvoiceImportPage'
-import { PreparationRecipePage } from '@/modules/supply/pages/PreparationRecipePage'
-import { CompositionEditorPage } from '@/modules/menuPlanner/pages/CompositionEditorPage'
-import { CatalogPage } from '@/modules/menuPlanner/pages/CatalogPage'
-import { RecipeEditorPage } from '@/modules/recipes/pages/RecipeEditorPage'
-import { CustomersPage } from '@/modules/customers/pages/CustomersPage'
-import { CustomerDetailPage } from '@/modules/customers/pages/CustomerDetailPage'
 import { OperationsRedirect } from '@/modules/operations/components/OperationsRedirect'
-import { OperationsPage } from '@/modules/operations/pages/OperationsPage'
-import { MyShiftsPage } from '@/modules/staff/pages/MyShiftsPage'
-import { StaffPage } from '@/modules/staff/pages/StaffPage'
-import { FinancePage } from '@/modules/finance/pages/FinancePage'
-import { IntegrationsPage } from '@/modules/integrations/pages/IntegrationsPage'
-import { PublicMenuAdminPage } from '@/modules/publicMenu/pages/PublicMenuAdminPage'
 import { OrderTrackingRoute, PublicMenuRoute } from '@/modules/publicMenu/public/PublicRoutes'
-import { RolesPage, UsersLayout, UsersPage } from '@/modules/organization/pages/UsersAndPermissionsPage'
 import { ActivationPage } from '@/modules/invitations/pages/ActivationPage'
 import { SignUpPage } from '@/modules/signup/pages/SignUpPage'
 import { SignUpConfirmedPage } from '@/modules/signup/pages/SignUpConfirmedPage'
-import { ProfilePage } from '@/modules/profile/pages/ProfilePage'
-import { KitchenSelectorPage } from '@/modules/kitchens/pages/KitchenSelectorPage'
-import { ActivitySettingsPage } from '@/modules/settings/pages/ActivitySettingsPage'
-import { AiSettingsPage } from '@/modules/settings/pages/AiSettingsPage'
-import { BillingSettingsPage } from '@/modules/settings/pages/BillingSettingsPage'
-import { ConsumerPage } from '@/modules/consumer/pages/ConsumerPage'
-import { IntegrationsSettingsPage } from '@/modules/settings/pages/IntegrationsSettingsPage'
-import { KitchenGeneralPage } from '@/modules/settings/pages/KitchenGeneralPage'
-import { SettingsLayout } from '@/modules/settings/pages/SettingsLayout'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { HelpElsewhere } from '@/modules/help/redirects'
 import { DOCS_ROUTES, helpCenterRoutes } from '@/modules/help/routes'
 import { currentHost } from '@/shared/tenant/host'
 import { TenantGate } from '@/shared/tenant/TenantProvider'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, type ComponentType } from 'react'
 import { createBrowserRouter, Navigate, useParams, type RouteObject } from 'react-router-dom'
-import { AppLayout } from './AppLayout'
 import { homeSection } from './navigation'
 import { KitchenEntryRedirect, LegacyKitchenRedirect, LegacyOrgRedirect } from './kitchenEntry'
 import { KitchenScope } from './KitchenScope'
+import { FullScreenLoading } from './FullScreenLoading'
 import { ProtectedRoute } from './ProtectedRoute'
 
 /** Redirección a una sección de la Cocina activa (las rutas viejas de dentro de la app). */
@@ -75,6 +51,14 @@ const InsightsPage = lazy(() => import('@/modules/insights/pages/InsightsPage').
 
 // A lazy page (dashboard, Insights) inside the layout: its skeleton, not a bare «Cargando…».
 const loading = <LoadingState variant="cards" rows={3} cols={3} label="Preparando la pantalla…" />
+
+/**
+ * A screen of the app, downloaded when it is opened (the route's `lazy`): the landing, the sign-in and
+ * the public menu no longer download the whole app first. While the first one arrives, the full-screen wait.
+ */
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K): Pick<RouteObject, 'lazy'> {
+  return { lazy: async () => ({ Component: (await load())[name] }) }
+}
 
 const routes: RouteObject[] = [
   // Pública: presentación del producto, antes de iniciar sesión.
@@ -125,11 +109,10 @@ const routes: RouteObject[] = [
   // Tus cuentas: elegir, cambiar y (SUPER_ADMIN) crear.
   {
     path: '/cuentas',
-    element: (
-      <ProtectedRoute>
-        <KitchenSelectorPage />
-      </ProtectedRoute>
-    ),
+    lazy: async () => {
+      const { KitchenSelectorPage } = await import('@/modules/kitchens/pages/KitchenSelectorPage')
+      return { element: <ProtectedRoute><KitchenSelectorPage /></ProtectedRoute> }
+    },
   },
   // Dirección anterior del selector.
   { path: '/cocinas', element: <Navigate to="/cuentas" replace /> },
@@ -158,70 +141,70 @@ const routes: RouteObject[] = [
     ),
     children: [
       {
-        element: <AppLayout />,
+        ...page(() => import('./AppLayout'), 'AppLayout'),
         children: [
           // "/" = your start: each role lands on its own screen (ADR 0020, D3).
           { index: true, element: <RoleHome /> },
           { path: 'dashboard', element: <Suspense fallback={loading}><DashboardPage /></Suspense> },
           // Centro de operaciones (ADR 0031): Tablero, Cocina, Despacho y Lista
           // del mismo pedido; /operations/:orderId abre su detalle sobre la vista.
-          { path: 'operations', element: <OperationsPage /> },
-          { path: 'operations/:orderId', element: <OperationsPage /> },
+          { path: 'operations', ...page(() => import('@/modules/operations/pages/OperationsPage'), 'OperationsPage') },
+          { path: 'operations/:orderId', ...page(() => import('@/modules/operations/pages/OperationsPage'), 'OperationsPage') },
           // Las direcciones de antes (Pedidos y Cocina) llevan a la misma vista.
           { path: 'orders', element: <OperationsRedirect /> },
           { path: 'orders/:orderId', element: <OperationsRedirect /> },
           { path: 'kitchen', element: <OperationsRedirect view="kitchen" /> },
           { path: 'delivery', element: <OperationsRedirect view="dispatch" /> },
           // Catálogo — Planificador de Menús: platos, calendario y recetas; ?view=shared, los platos compartidos (ADR 0024).
-          { path: 'menu-planner', element: <CatalogPage /> },
-          { path: 'recipes/:productId', element: <RecipeEditorPage /> },
+          { path: 'menu-planner', ...page(() => import('@/modules/menuPlanner/pages/CatalogPage'), 'CatalogPage') },
+          { path: 'recipes/:productId', ...page(() => import('@/modules/recipes/pages/RecipeEditorPage'), 'RecipeEditorPage') },
           // ADR 0059: what the customer chooses in a dish.
-          { path: 'dishes/:productId/composition', element: <CompositionEditorPage /> },
+          { path: 'dishes/:productId/composition', ...page(() => import('@/modules/menuPlanner/pages/CompositionEditorPage'), 'CompositionEditorPage') },
           // Abastecimiento — Stock, Compras y Proveedores. La vista y el elemento seleccionado viven en la URL.
-          { path: 'supply', element: <SupplyPage /> },
-          { path: 'supply/:view', element: <SupplyPage /> },
-          { path: 'supply/:view/:id', element: <SupplyPage /> },
+          { path: 'supply', ...page(() => import('@/modules/supply/pages/SupplyPage'), 'SupplyPage') },
+          { path: 'supply/:view', ...page(() => import('@/modules/supply/pages/SupplyPage'), 'SupplyPage') },
+          { path: 'supply/:view/:id', ...page(() => import('@/modules/supply/pages/SupplyPage'), 'SupplyPage') },
           // ADR 0049: importar una compra desde una factura (leer y revisar).
           // ADR 0057: a preparation's recipe, in the recipe editor.
-          { path: 'supply/preparaciones/:id/receta', element: <PreparationRecipePage /> },
-          { path: 'supply/compras/importar', element: <InvoiceImportPage /> },
-          { path: 'supply/compras/importar/:importId', element: <InvoiceImportPage /> },
+          { path: 'supply/preparaciones/:id/receta', ...page(() => import('@/modules/supply/pages/PreparationRecipePage'), 'PreparationRecipePage') },
+          { path: 'supply/compras/importar', ...page(() => import('@/modules/supply/pages/InvoiceImportPage'), 'InvoiceImportPage') },
+          { path: 'supply/compras/importar/:importId', ...page(() => import('@/modules/supply/pages/InvoiceImportPage'), 'InvoiceImportPage') },
           { path: 'inventory', element: <KitchenRedirect to="/supply/stock" /> },
           { path: 'inventory/movimientos', element: <KitchenRedirect to="/supply/stock" /> },
           { path: 'purchases', element: <KitchenRedirect to="/supply/compras" /> },
           { path: 'purchases/:id', element: <LegacyPurchaseRedirect /> },
           { path: 'suppliers', element: <KitchenRedirect to="/supply/proveedores" /> },
           // Personal y Turnos (ADR 0020); "Mis turnos" es de cada persona, sin permiso.
-          { path: 'staff', element: <StaffPage /> },
+          { path: 'staff', ...page(() => import('@/modules/staff/pages/StaffPage'), 'StaffPage') },
           // Finanzas (ADR 0051): obligaciones, pagos, flujo de caja y rentabilidad real.
-          { path: 'finance', element: <FinancePage /> },
-          { path: 'finance/:tab', element: <FinancePage /> },
+          { path: 'finance', ...page(() => import('@/modules/finance/pages/FinancePage'), 'FinancePage') },
+          { path: 'finance/:tab', ...page(() => import('@/modules/finance/pages/FinancePage'), 'FinancePage') },
           // Menú público (ADR 0052): publish, ordering options, link and QR; Diseño (ADR 0053).
-          { path: 'public-menu', element: <PublicMenuAdminPage /> },
-          { path: 'public-menu/:tab', element: <PublicMenuAdminPage /> },
+          { path: 'public-menu', ...page(() => import('@/modules/publicMenu/pages/PublicMenuAdminPage'), 'PublicMenuAdminPage') },
+          { path: 'public-menu/:tab', ...page(() => import('@/modules/publicMenu/pages/PublicMenuAdminPage'), 'PublicMenuAdminPage') },
           // WhatsApp e Integraciones (ADR 0055).
-          { path: 'integrations', element: <IntegrationsPage /> },
-          { path: 'integrations/:tab', element: <IntegrationsPage /> },
-          { path: 'my-shifts', element: <MyShiftsPage /> },
+          { path: 'integrations', ...page(() => import('@/modules/integrations/pages/IntegrationsPage'), 'IntegrationsPage') },
+          { path: 'integrations/:tab', ...page(() => import('@/modules/integrations/pages/IntegrationsPage'), 'IntegrationsPage') },
+          { path: 'my-shifts', ...page(() => import('@/modules/staff/pages/MyShiftsPage'), 'MyShiftsPage') },
           // Clientes — saldos, pagos e historial.
-          { path: 'customers', element: <CustomersPage /> },
-          { path: 'customers/:id', element: <CustomerDetailPage /> },
+          { path: 'customers', ...page(() => import('@/modules/customers/pages/CustomersPage'), 'CustomersPage') },
+          { path: 'customers/:id', ...page(() => import('@/modules/customers/pages/CustomerDetailPage'), 'CustomerDetailPage') },
           // Quanela Consumer (ADR 0046): Resumen · Perfil del negocio · Platos. It used to live in Configuración.
-          { path: 'consumer', element: <ConsumerPage /> },
-          { path: 'consumer/:section', element: <ConsumerPage /> },
+          { path: 'consumer', ...page(() => import('@/modules/consumer/pages/ConsumerPage'), 'ConsumerPage') },
+          { path: 'consumer/:section', ...page(() => import('@/modules/consumer/pages/ConsumerPage'), 'ConsumerPage') },
           { path: 'settings/consumer', element: <KitchenRedirect to="/consumer" /> },
           // Insights (ADR 0027): how the business is doing. /reports is its old address.
           { path: 'insights', element: <Suspense fallback={loading}><InsightsPage /></Suspense> },
           { path: 'reports', element: <KitchenRedirect to="/insights" /> },
           // Mi perfil: nombre, avatar y contraseña de la persona (ADR 0008, Fase A).
-          { path: 'perfil', element: <ProfilePage /> },
+          { path: 'perfil', ...page(() => import('@/modules/profile/pages/ProfilePage'), 'ProfilePage') },
           // Usuarios: Usuarios · Roles y permisos, always of this account (ADR 0024), in the shell of Configuración (ADR 0026).
           {
             path: 'users',
-            element: <UsersLayout />,
+            ...page(() => import('@/modules/organization/pages/UsersAndPermissionsPage'), 'UsersLayout'),
             children: [
-              { index: true, element: <UsersPage /> },
-              { path: 'roles', element: <RolesPage /> },
+              { index: true, ...page(() => import('@/modules/organization/pages/UsersAndPermissionsPage'), 'UsersPage') },
+              { path: 'roles', ...page(() => import('@/modules/organization/pages/UsersAndPermissionsPage'), 'RolesPage') },
               { path: '*', element: <Navigate to=".." replace /> },
             ],
           },
@@ -230,13 +213,13 @@ const routes: RouteObject[] = [
           // Configuración of the account (ADR 0024): General, Facturación, IA y voz, Integraciones, Actividad.
           {
             path: 'settings',
-            element: <SettingsLayout />,
+            ...page(() => import('@/modules/settings/pages/SettingsLayout'), 'SettingsLayout'),
             children: [
-              { path: 'general', element: <KitchenGeneralPage /> },
-              { path: 'billing', element: <BillingSettingsPage /> },
-              { path: 'ai', element: <AiSettingsPage /> },
-              { path: 'integrations', element: <IntegrationsSettingsPage /> },
-              { path: 'activity', element: <ActivitySettingsPage /> },
+              { path: 'general', ...page(() => import('@/modules/settings/pages/KitchenGeneralPage'), 'KitchenGeneralPage') },
+              { path: 'billing', ...page(() => import('@/modules/settings/pages/BillingSettingsPage'), 'BillingSettingsPage') },
+              { path: 'ai', ...page(() => import('@/modules/settings/pages/AiSettingsPage'), 'AiSettingsPage') },
+              { path: 'integrations', ...page(() => import('@/modules/settings/pages/IntegrationsSettingsPage'), 'IntegrationsSettingsPage') },
+              { path: 'activity', ...page(() => import('@/modules/settings/pages/ActivitySettingsPage'), 'ActivitySettingsPage') },
             ],
           },
           { path: '*', element: <KitchenRedirect to="/" /> },
@@ -259,7 +242,9 @@ const routes: RouteObject[] = [
 
 // Every route goes through the gate of the subdomain's organization (ADR 0021);
 // doc.quanela.com is only the help center (ADR 0035).
-export const router = createBrowserRouter(currentHost().kind === 'docs' ? DOCS_ROUTES : [{ element: <TenantGate />, children: routes }])
+export const router = createBrowserRouter(
+  currentHost().kind === 'docs' ? DOCS_ROUTES : [{ element: <TenantGate />, hydrateFallbackElement: <FullScreenLoading stage="page" />, children: routes }],
+)
 
 // ADR 0061: without a chosen theme, the sign-in and the help center are light and the app dark, also when moving between them.
 router.subscribe((state) => applyRouteDefault(state.location.pathname))

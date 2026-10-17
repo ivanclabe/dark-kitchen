@@ -70,13 +70,14 @@ export function OperationsShell({
     () => ({
       can,
       density,
+      kitchen: ops.view === 'kitchen',
       scope,
       openDetail: ops.openDetail,
       requestConfirm: ops.requestConfirm,
       requestDispatch: ops.requestDispatch,
       requestCancel: ops.requestCancel,
     }),
-    [can, density, scope, ops.openDetail, ops.requestConfirm, ops.requestDispatch, ops.requestCancel],
+    [can, density, ops.view, scope, ops.openDetail, ops.requestConfirm, ops.requestDispatch, ops.requestCancel],
   )
 
   const tabs = ops.views.map((v) => ({ value: v, label: OPERATIONS_VIEW_LABEL[v], icon: VIEW_ICON[v] }))
@@ -134,7 +135,7 @@ export function OperationsShell({
                         {...props}
                         aria-label="Más opciones"
                         title="Más opciones"
-                        className="inline-flex size-10 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500"
+                        className="inline-flex size-10 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
                       >
                         <MoreHorizontal size={16} aria-hidden />
                       </button>
@@ -143,7 +144,8 @@ export function OperationsShell({
                 )}
                 {canSeeOrders && (
                   <Tooltip label={canCreate ? 'Crear un pedido nuevo (N)' : ACTION_DENIED_REASON.create} side="bottom">
-                    <Button variant="primary" icon={Plus} onClick={ops.openNewOrder} disabled={!canCreate}>
+                    {/* In the Cocina view the line's action is advancing the orders: creating one steps back to secondary. */}
+                    <Button variant={ops.view === 'kitchen' ? 'secondary' : 'primary'} icon={Plus} onClick={ops.openNewOrder} disabled={!canCreate}>
                       Nuevo pedido
                     </Button>
                   </Tooltip>

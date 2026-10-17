@@ -18,6 +18,7 @@ import { numberSetting, PRIORITY_ORDER } from '@/modules/ai/lib/catalog'
 import { useIngredients } from '../hooks/useIngredients'
 import { useSupplySuggestions } from '../hooks/useSuggestions'
 import { formatCoverage, needsAttention, orderQuantity, SHORT_COVERAGE_DAYS, urgencyOf } from '../lib/coverage'
+import { formatQuantity } from '@/shared/units/conversion'
 import { inventoryValue } from '../lib/stock'
 import type { SupplySuggestion } from '../types'
 import type { PresetLine } from './NewPurchaseDialog'
@@ -66,7 +67,7 @@ export function ReorderPanel({
 }) {
   const { reorderDays } = useCostSettings()
   const { data: suggestions, isLoading, isError, error, refetch } = useSupplySuggestions()
-  const { data: ingredients } = useIngredients()
+  const { data: ingredients, isLoading: ingredientsLoading, isError: ingredientsError } = useIngredients()
   // El umbral de cobertura corta es configurable (Configuración → IA → Sugerencias de compra).
   const reorderAi = useAiFeature('supply_reorder')
   const coverageDays = numberSetting(reorderAi.settings, 'coverage_days', SHORT_COVERAGE_DAYS)
@@ -74,6 +75,8 @@ export function ReorderPanel({
   const aiByRef = useMemo(() => insightItemsByRef(aiResult), [aiResult])
 
   const active = useMemo(() => (ingredients ?? []).filter((i) => i.active), [ingredients])
+  // Without ingredients there is no coverage to judge: never a green «all good» (Honest Zero, DESIGN.md).
+  const noIngredients = ingredients !== undefined && active.length === 0
   const attention = useMemo(() => (suggestions ?? []).filter((s) => !s.isPreparation && needsAttention(s, coverageDays)), [suggestions, coverageDays])
   const wasted30d = useMemo(() => (suggestions ?? []).reduce((sum, s) => sum + s.wasted30d * s.avgCost, 0), [suggestions])
 
@@ -107,15 +110,31 @@ export function ReorderPanel({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-        <StatCard label="Valor del inventario" value={formatMoney(inventoryValue(active))} hint={`${active.length} insumos activos`} icon={Wallet} tone="brand" emphasis />
+        {/* ADR 0065: while loading (or after an error) the figures wait — no «$0» nor «todo con cobertura» that is not known yet. */}
         <StatCard
-          label="Piden atención"
-          value={attention.length}
-          hint={attention.length > 0 ? `Bajo mínimo o < ${coverageDays} días` : 'Todo con cobertura suficiente'}
-          icon={attention.length > 0 ? AlertTriangle : CheckCircle2}
-          tone={attention.length > 0 ? 'warn' : 'good'}
+          label="Valor del inventario"
+          value={formatMoney(inventoryValue(active))}
+          hint={`${active.length} insumos activos`}
+          icon={Wallet}
+          emphasis
+          loading={ingredientsLoading || ingredientsError}
         />
-        <StatCard label="Merma (30 días)" value={formatMoney(wasted30d)} hint="Valorizada al costo promedio" icon={Trash2} tone={wasted30d > 0 ? 'warn' : 'neutral'} />
+        <StatCard
+          loading={isLoading || isError}
+          label="Piden atención"
+          value={noIngredients ? '—' : attention.length}
+          hint={noIngredients ? 'Sin insumos registrados' : attention.length > 0 ? `Bajo mínimo o < ${coverageDays} días` : 'Todo con cobertura suficiente'}
+          icon={noIngredients || !suggestions ? Clock : attention.length > 0 ? AlertTriangle : CheckCircle2}
+          tone={noIngredients || !suggestions ? 'neutral' : attention.length > 0 ? 'warn' : 'good'}
+        />
+        <StatCard
+          label="Merma (30 días)"
+          value={formatMoney(wasted30d)}
+          hint="Valorizada al costo promedio"
+          icon={Trash2}
+          tone={wasted30d > 0 ? 'warn' : 'neutral'}
+          loading={isLoading || isError}
+        />
       </div>
 
       {onStartCount && (
@@ -134,6 +153,8 @@ export function ReorderPanel({
           <ErrorState error={error} onRetry={() => void refetch()} compact />
         ) : isLoading ? (
           <LoadingState variant="block" className="!border-0 !bg-transparent !p-0" />
+        ) : noIngredients ? (
+          <EmptyState icon={PackagePlus} title="Todavía no hay insumos" description="Registra tus insumos con su mínimo y aquí verás qué reponer y a quién comprárselo." compact />
         ) : attention.length === 0 ? (
           <EmptyState icon={CheckCircle2} title="Nada por reponer" description="Ningún insumo activo está bajo mínimo ni se queda corto esta semana." compact />
         ) : (
@@ -175,15 +196,15 @@ export function ReorderPanel({
                                 {s.name} <UrgencyBadge suggestion={s} coverageDays={coverageDays} />
                               </p>
                               <p className="text-xs text-neutral-500 tabular-nums">
-                                {s.stockAvailable} {s.baseUnitCode}
-                                {s.dailyBurn > 0 ? ` · gasta ${Math.round(s.dailyBurn * 100) / 100}/día · dura ${formatCoverage(s)}` : ' · sin consumo en 30 días'}
+                                {formatQuantity(s.stockAvailable, s.baseUnitCode)}
+                                {s.dailyBurn > 0 ? ` · gasta ${formatQuantity(s.dailyBurn, s.baseUnitCode)}/día · dura ${formatCoverage(s)}` : ' · sin consumo en 30 días'}
                               </p>
                               {ai && <InsightExplanation item={ai} />}
                             </div>
                             <span className="inline-flex shrink-0 items-center gap-2">
                               {qty > 0 ? (
                                 <span className="text-sm font-semibold tabular-nums text-amber-400">
-                                  +{qty} {s.baseUnitCode}
+                                  +{formatQuantity(qty, s.baseUnitCode)}
                                 </span>
                               ) : (
                                 <span className="text-xs text-neutral-500">Sin meta</span>

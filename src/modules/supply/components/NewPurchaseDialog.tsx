@@ -127,8 +127,9 @@ export function NewPurchaseDialog({
       >
         <form id="new-purchase-form" onSubmit={handleSubmit} className="space-y-4">
           <FormField label="Proveedor" required>
-            {() => (
+            {(a11y) => (
               <Combobox
+                {...a11y}
                 value={supplierId}
                 onChange={setSupplierId}
                 options={supplierOptions}

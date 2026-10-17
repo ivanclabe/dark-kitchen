@@ -85,14 +85,14 @@ describe('el rail cabe en la pantalla', () => {
 
   it('agrupa: Día a día, Clientes y ventas, Negocio y Administración, en ese orden', () => {
     expect([...new Set(all.map((i) => i.group))]).toEqual(['daily', 'sales', 'business', 'admin'])
-    expect(all.filter((i) => i.group === 'daily').map((i) => i.label)).toEqual(['Inicio', 'Operación', 'Catálogo', 'Abastecimiento'])
+    expect(all.filter((i) => i.group === 'daily').map((i) => i.label)).toEqual(['Inicio', 'Centro de operaciones', 'Planificador de Menús', 'Abastecimiento'])
   })
 
   it('en una pantalla baja, lo que no cabe pasa a «Más» sin perder ningún módulo', () => {
     // Exactly the first group plus «Más»: 5 slots, 4 gaps.
     const height = 5 * item + 4 * gap
     const { visible, overflow } = fitRail(all, height)
-    expect(visible.map((i) => i.label)).toEqual(['Inicio', 'Operación', 'Catálogo', 'Abastecimiento'])
+    expect(visible.map((i) => i.label)).toEqual(['Inicio', 'Centro de operaciones', 'Planificador de Menús', 'Abastecimiento'])
     expect([...visible, ...overflow]).toEqual(all)
     // One pixel less and Abastecimiento moves too.
     expect(fitRail(all, height - 1).visible).toHaveLength(3)

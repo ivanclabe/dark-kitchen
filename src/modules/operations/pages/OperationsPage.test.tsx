@@ -5,13 +5,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Order } from '@/modules/orders/types'
 
 // ADR 0031: one Centro de operaciones — each role its views, the figures of the day, the order on top.
-const state = vi.hoisted(() => ({ perms: new Set<string>(), live: [] as Order[] }))
+const state = vi.hoisted(() => ({ perms: new Set<string>(), live: [] as Order[] | undefined }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
   useActiveKitchen: () => ({ can: (p: string) => state.perms.has(p), path: (to: string) => `/k/centro${to}`, kitchen: { id: 'k1', slug: 'centro' } }),
 }))
 vi.mock('@/modules/orders/hooks/useOrders', () => ({
-  useLiveOrders: () => ({ data: state.live, isLoading: false }),
+  // Like the real hook: a disabled query has no data.
+  useLiveOrders: (enabled = true) => ({ data: enabled ? state.live : undefined, isLoading: false }),
   useDeliveredTodayCount: () => ({ data: 18 }),
 }))
 vi.mock('@/modules/orders/board/OrderBoard', () => ({ OrderBoard: ({ tickets }: { tickets?: Order[] }) => <p>{`board ${tickets?.length ?? 0}`}</p> }))
@@ -68,6 +69,22 @@ describe('Centro de operaciones (ADR 0031)', () => {
       expect(within(figures).getByText(label).previousSibling?.textContent).toBe(value)
     }
     expect(screen.getByText('board 3')).toBeTruthy()
+  })
+
+  it('ADR 0065: Lista entered directly counts the open orders too (it showed 0)', () => {
+    renderAt('/k/centro/operations?view=list')
+    const figures = screen.getByRole('list', { name: 'Resumen de la operación' })
+    expect(within(figures).getByText('Por confirmar').previousSibling?.textContent).toBe('1')
+    expect(within(figures).getByText('Por cobrar').previousSibling?.textContent).toBe('2')
+  })
+
+  it('ADR 0065: without the orders yet a figure is «—», never a 0 that is not true', () => {
+    state.live = undefined
+    renderAt()
+    const figures = screen.getByRole('list', { name: 'Resumen de la operación' })
+    for (const label of ['Por confirmar', 'En cola', 'Preparando', 'Listos', 'En ruta', 'Por cobrar']) {
+      expect(within(figures).getByText(label).previousSibling?.textContent).toBe('—')
+    }
   })
 
   it('a figure opens its orders already filtered', () => {

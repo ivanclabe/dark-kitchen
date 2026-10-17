@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T00:00:00Z",
+  "title": "Design System: Quanela",
+  "extensions": {
+    "colorMeta": {
+      "ember": { "role": "primary", "displayName": "Ember", "canonical": "#f97316", "tonalRamp": ["#7c2d12", "#9a3412", "#c2410c", "#ea580c", "#f97316", "#fb923c", "#fdba74", "#ffedd5"] },
+      "ember-deep": { "role": "primary", "displayName": "Deep Ember (action)", "canonical": "#c2410c" },
+      "night-canvas": { "role": "neutral", "displayName": "Night Canvas", "canonical": "#0a0a0a", "tonalRamp": ["#0a0a0a", "#171717", "#262626", "#404040", "#6b6b6b", "#858585", "#a3a3a3", "#fafafa"] },
+      "paper-canvas": { "role": "neutral", "displayName": "Paper Canvas (light theme)", "canonical": "#f5f5f5" },
+      "linen-canvas": { "role": "neutral", "displayName": "Linen Canvas (neutral theme)", "canonical": "#f2f0ed" },
+      "roast-brown": { "role": "neutral", "displayName": "Roast Brown (landing)", "canonical": "#1C1310" },
+      "success": { "role": "tertiary", "displayName": "Success" },
+      "warning": { "role": "tertiary", "displayName": "Warning" },
+      "danger": { "role": "tertiary", "displayName": "Danger" },
+      "info": { "role": "tertiary", "displayName": "Info" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The one headline figure of a summary." },
+      "headline": { "displayName": "Headline", "purpose": "Page title, once per page." },
+      "title": { "displayName": "Title", "purpose": "Section titles." },
+      "body": { "displayName": "Body", "purpose": "Default text, tables and forms." },
+      "label": { "displayName": "Label", "purpose": "Form labels and table headers, uppercase." },
+      "micro": { "displayName": "Micro", "purpose": "Overlines, small badges and counters; the floor (11 px)." }
+    },
+    "shadows": [
+      { "name": "card", "value": "0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.5)", "purpose": "The rare card that must lift." },
+      { "name": "float", "value": "0 12px 40px -8px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)", "purpose": "Menus, popovers, toasts, dialogs, drawers." }
+    ],
+    "motion": [
+      { "name": "ease-snappy", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "UI entrances and press feedback (150–300 ms)." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Sheets and side drawers (300 ms)." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action of a view.",
+      "html": "<button class=\"ds-btn-primary\">Nuevo pedido</button>",
+      "css": ".ds-btn-primary { background: #c2410c; color: #fff; height: 40px; padding: 0 16px; border: none; border-radius: 9999px; font: 500 14px Inter, system-ui, sans-serif; transition: background-color 150ms, transform 150ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-primary:hover { background: #9a3412; } .ds-btn-primary:active { background: #7c2d12; transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #f97316; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Important but not main actions.",
+      "html": "<button class=\"ds-btn-secondary\">Exportar</button>",
+      "css": ".ds-btn-secondary { background: #171717; color: #e5e5e5; height: 40px; padding: 0 16px; border: 1px solid #262626; border-radius: 9999px; font: 500 14px Inter, system-ui, sans-serif; transition: background-color 150ms, border-color 150ms; } .ds-btn-secondary:hover { background: #262626; border-color: #404040; color: #fafafa; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #f97316; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form field with a 3:1 border and the focus ring.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nombre del plato\" />",
+      "css": ".ds-input { width: 240px; background: #171717; color: #f5f5f5; border: 1px solid #6b6b6b; border-radius: 8px; padding: 10px 14px; font: 400 14px Inter, system-ui, sans-serif; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: #858585; } .ds-input:hover { border-color: #858585; } .ds-input:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.25); }"
+    },
+    {
+      "name": "Filter Chips",
+      "kind": "chip",
+      "refersTo": "chip-active",
+      "description": "Single-choice filters; the active one in Deep Ember.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">Todos <span class=\"ds-count\">24</span></button><button class=\"ds-chip\">Abiertos</button><button class=\"ds-chip\">Entregados</button></div>",
+      "css": ".ds-chips { display: flex; gap: 6px; } .ds-chip { display: inline-flex; align-items: center; gap: 6px; border: none; border-radius: 9999px; padding: 6px 12px; background: #171717; color: #a3a3a3; font: 500 12px Inter, system-ui, sans-serif; transition: background-color 150ms, color 150ms; } .ds-chip:hover { background: #262626; color: #e5e5e5; } .ds-chip-on { background: #f5f5f5; color: #0a0a0a; } .ds-count { border-radius: 9999px; padding: 0 6px; background: rgba(0,0,0,0.2); font-size: 11px; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat container on the night surface with a hairline border.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-label\">Por cobrar</p><p class=\"ds-figure\">$400.000</p><p class=\"ds-caption\">4 clientes</p></div>",
+      "css": ".ds-card { width: 240px; background: rgba(23,23,23,0.6); border: 1px solid rgba(38,38,38,0.6); border-radius: 16px; padding: 24px; font-family: Inter, system-ui, sans-serif; } .ds-label { margin: 0; color: #858585; font-size: 12px; font-weight: 500; letter-spacing: 0.025em; text-transform: uppercase; } .ds-figure { margin: 8px 0 0; color: #fafafa; font-size: 24px; font-weight: 600; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; } .ds-caption { margin: 4px 0 0; color: #858585; font-size: 12px; }"
+    },
+    {
+      "name": "Order Card",
+      "kind": "custom",
+      "description": "The board card: dishes, number and SLA time, and the next step as a labelled pill.",
+      "html": "<div class=\"ds-order\"><p class=\"ds-dish\">2× Ajiaco santafereño</p><div class=\"ds-meta\"><span>#1005 · <b class=\"ds-late\">25h 43m</b></span><button class=\"ds-next\">Marcar listo</button></div></div>",
+      "css": ".ds-order { width: 260px; background: #171717; border: 1px solid #262626; border-left: 2px solid #ef4444; border-radius: 8px; padding: 8px 12px; font-family: Inter, system-ui, sans-serif; } .ds-dish { margin: 0; color: #f5f5f5; font-size: 14px; font-weight: 500; } .ds-meta { margin-top: 6px; display: flex; align-items: center; justify-content: space-between; color: #858585; font-size: 12px; font-variant-numeric: tabular-nums; } .ds-late { color: #f87171; font-weight: 500; } .ds-next { height: 28px; padding: 0 10px; border: 1px solid #404040; border-radius: 9999px; background: transparent; color: #e5e5e5; font: 500 12px Inter, system-ui, sans-serif; } .ds-next:hover { background: #c2410c; border-color: transparent; color: #fff; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Kitchen Pass",
+    "overview": "The pass is the counter between the kitchen and the dining room: dark, ordered, lit only where something is ready to go. Quanela reads the same way. Most of the screen is a quiet night surface; information sits in hairline-bordered cards and tables; the ember orange appears only where the person has to act or where something needs them.",
+    "keyCharacteristics": [
+      "Night surfaces with hairline borders; depth by tone, shadow only on what floats.",
+      "One accent: ember orange, rationed to action, focus and live state; selection is ink.",
+      "Inter with tabular figures; small type set with uppercase micro-labels.",
+      "Pills for actions and filters, softly rounded cards, gently rounded fields.",
+      "Light, dark and neutral themes from one token set; AA contrast in all three."
+    ],
+    "rules": [
+      { "name": "The One Ember Rule", "body": "Orange means «act here» or «this is live». If something orange cannot be clicked, selected or is not a live state, it should be neutral.", "section": "colors" },
+      { "name": "The Honest Zero Rule", "body": "A figure that is not known yet is «—» in a muted tone, never a 0 and never a green «all good».", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "Every number that can be compared uses tabular figures and is formatted, never raw.", "section": "typography" },
+      { "name": "The Only-What-Floats Rule", "body": "A surface that stays in the flow of the page has no shadow. Shadow means «this is above the page and will go away».", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep orange to action, focus and live state; selection is ink (The One Ember Rule).",
+      "Do use Deep Ember (#c2410c) under white text; the bright Ember (#f97316) only as text, ring or accent.",
+      "Do show unknown figures as «—» and empty or failed states with what happened and what to do next.",
+      "Do use the shared components in src/shared/ui instead of hand-made variants.",
+      "Do honor reduced motion: transitions keep only a short fade, nothing moves."
+    ],
+    "donts": [
+      "Don't animate anything endlessly on an operational screen (no pulsing «live» dots, no count-up numbers).",
+      "Don't put white text on #f97316 or invent new sizes below 11 px.",
+      "Don't add shadows to cards that stay in the page, gradients on text, decorative glass or eyebrow labels above headings.",
+      "Don't use a colored side border thicker than the 2 px state stripe of the order card.",
+      "Don't invent customers, figures or testimonials anywhere in the product or the landing."
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 id: first-order
 section: getting-started
 title: Tu primer pedido, de principio a fin
-summary: Crea el pedido, agrégale platos, confírmalo, prepáralo en Cocina, despáchalo, entrégalo y registra el pago, todo desde Operación.
+summary: Crea el pedido, agrégale platos, confírmalo, prepáralo en Cocina, despáchalo, entrégalo y registra el pago, todo desde el Centro de operaciones.
 audience: [owner, admin, manager, cashier]
 permissions: [orders.create]
 appPath: /operations
@@ -18,7 +18,7 @@ order: 5
 
 Este es el recorrido completo de un pedido. Cada paso tiene su guía detallada.
 
-1. **Crear.** En **Operación**, toca **Nuevo pedido** (o la tecla **N**), elige el cliente y toca **Crear pedido**. Ver [Crear un pedido](help:create-order).
+1. **Crear.** En **Centro de operaciones**, toca **Nuevo pedido** (o la tecla **N**), elige el cliente y toca **Crear pedido**. Ver [Crear un pedido](help:create-order).
 2. **Agregar platos.** Elige el plato, la cantidad y una observación si hace falta («Sin cebolla»), y toca **Agregar plato**.
 3. **Confirmar.** Toca **Confirmar pedido** → **Sí, confirmar**. Quanela reserva los insumos y el pedido pasa a **En cola** en la cocina. Ver [Confirmar y cancelar](help:confirm-cancel).
 4. **Preparar.** En la vista **Cocina**, toca **Iniciar** y luego **Marcar listo**. Al marcar listo, los insumos se descuentan del inventario. Ver [Usar la vista Cocina](help:kitchen-view).

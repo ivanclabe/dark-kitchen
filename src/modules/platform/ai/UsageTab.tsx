@@ -1,5 +1,5 @@
 import { Card } from '@/shared/ui/Card'
-import { chartAxisTick, chartBrand, chartCursor, chartDanger, chartTooltip } from '@/shared/ui/chartTheme'
+import { chartAxisTick, chartInk, chartCursor, chartDanger, chartTooltip } from '@/shared/ui/chartTheme'
 import { DataTable, type DataTableColumn } from '@/shared/ui/DataTable'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
@@ -51,7 +51,7 @@ export function UsageTab() {
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Últimas 24 horas" value={integer(t.runs24h)} hint="Análisis de IA (llamadas al modelo)" icon={Activity} tone="brand" />
+        <StatCard label="Últimas 24 horas" value={integer(t.runs24h)} hint="Análisis de IA (llamadas al modelo)" icon={Activity} />
         <StatCard label="Últimos 30 días" value={integer(t.runs)} hint={`${t.errors} con error`} icon={BarChart3} tone={t.errors > 0 ? 'warn' : 'neutral'} />
         <StatCard
           label="Costo estimado (30 días)"
@@ -76,7 +76,7 @@ export function UsageTab() {
                 {...chartTooltip}
                 formatter={(value, name) => [value, name === 'runs' ? 'Análisis' : 'Con error']}
               />
-              <Bar dataKey="runs" fill={chartBrand} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="runs" fill={chartInk} radius={[6, 6, 0, 0]} />
               <Bar dataKey="errors" fill={chartDanger} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

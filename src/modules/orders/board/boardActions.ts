@@ -16,6 +16,8 @@ export interface BoardActions {
   /** Permissions in the active account. */
   can: Can
   density: 'normal' | 'grande'
+  /** The Cocina view: its cards list one dish per line, whole, and without the payment (ADR 0065). */
+  kitchen?: boolean
   scope?: ReadonlySet<FlowAction>
   openDetail: (order: Order) => void
   requestConfirm: (order: Order) => void

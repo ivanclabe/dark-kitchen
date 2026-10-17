@@ -17,7 +17,7 @@ updated: 2026-10-06
 order: 6
 ---
 
-1. En **Operación**, abre la vista **Lista**.
+1. En **Centro de operaciones**, abre la vista **Lista**.
 2. Escribe en el buscador un **número de pedido**, un **cliente**, un **teléfono** o un **plato**.
 3. Elige las **fechas**: Hoy, Últimos 7 días (la opción de entrada), Últimos 30 días o Todo.
 4. Filtra por **estado** con un toque: Todos, Abiertos, Por confirmar, En cola, Preparando, Listo, En ruta, Entregados o Cancelados.

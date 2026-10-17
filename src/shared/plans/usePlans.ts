@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { fetchPublicPricing, PUBLIC_PLANS_KEY } from './plans'
+import { fetchPublicPricing, PUBLIC_PLANS_KEY, type BillingPeriod } from './plans'
 
 /** Planes y catálogo de funciones públicos (sin sesión). */
 export function usePublicPricing() {
@@ -56,7 +56,47 @@ export function useSelectedPlan(): { plan: string | null; setPlan: (plan: string
   return { plan, setPlan }
 }
 
+const PERIOD_KEY = 'dk-signup-period'
+
+/** Mensual o anual (ADR 0066): viaja como ?periodo=anual desde Precios y se recuerda en la pestaña. */
+export function useSelectedPeriod(): { period: BillingPeriod; setPeriod: (period: BillingPeriod) => void } {
+  const [params, setParams] = useSearchParams()
+  const fromUrl = params.get('periodo')
+  let stored: string | null = null
+  try {
+    stored = sessionStorage.getItem(PERIOD_KEY)
+  } catch {
+    stored = null
+  }
+  const period: BillingPeriod = (fromUrl ?? stored) === 'anual' ? 'annual' : 'monthly'
+  const setPeriod = useCallback(
+    (next: BillingPeriod) => {
+      try {
+        sessionStorage.setItem(PERIOD_KEY, next === 'annual' ? 'anual' : 'mensual')
+      } catch {
+        // La URL basta.
+      }
+      setParams(
+        (current) => {
+          const updated = new URLSearchParams(current)
+          if (next === 'annual') updated.set('periodo', 'anual')
+          else updated.delete('periodo')
+          return updated
+        },
+        { replace: true },
+      )
+    },
+    [setParams],
+  )
+  return { period, setPeriod }
+}
+
 /** Olvida el plan elegido (al terminar el registro). */
 export function clearSelectedPlan() {
   writeStored(null)
+  try {
+    sessionStorage.removeItem(PERIOD_KEY)
+  } catch {
+    // nada que olvidar
+  }
 }

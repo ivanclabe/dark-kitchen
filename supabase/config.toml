@@ -420,3 +420,11 @@ verify_jwt = false
 
 [functions.dk-whatsapp-dispatch]
 verify_jwt = false
+
+# ADR 0066: Wompi calls the events webhook without a Supabase session (it checks Wompi's
+# checksum), and pg_cron wakes the renewals (the database decides what is due).
+[functions.dk-billing-webhook]
+verify_jwt = false
+
+[functions.dk-billing-renew]
+verify_jwt = false

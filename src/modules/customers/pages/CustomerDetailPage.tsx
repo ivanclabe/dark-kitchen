@@ -247,7 +247,7 @@ export function CustomerDetailPage() {
               </Badge>
             )}
             {open > 0 && (
-              <button type="button" onClick={() => goTo('complaints')} className="rounded-full focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none">
+              <button type="button" onClick={() => goTo('complaints')} className="rounded-full focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none">
                 <Badge size="sm" tone="danger" icon={MessageSquareWarning}>
                   {open === 1 ? '1 queja abierta' : `${open} quejas abiertas`}
                 </Badge>

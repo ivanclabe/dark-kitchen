@@ -1,8 +1,12 @@
 import { hashKey, MutationCache, QueryClient, type QueryKey } from '@tanstack/react-query'
 import { getActiveKitchenId, getActiveRoleId } from '@/shared/kitchen/activeKitchen'
 
-/** Consultas que no pertenecen a una Cuenta (p. ej. el contexto del usuario). */
-const GLOBAL_QUERY_ROOTS = new Set(['my-kitchens', 'public-plans'])
+/**
+ * Consultas que no pertenecen a una Cuenta (p. ej. el contexto del usuario). `billing-access`
+ * (ADR 0066) también: KitchenScope la lee mientras fija la Cuenta activa; con la Cuenta en la
+ * clave, la consulta cambiaba de clave en cada render y nunca terminaba (pantalla de carga eterna).
+ */
+const GLOBAL_QUERY_ROOTS = new Set(['my-kitchens', 'public-plans', 'billing-access'])
 
 /**
  * La caché se separa por Cuenta y por rol activo: cada consulta se guarda

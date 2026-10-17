@@ -109,7 +109,8 @@ export function isSelectablePlan(plans: Plan[] | undefined, key: string | null |
   return Boolean(key && plans?.some((p) => p.key === key && p.selfServe))
 }
 
-/** Ruta del registro con el plan elegido. */
-export function signupPath(plan?: PlanKey | null): string {
-  return plan ? `/registro?plan=${encodeURIComponent(plan)}` : '/registro'
+/** Ruta del registro con el plan (y la periodicidad, si es anual) elegidos. */
+export function signupPath(plan?: PlanKey | null, period: BillingPeriod = 'monthly'): string {
+  if (!plan) return '/registro'
+  return `/registro?plan=${encodeURIComponent(plan)}${period === 'annual' ? '&periodo=anual' : ''}`
 }

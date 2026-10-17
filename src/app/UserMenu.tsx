@@ -88,7 +88,7 @@ function useCommonMenu(session: SessionInfo) {
         { kind: 'section', id: 'text', label: 'Tamaño del texto' },
         { kind: 'item', id: 'text-normal', label: 'Normal', checked: appearance.textSize === 'normal', keepOpen: true, onSelect: () => setAppearance({ textSize: 'normal' }) },
         { kind: 'item', id: 'text-large', label: 'Grande', checked: appearance.textSize === 'large', keepOpen: true, onSelect: () => setAppearance({ textSize: 'large' }) },
-        { kind: 'custom', id: 'appearance-note', render: () => <p className="px-3 pt-1 pb-1.5 text-[11px] text-neutral-500">Se guarda en este equipo.</p> },
+        { kind: 'custom', id: 'appearance-note', render: () => <p className="px-3 pt-1 pb-1.5 text-2xs text-neutral-500">Se guarda en este equipo.</p> },
       ],
     },
     {
@@ -143,7 +143,7 @@ function Trigger(props: { onClick: () => void; 'aria-haspopup': 'menu'; 'aria-ex
       type="button"
       {...props}
       aria-label={`Menú de usuario: ${profile?.fullName ?? ''}`}
-      className="rounded-xl transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      className="rounded-xl transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
       <Avatar avatarKey={profile?.avatarKey} seed={profile?.id} size="sm" />
     </button>

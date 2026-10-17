@@ -46,7 +46,7 @@ function prefersReducedMotion(): boolean {
  * The full headline is laid out invisibly underneath, so nothing moves while it writes; screen readers get the
  * whole text at once (aria-label), and with reduced motion it simply appears.
  */
-export function GhostHeadline({ className, style }: { className?: string; style?: CSSProperties }) {
+export function GhostHeadline({ id, className, style }: { id?: string; className?: string; style?: CSSProperties }) {
   const [index, setIndex] = useState(() => (prefersReducedMotion() ? FINAL : 0))
   const [caretOn, setCaretOn] = useState(() => !prefersReducedMotion())
 
@@ -66,8 +66,8 @@ export function GhostHeadline({ className, style }: { className?: string; style?
     <span className="relative inline-block w-0">
       <span
         className={clsx(
-          'absolute bottom-[0.02em] left-[0.04em] h-[0.82em] w-[0.07em] rounded-full bg-brasa-500 transition-opacity duration-500',
-          caretOn ? 'motion-safe:animate-caret' : 'opacity-0',
+          'absolute bottom-[0.02em] left-[0.04em] h-[0.82em] w-[0.07em] rounded-full bg-[#C2410C] transition-opacity duration-500',
+          caretOn ? 'landing-caret' : 'opacity-0',
         )}
       />
     </span>
@@ -75,7 +75,7 @@ export function GhostHeadline({ className, style }: { className?: string; style?
   const onLine2 = frame.line2 !== ''
 
   return (
-    <h1 aria-label={`${LINE_1} ${LINE_2}`} className={className} style={style}>
+    <h1 id={id} aria-label={`${LINE_1} ${LINE_2}`} className={className} style={style}>
       <span aria-hidden className="grid">
         {/* The final layout, invisible: it reserves the space. */}
         <span className="invisible [grid-area:1/1]">
@@ -89,11 +89,12 @@ export function GhostHeadline({ className, style }: { className?: string; style?
           {onLine2 && (
             <>
               <br />
-              <span className="text-brasa-500">
+              {/* Deep Ember: the bright orange does not reach 3:1 on white, even this large. */}
+              <span className="text-[#C2410C]">
                 {frame.accepted ? (
                   <>
                     {LINE_2_TYPED}
-                    <span className="rounded-[0.12em] motion-safe:animate-ghost-accept">{LINE_2.slice(LINE_2_TYPED.length)}</span>
+                    <span className="landing-ghost-accept rounded-[0.12em]">{LINE_2.slice(LINE_2_TYPED.length)}</span>
                   </>
                 ) : (
                   frame.line2
@@ -101,10 +102,10 @@ export function GhostHeadline({ className, style }: { className?: string; style?
               </span>
               {caret}
               {frame.ghost && (
-                <span className="relative text-[#1C1310]/20 motion-safe:animate-fade-in">
+                <span className="landing-ghost relative text-[#1C1310]/20">
                   {frame.ghost}
                   {frame.tab && (
-                    <span className="absolute top-1/2 left-full ml-3 hidden -translate-y-1/2 items-center gap-1 rounded-md border border-[#1C1310]/15 bg-white/80 px-1.5 py-0.5 font-sans text-xs font-semibold tracking-normal whitespace-nowrap text-[#5B4A42] shadow-sm sm:inline-flex">
+                    <span className="absolute top-1/2 left-full ml-3 hidden -translate-y-1/2 items-center gap-1 rounded-md bg-[var(--l-field)] px-2 py-1 font-sans text-[13px] font-semibold tracking-normal whitespace-nowrap text-[var(--l-soft)] sm:inline-flex">
                       Tab ⇥
                     </span>
                   )}

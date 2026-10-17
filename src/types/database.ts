@@ -327,6 +327,130 @@ export type Database = {
           },
         ]
       }
+      dk_billing_events: {
+        Row: {
+          checksum: string
+          environment: string | null
+          event_type: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          received_at: string
+          reference: string | null
+          result: string | null
+          signature_valid: boolean
+          transaction_id: string | null
+          transaction_status: string | null
+        }
+        Insert: {
+          checksum: string
+          environment?: string | null
+          event_type?: string | null
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          provider?: string
+          received_at?: string
+          reference?: string | null
+          result?: string | null
+          signature_valid: boolean
+          transaction_id?: string | null
+          transaction_status?: string | null
+        }
+        Update: {
+          checksum?: string
+          environment?: string | null
+          event_type?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          received_at?: string
+          reference?: string | null
+          result?: string | null
+          signature_valid?: boolean
+          transaction_id?: string | null
+          transaction_status?: string | null
+        }
+        Relationships: []
+      }
+      dk_billing_payments: {
+        Row: {
+          amount_in_cents: number
+          automatic: boolean
+          created_at: string
+          created_by: string | null
+          currency: string
+          finalized_at: string | null
+          id: string
+          invoice_id: string
+          method: string | null
+          organization_id: string
+          provider: string
+          provider_transaction_id: string | null
+          reference: string
+          status: string
+          status_message: string | null
+        }
+        Insert: {
+          amount_in_cents: number
+          automatic?: boolean
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          finalized_at?: string | null
+          id?: string
+          invoice_id: string
+          method?: string | null
+          organization_id: string
+          provider?: string
+          provider_transaction_id?: string | null
+          reference: string
+          status?: string
+          status_message?: string | null
+        }
+        Update: {
+          amount_in_cents?: number
+          automatic?: boolean
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          finalized_at?: string | null
+          id?: string
+          invoice_id?: string
+          method?: string | null
+          organization_id?: string
+          provider?: string
+          provider_transaction_id?: string | null
+          reference?: string
+          status?: string
+          status_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dk_billing_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "dk_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_billing_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "dk_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_billing_payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "dk_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dk_consumer_ai_runs: {
         Row: {
           consumer_id: string
@@ -1746,57 +1870,84 @@ export type Database = {
       dk_invoices: {
         Row: {
           amount: number
+          attempts: number
+          billing_period: string | null
           created_at: string
           currency: string
           due_at: string | null
           id: string
           issued_at: string
+          kind: string | null
+          method: string | null
+          next_attempt_at: string | null
+          notes: string | null
           number: string
           organization_id: string
           paid_at: string | null
           pdf_url: string | null
           period_end: string | null
           period_start: string | null
+          plan_key: string | null
           provider: string | null
           provider_invoice_id: string | null
+          refunded_amount: number
           status: string
           subscription_id: string | null
+          support_path: string | null
         }
         Insert: {
           amount: number
+          attempts?: number
+          billing_period?: string | null
           created_at?: string
           currency?: string
           due_at?: string | null
           id?: string
           issued_at?: string
+          kind?: string | null
+          method?: string | null
+          next_attempt_at?: string | null
+          notes?: string | null
           number: string
           organization_id: string
           paid_at?: string | null
           pdf_url?: string | null
           period_end?: string | null
           period_start?: string | null
+          plan_key?: string | null
           provider?: string | null
           provider_invoice_id?: string | null
+          refunded_amount?: number
           status: string
           subscription_id?: string | null
+          support_path?: string | null
         }
         Update: {
           amount?: number
+          attempts?: number
+          billing_period?: string | null
           created_at?: string
           currency?: string
           due_at?: string | null
           id?: string
           issued_at?: string
+          kind?: string | null
+          method?: string | null
+          next_attempt_at?: string | null
+          notes?: string | null
           number?: string
           organization_id?: string
           paid_at?: string | null
           pdf_url?: string | null
           period_end?: string | null
           period_start?: string | null
+          plan_key?: string | null
           provider?: string | null
           provider_invoice_id?: string | null
+          refunded_amount?: number
           status?: string
           subscription_id?: string | null
+          support_path?: string | null
         }
         Relationships: [
           {
@@ -1805,6 +1956,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dk_organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_invoices_plan_key_fkey"
+            columns: ["plan_key"]
+            isOneToOne: false
+            referencedRelation: "dk_plans"
+            referencedColumns: ["key"]
           },
           {
             foreignKeyName: "dk_invoices_subscription_id_fkey"
@@ -4969,14 +5127,21 @@ export type Database = {
       }
       dk_subscriptions: {
         Row: {
+          billing_mode: string
           billing_period: string
           cancel_at_period_end: boolean
           canceled_at: string | null
           created_at: string
           current_period_end: string | null
           current_period_start: string
+          customer_email: string | null
+          grace_ends_at: string | null
           id: string
           organization_id: string
+          payment_method_label: string | null
+          payment_source_id: string | null
+          pending_billing_period: string | null
+          pending_plan_key: string | null
           plan_key: string
           provider: string | null
           provider_customer_id: string | null
@@ -4987,14 +5152,21 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          billing_mode?: string
           billing_period?: string
           cancel_at_period_end?: boolean
           canceled_at?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string
+          customer_email?: string | null
+          grace_ends_at?: string | null
           id?: string
           organization_id: string
+          payment_method_label?: string | null
+          payment_source_id?: string | null
+          pending_billing_period?: string | null
+          pending_plan_key?: string | null
           plan_key: string
           provider?: string | null
           provider_customer_id?: string | null
@@ -5005,14 +5177,21 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          billing_mode?: string
           billing_period?: string
           cancel_at_period_end?: boolean
           canceled_at?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string
+          customer_email?: string | null
+          grace_ends_at?: string | null
           id?: string
           organization_id?: string
+          payment_method_label?: string | null
+          payment_source_id?: string | null
+          pending_billing_period?: string | null
+          pending_plan_key?: string | null
           plan_key?: string
           provider?: string | null
           provider_customer_id?: string | null
@@ -5029,6 +5208,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "dk_organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dk_subscriptions_pending_plan_key_fkey"
+            columns: ["pending_plan_key"]
+            isOneToOne: false
+            referencedRelation: "dk_plans"
+            referencedColumns: ["key"]
           },
           {
             foreignKeyName: "dk_subscriptions_plan_key_fkey"
@@ -6069,6 +6255,175 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      dk_billing_apply_transaction: {
+        Args: {
+          p_amount_in_cents: number
+          p_currency: string
+          p_message?: string
+          p_method?: string
+          p_reference: string
+          p_status: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      dk_billing_cancel: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      dk_billing_charges_due: { Args: never; Returns: Json }
+      dk_billing_checkout_start: {
+        Args: {
+          p_billing_period?: string
+          p_organization_id: string
+          p_plan_key?: string
+        }
+        Returns: Json
+      }
+      dk_billing_daily: { Args: never; Returns: undefined }
+      dk_billing_enforced: { Args: never; Returns: boolean }
+      dk_billing_finish_event: {
+        Args: { p_checksum: string; p_result: string }
+        Returns: undefined
+      }
+      dk_billing_interval: { Args: { p_period: string }; Returns: string }
+      dk_billing_kick: { Args: never; Returns: undefined }
+      dk_billing_manager_email: {
+        Args: { p_organization_id: string }
+        Returns: string
+      }
+      dk_billing_mark_past_due: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      dk_billing_new_attempt: {
+        Args: {
+          p_automatic: boolean
+          p_invoice: Database["public"]["Tables"]["dk_invoices"]["Row"]
+        }
+        Returns: {
+          amount_in_cents: number
+          automatic: boolean
+          created_at: string
+          created_by: string | null
+          currency: string
+          finalized_at: string | null
+          id: string
+          invoice_id: string
+          method: string | null
+          organization_id: string
+          provider: string
+          provider_transaction_id: string | null
+          reference: string
+          status: string
+          status_message: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "dk_billing_payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      dk_billing_new_invoice: {
+        Args: {
+          p_amount: number
+          p_due_at?: string
+          p_kind: string
+          p_organization_id: string
+          p_period: string
+          p_period_end?: string
+          p_period_start?: string
+          p_plan_key: string
+        }
+        Returns: {
+          amount: number
+          attempts: number
+          billing_period: string | null
+          created_at: string
+          currency: string
+          due_at: string | null
+          id: string
+          issued_at: string
+          kind: string | null
+          method: string | null
+          next_attempt_at: string | null
+          notes: string | null
+          number: string
+          organization_id: string
+          paid_at: string | null
+          pdf_url: string | null
+          period_end: string | null
+          period_start: string | null
+          plan_key: string | null
+          provider: string | null
+          provider_invoice_id: string | null
+          refunded_amount: number
+          status: string
+          subscription_id: string | null
+          support_path: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "dk_invoices"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      dk_billing_price: {
+        Args: {
+          p_period: string
+          p_plan: Database["public"]["Tables"]["dk_plans"]["Row"]
+        }
+        Returns: number
+      }
+      dk_billing_record_event: {
+        Args: {
+          p_checksum: string
+          p_environment: string
+          p_event_type: string
+          p_payload: Json
+          p_reference: string
+          p_signature_valid: boolean
+          p_transaction_id: string
+          p_transaction_status: string
+        }
+        Returns: boolean
+      }
+      dk_billing_remove_source: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      dk_billing_resume: {
+        Args: { p_organization_id: string }
+        Returns: undefined
+      }
+      dk_billing_save_source: {
+        Args: {
+          p_email: string
+          p_label: string
+          p_organization_id: string
+          p_source_id: string
+        }
+        Returns: undefined
+      }
+      dk_billing_schedule_change: {
+        Args: {
+          p_billing_period: string
+          p_organization_id: string
+          p_plan_key: string
+        }
+        Returns: undefined
+      }
+      dk_billing_setting: {
+        Args: { p_default: string; p_key: string }
+        Returns: string
+      }
+      dk_billing_source_for_reference: {
+        Args: { p_reference: string }
+        Returns: Json
+      }
+      dk_billing_tick: { Args: never; Returns: Json }
       dk_calculate_recipe_cost: {
         Args: { p_recipe_id: string }
         Returns: number
@@ -6227,6 +6582,7 @@ export type Database = {
           p_account_icon?: string
           p_account_name?: string
           p_address?: string
+          p_billing_period?: string
           p_category: string
           p_city?: string
           p_country?: string
@@ -6515,6 +6871,8 @@ export type Database = {
         Args: { p_from: string; p_to: string }
         Returns: Json
       }
+      dk_ga_billing_org: { Args: { p_organization_id: string }; Returns: Json }
+      dk_ga_billing_overview: { Args: never; Returns: Json }
       dk_ga_check_new_organization: {
         Args: { p_email: string; p_name: string; p_tax_id?: string }
         Returns: Json
@@ -6554,9 +6912,34 @@ export type Database = {
       dk_ga_organizations: { Args: never; Returns: Json }
       dk_ga_overview: { Args: { p_from: string; p_to: string }; Returns: Json }
       dk_ga_password_link_target: { Args: { p_user_id: string }; Returns: Json }
+      dk_ga_record_refund: {
+        Args: { p_amount: number; p_invoice_id: string; p_note?: string }
+        Returns: undefined
+      }
+      dk_ga_record_transfer: {
+        Args: {
+          p_amount: number
+          p_billing_period: string
+          p_note?: string
+          p_organization_id: string
+          p_paid_on: string
+          p_plan_key: string
+          p_support_path?: string
+        }
+        Returns: string
+      }
       dk_ga_resend_invitation: {
         Args: { p_organization_id: string }
         Returns: Json
+      }
+      dk_ga_retry_charge: { Args: { p_invoice_id: string }; Returns: undefined }
+      dk_ga_set_billing_mode: {
+        Args: { p_mode: string; p_organization_id: string }
+        Returns: undefined
+      }
+      dk_ga_set_billing_setting: {
+        Args: { p_key: string; p_value: string }
+        Returns: undefined
       }
       dk_ga_set_global_admin: {
         Args: { p_email: string; p_on: boolean }
@@ -6827,6 +7210,7 @@ export type Database = {
       }
       dk_menu_design_use: { Args: { p_id: string }; Returns: Json }
       dk_menu_designs_prune: { Args: { p_kitchen: string }; Returns: undefined }
+      dk_my_billing_access: { Args: never; Returns: Json }
       dk_my_context: { Args: never; Returns: Json }
       dk_my_features: { Args: never; Returns: Json }
       dk_my_kitchens: {
@@ -6902,6 +7286,10 @@ export type Database = {
           p_to?: string
         }
         Returns: string[]
+      }
+      dk_org_access_ok: {
+        Args: { p_organization_id: string }
+        Returns: boolean
       }
       dk_org_ai_usage: {
         Args: { p_days?: number; p_organization_id: string }
@@ -7668,12 +8056,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -7697,11 +8085,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -7722,11 +8110,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -7747,11 +8135,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -7764,11 +8152,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never) = never,
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -7825,3 +8213,4 @@ export const Constants = {
     },
   },
 } as const
+

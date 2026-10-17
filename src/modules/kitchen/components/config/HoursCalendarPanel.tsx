@@ -11,6 +11,7 @@ import { useState, type FormEvent } from 'react'
 import { useDeleteHoursException, useKitchenSchedule, useSaveHoursException } from '../../hooks/useKitchenSchedule'
 import { dayHoursError, hoursForDate, isOvernight, type DayHours, type KitchenSchedule } from '../../lib/schedule'
 import { timeInputClass } from './timeInputClass'
+import { selectedFillClass } from '@/shared/ui/formClasses'
 
 const WEEKDAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 const EMPTY_SCHEDULE: KitchenSchedule = { weekly: {}, exceptions: [] }
@@ -92,7 +93,7 @@ function DayEditor({ date, schedule, canEdit }: { date: string; schedule: Kitche
             onClick={() => setMode(m.value)}
             className={clsx(
               'rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed',
-              mode === m.value ? 'bg-brasa-500 text-white' : 'text-neutral-400 hover:text-neutral-200',
+              mode === m.value ? selectedFillClass : 'text-neutral-400 hover:text-neutral-200',
             )}
           >
             {m.label}
@@ -192,7 +193,7 @@ export function HoursCalendarPanel({ canEdit }: { canEdit: boolean }) {
                 <span
                   className={clsx(
                     'flex size-6 items-center justify-center rounded-full text-xs tabular-nums',
-                    date === today ? 'bg-brasa-500 font-semibold text-white' : 'text-neutral-200',
+                    date === today ? 'bg-primary font-semibold text-on-primary' : 'text-neutral-200',
                   )}
                 >
                   {Number(date.slice(8))}

@@ -12,10 +12,11 @@ import { useTenant } from '@/shared/tenant/tenantContext'
 import { Button } from '@/shared/ui/Button'
 import { FormField, Input } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
-import { ArrowLeft, CircleHelp, Eye, EyeOff, LogIn } from 'lucide-react'
+import { ArrowLeft, CircleHelp, Eye, EyeOff, Loader2, LogIn } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { OwnerMethodButtons, PhoneSignIn } from '@/modules/signup/components/OwnerMethods'
+import { SessionSwitch } from '../components/SessionSwitch'
 import { enabledOwnerMethods, oauthErrorFromUrl, OWNER_SIGNUP_RETURN } from '@/modules/signup/ownerAuth'
 import { hasOwnerSignInMark } from '@/modules/signup/ownerSession'
 import { clearAccountChoice, markAccountChoice } from '@/shared/kitchen/accountChoice'
@@ -40,7 +41,7 @@ function PanelBrand({ name }: { name: string }) {
  * their business with Google, Instagram or phone signs in that way (ADR 0025).
  */
 export function LoginPage() {
-  const { session, signIn } = useAuth()
+  const { session, loading, signIn } = useAuth()
   // On an organization's subdomain, its own login (ADR 0021): same identity, its name.
   const tenant = useTenant()
   const orgName = tenant.mode === 'tenant' && tenant.status !== 'not_found' ? tenant.organization?.name : null
@@ -57,9 +58,14 @@ export function LoginPage() {
   const [ownerError, setOwnerError] = useState<string | null>(() => oauthErrorFromUrl(window.location.href))
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // Signed in HERE (password or SMS code) goes straight in. Someone who arrives with a session
+  // already open chooses: keep going with it or use another account (it used to redirect,
+  // and there was no way to sign in with another account without clearing the browser).
+  const [justSignedIn, setJustSignedIn] = useState(false)
 
   // Back from Google, Instagram or the SMS code: the sign-up decides (owner, onboarding or D3 guard).
-  if (session) return <Navigate to={hasOwnerSignInMark() ? OWNER_SIGNUP_RETURN : target} replace />
+  // A link that asked to come back (?next=, e.g. an invitation) also continues.
+  if (session && (justSignedIn || hasOwnerSignInMark() || next)) return <Navigate to={hasOwnerSignInMark() ? OWNER_SIGNUP_RETURN : target} replace />
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -67,9 +73,11 @@ export function LoginPage() {
     setError(null)
     // ADR 0043: a plain sign-in (not a link to a page) lets someone with several accounts choose one.
     if (target === APP_ENTRY) markAccountChoice()
+    setJustSignedIn(true)
     const { error } = await signIn(normalizeEmail(email), password)
     if (error) {
       clearAccountChoice()
+      setJustSignedIn(false)
       setError(error)
     }
     setSubmitting(false)
@@ -119,99 +127,122 @@ export function LoginPage() {
 
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-[28rem] lg:rounded-3xl lg:border lg:border-neutral-800/70 lg:bg-neutral-900/40 lg:px-9 lg:py-7 lg:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)]">
-            <div className="mb-6 flex flex-col items-center text-center">
-              <BrandMark className="mb-4 size-12 lg:hidden" />
-              <h1 className={typography.h1}>Inicia sesión</h1>
-              <p className={`mt-1.5 ${typography.small}`}>
-                {orgName && tenant.code ? (
-                  <>
-                    Entra a {orgName} en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.code)}</span>.
-                  </>
-                ) : (
-                  'Usa el correo y la contraseña de tu cuenta de Quanela.'
-                )}
+            {loading ? (
+              <p role="status" className="flex items-center justify-center gap-2 py-10 text-sm text-neutral-400">
+                <Loader2 size={16} className="animate-spin" aria-hidden /> Comprobando tu sesión…
               </p>
-            </div>
+            ) : session ? (
+              <SessionSwitch
+                title="Ya iniciaste sesión"
+                description="Puedes seguir con esta cuenta o cerrar la sesión en este equipo para entrar con otra."
+                continueTo={target}
+                continueLabel="Continuar con esta cuenta"
+                switchLabel="Usar otra cuenta"
+              />
+            ) : (
+              <>
+              <div className="mb-6 flex flex-col items-center text-center">
+                <BrandMark className="mb-4 size-12 lg:hidden" />
+                <h1 className={typography.h1}>Inicia sesión</h1>
+                <p className={`mt-1.5 ${typography.small}`}>
+                  {orgName && tenant.code ? (
+                    <>
+                      Entra a {orgName} en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.code)}</span>.
+                    </>
+                  ) : (
+                    'Usa el correo y la contraseña de tu cuenta de Quanela.'
+                  )}
+                </p>
+              </div>
 
-            {notice && <Feedback tone="warning" role="status" description={notice} className="mb-5" />}
+              {notice && <Feedback tone="warning" role="status" description={notice} className="mb-5" />}
 
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-              <FormField label="Correo electrónico" required>
-                {(a11y) => (
-                  <EmailInput
-                    {...a11y}
-                    required
-                    autoComplete="username"
-                    placeholder="nombre@negocio.com"
-                    value={email}
-                    onValueChange={(v) => {
-                      setEmail(v)
-                      setError(null)
-                    }}
-                    autoFocus
-                  />
-                )}
-              </FormField>
-              <FormField label="Contraseña" required error={error}>
-                {(a11y) => (
-                  <div className="relative">
-                    <Input
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                <FormField label="Correo electrónico" required>
+                  {(a11y) => (
+                    <EmailInput
                       {...a11y}
-                      type={showPassword ? 'text' : 'password'}
                       required
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value)
+                      autoComplete="username"
+                      placeholder="nombre@negocio.com"
+                      value={email}
+                      onValueChange={(v) => {
+                        setEmail(v)
                         setError(null)
                       }}
-                      className="pr-11"
+                      autoFocus
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      aria-pressed={showPassword}
-                      className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none"
-                    >
-                      {showPassword ? <EyeOff size={16} aria-hidden /> : <Eye size={16} aria-hidden />}
-                    </button>
-                  </div>
+                  )}
+                </FormField>
+                <FormField label="Contraseña" required error={error}>
+                  {(a11y) => (
+                    <div className="relative">
+                      <Input
+                        {...a11y}
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value)
+                          setError(null)
+                        }}
+                        className="pr-11"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        aria-pressed={showPassword}
+                        className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none"
+                      >
+                        {showPassword ? <EyeOff size={16} aria-hidden /> : <Eye size={16} aria-hidden />}
+                      </button>
+                    </div>
+                  )}
+                </FormField>
+                {error === INVALID_CREDENTIALS_MESSAGE && (
+                  // There is no self-service reset yet: the guide says how to get a new password.
+                  <a
+                    href={helpHref('/help/getting-started/switch-account#si-olvidaste-tu-contrasena')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="-mt-2 inline-block text-sm text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </a>
                 )}
-              </FormField>
-              {error === INVALID_CREDENTIALS_MESSAGE && (
-                // There is no self-service reset yet: the guide says how to get a new password.
-                <a
-                  href={helpHref('/help/getting-started/switch-account#si-olvidaste-tu-contrasena')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="-mt-2 inline-block text-sm text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </a>
+                <Button type="submit" variant="primary" size="lg" icon={LogIn} loading={submitting} className="w-full">
+                  Iniciar sesión
+                </Button>
+              </form>
+
+              {methods.length > 0 && (
+                <section aria-label="Entrar con el método con el que creaste tu negocio" className="mt-5 space-y-3 border-t border-neutral-800/70 pt-5">
+                  <p className="text-center text-xs text-neutral-500">
+                    ¿Creaste tu negocio con {methods.map((m) => ({ google: 'Google', instagram: 'Instagram', phone: 'tu teléfono' })[m]).join(', ').replace(/, ([^,]*)$/, ' o $1')}?
+                  </p>
+                  {ownerPhone ? (
+                    <PhoneSignIn
+                      create={false}
+                      onBack={() => setOwnerPhone(false)}
+                      onSignedIn={() => {
+                        setOwnerError(null)
+                        setJustSignedIn(true)
+                      }}
+                    />
+                  ) : (
+                    <OwnerMethodButtons methods={methods} compact onPhone={() => setOwnerPhone(true)} onError={setOwnerError} />
+                  )}
+                  {ownerError && <p role="alert" className="text-sm text-red-400">{ownerError}</p>}
+                </section>
               )}
-              <Button type="submit" variant="primary" size="lg" icon={LogIn} loading={submitting} className="w-full">
-                Iniciar sesión
-              </Button>
-            </form>
 
-            {methods.length > 0 && (
-              <section aria-label="Entrar con el método con el que creaste tu negocio" className="mt-5 space-y-3 border-t border-neutral-800/70 pt-5">
-                <p className="text-center text-xs text-neutral-500">
-                  ¿Creaste tu negocio con {methods.map((m) => ({ google: 'Google', instagram: 'Instagram', phone: 'tu teléfono' })[m]).join(', ').replace(/, ([^,]*)$/, ' o $1')}?
-                </p>
-                {ownerPhone ? (
-                  <PhoneSignIn create={false} onBack={() => setOwnerPhone(false)} onSignedIn={() => setOwnerError(null)} />
-                ) : (
-                  <OwnerMethodButtons methods={methods} compact onPhone={() => setOwnerPhone(true)} onError={setOwnerError} />
-                )}
-                {ownerError && <p role="alert" className="text-sm text-red-400">{ownerError}</p>}
-              </section>
+              <p className="mt-5 border-t border-neutral-800/70 pt-4 text-center text-xs leading-relaxed text-neutral-500">
+                ¿Eres nuevo en el equipo o no tienes contraseña? Pide a tu administrador una <span className="text-neutral-300">invitación</span>.
+              </p>
+              </>
             )}
-
-            <p className="mt-5 border-t border-neutral-800/70 pt-4 text-center text-xs leading-relaxed text-neutral-500">
-              ¿Eres nuevo en el equipo o no tienes contraseña? Pide a tu administrador una <span className="text-neutral-300">invitación</span>.
-            </p>
         </div>
         </div>
 

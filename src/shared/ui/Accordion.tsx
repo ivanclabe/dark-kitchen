@@ -35,7 +35,7 @@ export function Accordion({
           aria-expanded={open}
           aria-controls={bodyId}
           onClick={() => setOpen((o) => !o)}
-          className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-neutral-800/30 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-neutral-800/30 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none"
         >
           <ChevronDown size={14} className={clsx('shrink-0 text-neutral-500 transition-transform duration-200', open ? 'rotate-0' : '-rotate-90')} aria-hidden />
           <span className="shrink-0 text-sm font-medium text-neutral-200">{title}</span>

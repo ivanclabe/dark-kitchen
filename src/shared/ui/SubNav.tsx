@@ -43,7 +43,7 @@ export function SubNav<T extends string>({ items, value, onChange, label }: { it
             onClick={() => onChange(item.value)}
             className={clsx(
               // Same weight active or not: the tabs never change width (no sideways jump).
-              '-mb-px shrink-0 border-b-2 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+              '-mb-px shrink-0 border-b-2 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
               active ? 'border-brasa-500 text-neutral-50' : 'border-transparent text-neutral-400 hover:text-neutral-200',
             )}
           >
@@ -84,7 +84,7 @@ export function SubNavLinks({ items, label }: { items: SubNavLink[]; label: stri
           end={item.end}
           className={({ isActive }) =>
             clsx(
-              '-mb-px shrink-0 border-b-2 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+              '-mb-px shrink-0 border-b-2 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
               isActive ? 'border-brasa-500 text-neutral-50' : 'border-transparent text-neutral-400 hover:text-neutral-200',
             )
           }

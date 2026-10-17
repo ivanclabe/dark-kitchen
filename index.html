@@ -9,6 +9,16 @@
       content="Pedidos, cocina, despacho, menús, inventario y cobros en una sola plataforma para dark kitchens. Empieza gratis 14 días, sin tarjeta."
     />
     <meta name="theme-color" content="#0a0a0a" />
+    <!-- Inter (ADR 0065): preconnect + link instead of a CSS @import, which blocked the first render. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+    <!-- The page color before the app paints: no white flash on the dark theme while it loads. -->
+    <style>
+      html { background: #0a0a0a; }
+      html[data-theme='light'] { background: #f5f5f5; }
+      html[data-theme='neutral'] { background: #f2f0ed; }
+    </style>
     <!-- Apariencia de este equipo (ADR 0023), antes del primer pintado: sin destello al cargar. -->
     <script>
       try {
@@ -21,6 +31,8 @@
         var byPage = location.hostname.indexOf('doc.') === 0 || /^\/(login|registro|activar|set-password|signup-admin|help)(\/|$)/.test(location.pathname) ? 'light' : 'dark'
         var t = !chosen ? byPage : a.theme === 'light' || a.theme === 'neutral' ? a.theme : a.theme === 'system' && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
         document.documentElement.dataset.theme = t
+        // The browser bar (mobile) in the page color of the theme.
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', t === 'light' ? '#f5f5f5' : t === 'neutral' ? '#f2f0ed' : '#0a0a0a')
         document.documentElement.dataset.textSize = a.textSize === 'large' ? 'large' : 'normal'
       } catch (e) {}
     </script>

@@ -46,6 +46,6 @@ No necesitas guardar el perfil antes: la primera vez que guardas platos, la publ
 3. En los publicados, marca sus **etiquetas** (vegetariano, vegano, sin gluten, picante, saludable) y, si tiene receta, **Mostrar ingredientes (solo nombres)**.
 4. Toca **Guardar**.
 
-«sin foto» y «sin descripción» te llevan al plato en **Catálogo** para completarlo. El precio y si el plato está disponible hoy salen del menú del día: no se escriben aquí.
+«sin foto» y «sin descripción» te llevan al plato en **Planificador de Menús** para completarlo. El precio y si el plato está disponible hoy salen del menú del día: no se escriben aquí.
 
 > **Cuidado:** solo se ven los platos **activos** que publiques. Nada privado (costos, recetas completas, clientes o montos) se puede publicar.

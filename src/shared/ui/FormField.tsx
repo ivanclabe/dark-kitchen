@@ -27,7 +27,7 @@ export function FormField({
   error?: string | null
   required?: boolean
   className?: string
-  children: (props: { id: string; 'aria-invalid': boolean | undefined; 'aria-describedby': string | undefined }) => ReactNode
+  children: (props: { id: string; 'aria-invalid': boolean | undefined; 'aria-describedby': string | undefined; 'aria-required': boolean | undefined }) => ReactNode
 }) {
   const id = useId()
   const hintId = `${id}-hint`
@@ -48,7 +48,8 @@ export function FormField({
         </label>
         {info && <InfoTip text={info} label={`Qué es «${label}»`} />}
       </div>
-      {children({ id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
+      {/* aria-required: the * is visual only; a screen reader now hears that the field is required too. */}
+      {children({ id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy, 'aria-required': required || undefined })}
       {error ? (
         <p id={errorId} role="alert" className="mt-1.5 text-xs text-red-400">
           {error}

@@ -38,7 +38,7 @@ export function PlanCard({
     >
       <div className="flex items-center justify-between gap-2">
         <Heading className="text-lg font-semibold text-neutral-50">{plan.name}</Heading>
-        {plan.badge && <span className="rounded-full bg-brasa-500 px-2.5 py-0.5 text-xs font-semibold text-white">{plan.badge}</span>}
+        {plan.badge && <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-on-primary">{plan.badge}</span>}
       </div>
       <p className="mt-2 min-h-10 text-sm leading-relaxed text-neutral-400">{plan.description}</p>
 
@@ -48,7 +48,15 @@ export function PlanCard({
           {plan.currency}/{annual ? 'año' : 'mes'}
         </span>
       </p>
-      <p className="mt-1 h-5 text-xs text-neutral-500">{plan.trialDays > 0 ? `${plan.trialDays} días gratis, sin tarjeta` : 'Con acompañamiento de nuestro equipo'}</p>
+      <p className="mt-1 h-5 text-xs text-neutral-500">
+        {plan.trialDays > 0
+          ? `${plan.trialDays} días gratis, sin tarjeta`
+          : !plan.selfServe
+            ? 'Con acompañamiento de nuestro equipo'
+            : annual
+              ? 'Pagas el año y te regalamos dos meses'
+              : 'Sin permanencia: cancelas cuando quieras'}
+      </p>
 
       <div className="mt-5">{action}</div>
 

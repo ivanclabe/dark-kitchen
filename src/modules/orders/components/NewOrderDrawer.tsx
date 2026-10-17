@@ -132,8 +132,9 @@ export function NewOrderDrawer({ open, onClose, initialCustomer }: { open: boole
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormField label="Cliente" required error={error}>
-              {() => (
+              {(a11y) => (
                 <Combobox
+                  {...a11y}
                   value={customerId}
                   onChange={choose}
                   options={customerOptions}

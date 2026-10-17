@@ -22,7 +22,7 @@ export function StockBar({ ingredient }: { ingredient: Ingredient }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-800" role="presentation">
       <div
-        className={clsx('h-full rounded-full transition-all', low ? 'bg-red-500' : near ? 'bg-amber-500' : 'bg-emerald-500')}
+        className={clsx('h-full rounded-full', low ? 'bg-red-500' : near ? 'bg-amber-500' : 'bg-emerald-500')}
         style={{ width: `${Math.max(ratio * 100, low ? 6 : 8)}%` }}
       />
     </div>
@@ -91,7 +91,7 @@ export function IngredientPanel({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por nombre o código…"
           aria-label="Buscar insumo"
-          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
+          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pr-3 pl-9 text-sm text-neutral-100 transition-colors outline-none placeholder:text-neutral-500 hover:border-neutral-700 focus:border-focus focus:ring-2 focus:ring-focus/25"
         />
       </div>
 

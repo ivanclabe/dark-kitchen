@@ -1,6 +1,6 @@
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { LoadingState } from '@/shared/ui/LoadingState'
-import { DndContext, DragOverlay, useDroppable } from '@dnd-kit/core'
+import { DndContext, DragOverlay, useDroppable, type Announcements, type ScreenReaderInstructions, type UniqueIdentifier } from '@dnd-kit/core'
 import clsx from 'clsx'
 import { ClipboardList, type LucideIcon } from 'lucide-react'
 import { useMemo } from 'react'
@@ -19,6 +19,26 @@ const COLUMN_TONE: Partial<Record<OrderStatus, string>> = {
   EN_PREPARACION: 'text-amber-400',
   LISTO: 'text-emerald-400',
   DESPACHADO: 'text-violet-400',
+}
+
+const INSTRUCTIONS: ScreenReaderInstructions = {
+  draggable:
+    'Para mover un pedido, arrástralo a otra columna; en pantallas táctiles, mantenlo presionado y arrástralo. Enter abre el detalle del pedido, con todas sus acciones.',
+}
+
+/** dnd-kit says what happens during a drag — in Spanish and with the order number (it was in English). */
+function announcements(tickets: Order[] | undefined): Announcements {
+  const order = (id: UniqueIdentifier) => {
+    const ticket = tickets?.find((t) => t.id === id)
+    return ticket ? `pedido #${ticket.orderNumber}` : 'pedido'
+  }
+  const column = (id: UniqueIdentifier) => ORDER_STATUS_CONFIG[id as OrderStatus]?.label ?? String(id)
+  return {
+    onDragStart: ({ active }) => `Moviendo el ${order(active.id)}.`,
+    onDragOver: ({ active, over }) => (over ? `El ${order(active.id)} está sobre ${column(over.id)}.` : `El ${order(active.id)} no está sobre ninguna columna.`),
+    onDragEnd: ({ active, over }) => (over ? `El ${order(active.id)} se soltó en ${column(over.id)}.` : `El ${order(active.id)} volvió a su columna.`),
+    onDragCancel: ({ active }) => `Se canceló el movimiento del ${order(active.id)}.`,
+  }
 }
 
 function KanbanColumn({
@@ -44,8 +64,14 @@ function KanbanColumn({
   const Icon = config.icon
 
   return (
-    <div className={clsx('flex min-h-0 min-w-52 flex-1 flex-col rounded-xl border border-neutral-800/60 transition-opacity', dropState === 'invalid' && 'opacity-35')}>
-      <p className="flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-wide text-neutral-300 uppercase">
+    // Phone (ADR 0065): one column at a time with a peek of the next, snapping — it used to cut them in half.
+    <div
+      className={clsx(
+        'flex min-h-0 w-[85%] shrink-0 snap-start flex-col rounded-xl border border-neutral-800/60 transition-opacity sm:w-auto sm:min-w-52 sm:flex-1 sm:shrink',
+        dropState === 'invalid' && 'opacity-35',
+      )}
+    >
+      <p className="flex shrink-0 items-center gap-1.5 px-3 py-2 text-2xs font-semibold tracking-wide text-neutral-300 uppercase">
         <Icon size={12} className={COLUMN_TONE[status]} aria-hidden />
         {config.label}
       </p>
@@ -132,8 +158,13 @@ export function OrderBoard({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={(e) => void handleDragEnd(e)}>
-        <div className="flex min-h-0 flex-1 gap-2 overflow-x-auto pb-1">
+      <DndContext
+        sensors={sensors}
+        accessibility={{ announcements: announcements(tickets), screenReaderInstructions: INSTRUCTIONS }}
+        onDragStart={handleDragStart}
+        onDragEnd={(e) => void handleDragEnd(e)}
+      >
+        <div className={clsx('flex min-h-0 flex-1 gap-2 overflow-x-auto overscroll-x-contain pb-1 sm:snap-none', activeTicket ? 'snap-none' : 'snap-x snap-mandatory')}>
           {columns.map((status) => (
             <KanbanColumn
               key={status}
@@ -151,7 +182,7 @@ export function OrderBoard({
         <DragOverlay>
           {activeTicket && (
             <div className="shadow-float w-64 rounded-lg border border-brasa-500/60 bg-neutral-900 px-3 py-2">
-              <OrderCardBody ticket={activeTicket} now={now} density={board.density} />
+              <OrderCardBody ticket={activeTicket} now={now} density={board.density} kitchen={board.kitchen} />
             </div>
           )}
         </DragOverlay>

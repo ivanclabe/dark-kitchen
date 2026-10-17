@@ -96,17 +96,20 @@ function DashboardHeader({
   firstName,
   salesToday,
   ordersToday,
+  pendingIncluded,
   loading,
 }: {
   firstName: string
   salesToday: number | null
   ordersToday: number | null
+  /** The figure counts orders still to confirm (dk_dashboard_summary counts everything not cancelled). */
+  pendingIncluded: boolean
   loading: boolean
 }) {
   const [hidden, setHidden] = useState(false)
-  // Reloj real (tick de 1s porque se ve el segundero), no decorativo.
-  const now = useNow(1000)
-  const clock = new Date(now).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+  // Reloj real en horas y minutos (ADR 0065: el segundero era ruido en una pantalla para leer de un vistazo).
+  const now = useNow(10_000)
+  const clock = new Date(now).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false })
 
   return (
     <PageHeader help="home-screen"
@@ -115,7 +118,7 @@ function DashboardHeader({
       description={
         <span className="inline-flex flex-wrap items-center gap-x-2">
           <span className="font-medium text-neutral-200">Hola, {firstName}</span>
-          <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" aria-label="En vivo" />
+          <span className="size-1.5 rounded-full bg-emerald-400" aria-label="En vivo" />
           <span>
             {formatDateLong(todayStr())} · <span className="tabular-nums">{clock}</span>
           </span>
@@ -135,21 +138,23 @@ function DashboardHeader({
               <div className="mt-1.5 h-7 w-40 animate-pulse rounded bg-neutral-800 md:ml-auto" />
             ) : (
               <p className="mt-0.5 flex items-baseline gap-2 text-xl font-semibold tabular-nums text-neutral-50 md:justify-end">
-                {hidden ? '••••••' : formatMoney(salesToday ?? 0)}
+                {hidden ? '••••••' : salesToday === null ? '—' : formatMoney(salesToday)}
                 <span className="font-light text-neutral-700" aria-hidden>
                   |
                 </span>
                 <span className="text-sm font-medium text-neutral-400">
-                  {ordersToday ?? 0} pedido{ordersToday === 1 ? '' : 's'}
+                  {ordersToday === null ? '—' : `${ordersToday} pedido${ordersToday === 1 ? '' : 's'}`}
                 </span>
               </p>
             )}
+            {/* Honest about what it counts: Análisis counts only confirmed sales, so both figures can differ. */}
+            {!loading && pendingIncluded && <p className="mt-0.5 text-xs text-neutral-500 md:text-right">Incluye pedidos por confirmar</p>}
           </div>
 
           <div className="flex items-start gap-5">
             <HeroAction icon={ShoppingCart} label="Compras" to="/supply/compras" />
             <HeroAction icon={Users} label="Clientes" to="/customers" />
-            <HeroAction icon={BarChart3} label="Insights" to="/insights" />
+            <HeroAction icon={BarChart3} label="Análisis" to="/insights" />
           </div>
         </div>
       }
@@ -222,6 +227,18 @@ function LateKitchenRow() {
     }
   }, [live, now, thresholds])
 
+  // ADR 0065: until the orders arrive (or if they fail) «—», not a green 0 that says all is well.
+  if (!live) {
+    return (
+      <StatList
+        items={[
+          { label: 'Atrasados (fuera de SLA)', value: '—', to: '/operations?view=kitchen' },
+          { label: 'Listos para despachar', value: '—', to: '/operations?view=dispatch' },
+          { label: 'En ruta', value: '—', to: '/operations?view=dispatch' },
+        ]}
+      />
+    )
+  }
   return (
     <StatList
       items={[
@@ -250,7 +267,7 @@ function KitchenNowCard({ summary, liveOps }: { summary: DashboardSummary | unde
 
 /** En turno ahora (Personal y Turnos, ADR 0020): who is working, by role. */
 function OnShiftCard() {
-  const { data, isLoading } = useOnShiftNow()
+  const { data, isLoading, isError, error, refetch } = useOnShiftNow()
   const byRole = useMemo(() => {
     const map = new Map<string, string[]>()
     for (const s of data ?? []) map.set(s.roleName, [...(map.get(s.roleName) ?? []), s.fullName.split(' ')[0]])
@@ -260,6 +277,8 @@ function OnShiftCard() {
     <Card title="En turno ahora" icon={CalendarClock} action={<CardLink to="/staff" label="Ver turnos" />}>
       {isLoading ? (
         <LoadingState variant="block" className="!border-0 !bg-transparent !p-0" />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={() => void refetch()} compact />
       ) : byRole.length === 0 ? (
         <p className="text-sm text-neutral-500">Nadie tiene turno en este momento.</p>
       ) : (
@@ -286,7 +305,7 @@ function CarteraRows() {
         {
           label: 'Vencido',
           value: data?.overdueBalance !== undefined ? formatMoney(data.overdueBalance) : '—',
-          tone: (data?.overdueBalance ?? 0) > 0 ? 'warn' : 'good',
+          tone: data?.overdueBalance === undefined ? undefined : data.overdueBalance > 0 ? 'warn' : 'good',
           to: '/customers?status=overdue',
         },
       ]}
@@ -390,11 +409,11 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
-
-      <TipOfTheDay />
+      <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} pendingIncluded={(data?.ordersNuevo ?? 0) > 0} loading={isLoading} />
 
       <NeedsAttention />
+
+      <TipOfTheDay />
 
       {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
 

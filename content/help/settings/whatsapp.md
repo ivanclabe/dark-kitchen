@@ -20,7 +20,7 @@ updated: 2026-10-11
 order: 6
 ---
 
-En **WhatsApp** (menú lateral) conectas el **número oficial** de WhatsApp de tu negocio. Usa WhatsApp Business Platform de Meta, con tu propio número y tu propia cuenta de Meta.
+En **WhatsApp e Integraciones** (menú lateral) conectas el **número oficial** de WhatsApp de tu negocio. Usa WhatsApp Business Platform de Meta, con tu propio número y tu propia cuenta de Meta.
 
 ## Conectar tu número
 

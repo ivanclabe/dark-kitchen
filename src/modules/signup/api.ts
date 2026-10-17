@@ -1,5 +1,6 @@
 import { appUrl } from '@/shared/lib/appUrl'
 import { supabase } from '@/shared/lib/supabase'
+import type { BillingPeriod } from '@/shared/plans/plans'
 
 /** ¿Está abierto el registro público? (ADR 0008 D8: se activa con SMTP y CAPTCHA configurados). */
 export const PUBLIC_SIGNUP_ENABLED = import.meta.env.VITE_PUBLIC_SIGNUP === 'true'
@@ -33,13 +34,14 @@ export async function signUpBusiness(input: {
   password: string
   organization: PendingOrganization
   plan: string
+  billingPeriod?: BillingPeriod
   captchaToken?: string
 }): Promise<{ hasSession: boolean }> {
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
     options: {
-      data: { full_name: input.fullName.trim(), pending_organization: input.organization, plan: input.plan },
+      data: { full_name: input.fullName.trim(), pending_organization: input.organization, plan: input.plan, billing_period: input.billingPeriod ?? 'monthly' },
       emailRedirectTo: appUrl(CONFIRMED_PATH),
       captchaToken: input.captchaToken,
     },
@@ -61,7 +63,7 @@ export const PLAN_NOT_AVAILABLE = 'PLAN_NOT_AVAILABLE'
  * Crea organización + suscripción + primera Cuenta (idempotente) y devuelve
  * el identificador de la Cuenta. La base valida el plan.
  */
-export async function createOrganization(org: PendingOrganization, plan: string | null, fullName?: string): Promise<string> {
+export async function createOrganization(org: PendingOrganization, plan: string | null, fullName?: string, billingPeriod?: BillingPeriod | null): Promise<string> {
   const { data, error } = await supabase.rpc('dk_create_organization', {
     p_name: org.name,
     p_sector: org.sector,
@@ -76,6 +78,8 @@ export async function createOrganization(org: PendingOrganization, plan: string 
     p_plan: plan ?? undefined,
     p_account_name: org.accountName || undefined,
     p_account_icon: org.accountIcon || undefined,
+    // ADR 0066: the organization is born unpaid with the period chosen; the checkout comes next.
+    p_billing_period: billingPeriod ?? undefined,
   })
   if (error) throw error
   return data
@@ -84,6 +88,11 @@ export async function createOrganization(org: PendingOrganization, plan: string 
 export function pendingOrganizationOf(metadata: Record<string, unknown> | undefined): PendingOrganization | null {
   const value = metadata?.pending_organization
   return value && typeof value === 'object' && 'name' in value ? (value as PendingOrganization) : null
+}
+
+export function pendingPeriodOf(metadata: Record<string, unknown> | undefined): BillingPeriod | null {
+  const value = metadata?.billing_period
+  return value === 'annual' || value === 'monthly' ? value : null
 }
 
 export function pendingPlanOf(metadata: Record<string, unknown> | undefined): string | null {
@@ -96,8 +105,10 @@ export function pendingPlanOf(metadata: Record<string, unknown> | undefined): st
  * business data on their user (the same metadata the email sign-up carries),
  * and /registro/confirmado creates everything at once.
  */
-export async function savePendingBusiness(input: { fullName: string; organization: PendingOrganization; plan: string }): Promise<void> {
-  const { error } = await supabase.auth.updateUser({ data: { full_name: input.fullName, pending_organization: input.organization, plan: input.plan } })
+export async function savePendingBusiness(input: { fullName: string; organization: PendingOrganization; plan: string; billingPeriod?: BillingPeriod }): Promise<void> {
+  const { error } = await supabase.auth.updateUser({
+    data: { full_name: input.fullName, pending_organization: input.organization, plan: input.plan, billing_period: input.billingPeriod ?? 'monthly' },
+  })
   if (error) throw error
 }
 

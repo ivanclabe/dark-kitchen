@@ -13,7 +13,7 @@ export interface OrderPaymentSummary {
 export const PAYMENT_STATE_LABEL: Record<PaymentState, string> = {
   paid: 'Pagado',
   partial: 'Pago parcial',
-  pending: 'Pago pendiente',
+  pending: 'Por cobrar',
 }
 
 /**

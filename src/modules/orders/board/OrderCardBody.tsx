@@ -48,10 +48,13 @@ export function OrderCardBody({
   density = 'normal',
   trailing,
   stalledNotes,
+  kitchen = false,
 }: {
   ticket: Order
   now: number
   density?: 'normal' | 'grande'
+  /** Cocina: one dish per line, whole (the line reads the dishes, not a summary), and no payment. */
+  kitchen?: boolean
   trailing?: ReactNode
   /** Platos o pedido detenidos (alertas de Configuración → IA). */
   stalledNotes?: string[]
@@ -59,7 +62,7 @@ export function OrderCardBody({
   const { data: thresholds = DEFAULT_SLA_THRESHOLDS } = useSlaSettings()
   const { can } = useActiveKitchen()
   // ADR 0031: the payment dimension, only for whoever sees the receivables (the line and the riders do not).
-  const payment = can('receivables.view') ? paymentSummary(ticket) : null
+  const payment = !kitchen && can('receivables.view') ? paymentSummary(ticket) : null
   const big = density === 'grande'
   const inKitchen = isKitchenStage(ticket.status)
   const isDispatched = ticket.status === 'DESPACHADO'
@@ -74,24 +77,33 @@ export function OrderCardBody({
 
   return (
     <>
-      {ticket.items.length > 0 ? (
+      {ticket.items.length > 0 && kitchen ? (
+        <ul className={clsx('space-y-0.5 font-medium text-neutral-100', big ? 'text-lg leading-snug' : 'text-sm')}>
+          {ticket.items.map((item) => (
+            <li key={item.id} className="flex gap-1.5">
+              <span className="shrink-0 tabular-nums text-neutral-400">{item.quantity}×</span>
+              <span className="min-w-0 break-words">{item.productName}</span>
+            </li>
+          ))}
+        </ul>
+      ) : ticket.items.length > 0 ? (
         <p className={clsx('line-clamp-2 font-medium text-neutral-100', big ? 'text-lg leading-snug' : 'text-sm')}>{summarizeItems(ticket.items)}</p>
       ) : (
         <p className={clsx('font-medium text-amber-400', big ? 'text-base' : 'text-sm')}>Sin platos todavía</p>
       )}
 
       {choices.length > 0 && (
-        <p className={clsx('mt-1 text-neutral-300', big ? 'text-sm' : 'text-xs', big ? 'line-clamp-4' : 'line-clamp-2')}>{choices.join(' · ')}</p>
+        <p className={clsx('mt-1 text-neutral-300', big ? 'text-sm' : 'text-xs', !kitchen && (big ? 'line-clamp-4' : 'line-clamp-2'))}>{choices.join(' · ')}</p>
       )}
 
       {notes.length > 0 && (
-        <p className={clsx('mt-1 text-amber-300', big ? 'text-sm' : 'text-xs', big ? 'line-clamp-3' : 'line-clamp-2')}>⚠ {notes.join(' · ')}</p>
+        <p className={clsx('mt-1 text-amber-300', big ? 'text-sm' : 'text-xs', !kitchen && (big ? 'line-clamp-3' : 'line-clamp-2'))}>⚠ {notes.join(' · ')}</p>
       )}
 
       {stalledNotes && stalledNotes.length > 0 && (
         <p className={clsx('mt-1 flex items-start gap-1 font-medium text-red-400', big ? 'text-sm' : 'text-xs')}>
           <Pause size={11} className="mt-0.5 shrink-0" aria-label="Detenido" />
-          <span className="line-clamp-2">{stalledNotes.join(' · ')}</span>
+          <span className={clsx(!kitchen && 'line-clamp-2')}>{stalledNotes.join(' · ')}</span>
         </p>
       )}
 
@@ -109,28 +121,32 @@ export function OrderCardBody({
         </p>
       )}
 
-      <div className="mt-1.5 flex min-h-6 items-center justify-between gap-2">
+      {/* The action wraps under the meta when the column is narrow (it has its word now). */}
+      <div className="mt-1.5 flex min-h-6 flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
         <span className={clsx('inline-flex items-center gap-1.5 tabular-nums', big ? 'text-sm' : 'text-xs')}>
           <span className="text-neutral-500">
-            #{ticket.orderNumber} · <span className={clsx('font-medium', TIME_TIER_STYLE[tier])}>{formatElapsed(minutesAgo)}</span>
+            #{ticket.orderNumber} ·{' '}
+            <span className={clsx('font-medium', TIME_TIER_STYLE[tier])} title={isDispatched ? 'Tiempo desde que salió' : 'Tiempo desde que se hizo el pedido'}>
+              {formatElapsed(minutesAgo)}
+            </span>
           </span>
           {ticket.priority > 0 && <Flag size={11} className="shrink-0 text-violet-400" aria-label="Prioritario" />}
           {ticket.requiresReview && (
-            <span className="rounded bg-amber-500/15 px-1 text-[10px] font-medium text-amber-400" title="Tuvo devoluciones de inventario: revisar">
+            <span className="rounded bg-amber-500/15 px-1 text-2xs font-medium text-amber-400" title="Tuvo devoluciones de inventario: revisar">
               Revisar
             </span>
           )}
           {payment && (
             <span
-              className={clsx('rounded px-1 text-[10px] font-medium', payment.state === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400')}
-              title={payment.state === 'paid' ? 'Pagado' : `${PAYMENT_STATE_LABEL[payment.state]}: ${formatMoney(payment.balance)} por cobrar`}
+              className={clsx('rounded px-1 text-2xs font-medium', payment.state === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400')}
+              title={payment.state === 'paid' ? 'Pagado' : `${formatMoney(payment.balance)} por cobrar`}
             >
-              {payment.state === 'paid' ? 'Pagado' : 'Por cobrar'}
+              {PAYMENT_STATE_LABEL[payment.state]}
             </span>
           )}
           {inKitchen && <ItemProgress items={ticket.items} />}
         </span>
-        {trailing}
+        {trailing && <span className="ml-auto">{trailing}</span>}
       </div>
     </>
   )

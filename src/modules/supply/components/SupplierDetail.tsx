@@ -89,7 +89,7 @@ export function SupplierDetail({ supplier, onEdit, onSelectPurchase }: { supplie
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-        <StatCard label="Comprado (confirmado)" value={formatMoney(totalBought)} hint={`${supplierPurchases.length} factura(s)`} icon={ShoppingCart} tone="brand" />
+        <StatCard label="Comprado (confirmado)" value={formatMoney(totalBought)} hint={`${supplierPurchases.length} factura(s)`} icon={ShoppingCart} />
         <StatCard label="Insumos asignados" value={supplierIngredients.length} hint="Como proveedor principal" icon={Boxes} />
         {can('finance.view') && (
           <StatCard

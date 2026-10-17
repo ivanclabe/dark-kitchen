@@ -44,7 +44,7 @@ function InstagramIcon() {
 }
 
 const methodButtonClass =
-  'flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+  'flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
 
 /**
  * "Continuar con Google / Instagram / teléfono / email" (ADR 0025): only the

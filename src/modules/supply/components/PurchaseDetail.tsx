@@ -217,8 +217,20 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
   }
 
   async function handleOpenAttachment(filePath: string) {
-    const url = await attachmentUrl.mutateAsync(filePath)
-    window.open(url, '_blank', 'noopener,noreferrer')
+    // Safari blocks a window opened after an await (it is no longer the tap): the tab opens now, the file arrives after.
+    const tab = window.open('', '_blank')
+    try {
+      const url = await attachmentUrl.mutateAsync(filePath)
+      if (tab) {
+        tab.opener = null
+        tab.location.href = url
+      } else {
+        window.location.assign(url)
+      }
+    } catch (err) {
+      tab?.close()
+      setError(getErrorMessage(err, 'No se pudo abrir el adjunto'))
+    }
   }
 
   if (isError) return <ErrorState error={purchaseError} onRetry={() => void refetch()} />
@@ -327,8 +339,9 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
                 ) : undefined
               }
             >
-              {() => (
+              {(a11y) => (
                 <Combobox
+                  {...a11y}
                   value={ingredientId}
                   onChange={chooseIngredient}
                   options={ingredientOptions}

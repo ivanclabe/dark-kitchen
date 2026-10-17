@@ -48,6 +48,6 @@ describe('GhostHeadline', () => {
     render(<GhostHeadline />)
     const h1 = screen.getByRole('heading')
     expect(visible(h1)).toBe('Tu cocina,más inteligente')
-    expect(h1.querySelector('.motion-safe\\:animate-caret')).toBeNull()
+    expect(h1.querySelector('.landing-caret')).toBeNull()
   })
 })

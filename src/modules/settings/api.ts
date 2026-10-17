@@ -122,6 +122,9 @@ export interface Invoice {
   amount: number
   currency: string
   status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible'
+  /** ADR 0066 */
+  kind: 'activation' | 'renewal' | 'upgrade' | 'transfer' | null
+  method: string | null
   issuedAt: string
   paidAt: string | null
   pdfUrl: string | null
@@ -130,8 +133,10 @@ export interface Invoice {
 export async function fetchInvoices(organizationId: string): Promise<Invoice[]> {
   const { data, error } = await supabase
     .from('dk_invoices')
-    .select('id, number, period_start, period_end, amount, currency, status, issued_at, paid_at, pdf_url')
+    .select('id, number, period_start, period_end, amount, currency, status, kind, method, issued_at, paid_at, pdf_url')
     .eq('organization_id', organizationId)
+    // An abandoned checkout leaves a voided invoice: only the refunded ones are worth showing.
+    .or('status.neq.void,refunded_amount.gt.0')
     .order('issued_at', { ascending: false })
     .limit(50)
   if (error) throw error
@@ -143,6 +148,8 @@ export async function fetchInvoices(organizationId: string): Promise<Invoice[]> 
     amount: Number(i.amount),
     currency: i.currency,
     status: i.status as Invoice['status'],
+    kind: (i.kind as Invoice['kind']) ?? null,
+    method: i.method,
     issuedAt: i.issued_at,
     paidAt: i.paid_at,
     pdfUrl: i.pdf_url,

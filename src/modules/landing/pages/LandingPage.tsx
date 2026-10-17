@@ -1,67 +1,119 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { RobotFace } from '@/shared/robot/RobotFace'
 import { applyAppearance, applyRouteDefault, savedTheme } from '@/shared/appearance/appearance'
-import { BrandLogo, BrandMark } from '@/shared/brand/BrandMark'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
-import { ArrowRight, BarChart3, CalendarDays, ChefHat, MessageCircleMore, Package, PlayCircle, Sparkles, Wallet, Warehouse, type LucideIcon } from 'lucide-react'
-import { useEffect, type CSSProperties } from 'react'
+import { ArrowRight } from 'lucide-react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LaptopMockup, PhoneMockup } from '../components/HeroDevices'
+import { ClosingSection } from '../components/ClosingSection'
 import { FaqSection } from '../components/FaqSection'
+import { FeatureProofs } from '../components/FeatureProofs'
 import { GhostHeadline } from '../components/GhostHeadline'
 import { LandingNav } from '../components/LandingNav'
+import { MenuPlannerSection } from '../components/MenuPlannerSection'
+import { OrderStory, type StoryStep } from '../components/OrderStory'
 import { PricingSection } from '../components/PricingSection'
-import { DISPLAY_FONT, display } from '../lib/typography'
+import { ProductShowcase } from '../components/ProductShowcase'
+import { DISPLAY_FONT } from '../lib/typography'
+import '../landing.css'
 
-/** Todo lo que describe esta lista existe hoy en la app — nada de "próximamente" ni cifras inventadas. */
-const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
+/** How one order travels through the day. Everything it says exists in the app today: no invented figures. */
+const STEPS: StoryStep[] = [
   {
-    icon: ChefHat,
-    title: 'Cocina en tiempo real',
-    body: 'Un solo tablero del pedido a la entrega, con alertas de tiempo, control por plato y comandos de voz.',
+    title: 'Llega por donde te escriben',
+    body: (
+      <>
+        <p>Un pedido por WhatsApp, por tu menú web, por teléfono o en el mostrador entra a la misma lista, con el cliente, sus platos y su total.</p>
+        <p>Lo confirmas y Quanela aparta los insumos que lleva cada receta.</p>
+      </>
+    ),
   },
   {
-    icon: CalendarDays,
-    title: 'Planificador de menús',
-    body: 'Arma la semana arrastrando platos al calendario y copia semanas completas en un clic.',
+    title: 'La cocina lo ve plato por plato',
+    body: (
+      <>
+        <p>En la vista Cocina cada pedido muestra sus platos enteros y el tiempo desde que entró. Si pasa del tiempo que definiste, se pone en rojo.</p>
+        <p>Con «Oye Quanela», la línea avanza los pedidos por voz, sin tocar la pantalla.</p>
+      </>
+    ),
   },
   {
-    icon: Warehouse,
-    title: 'Abastecimiento',
-    body: 'Stock, compras y proveedores, con sugerencias de reposición según tu consumo real.',
+    title: 'Sale con su domiciliario',
+    body: (
+      <>
+        <p>Despacho reúne lo que está listo y lo que va en camino: asignas quién lo lleva, sabes hace cuánto salió y lo marcas entregado cuando llega.</p>
+        <p>El cobro va aparte: el pedido queda por cobrar hasta que registras el pago.</p>
+      </>
+    ),
   },
   {
-    icon: Wallet,
-    title: 'Clientes y cobros',
-    body: 'Saldos, pagos e historial de cada cliente en un lugar, sin hojas de cálculo.',
+    title: 'Se descuenta y se costea solo',
+    body: (
+      <>
+        <p>Al marcar cada plato listo, sus insumos salen del inventario según la receta. Cada venta sabe cuánto costó y cuánto te dejó.</p>
+        <p>Sin pasar nada a mano a una hoja de cálculo al final del día.</p>
+      </>
+    ),
+  },
+  {
+    title: 'Y te dice qué hacer después',
+    body: (
+      <>
+        <p>
+          Los agentes de IA trabajan sobre ese pedido y todos los demás: qué comprar, qué perecedero está en riesgo, qué plato se vende por debajo de su costo, qué pedido se
+          quedó quieto.
+        </p>
+        <p>Recomiendan y te dicen por qué. Tú decides.</p>
+        <img src="/robot/robot-idea-lg.webp" width={368} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-36 w-auto lg:hidden" />
+      </>
+    ),
   },
 ]
 
-function delay(ms: number): CSSProperties {
-  return { animationDelay: `${ms}ms` }
+/** Entrances, once per element as it enters; without the observer everything simply stays visible. */
+function useReveal() {
+  const root = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = root.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    el.classList.add('landing-motion')
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue
+          e.target.classList.add('is-in')
+          io.unobserve(e.target)
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+    )
+    // Sections that render later (the plans, once loaded) are picked up too.
+    const watch = () => el.querySelectorAll('[data-reveal]:not(.is-in)').forEach((n) => io.observe(n))
+    watch()
+    const mo = new MutationObserver(watch)
+    mo.observe(el, { childList: true, subtree: true })
+    return () => {
+      io.disconnect()
+      mo.disconnect()
+    }
+  }, [])
+  return root
 }
 
-
-/** What Quanela does, in five words each (all of it exists in the app). */
-const HIGHLIGHTS: { icon: LucideIcon; label: string }[] = [
-  { icon: MessageCircleMore, label: 'Pedidos por WhatsApp' },
-  { icon: ChefHat, label: 'Gestión de cocina' },
-  { icon: Package, label: 'Control de inventario' },
-  { icon: BarChart3, label: 'Reportes en tiempo real' },
-  { icon: Sparkles, label: 'Agentes de IA para automatizar' },
-]
-
-/** The brand's hero scene (mascot, food, channels). */
-const HERO_IMAGE = '/brand/landing-hero.webp'
+function rise(i: number): CSSProperties {
+  return { '--i': i } as CSSProperties
+}
 
 /**
- * Landing pública de Quanela, según el boceto de la marca: el logo grande, «Tu cocina, más inteligente», dos
- * acciones y cinco cosas que hace la app; a la derecha, la escena de la mascota con el tablero de pedidos en
- * un portátil y el menú web en un celular. Todo lo que dice existe hoy en la app: ni cifras inventadas ni
- * testimonios.
+ * Landing pública de Quanela (ADR 0068): «La comanda que viaja». A la izquierda, un pedido de ejemplo que no
+ * se va de la pantalla; a la derecha, cómo viaja del WhatsApp a la caja. Luego la app por dentro (pantallas
+ * reales con datos de ejemplo), el resto del día, los planes (de la base), las preguntas y el registro ya
+ * abierto. Todo lo que dice existe hoy en la app: ni clientes, ni testimonios, ni cifras inventadas.
  */
 export function LandingPage() {
   const { session } = useAuth()
+  const root = useReveal()
   const { hash } = useLocation()
 
   // Enlaces a una sección (/#precios, también desde /precios): desplazamiento suave.
@@ -76,7 +128,10 @@ export function LandingPage() {
     root.dataset.theme = 'dark'
     // The page itself is light: native controls and the scrollbar too (ADR 0061).
     root.style.colorScheme = 'light'
+    // The landing's white reaches the edges, also when the page is pulled past its end.
+    root.style.backgroundColor = '#ffffff'
     return () => {
+      root.style.backgroundColor = ''
       // Leaving the landing (to the login, for instance): the chosen theme, or the next page's default.
       if (savedTheme() !== null) applyAppearance()
       else applyRouteDefault(window.location.pathname)
@@ -97,116 +152,63 @@ export function LandingPage() {
   }, [hash])
 
   return (
-    <div className="min-h-dvh bg-[#FBF6EF] text-[#1C1310]">
+    <div ref={root} className="landing min-h-dvh">
       <LandingNav />
 
       <main>
-        <section id="producto" className="relative isolate scroll-mt-16 overflow-hidden bg-[#FDF7F1]">
-          {/* The brand's scene (wide screens): the mascot, the food and the channels Quanela works with. */}
-          <img
-            src={HERO_IMAGE}
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 hidden size-full object-cover object-[70%_100%] lg:block"
-          />
-
-          <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-10 sm:px-6 sm:pt-28 lg:flex lg:min-h-[100svh] lg:items-center lg:pt-24 lg:pb-14">
-            <div className="relative z-10 max-w-xl lg:max-w-[37rem]">
-              <BrandLogo className="animate-landing-rise hidden h-24 lg:block xl:h-28" />
-              <GhostHeadline
-                style={{ ...display, ...delay(60) }}
-                className="animate-landing-rise text-[3.1rem] leading-[1.02] font-black tracking-[-0.02em] text-[#1C1310] sm:text-6xl lg:mt-8 lg:text-[3.6rem] xl:text-[4.1rem] 2xl:text-[4.6rem]"
-              />
-              <p className="animate-landing-rise mt-6 max-w-lg text-lg leading-snug text-pretty text-[#5B4A42] sm:text-[1.4rem]" style={delay(120)}>
-                La plataforma con agentes de IA para gestionar pedidos, inventario, menús y mucho más en tu dark kitchen o restaurante.
+        <OrderStory
+          steps={STEPS}
+          hero={
+            <section id="producto" className="landing-hero relative flex scroll-mt-24 flex-col px-[var(--l-margin)] pt-8 pb-16 lg:min-h-[calc(100svh-88px)] lg:justify-center lg:pt-12" aria-labelledby="landing-title">
+              {/* The brand's name, huge: an image of the name (the page's heading is the sentence that says what it is). */}
+              <p className="landing-display landing-name order-first leading-[0.9] lg:order-none" aria-hidden>
+                <span className="landing-name-ink landing-rise">quanela</span>
+                <span className="landing-name-over landing-rise">quanela</span>
               </p>
-              <div className="animate-landing-rise mt-8 flex flex-wrap items-center gap-3" style={delay(200)}>
-                <Link
-                  to={session ? APP_ENTRY : '/registro'}
-                  className="group inline-flex items-center gap-2.5 rounded-2xl bg-brasa-500 px-7 py-4 text-lg font-semibold text-white shadow-[0_16px_30px_-14px_var(--color-brasa-600)] transition-colors hover:bg-brasa-600"
-                >
-                  {session ? 'Ir a mi cuenta' : 'Comienza gratis'}
-                  <ArrowRight size={20} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
-                </Link>
-                <a
-                  href="#funcionalidades"
-                  className="inline-flex items-center gap-3 rounded-2xl bg-white/70 px-6 py-4 text-lg font-medium text-[#5B4A42] ring-1 ring-brasa-500/25 backdrop-blur-sm transition-colors hover:bg-white"
-                >
-                  <PlayCircle size={24} className="text-brasa-500" aria-hidden /> Ver cómo funciona
-                </a>
-              </div>
-              <ul className="animate-landing-rise mt-10 grid max-w-[34rem] grid-cols-3 gap-x-2 gap-y-5 sm:grid-cols-5" style={delay(300)}>
-                {HIGHLIGHTS.map(({ icon: Icon, label }) => (
-                  <li key={label} className="flex flex-col items-center gap-2 text-center text-[13px] leading-tight font-medium text-[#3B2C26] sm:text-sm">
-                    <span className="flex size-14 items-center justify-center rounded-2xl bg-white text-brasa-500 shadow-[0_10px_24px_-14px_rgba(124,45,18,0.45)] ring-1 ring-black/[0.04]">
-                      <Icon size={26} strokeWidth={1.9} aria-hidden />
-                    </span>
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* The product (wide screens): the orders board on a laptop and the web menu on a phone. */}
-          <div className="animate-landing-rise pointer-events-none absolute right-[1.5%] bottom-[2%] hidden w-[min(47vw,78svh)] lg:block" style={delay(380)}>
-            <LaptopMockup className="origin-right [transform:perspective(2400px)_rotateY(-9deg)_rotateX(2deg)]" />
-            <PhoneMockup className="absolute bottom-[1%] left-[1%] w-[22%]" />
-          </div>
-
-          {/* Phones and tablets: the scene, then the product. */}
-          <div className="relative px-4 pb-14 sm:px-6 lg:hidden">
-            <img src={HERO_IMAGE} alt="" aria-hidden className="aspect-[16/11] w-full rounded-3xl object-cover object-[88%_25%]" />
-            <div className="relative -mt-16 sm:-mt-28">
-              <LaptopMockup className="ml-auto w-[86%]" />
-              <PhoneMockup className="absolute -bottom-6 left-0 w-[32%]" />
-            </div>
-          </div>
-        </section>
-
-        <section id="funcionalidades" className="scroll-mt-24 bg-white" aria-labelledby="landing-features">
-          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-            <h2 id="landing-features" style={display} className="max-w-2xl text-3xl font-black tracking-[-0.02em] text-balance text-[#1C1310] sm:text-5xl">
-              Todo lo que pasa en tu cocina, <span className="text-brasa-500">en una sola pantalla.</span>
-            </h2>
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {FEATURES.map(({ icon: Icon, title, body }) => (
-                <div key={title} className="rounded-2xl bg-[#FAF7F3] p-6 ring-1 ring-black/[0.06] transition-shadow hover:shadow-[0_18px_40px_-24px_rgba(30,20,10,0.45)]">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-brasa-500 text-white shadow-[0_10px_24px_-12px_var(--color-brasa-500)]">
-                    <Icon size={20} aria-hidden />
-                  </span>
-                  <h3 className="mt-5 text-lg font-semibold text-neutral-950">{title}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-neutral-600">{body}</p>
+              <div className="mt-6 max-w-[36rem] lg:mt-0 lg:ml-[clamp(0px,4vw,72px)]">
+                <GhostHeadline id="landing-title" className="landing-display text-[clamp(34px,3.6vw,56px)] leading-[1.02]" />
+                <p className="landing-rise mt-5 max-w-[46ch]" style={rise(2)}>
+                  Pedidos por WhatsApp y menú web, cocina, domicilios, inventario, costos y clientes, con agentes de IA que recomiendan sobre tus datos reales.
+                </p>
+                <div className="landing-rise mt-8 flex flex-wrap items-center gap-x-6 gap-y-3" style={rise(3)}>
+                  <Link to={session ? APP_ENTRY : '/registro'} className="landing-button landing-button-accent">
+                    {session ? 'Ir a mi cuenta' : 'Crear mi cuenta'} <ArrowRight size={18} aria-hidden />
+                  </Link>
+                  <span className="text-[length:var(--l-size-small)] text-[var(--l-soft)]">Sin permanencia. Pagas en línea con tarjeta, PSE o Nequi.</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </div>
+            </section>
+          }
+        />
 
+        <ProductShowcase />
+        <MenuPlannerSection />
+        <FeatureProofs />
         <PricingSection />
         <FaqSection />
+        <ClosingSection />
       </main>
 
-      <footer className="theme-light border-t border-[#1C1310]/[0.07] bg-[#FBF6EF]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-sm text-neutral-500 sm:px-6">
-          <span className="flex items-center gap-2">
-            <BrandMark className="size-6" /> © {new Date().getFullYear()} Quanela
-          </span>
-          <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5 gap-y-2">
-            <a href="#precios" className="transition-colors hover:text-neutral-200">
-              Precios
-            </a>
-            <a href="#faq" className="transition-colors hover:text-neutral-200">
-              FAQ
-            </a>
-            <a href={helpHref()} className="transition-colors hover:text-neutral-200">
-              Centro de ayuda
-            </a>
-            <Link to={session ? APP_ENTRY : '/login'} className="transition-colors hover:text-neutral-200">
-              {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
-            </Link>
-          </nav>
-        </div>
+      <footer className="grid gap-2 px-[var(--l-margin)] pt-20 pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:pb-[30px]">
+        <span className="flex items-center gap-2.5 text-[var(--l-soft)]">
+          <RobotFace mood="info" size={32} lazy />
+          Quanela · operación e IA para cocinas
+        </span>
+        <nav aria-label="Pie de página" className="flex flex-wrap gap-x-6 gap-y-1">
+          <a href="#precios" className="landing-link">
+            Precios
+          </a>
+          <a href="#faq" className="landing-link">
+            Preguntas
+          </a>
+          <a href={helpHref()} className="landing-link">
+            Centro de ayuda
+          </a>
+          <Link to={session ? APP_ENTRY : '/login'} className="landing-link">
+            {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
+          </Link>
+        </nav>
+        <span className="text-[var(--l-soft)] sm:text-right">© {new Date().getFullYear()} Quanela</span>
       </footer>
     </div>
   )

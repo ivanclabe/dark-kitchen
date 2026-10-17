@@ -7,6 +7,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 for src in docs/brand/robot/robot-*.png; do
   name=$(basename "$src" .png)
-  cwebp -quiet -q 90 -alpha_q 100 -m 6 -resize 0 96 "$src" -o "public/robot/${name}-sm.webp"
-  cwebp -quiet -q 90 -alpha_q 100 -m 6 -resize 0 288 "$src" -o "public/robot/${name}-lg.webp"
+  cwebp -quiet -q 90 -alpha_q 100 -sharp_yuv -m 6 -resize 0 96 "$src" -o "public/robot/${name}-sm.webp"
+  cwebp -quiet -q 90 -alpha_q 100 -sharp_yuv -m 6 -resize 0 288 "$src" -o "public/robot/${name}-lg.webp"
 done

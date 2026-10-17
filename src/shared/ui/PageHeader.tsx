@@ -49,7 +49,7 @@ export function PageHeader({
       <div className={stackActions ? 'flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-x-6' : 'flex flex-wrap items-start justify-between gap-x-6 gap-y-3'}>
         <div className="flex min-w-0 items-start gap-3">
           {Icon && (
-            <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-brasa-500/20 bg-brasa-500/10 text-brasa-400">
+            <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-300">
               <Icon size={18} aria-hidden />
             </span>
           )}

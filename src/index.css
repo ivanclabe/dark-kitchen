@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Inter loads from index.html (preconnect + link): an @import here blocked the first render. */
 @import 'tailwindcss';
 
 /* Public menu (ADR 0053): wide layout by the page's own width, so the phone preview inside the editor looks like a phone. */
@@ -28,21 +28,43 @@
   --color-neutral-500: #858585;
   --color-neutral-600: #6b6b6b;
 
-  /* Tokens semánticos del Design System. Mapean a la escala neutral que ya
-     usa toda la app (no cambian el look actual) pero dan un nombre estable
-     para componentes nuevos: bg-surface, border-line, text-muted, etc. */
-  --color-canvas: #0a0a0a; /* neutral-950 — fondo de la app */
-  --color-surface: #171717; /* neutral-900 — cards, sidebar, inputs */
-  --color-surface-raised: #1f1f1f; /* hover de filas, chips inactivos */
-  --color-line: #262626; /* neutral-800 — bordes hairline */
-  --color-line-strong: #404040; /* neutral-700 — bordes con foco/hover */
-  --color-text: #fafafa; /* neutral-50 */
-  --color-text-secondary: #a3a3a3; /* neutral-400 */
-  --color-text-muted: #858585; /* neutral-500 */
-  --color-success: #34d399; /* emerald-400 */
-  --color-warning: #fbbf24; /* amber-400 */
-  --color-danger: #f87171; /* red-400 */
-  --color-info: #38bdf8; /* sky-400 */
+  /* Tokens semánticos (ADR 0065). Son alias de la escala que cada tema ya
+     redefine, así que siguen al tema sin repetir valores:
+       canvas / surface / surface-raised — fondo, tarjetas, hover de filas
+       line / line-strong — borde hairline y borde con énfasis
+       text / text-secondary / text-muted — texto principal y secundarios
+       success / warning / danger / info — estados (insignias, avisos) */
+  --color-canvas: var(--color-neutral-950);
+  --color-surface: var(--color-neutral-900);
+  --color-surface-raised: var(--color-neutral-800);
+  --color-line: var(--color-neutral-800);
+  --color-line-strong: var(--color-neutral-700);
+  --color-text: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-muted: var(--color-neutral-500);
+  --color-success: var(--color-emerald-400);
+  --color-warning: var(--color-amber-400);
+  --color-danger: var(--color-red-400);
+  --color-info: var(--color-sky-400);
+
+  /* Acción principal (ADR 0065): botón primario, chip activo, interruptor
+     encendido y contadores. brasa-700 con texto blanco llega a 5,2:1 (brasa-500
+     con blanco daba 2,8:1); el naranja vivo queda para la marca y los acentos. */
+  --color-primary: #c2410c;
+  --color-primary-hover: #9a3412;
+  --color-primary-active: #7c2d12;
+  --color-on-primary: #ffffff;
+
+  /* Foco por teclado: brasa-500 sobre el fondo oscuro (7:1). La familia clara
+     lo oscurece a brasa-700 para pasar 3:1 (ver abajo). */
+  --color-focus: #f97316;
+
+  /* Texto mínimo de la interfaz: 11 px (antes había 10 y 11 px sueltos). */
+  /* Motion (ADR 0065): a strong ease-out for UI, and the drawer curve for sheets and side panels. */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
   --shadow-float: 0 12px 40px -8px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -53,10 +75,31 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Superficies del navegador con la paleta (ADR 0065): selección, cursor de
+   texto y el destello gris al tocar en el celular. */
+::selection {
+  background: color-mix(in oklab, var(--color-brasa-500) 32%, transparent);
+}
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer base {
+  input,
+  textarea {
+    caret-color: var(--color-brasa-500);
+  }
+  /* Sin la espera del doble toque (zoom) en controles; en una capa para que
+     touch-none del arrastre (tablero) siga ganando. */
+  :where(a, button, [role='button'], input, select, textarea, label, summary) {
+    touch-action: manipulation;
+  }
+}
+
 /* Foco por teclado consistente en toda la app (links, filas clickeables,
    botones sin clase de foco propia). Los inputs ya traen su propio ring. */
 :where(a, button, [role='button'], [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brasa-500);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -66,7 +109,10 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    /* An endless animation would otherwise flicker every 0.01 ms. */
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -86,30 +132,109 @@ body {
   background: #3f3f46;
 }
 
-@keyframes drawer-in {
-  from {
+/* ADR 0065 (Fase 4): entrances as transitions with @starting-style — a burst of toasts or a quick
+   reopen retargets from where it is instead of restarting a keyframe. Only transform and opacity.
+   Closing is instant (the system answering snaps). Reduced motion keeps a short fade, no movement. */
+.motion-backdrop {
+  transition: opacity 200ms var(--ease-snappy);
+}
+.motion-toast {
+  transition:
+    transform 300ms var(--ease-snappy),
+    opacity 300ms var(--ease-snappy);
+}
+.motion-drawer-right,
+.motion-drawer-left {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+/* Modal: a bottom sheet on a phone, a centred dialog from 40 rem. */
+.motion-sheet {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+/* Dropdown anchored to its button (the component sets transform-origin on that side). */
+.motion-pop {
+  transition:
+    transform 150ms var(--ease-snappy),
+    opacity 150ms var(--ease-snappy);
+}
+/* Popover and MenuPanel: a bottom sheet below 48 rem, a dropdown from there. */
+.motion-pop-sheet {
+  transition:
+    transform 300ms var(--ease-drawer),
+    opacity 200ms var(--ease-snappy);
+}
+@media (width >= 48rem) {
+  .motion-pop-sheet {
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-snappy);
+  }
+}
+
+@starting-style {
+  .motion-backdrop {
+    opacity: 0;
+  }
+  .motion-toast {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  .motion-drawer-right {
     transform: translateX(100%);
   }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-drawer-in {
-  animation: drawer-in 0.2s ease-out;
-}
-
-@keyframes drawer-in-left {
-  from {
+  .motion-drawer-left {
     transform: translateX(-100%);
   }
-  to {
-    transform: translateX(0);
+  .motion-sheet,
+  .motion-pop-sheet {
+    transform: translateY(100%);
+  }
+  .motion-pop {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@media (width >= 40rem) {
+  @starting-style {
+    .motion-sheet {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+}
+@media (width >= 48rem) {
+  @starting-style {
+    .motion-pop-sheet {
+      opacity: 0;
+      transform: scale(0.97);
+    }
   }
 }
 
-.animate-drawer-in-left {
-  animation: drawer-in-left 0.2s ease-out;
+/* Reduced motion: gentler, not zero — the fade stays, nothing moves (wins over the 0.01 ms rule above). */
+@media (prefers-reduced-motion: reduce) {
+  .motion-backdrop,
+  .motion-toast,
+  .motion-drawer-right,
+  .motion-drawer-left,
+  .motion-sheet,
+  .motion-pop,
+  .motion-pop-sheet {
+    transition-property: opacity !important;
+    transition-duration: 150ms !important;
+  }
+  /* The sheets and drawers only slide otherwise: here they fade in instead. */
+  @starting-style {
+    .motion-drawer-right,
+    .motion-drawer-left,
+    .motion-sheet,
+    .motion-pop-sheet {
+      opacity: 0;
+    }
+  }
 }
 
 @keyframes fade-in {
@@ -146,50 +271,6 @@ body {
 
 .animate-ember {
   animation: ember-rise var(--ember-duration, 6s) ease-in-out var(--ember-delay, 0s) infinite;
-}
-
-@keyframes landing-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-landing-rise {
-  animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Landing headline (GhostHeadline): the blinking caret and the flash of an accepted suggestion. */
-@keyframes caret-blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  55%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@utility animate-caret {
-  animation: caret-blink 1s step-end infinite;
-}
-
-@keyframes ghost-accept {
-  from {
-    background-color: rgb(249 115 22 / 0.18);
-  }
-  to {
-    background-color: rgb(249 115 22 / 0);
-  }
-}
-
-@utility animate-ghost-accept {
-  animation: ghost-accept 0.9s ease-out both;
 }
 
 /* The robot during long work (ADR 0060): a slow bob. Used with motion-safe:, so it stops with reduced motion. */
@@ -316,8 +397,10 @@ html[data-theme='neutral'],
 .theme-light {
   color-scheme: light;
   --color-brasa-200: #7c2d12;
-  --color-brasa-300: #9a3412;
-  --color-brasa-400: #c2410c;
+  --color-brasa-300: #7c2d12;
+  /* 800: orange text and links pass 4.5:1 on the soft brand tint too (ADR 0065). */
+  --color-brasa-400: #9a3412;
+  --color-focus: #c2410c;
   /* Each accent's pale shades (200-400, text on a soft tint) become its 700. */
   --color-red-200: oklch(50.5% 0.213 27.518);
   --color-amber-200: oklch(55.5% 0.163 48.998);
@@ -330,21 +413,30 @@ html[data-theme='neutral'],
   --color-teal-300: oklch(51.1% 0.096 186.391);
   --color-indigo-300: oklch(45.7% 0.24 277.023);
   --color-emerald-300: oklch(50.8% 0.118 165.612);
-  --color-emerald-400: oklch(50.8% 0.118 165.612);
+  --color-emerald-400: oklch(43.2% 0.095 166.913); /* 800: text on a 15% tint ≥ 4.5:1 */
   --color-amber-300: oklch(55.5% 0.163 48.998);
-  --color-amber-400: oklch(55.5% 0.163 48.998);
+  --color-amber-400: oklch(47.3% 0.137 46.201); /* 800: text on a 15% tint ≥ 4.5:1 */
   --color-red-300: oklch(50.5% 0.213 27.518);
-  --color-red-400: oklch(50.5% 0.213 27.518);
+  --color-red-400: oklch(44.4% 0.177 26.899); /* 800: text on a 15% tint ≥ 4.5:1 */
   --color-sky-300: oklch(50% 0.134 242.749);
-  --color-sky-400: oklch(50% 0.134 242.749);
+  --color-sky-400: oklch(44.3% 0.11 240.79); /* 800: text on a 15% tint ≥ 4.5:1 */
   --color-violet-300: oklch(49.1% 0.27 292.581);
-  --color-violet-400: oklch(49.1% 0.27 292.581);
+  --color-violet-400: oklch(43.2% 0.232 292.759); /* 800: text on a 15% tint ≥ 4.5:1 */
   --color-blue-300: oklch(48.8% 0.243 264.376);
-  --color-blue-400: oklch(48.8% 0.243 264.376);
-  --color-success: #047857;
-  --color-warning: #b45309;
-  --color-danger: #b91c1c;
-  --color-info: #0369a1;
+  --color-blue-400: oklch(42.4% 0.199 265.638); /* 800: text on a 15% tint ≥ 4.5:1 */
+  /* The aliases resolve again here, so a .theme-light section follows its own palette. */
+  --color-canvas: var(--color-neutral-950);
+  --color-surface: var(--color-neutral-900);
+  --color-surface-raised: var(--color-neutral-800);
+  --color-line: var(--color-neutral-800);
+  --color-line-strong: var(--color-neutral-700);
+  --color-text: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-muted: var(--color-neutral-500);
+  --color-success: var(--color-emerald-400);
+  --color-warning: var(--color-amber-400);
+  --color-danger: var(--color-red-400);
+  --color-info: var(--color-sky-400);
 }
 
 /* Claro: blanco y gris frío, la escala invertida. */
@@ -356,20 +448,13 @@ html[data-theme='light'],
   --color-neutral-300: oklch(37.1% 0 0);
   --color-neutral-400: oklch(43.9% 0 0);
   --color-neutral-500: #666666;
-  --color-neutral-600: #8f8f8f;
+  /* 3:1 on white and on the page: field borders, switches, hints (ADR 0065). */
+  --color-neutral-600: #8a8a8a;
   --color-neutral-700: oklch(87% 0 0);
   --color-neutral-800: oklch(92.2% 0 0);
   --color-neutral-900: oklch(100% 0 0);
   --color-neutral-950: oklch(97% 0 0);
 
-  --color-canvas: #f5f5f5;
-  --color-surface: #ffffff;
-  --color-surface-raised: #ebebeb;
-  --color-line: #e5e5e5;
-  --color-line-strong: #d4d4d4;
-  --color-text: #171717;
-  --color-text-secondary: #525252;
-  --color-text-muted: #666666;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px -12px rgba(0, 0, 0, 0.12);
   --shadow-float: 0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -384,20 +469,12 @@ html[data-theme='neutral'] {
   --color-neutral-300: #4f4a44;
   --color-neutral-400: #5e5a54;
   --color-neutral-500: #68645e;
-  --color-neutral-600: #938d84;
+  --color-neutral-600: #8a847b;
   --color-neutral-700: #cfc9c0;
   --color-neutral-800: #dfdad3;
   --color-neutral-900: #faf9f7;
   --color-neutral-950: #f2f0ed;
 
-  --color-canvas: #f2f0ed;
-  --color-surface: #faf9f7;
-  --color-surface-raised: #eae7e2;
-  --color-line: #d8d3cc;
-  --color-line-strong: #cfc9c0;
-  --color-text: #292724;
-  --color-text-secondary: #5e5a54;
-  --color-text-muted: #68645e;
 
   --shadow-card: 0 1px 2px rgba(28, 19, 16, 0.06), 0 8px 24px -14px rgba(28, 19, 16, 0.14);
   --shadow-float: 0 12px 40px -10px rgba(28, 19, 16, 0.2), 0 2px 8px rgba(28, 19, 16, 0.08);

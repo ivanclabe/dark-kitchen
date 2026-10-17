@@ -30,14 +30,14 @@ export function BarList({ items, emptyText = 'Sin datos en este periodo.' }: { i
               </span>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-neutral-800">
-              <div className="h-full rounded-full bg-brasa-500" style={{ width: `${Math.max(2, (i.value / max) * 100)}%` }} />
+              <div className="h-full rounded-full bg-neutral-300" style={{ width: `${Math.max(2, (i.value / max) * 100)}%` }} />
             </div>
           </>
         )
         return (
           <li key={i.id}>
             {i.onSelect ? (
-              <button type="button" onClick={i.onSelect} className={clsx('w-full rounded-lg text-left transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-brasa-500 focus-visible:outline-none')}>
+              <button type="button" onClick={i.onSelect} className={clsx('w-full rounded-lg text-left transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none')}>
                 {row}
               </button>
             ) : (

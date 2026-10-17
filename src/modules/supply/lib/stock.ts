@@ -1,8 +1,11 @@
 import type { Ingredient } from '../types'
 
-/** Misma regla que usaba InventoryPage: disponible por debajo (o igual) del mínimo configurado. */
+/**
+ * Disponible por debajo (o igual) del mínimo configurado. Sin mínimo (0) no hay
+ * umbral que romper (ADR 0065): antes todo insumo sin mínimo y en 0 salía «bajo mínimo».
+ */
 export function isLowStock(ingredient: Ingredient): boolean {
-  return ingredient.stockAvailable <= ingredient.minStock
+  return ingredient.minStock > 0 && ingredient.stockAvailable <= ingredient.minStock
 }
 
 /**

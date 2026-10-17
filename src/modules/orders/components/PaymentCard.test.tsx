@@ -33,7 +33,7 @@ afterEach(cleanup)
 describe('Pago in the order (ADR 0031)', () => {
   it('pending: the balance and «Registrar pago»; the form comes filled and confirms in one tap', async () => {
     renderCard(order())
-    expect(screen.getByText('Pago pendiente')).toBeTruthy()
+    expect(screen.getByText('Por cobrar')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Registrar pago' }))
     expect((screen.getByLabelText('Monto del pago') as HTMLInputElement).value).toBe('85.000')
     fireEvent.click(screen.getByRole('button', { name: 'Transferencia' }))
@@ -69,7 +69,7 @@ describe('Pago in the order (ADR 0031)', () => {
       { id: 'p1', amount: 85000, method: 'Efectivo', note: null, createdAt: '2026-10-06T12:00:00Z', createdBy: 'Caja', voidsPaymentId: null },
       { id: 'v1', amount: -85000, method: 'Efectivo', note: 'Cobrado dos veces', createdAt: '2026-10-06T12:05:00Z', createdBy: 'Caja', voidsPaymentId: 'p1' },
     ] }))
-    expect(screen.getByText('Pago pendiente')).toBeTruthy()
+    expect(screen.getByText('Por cobrar')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /Ver detalle/ }))
     expect(screen.getByText('Anulado')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Anular' })).toBeNull()
@@ -78,7 +78,7 @@ describe('Pago in the order (ADR 0031)', () => {
   it('who sees the receivables but does not collect: no actions', () => {
     state.perms = new Set(['receivables.view'])
     renderCard(order())
-    expect(screen.getByText('Pago pendiente')).toBeTruthy()
+    expect(screen.getByText('Por cobrar')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Registrar pago' })).toBeNull()
   })
 

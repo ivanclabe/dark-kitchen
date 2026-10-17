@@ -33,10 +33,10 @@ function withoutKitchen(path: string): string {
 /** The label of the screen a path belongs to, for «Volver a …» (the first segment after the Cocina prefix). */
 const SECTION_LABELS: Record<string, string> = {
   dashboard: 'Inicio',
-  operations: 'Operación',
+  operations: 'Centro de operaciones',
   customers: 'Clientes',
-  insights: 'Insights',
-  'menu-planner': 'Catálogo',
+  insights: 'Análisis',
+  'menu-planner': 'Planificador de Menús',
   supply: 'Abastecimiento',
 }
 

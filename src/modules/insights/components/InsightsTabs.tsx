@@ -32,11 +32,11 @@ export interface TabProps {
 
 /** Theme tokens (ADR 0061): the same series read well in dark, light and neutral. */
 const COLORS = {
-  revenue: 'var(--color-brasa-500)',
+  revenue: 'var(--color-neutral-300)',
   profit: 'var(--color-emerald-400)',
   cogs: 'var(--color-red-400)',
-  margin: 'var(--color-neutral-400)',
-  orders: 'var(--color-neutral-400)',
+  margin: 'var(--color-neutral-500)',
+  orders: 'var(--color-neutral-500)',
 }
 
 function ChangeCell({ value, goodWhen = 'up' }: { value: number | null; goodWhen?: 'up' | 'down' }) {
@@ -51,6 +51,8 @@ function ChangeCell({ value, goodWhen = 'up' }: { value: number | null; goodWhen
 export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, onProduct }: TabProps) {
   const cur = data.current
   const prev = data.previous
+  // No sale has a cost: cost, profit and margin are unknown, never «$0» and «100 %» (Honest Zero, DESIGN.md).
+  const noCost = cur.costCoverage === 0
   const series = (pick: (d: InsightsData['daily'][number]) => number) => data.daily.map(pick)
   const kpis: Kpi[] = [
     { id: 'revenue', label: 'Ingresos', value: formatMoney(cur.revenue), change: change(cur.revenue, prev?.revenue), goodWhen: 'up', series: series((d) => d.revenue), onSelect: () => onTab('sales') },
@@ -59,30 +61,31 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
           {
             id: 'cogs',
             label: 'Costo de ventas',
-            value: formatMoney(cur.cogs ?? 0),
-            change: change(cur.cogs, prev?.cogs),
+            value: noCost ? '—' : formatMoney(cur.cogs ?? 0),
+            change: noCost ? null : change(cur.cogs, prev?.cogs),
             goodWhen: 'neutral',
-            hint: cur.estimatedCogs ? `${formatMoney(cur.estimatedCogs)} estimado` : undefined,
-            series: series((d) => d.cogs ?? 0),
+            hint: noCost ? 'Sin costo registrado' : cur.estimatedCogs ? `${formatMoney(cur.estimatedCogs)} estimado` : undefined,
+            series: noCost ? undefined : series((d) => d.cogs ?? 0),
             onSelect: () => onTab('costs'),
           },
           {
             id: 'gross-profit',
             label: 'Utilidad bruta',
-            value: formatMoney(cur.grossProfit ?? 0),
-            change: change(cur.grossProfit, prev?.grossProfit),
+            value: noCost ? '—' : formatMoney(cur.grossProfit ?? 0),
+            change: noCost ? null : change(cur.grossProfit, prev?.grossProfit),
             goodWhen: 'up',
-            series: series((d) => d.netRevenue - (d.cogs ?? 0)),
+            hint: noCost ? 'Sin costo registrado' : undefined,
+            series: noCost ? undefined : series((d) => d.netRevenue - (d.cogs ?? 0)),
             onSelect: () => onTab('products'),
           },
           {
             id: 'gross-margin',
             label: 'Margen bruto',
-            value: formatPercent(cur.grossMargin),
-            change: cur.grossMargin != null && prev?.grossMargin != null ? cur.grossMargin - prev.grossMargin : null,
-            changeLabel: cur.grossMargin != null && prev?.grossMargin != null ? formatPoints(cur.grossMargin - prev.grossMargin) : undefined,
+            value: noCost ? '—' : formatPercent(cur.grossMargin),
+            change: !noCost && cur.grossMargin != null && prev?.grossMargin != null ? cur.grossMargin - prev.grossMargin : null,
+            changeLabel: !noCost && cur.grossMargin != null && prev?.grossMargin != null ? formatPoints(cur.grossMargin - prev.grossMargin) : undefined,
             goodWhen: 'up',
-            hint: cur.costCoverage != null && cur.costCoverage < 1 ? `Costo en ${formatPercent(cur.costCoverage, 0)} de las ventas` : undefined,
+            hint: noCost ? 'Registra el costo de tus platos' : cur.costCoverage != null && cur.costCoverage < 1 ? `Costo en ${formatPercent(cur.costCoverage, 0)} de las ventas` : undefined,
           },
         ] satisfies Kpi[])
       : []),
@@ -96,8 +99,8 @@ export function OverviewTab({ data, compareLabel, summary, onTab, onCategory, on
       label: dayLabel(d.date),
       netRevenue: d.netRevenue,
       revenue: d.revenue,
-      grossProfit: data.profitability ? profit : null,
-      margin: data.profitability && d.netRevenue > 0 ? profit / d.netRevenue : null,
+      grossProfit: data.profitability && !noCost ? profit : null,
+      margin: data.profitability && !noCost && d.netRevenue > 0 ? profit / d.netRevenue : null,
     }
   })
 
@@ -300,7 +303,7 @@ export function CostsTab({ data, compareLabel }: TabProps) {
   const { can, path } = useActiveKitchen()
   const navigate = useNavigate()
   // «Volver» from Abastecimiento brings the person back to these figures (ADR 0031).
-  const here = useHere('Insights')
+  const here = useHere('Análisis')
   const openIngredient = can('inventory.view') ? (id: string) => navigate(path(`/supply/stock/${id}`), { state: { from: here } }) : null
   const openSupplier = can('suppliers.view') ? (id: string) => navigate(path(`/supply/proveedores/${id}`), { state: { from: here } }) : null
   const unitCosts = data.products.filter((p) => p.unitCost != null)

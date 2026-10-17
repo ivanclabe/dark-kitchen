@@ -42,6 +42,13 @@ const PAYMENT_FILTERS: { value: '' | 'paid' | 'pending'; label: string }[] = [
 
 const PAGE = 50
 
+const EMPTY_BY_RANGE: Record<Range, string> = {
+  today: 'Todavía no hay pedidos de hoy.',
+  '7d': 'No hubo pedidos en los últimos 7 días. Cambia las fechas para ver los anteriores.',
+  '30d': 'No hubo pedidos en los últimos 30 días. Cambia las fechas para ver los anteriores.',
+  all: 'Todavía no hay pedidos en esta cuenta.',
+}
+
 function rangeStart(range: Range): string | null {
   if (range === 'all') return null
   const d = new Date()
@@ -110,9 +117,13 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
   )
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, error, refetch } = useOrderSearchPages(filters)
   const orders = useMemo(() => data?.pages.flatMap((p) => p.orders), [data])
+  // Only the dates narrow the list: it is not «no match», there were no orders in that range.
+  const filtered = !!search || !!statusKey || !!channel || !!payment
 
+  // ADR 0065: fixed widths, so a long name truncates instead of pushing Estado/Pago/Total out of view.
+  // On a phone: #, the customer (with the status and payment under the name) and the total.
   const columns: DataTableColumn<Order>[] = [
-    { key: 'number', header: '#', cell: (o) => <span className="font-semibold tabular-nums text-neutral-100">#{o.orderNumber}</span> },
+    { key: 'number', header: '#', width: 'w-16 sm:w-20', cell: (o) => <span className="font-semibold tabular-nums text-neutral-100">#{o.orderNumber}</span> },
     {
       key: 'customer',
       header: 'Cliente',
@@ -120,15 +131,22 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
         <span className="block min-w-0">
           <span className="block truncate text-neutral-100">{o.customerName}</span>
           <span className="block truncate text-xs text-neutral-500">{o.items.map((i) => `${i.quantity}× ${i.productName}`).join(', ') || 'Sin platos'}</span>
+          <span className="mt-1.5 flex flex-wrap gap-1 sm:hidden">
+            <OrderStatusBadge status={o.status} size="sm" />
+            {seesPayments && <PaymentBadge order={o} size="sm" />}
+          </span>
         </span>
       ),
     },
-    { key: 'status', header: 'Estado', cell: (o) => <OrderStatusBadge status={o.status} size="sm" /> },
-    ...(seesPayments ? ([{ key: 'payment', header: 'Pago', cell: (o) => <PaymentBadge order={o} size="sm" /> }] satisfies DataTableColumn<Order>[]) : []),
+    { key: 'status', header: 'Estado', width: 'w-36', hideBelow: 'sm', cell: (o) => <OrderStatusBadge status={o.status} size="sm" /> },
+    ...(seesPayments
+      ? ([{ key: 'payment', header: 'Pago', width: 'w-40', hideBelow: 'md', cell: (o) => <PaymentBadge order={o} size="sm" /> }] satisfies DataTableColumn<Order>[])
+      : []),
     {
       key: 'channel',
       header: 'Canal',
-      hideBelow: 'md',
+      width: 'w-32',
+      hideBelow: 'xl',
       cell: (o) => {
         const c = CHANNEL_CONFIG[o.channel]
         return (
@@ -138,8 +156,8 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
         )
       },
     },
-    { key: 'date', header: 'Fecha', hideBelow: 'sm', cell: (o) => <span className="text-xs text-neutral-400">{formatDateTime(o.createdAt)}</span> },
-    { key: 'total', header: 'Total', align: 'right', cell: (o) => <span className="tabular-nums text-neutral-100">{formatMoney(o.total)}</span> },
+    { key: 'date', header: 'Fecha', width: 'w-44', hideBelow: 'lg', cell: (o) => <span className="text-xs text-neutral-400">{formatDateTime(o.createdAt)}</span> },
+    { key: 'total', header: 'Total', width: 'w-28 sm:w-32', align: 'right', cell: (o) => <span className="tabular-nums text-neutral-100">{formatMoney(o.total)}</span> },
   ]
 
   return (
@@ -173,13 +191,14 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
           ))}
         </Select>
       </div>
-      <div role="group" aria-label="Estado" className="flex flex-wrap gap-1.5">
+      {/* Phone: each filter group is one row that slides sideways (they took five rows before the first order). */}
+      <div role="group" aria-label="Estado" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] sm:flex-wrap [&>*]:shrink-0">
         {STATUS_FILTERS.map((f) => (
           <Chip key={f.value} label={f.label} active={statusKey === f.value} onClick={() => setFilter('status', f.value)} />
         ))}
       </div>
       {seesPayments && (
-        <div role="group" aria-label="Pago" className="flex flex-wrap gap-1.5">
+        <div role="group" aria-label="Pago" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] sm:flex-wrap [&>*]:shrink-0">
           {PAYMENT_FILTERS.map((f) => (
             <Chip key={f.value} label={f.label} active={(payment ?? '') === f.value} onClick={() => setFilter('payment', f.value)} />
           ))}
@@ -191,11 +210,18 @@ export const OrderListView = forwardRef<HTMLInputElement, { onOpen: (order: Orde
           columns={columns}
           rows={orders}
           getRowId={(o) => o.id}
+          layout="fixed"
           onRowClick={onOpen}
           isLoading={isLoading}
           error={error}
           onRetry={() => void refetch()}
-          emptyState={<EmptyState icon={ClipboardList} mood="noResults" title="Sin pedidos" description="Ningún pedido coincide con la búsqueda y los filtros." compact />}
+          emptyState={
+            filtered ? (
+              <EmptyState icon={ClipboardList} mood="noResults" title="Sin pedidos" description="Ningún pedido coincide con la búsqueda y los filtros." compact />
+            ) : (
+              <EmptyState icon={ClipboardList} title="Sin pedidos" description={EMPTY_BY_RANGE[range]} compact />
+            )
+          }
         />
         {hasNextPage && (
           <div className="flex justify-center py-3">

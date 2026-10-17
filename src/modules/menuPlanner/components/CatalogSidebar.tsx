@@ -5,6 +5,7 @@ import type { Product } from '@/modules/products/types'
 import { Button } from '@/shared/ui/Button'
 import { Chip } from '@/shared/ui/Chip'
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { ErrorState } from '@/shared/ui/ErrorState'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { Plus, Search, UtensilsCrossed } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -37,7 +38,7 @@ export function CatalogSidebar({
 }) {
   const { can } = useActiveKitchen()
   const dishCosts = useShowDishCosts()
-  const { data: products, isLoading } = useProducts()
+  const { data: products, isLoading, isError, error, refetch } = useProducts()
   const { data: categories } = useProductCategories()
   const [query, setQuery] = useState('')
   const [categoryId, setCategoryId] = useState<string | 'all'>('all')
@@ -70,12 +71,12 @@ export function CatalogSidebar({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar plato…"
           aria-label="Buscar plato"
-          className="w-full min-w-0 rounded-lg border border-neutral-800 bg-neutral-900 py-2.5 pl-9 pr-3 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-700 focus:border-brasa-500 focus:ring-2 focus:ring-brasa-500/15"
+          className="w-full min-w-0 rounded-lg border border-neutral-600 bg-neutral-900 py-2.5 pl-9 pr-3 text-sm text-neutral-100 outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-500 focus:border-focus focus:ring-2 focus:ring-focus/25"
         />
       </div>
 
       {can('menus.edit') && (
-        <p className="-mt-1 text-[11px] text-neutral-500">
+        <p className="-mt-1 text-2xs text-neutral-500">
           Arrastra a cualquier día, o usa <span className="font-semibold text-neutral-300">+</span> para agregar a <span className="text-neutral-300">{shortDateLabel(selectedDate)}</span>.
         </p>
       )}
@@ -92,8 +93,15 @@ export function CatalogSidebar({
       <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-0.5">
         {isLoading ? (
           <LoadingState variant="block" label="Cargando platos…" />
+        ) : isError ? (
+          // ADR 0065: a failed load is not «Sin platos».
+          <ErrorState error={error} onRetry={() => void refetch()} compact />
         ) : filtered.length === 0 ? (
-          <EmptyState icon={UtensilsCrossed} title="Sin platos" description="Ajusta la búsqueda o agrega un plato nuevo." compact />
+          (products ?? []).length === 0 ? (
+            <EmptyState icon={UtensilsCrossed} title="Sin platos" description="Todavía no hay platos en el catálogo. Agrega el primero para planear el menú." compact />
+          ) : (
+            <EmptyState icon={UtensilsCrossed} mood="noResults" title="Sin platos" description="Ningún plato coincide con la búsqueda o la categoría." compact />
+          )
         ) : (
           filtered.map((product) => (
             <DishCatalogCard

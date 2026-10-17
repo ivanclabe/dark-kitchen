@@ -1,3 +1,5 @@
+import { BILLING_ACCESS_KEY, fetchBillingAccess } from '@/shared/billing/billing'
+import { SubscriptionGate } from '@/shared/billing/SubscriptionGate'
 import { readStoredRole, setActiveKitchenId, setActiveRoleId, writeLastKitchenSlug, writeStoredRole } from '@/shared/kitchen/activeKitchen'
 import { fetchMyFeatures } from '@/shared/features/features'
 import { ActiveKitchenContext, buildActiveKitchen, FEATURES_KEY, useMyContext } from '@/shared/kitchen/activeKitchenContext'
@@ -53,6 +55,17 @@ export function KitchenScope() {
   // caché y los encabezados ya son los de este contexto).
   const { data: features } = useQuery({ queryKey: FEATURES_KEY, queryFn: fetchMyFeatures, enabled: Boolean(kitchen) && !crossHost, staleTime: 60_000 })
 
+  // ADR 0066: is this organization's subscription current? (the database blocks the data anyway)
+  const billing = useQuery({
+    queryKey: BILLING_ACCESS_KEY,
+    queryFn: fetchBillingAccess,
+    enabled: Boolean(kitchen) && !crossHost,
+    staleTime: 60_000,
+    // A failure opens the app (the database still closes the data); it is not asked again on every mount.
+    retryOnMount: false,
+  })
+  const access = billing.data?.find((a) => a.organizationId === account?.organizationId)
+
   const value = useMemo(
     () => (kitchen ? buildActiveKitchen(kitchen, { organization, setActiveRole, features }) : null),
     [kitchen, organization, setActiveRole, features],
@@ -62,7 +75,7 @@ export function KitchenScope() {
     if (crossHost) window.location.replace(crossHost)
   }, [crossHost])
 
-  const kitchenId = crossHost ? undefined : kitchen?.id
+  const kitchenId = crossHost || billing.isPending || access?.blocked ? undefined : kitchen?.id
   useEffect(() => {
     if (!kitchenId) return
     // Para volver a esta Cuenta al iniciar sesión, también desde otro equipo. No crítico.
@@ -88,6 +101,10 @@ export function KitchenScope() {
   }
   if (!kitchen || !value) return <Navigate to="/cuentas" replace state={{ missingSlug: kitchenSlug }} />
   if (!kitchen.active && !kitchen.isPlatformAdmin) return <KitchenInactivePage name={kitchen.name} />
+  // Wait for it (a small query, in parallel with the rest): otherwise the app flashes before the gate.
+  // If it fails, the app opens: the database keeps the data closed anyway.
+  if (billing.isPending && !kitchen.isPlatformAdmin) return <FullScreenLoading stage="kitchen" />
+  if (access?.blocked && !kitchen.isPlatformAdmin) return <SubscriptionGate access={access} organizationName={organization?.name ?? kitchen.name} />
 
   return (
     <ActiveKitchenContext value={value}>

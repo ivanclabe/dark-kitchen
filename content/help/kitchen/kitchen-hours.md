@@ -17,7 +17,7 @@ updated: 2026-10-06
 order: 4
 ---
 
-1. Abre **Operación → Cocina**.
+1. Abre **Centro de operaciones → Cocina**.
 2. Toca **⋯ → Configuración de cocina** (o toca el estado de la cocina debajo del título).
 3. Elige la pestaña:
 

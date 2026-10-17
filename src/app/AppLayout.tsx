@@ -1,3 +1,4 @@
+import { BillingBanner } from '@/shared/billing/BillingBanner'
 import { OnlineIndicator } from './OnlineIndicator'
 import { BrandMark } from '@/shared/brand/BrandMark'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
@@ -56,7 +57,7 @@ export function AppLayout() {
           aria-label={item.label}
           aria-current={active ? 'page' : undefined}
           className={clsx(
-            'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+            'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
             active ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
           )}
         >
@@ -109,6 +110,13 @@ export function AppLayout() {
     <VoiceProvider key={kitchen.id}>
     <CopilotProvider key={kitchen.id}>
     <div className="flex h-dvh overflow-hidden bg-neutral-950 text-neutral-100">
+      {/* ADR 0065: with the keyboard, the first Tab offers to skip the rail and the top bar. */}
+      <a
+        href="#contenido"
+        className="sr-only z-[80] rounded-full bg-primary px-4 py-2 text-sm font-semibold text-on-primary focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >
+        Saltar al contenido
+      </a>
       {/* Rail de escritorio compacto: solo íconos. El nombre de cada módulo
           aparece en un tooltip (hover y foco por teclado) y es su aria-label. */}
       <aside className="hidden w-16 shrink-0 flex-col items-center border-r border-neutral-800/60 bg-neutral-950 py-4 md:flex">
@@ -152,7 +160,7 @@ export function AppLayout() {
                     }}
                     aria-label="Más módulos"
                     className={clsx(
-                      'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brasa-500',
+                      'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
                       overflowActive || props['aria-expanded'] ? 'bg-brasa-500/10 text-brasa-400' : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-100',
                     )}
                   >
@@ -165,7 +173,7 @@ export function AppLayout() {
                 rail.overflow.map((item, i) => (
                   <Fragment key={item.to}>
                     {(i === 0 || item.group !== rail.overflow[i - 1].group) && (
-                      <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">{NAV_GROUP_LABELS[item.group]}</p>
+                      <p className="px-3 pt-2 pb-1 text-2xs font-semibold tracking-wide text-neutral-500 uppercase">{NAV_GROUP_LABELS[item.group]}</p>
                     )}
                     <PopoverItem
                       icon={item.icon}
@@ -231,7 +239,8 @@ export function AppLayout() {
             scrollee como un bloque. Las demás páginas siguen funcionando
             igual — su contenido simplemente scrollea dentro de <main>. */}
         {/* scrollbar-gutter: a short page and a long one keep the same width (no sideways jump when the scrollbar appears). */}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 [scrollbar-gutter:stable] sm:p-6 lg:p-8">
+        <main id="contenido" tabIndex={-1} className="flex outline-none min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 [scrollbar-gutter:stable] sm:p-6 lg:p-8">
+          <BillingBanner />
           <WelcomeCard />
           <Outlet />
         </main>
@@ -245,7 +254,7 @@ export function AppLayout() {
           {allItems.map((item, i) => (
             <Fragment key={item.to}>
               {(i === 0 || item.group !== allItems[i - 1].group) && (
-                <p className={clsx('px-3 pb-1 text-[11px] font-semibold tracking-wide text-neutral-500 uppercase', i > 0 && 'mt-3')}>{NAV_GROUP_LABELS[item.group]}</p>
+                <p className={clsx('px-3 pb-1 text-2xs font-semibold tracking-wide text-neutral-500 uppercase', i > 0 && 'mt-3')}>{NAV_GROUP_LABELS[item.group]}</p>
               )}
               {drawerLink(item)}
             </Fragment>

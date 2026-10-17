@@ -168,8 +168,9 @@ export function OrderBuilder({ orderId, onConfirm, onCancel }: { orderId: string
         <form onSubmit={handleAddItem} className={`${cardClass} space-y-4`}>
           <FormGrid cols={4}>
             <FormField label="Plato" required className="sm:col-span-2">
-              {() => (
+              {(a11y) => (
                 <Combobox
+                  {...a11y}
                   value={productId}
                   onChange={handleProductChange}
                   options={productOptions}
