@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const auth = vi.hoisted(() => ({
   session: null as null | { user: { email?: string; phone?: string; user_metadata: Record<string, unknown> } },
   profile: null as null | { id: string },
-  signOut: vi.fn(async () => undefined),
+  signOut: vi.fn(async () => ({ error: null as string | null })),
 }))
 const calls = vi.hoisted(() => ({
   oauth: vi.fn(async (_method: string, _path?: string) => undefined),
@@ -21,7 +21,7 @@ const calls = vi.hoisted(() => ({
 
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/hooks/useAuth', () => ({
-  useAuth: () => ({ session: auth.session, profile: auth.profile, loading: false, profileLoading: false, signOut: auth.signOut }),
+  useAuth: () => ({ session: auth.session, user: auth.session?.user ?? null, profile: auth.profile, loading: false, profileLoading: false, signOut: auth.signOut }),
 }))
 vi.mock('@/shared/plans/usePlans', async (original) => ({
   ...(await original<typeof import('@/shared/plans/usePlans')>()),
@@ -43,6 +43,7 @@ vi.mock('../ownerAuth', async (original) => ({
 vi.mock('../ownerSession', async (original) => ({ ...(await original<typeof import('../ownerSession')>()), ownsABusiness: calls.owns }))
 
 const { SignUpPage } = await import('./SignUpPage')
+const { ToastProvider } = await import('@/shared/ui/Toast')
 
 function Where() {
   const location = useLocation()
@@ -51,12 +52,14 @@ function Where() {
 
 function renderAt(url: string) {
   return render(
-    <MemoryRouter initialEntries={[url]}>
-      <Routes>
-        <Route path="/registro" element={<SignUpPage />} />
-        <Route path="*" element={<Where />} />
-      </Routes>
-    </MemoryRouter>,
+    <ToastProvider>
+      <MemoryRouter initialEntries={[url]}>
+        <Routes>
+          <Route path="/registro" element={<SignUpPage />} />
+          <Route path="*" element={<Where />} />
+        </Routes>
+      </MemoryRouter>
+    </ToastProvider>,
   )
 }
 
@@ -144,13 +147,18 @@ describe('owner sign-up methods (ADR 0025)', () => {
     expect(auth.signOut).not.toHaveBeenCalled()
   })
 
-  it('a signed-in user who used email (no mark) just goes into the app, as before', async () => {
+  it('a signed-in user who used email (no mark) chooses: their account, or sign out and register someone new', async () => {
     auth.session = { user: { email: 'cajero@prueba.test', user_metadata: {} } }
     auth.profile = { id: 'u3' }
-    renderAt('/registro')
-    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/app|'))
+    renderAt('/registro?plan=business')
+    expect(await screen.findByRole('heading', { name: 'Ya tienes una sesión abierta' })).toBeTruthy()
+    expect(screen.getByText('cajero@prueba.test')).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Ir a mi cuenta/ }).getAttribute('href')).toBe('/app')
     expect(calls.owns).not.toHaveBeenCalled()
-    expect(auth.signOut).not.toHaveBeenCalled()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Cerrar sesión y crear cuenta' }))
+    expect(auth.signOut).toHaveBeenCalledOnce()
+    // Stays on the sign-up (no redirect): once the session is gone the form shows.
+    expect(screen.queryByTestId('where')).toBeNull()
   })
 
   it('shows the error a provider sends back (it arrives in the real address)', () => {

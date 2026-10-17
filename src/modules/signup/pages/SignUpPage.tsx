@@ -22,11 +22,12 @@ import clsx from 'clsx'
 import { ArrowLeft, ArrowRight, Check, MailCheck, RotateCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { SessionSwitch } from '@/modules/auth/components/SessionSwitch'
 import { CONFIRMED_PATH, PUBLIC_SIGNUP_ENABLED, resendConfirmation, savePendingBusiness, signUpBusiness, TURNSTILE_SITE_KEY, type PendingOrganization } from '../api'
 import { OwnerMethodButtons, PhoneSignIn } from '../components/OwnerMethods'
 import { TurnstileWidget } from '../components/TurnstileWidget'
 import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
-import { NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
+import { hasOwnerSignInMark, NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
 
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
@@ -117,16 +118,20 @@ export function SignUpPage() {
   const onboarding = Boolean(session) && !loading && !profileLoading && !profile && step !== 'sent'
   const existingUser = Boolean(session && profile) && step !== 'sent'
 
-  // Someone who already has a user goes to their account (D4). D3: if they came with Google,
-  // Instagram or phone and own no business (an invited user), they sign in with email instead.
+  // Someone who already has a user chooses: their account, or sign out to register another (D4,
+  // revised). D3: if they came back from Google, Instagram or phone and own no business (an invited
+  // user), they sign in with email instead.
   const guarded = useRef(false)
   const [leaving, setLeaving] = useState<'home' | null>(null)
+  // Arrived with a session already open (not back from Google, Instagram or phone): they choose
+  // between their account and creating a new business with another one — it used to send them
+  // home, and registering someone new meant clearing the browser.
+  const choosing = existingUser && leaving === null && !hasOwnerSignInMark()
   useEffect(() => {
-    if (!existingUser || guarded.current) return
+    if (!existingUser || guarded.current || !hasOwnerSignInMark()) return
     guarded.current = true
-    // Without the mark (signed in with email) there is nothing to check.
-    const check = takeOwnerSignInMark() ? ownsABusiness() : Promise.resolve(true)
-    check
+    takeOwnerSignInMark()
+    ownsABusiness()
       .then(async (owner) => {
         if (owner) return setLeaving('home')
         await signOut()
@@ -136,6 +141,22 @@ export function SignUpPage() {
   }, [existingUser, signOut, navigate])
 
   if (leaving === 'home') return <Navigate to={APP_ENTRY} replace />
+  if (choosing) {
+    return (
+      <Shell>
+        <SessionSwitch
+          title="Ya tienes una sesión abierta"
+          description="Para crear un negocio nuevo con otra cuenta, cierra la sesión en este equipo. Tu plan elegido se conserva."
+          continueTo={APP_ENTRY}
+          continueLabel="Ir a mi cuenta"
+          switchLabel="Cerrar sesión y crear cuenta"
+          onSignedOut={() => {
+            guarded.current = false
+          }}
+        />
+      </Shell>
+    )
+  }
   if (session && step !== 'sent' && (loading || profileLoading || existingUser)) return <FullScreenLoading />
 
   const salesUrl = pricing?.plans.find((p) => p.cta === 'contact_sales')?.contactUrl ?? null
