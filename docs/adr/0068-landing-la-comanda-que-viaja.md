@@ -21,6 +21,8 @@ La crítica de la landing (`.impeccable/critique/…__src-modules-landing.md`) d
   - vive en el escenario, asomado sobre el pedido, y cambia de expresión con cada estado: emocionado cuando llega, contento en cola, guiña mientras se prepara, enamorado cuando está listo, contento en ruta, emocionado al entregar y con la idea cuando sugiere;
   - aparece junto a las preguntas frecuentes, en el cierre y en el pie;
   - en el celular, donde el escenario no queda fijo, el paso de la IA lleva su propio robot.
+  - los diez originales (`docs/brand/robot`) se volvieron a recortar de la hoja de la marca con el gorro completo y margen (los PNG sueltos lo tenían cortado arriba), sin las manchas de fondo que traía la hoja; `scripts/robot-icons.sh` los exporta con `-sharp_yuv`. Esto mejora al robot también en la app (ADR 0060);
+  - en pantallas bajas (menos de 860 px de alto) el pedido y el robot no se agrandan, para que el estado más alto quepa entero.
 - **Después, a todo lo ancho:**
   - la app por dentro, con pantallas reales tomadas de un negocio de ejemplo con datos ficticios (`public/brand/landing`) y el menú web;
   - el resto del día, con una prueba pequeña al lado de cada texto;

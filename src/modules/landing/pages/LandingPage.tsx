@@ -63,7 +63,7 @@ const STEPS: StoryStep[] = [
           quedó quieto.
         </p>
         <p>Recomiendan y te dicen por qué. Tú decides.</p>
-        <img src="/robot/robot-idea-lg.webp" width={381} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-40 w-auto lg:hidden" />
+        <img src="/robot/robot-idea-lg.webp" width={368} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-36 w-auto lg:hidden" />
       </>
     ),
   },

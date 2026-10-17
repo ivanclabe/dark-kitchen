@@ -6,18 +6,21 @@
  * scripts/robot-icons.sh. `sm` is 96 px tall (up to 48 px on screen), `lg` 288 px (empty states).
  */
 
-/** Width ÷ height of each original (some carry a symbol on the side: «!», «?», a bulb, «zZ»). */
+/**
+ * Width ÷ height of each original (some carry a symbol on the side: «!», «?», a bulb, «zZ»). The originals are cut
+ * from the brand sheet with the whole hat and a margin (docs/brand/robot).
+ */
 export const ROBOT_EXPRESSIONS = {
-  happy: 361 / 332,
-  excited: 369 / 316,
-  wink: 372 / 326,
-  surprised: 327 / 331,
-  astonished: 359 / 332,
-  confused: 363 / 329,
-  idea: 414 / 313,
-  sleeping: 401 / 309,
-  'in-love': 368 / 308,
-  angry: 392 / 313,
+  happy: 366 / 328,
+  excited: 365 / 329,
+  wink: 368 / 322,
+  surprised: 323 / 327,
+  astonished: 355 / 328,
+  confused: 359 / 325,
+  idea: 410 / 321,
+  sleeping: 397 / 321,
+  'in-love': 377 / 325,
+  angry: 388 / 328,
 } as const
 
 export type RobotExpression = keyof typeof ROBOT_EXPRESSIONS

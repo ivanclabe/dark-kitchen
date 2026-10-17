@@ -128,13 +128,37 @@
     height: 100svh;
     padding: 20px 0 20px 20px;
   }
-  /* The order is the one object on its field: at its true size it would be lost in it. */
+  .landing-stage-field {
+    height: 100%;
+    padding: 24px 40px;
+  }
+}
+/* The robot and the caption keep the order's width (26rem, or 1.25× of it where the order is enlarged). */
+.landing-stage-width {
+  width: 100%;
+  max-width: 26rem;
+}
+/* The robot on the stage: small on phones, beside the order on wide screens. */
+.landing-stage-robot {
+  height: 64px;
+  width: auto;
+}
+@media (min-width: 1024px) {
+  .landing-stage-robot {
+    height: 96px;
+  }
+}
+/* Tall enough screens: the order is the one object on its field, at its true size it would be lost in it. On a
+   short laptop screen it keeps its size, so its tallest state (Quanela's suggestion) and the robot both fit. */
+@media (min-width: 1024px) and (min-height: 860px) {
   .landing-stage [data-ui] {
     zoom: 1.25;
   }
-  .landing-stage-field {
-    height: 100%;
-    padding: 40px;
+  .landing-stage-width {
+    max-width: 32.5rem;
+  }
+  .landing-stage-robot {
+    height: 120px;
   }
 }
 

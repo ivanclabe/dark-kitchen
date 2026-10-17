@@ -39,7 +39,7 @@ export function ClosingSection() {
   return (
     <section className="theme-light grid min-h-[90svh] gap-12 bg-[var(--l-accent)] px-[var(--l-margin)] py-16 text-white lg:grid-cols-12 lg:gap-6 lg:py-20" aria-labelledby="landing-closing">
       <div className="flex flex-col justify-end lg:col-span-5">
-        <img src="/robot/robot-happy-lg.webp" width={314} height={288} alt="El robot de Quanela, contento" loading="lazy" data-reveal className="mb-8 h-32 w-auto self-start sm:h-40" />
+        <img src="/robot/robot-happy-lg.webp" width={322} height={288} alt="El robot de Quanela, contento" loading="lazy" data-reveal className="mb-8 h-32 w-auto self-start sm:h-36" />
         <h2 id="landing-closing" data-reveal className="landing-display text-[length:var(--l-size-display)]">
           Tu cocina,
           <br />
