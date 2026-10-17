@@ -31,7 +31,8 @@ La crítica de la landing (`.impeccable/critique/…__src-modules-landing.md`) d
   - en pantallas bajas (menos de 900 px de alto) el pedido y el robot no se agrandan, para que el estado más alto quepa entero.
 - **Después, a todo lo ancho:**
   - la app por dentro, con pantallas reales tomadas de un negocio de ejemplo con datos ficticios (`public/brand/landing`) y el menú web;
-  - el resto del día, con una prueba pequeña al lado de cada texto;
+  - la planificación del menú, en una banda propia: la semana como la muestra el planificador (platos de ejemplo); al tocar un plato de un día se ven sus reglas ahí (horario, precio promocional, límite de unidades o agotado). En el celular, un día a la vez;
+  - el resto del día, con una prueba pequeña al lado de cada texto (incluye Menú web y WhatsApp, este último desde el plan Business, y Finanzas);
   - los planes como tres bloques que crecen con el plan, más la comparativa;
   - las preguntas como texto corrido;
   - un cierre con el primer paso del registro ya abierto: elegir el plan y la periodicidad lleva a `/registro` con esa elección, igual que los botones de los planes. El cierre es un panel oscuro como el escenario del pedido (la página abre y cierra con el mismo objeto), con el robot y su pensamiento en la esquina superior y la tarjeta en blanco con la acción en ember.

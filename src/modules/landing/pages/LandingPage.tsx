@@ -10,6 +10,7 @@ import { ClosingSection } from '../components/ClosingSection'
 import { FaqSection } from '../components/FaqSection'
 import { FeatureProofs } from '../components/FeatureProofs'
 import { LandingNav } from '../components/LandingNav'
+import { MenuPlannerSection } from '../components/MenuPlannerSection'
 import { OrderStory, type StoryStep } from '../components/OrderStory'
 import { PricingSection } from '../components/PricingSection'
 import { ProductShowcase } from '../components/ProductShowcase'
@@ -183,6 +184,7 @@ export function LandingPage() {
         />
 
         <ProductShowcase />
+        <MenuPlannerSection />
         <FeatureProofs />
         <PricingSection />
         <FaqSection />

@@ -70,6 +70,45 @@ const FEATURES: { title: string; body: string[]; proof: ReactNode }[] = [
     ),
   },
   {
+    title: 'Menú web y WhatsApp',
+    body: [
+      'El menú de hoy en una página para tus clientes, con su enlace y su código QR. Los pedidos que hacen ahí entran directo a la cocina.',
+      'Desde el plan Business conectas el WhatsApp oficial de tu negocio: tus clientes reciben el estado de su pedido y también pueden pedir por ahí.',
+    ],
+    proof: (
+      <div className="space-y-2.5">
+        <p className="flex items-center justify-between gap-3">
+          <span className="text-neutral-300">quanela.com/menu/brasa-pan</span>
+          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">Publicado</span>
+        </p>
+        <p className="rounded-lg bg-neutral-900 px-3 py-2 text-neutral-100">Tu pedido #1004 va en camino con Andrés.</p>
+      </div>
+    ),
+  },
+  {
+    title: 'Finanzas',
+    body: [
+      'Gastos, lo que le debes a tus proveedores y la nómina, liquidada con las horas reales de los turnos.',
+      'La utilidad real del mes, de las ventas a la utilidad operativa, y el flujo de caja: lo que entró y lo que salió.',
+    ],
+    proof: (
+      <ul className="space-y-2 tabular-nums">
+        <li className="flex justify-between gap-3">
+          <span>Arriendo</span>
+          <span className="text-amber-400">Vence el 5 nov</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Carnes del Norte</span>
+          <span className="text-neutral-300">Por pagar {formatMoney(640000)}</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Nómina 1–15 oct</span>
+          <span className="text-neutral-300">312 h</span>
+        </li>
+      </ul>
+    ),
+  },
+  {
     title: 'Oye Quanela',
     body: [
       'Comandos de voz y avisos hablados para la cocina, en español. La línea avanza los pedidos sin soltar la espátula.',
