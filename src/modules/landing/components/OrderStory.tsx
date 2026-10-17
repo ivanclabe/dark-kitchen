@@ -210,14 +210,14 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
     <div className="landing-split">
       <aside className="landing-stage" aria-label="Un pedido de ejemplo">
         <div className="landing-stage-field flex-col gap-4">
+          <p className="landing-stage-width hidden text-[15px] text-[#d9cbbf] lg:block">Un pedido de ejemplo. Avánzalo con su botón, o sigue leyendo.</p>
           {/* Quanela's robot lives on the stage and reacts to every step of the order. */}
           <div className="landing-stage-width -mb-6 flex justify-end pr-4 lg:-mb-8">
             <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop landing-stage-robot relative z-0" />
           </div>
-          <div key={index} className="landing-order-swap relative z-10 flex w-full justify-center">
+          <div key={index} className="landing-order-swap relative z-10 flex w-full justify-center lg:justify-start">
             <OrderTicket index={index} onAdvance={advance} />
           </div>
-          <p className="landing-stage-width hidden text-[15px] text-[#d9cbbf] lg:block">Un pedido de ejemplo. Avánzalo con su botón, o sigue leyendo.</p>
           <p className="sr-only" aria-live="polite">
             Pedido 1004: {state.suggestion ? 'Quanela sugiere una compra' : state.clock}
           </p>

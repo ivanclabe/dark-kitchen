@@ -157,7 +157,7 @@ export function LandingPage() {
         <OrderStory
           steps={STEPS}
           hero={
-            <section id="producto" className="relative flex scroll-mt-16 flex-col px-[var(--l-margin)] pt-8 pb-16 lg:min-h-[100svh] lg:justify-center lg:pt-28 lg:pb-[clamp(160px,16vw,260px)]" aria-labelledby="landing-name">
+            <section id="producto" className="relative flex scroll-mt-16 flex-col px-[var(--l-margin)] pt-8 pb-16 lg:min-h-[calc(100svh-64px)] lg:justify-center lg:pt-12 lg:pb-[clamp(160px,16vw,260px)]" aria-labelledby="landing-name">
               <h1 id="landing-name" className="landing-display landing-name order-first leading-[0.9] lg:order-none">
                 <span className="sr-only">Quanela</span>
                 <span className="landing-name-ink landing-rise" aria-hidden>

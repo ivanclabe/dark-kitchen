@@ -119,18 +119,23 @@
   padding: 20px 16px;
 }
 @media (min-width: 1024px) {
+  /* The bar spans the whole width (64 px); the stage and the first screen start under it. */
   .landing-split {
     grid-template-columns: 47fr 53fr;
+    padding-top: 64px;
   }
   .landing-stage {
     position: sticky;
-    top: 0;
-    height: 100svh;
-    padding: 20px 0 20px 20px;
+    top: 64px;
+    height: calc(100svh - 64px);
+    padding: 4px 0 20px 20px;
   }
+  /* Caption, robot and order from the top-left: the bottom-right stays free for the name to cross in. */
   .landing-stage-field {
     height: 100%;
-    padding: 24px 40px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 32px 40px;
   }
 }
 /* The robot and the caption keep the order's width (26rem, or 1.25× of it where the order is enlarged). */
@@ -150,12 +155,12 @@
 }
 /* Tall enough screens: the order is the one object on its field, at its true size it would be lost in it. On a
    short laptop screen it keeps its size, so its tallest state (Quanela's suggestion) and the robot both fit. */
-@media (min-width: 1024px) and (min-height: 860px) {
+@media (min-width: 1024px) and (min-height: 900px) {
   .landing-stage [data-ui] {
-    zoom: 1.25;
+    zoom: 1.15;
   }
   .landing-stage-width {
-    max-width: 32.5rem;
+    max-width: 30rem;
   }
   .landing-stage-robot {
     height: 120px;
@@ -178,21 +183,28 @@
 @media (min-width: 1024px) {
   .landing-name {
     position: absolute;
-    left: -10vw;
+    left: var(--l-margin);
     bottom: 72px;
     margin: 0;
-    font-size: var(--l-size-name);
+    font-size: 10vw;
     z-index: 20;
   }
+}
+/* From 1280 px the stage is wide enough for the name to cross 6vw into it without meeting the order. */
+@media (min-width: 1280px) {
+  .landing-name {
+    left: -6vw;
+    font-size: var(--l-size-name);
+  }
   .landing-name-ink {
-    clip-path: inset(0 0 0 10vw);
+    clip-path: inset(0 0 0 6vw);
   }
   .landing-name-over {
     display: block;
     position: absolute;
     inset: 0;
     color: var(--l-on-stage);
-    clip-path: inset(0 calc(100% - 10vw) 0 0);
+    clip-path: inset(0 calc(100% - 6vw) 0 0);
   }
 }
 
@@ -221,6 +233,17 @@
     from {
       opacity: 0.4;
       transform: translateY(6px);
+    }
+  }
+  /* The menu panel drops in under the bar. */
+  .landing-menu-panel {
+    animation: landing-menu-in 200ms var(--l-ease-out);
+    transform-origin: top right;
+  }
+  @keyframes landing-menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
     }
   }
   /* The robot changes face with the order: a small pop, never a loop. */
