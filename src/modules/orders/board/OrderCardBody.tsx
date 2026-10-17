@@ -125,7 +125,10 @@ export function OrderCardBody({
       <div className="mt-1.5 flex min-h-6 flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
         <span className={clsx('inline-flex items-center gap-1.5 tabular-nums', big ? 'text-sm' : 'text-xs')}>
           <span className="text-neutral-500">
-            #{ticket.orderNumber} · <span className={clsx('font-medium', TIME_TIER_STYLE[tier])}>{formatElapsed(minutesAgo)}</span>
+            #{ticket.orderNumber} ·{' '}
+            <span className={clsx('font-medium', TIME_TIER_STYLE[tier])} title={isDispatched ? 'Tiempo desde que salió' : 'Tiempo desde que se hizo el pedido'}>
+              {formatElapsed(minutesAgo)}
+            </span>
           </span>
           {ticket.priority > 0 && <Flag size={11} className="shrink-0 text-violet-400" aria-label="Prioritario" />}
           {ticket.requiresReview && (
@@ -136,9 +139,9 @@ export function OrderCardBody({
           {payment && (
             <span
               className={clsx('rounded px-1 text-2xs font-medium', payment.state === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400')}
-              title={payment.state === 'paid' ? 'Pagado' : `${PAYMENT_STATE_LABEL[payment.state]}: ${formatMoney(payment.balance)} por cobrar`}
+              title={payment.state === 'paid' ? 'Pagado' : `${formatMoney(payment.balance)} por cobrar`}
             >
-              {payment.state === 'paid' ? 'Pagado' : 'Por cobrar'}
+              {PAYMENT_STATE_LABEL[payment.state]}
             </span>
           )}
           {inKitchen && <ItemProgress items={ticket.items} />}

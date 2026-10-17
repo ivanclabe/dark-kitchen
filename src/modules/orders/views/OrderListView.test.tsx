@@ -53,8 +53,9 @@ describe('Operación → Lista (ADR 0031)', () => {
   it('the payment: a column and a filter, for whoever sees the receivables', () => {
     renderAt()
     expect(screen.getByText('Pago')).toBeTruthy()
-    // In its column and, for phones, under the customer (CSS shows one or the other).
-    expect(screen.getAllByText('Pago pendiente')).toHaveLength(2)
+    // In its column and, for phones, under the customer (CSS shows one or the other), and the filter with the same word.
+    expect(screen.getAllByText('Por cobrar')).toHaveLength(3)
+    expect(screen.getByRole('button', { name: 'Por cobrar' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Pagados' }))
     expect(state.filters.at(-1)?.payment).toBe('paid')
   })
@@ -63,7 +64,7 @@ describe('Operación → Lista (ADR 0031)', () => {
     state.perms = new Set(['orders.view'])
     renderAt('/k/centro/operations?view=list&payment=pending')
     expect(screen.queryByRole('group', { name: 'Pago' })).toBeNull()
-    expect(screen.queryByText('Pago pendiente')).toBeNull()
+    expect(screen.queryByText('Por cobrar')).toBeNull()
     expect(state.filters[0]?.payment).toBeNull()
   })
 })

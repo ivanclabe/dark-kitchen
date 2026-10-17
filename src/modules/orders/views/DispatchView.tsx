@@ -31,7 +31,9 @@ function Column({ title, icon: Icon, count, children }: { title: string; icon: t
 function DispatchCard({ order, now, onOpen, action }: { order: Order; now: number; onOpen: () => void; action: ReactNode }) {
   // ADR 0031: whether it is paid, for whoever sees the receivables (not the rider).
   const showPayment = useActiveKitchen().can('receivables.view')
-  const since = order.status === 'DESPACHADO' ? (order.delivery?.dispatchedAt ?? order.updatedAt) : order.updatedAt
+  // The clock says what it counts: since it was ready (its last change) or since it left — not the order's age, as on the board.
+  const onTheWay = order.status === 'DESPACHADO'
+  const since = onTheWay ? (order.delivery?.dispatchedAt ?? order.updatedAt) : order.updatedAt
   return (
     <article className="rounded-lg border border-neutral-800 bg-neutral-900 p-3">
       <button type="button" onClick={onOpen} className="block w-full text-left">
@@ -39,7 +41,9 @@ function DispatchCard({ order, now, onOpen, action }: { order: Order; now: numbe
           <span className="font-semibold text-neutral-100">
             #{order.orderNumber} · {order.customerName}
           </span>
-          <span className="shrink-0 text-xs tabular-nums text-neutral-500">{formatElapsed(minutesAgoSince(since, now))}</span>
+          <span className="shrink-0 text-xs tabular-nums text-neutral-500">
+            {onTheWay ? 'En ruta hace' : 'Listo hace'} {formatElapsed(minutesAgoSince(since, now))}
+          </span>
         </p>
         <p className="mt-1 flex items-start gap-1.5 text-sm text-neutral-300">
           <MapPin size={13} className="mt-0.5 shrink-0 text-neutral-500" aria-hidden />
@@ -81,7 +85,8 @@ function DispatchAction({ order }: { order: Order }) {
   const allowed = allows(board, primary.action)
   return (
     <Tooltip label={allowed ? primary.label : ACTION_DENIED_REASON[primary.action]} side="top-end">
-      <Button size="sm" variant={primary.action === 'dispatch' ? 'primary' : 'secondary'} icon={primary.icon} disabled={!allowed} loading={actions.busy} onClick={actions.primary}>
+      {/* The same weight as on the board: one action per card is not one primary per screen. */}
+      <Button size="sm" variant="secondary" icon={primary.icon} disabled={!allowed} loading={actions.busy} onClick={actions.primary}>
         {primary.label}
       </Button>
     </Tooltip>

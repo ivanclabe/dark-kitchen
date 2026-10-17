@@ -175,7 +175,7 @@
       "waitFor": "Confirmar pago",
       "annotate": [
         {
-          "text": "Pago pendiente",
+          "text": "Por cobrar",
           "n": 1
         },
         {

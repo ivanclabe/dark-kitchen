@@ -2,7 +2,7 @@
 id: order-states
 section: orders
 title: Estados del pedido y del pago
-summary: "Un pedido va de Por confirmar a En cola, Preparando, Listo, En ruta y Entregado (o Cancelado); el pago es aparte: Pagado, Pago parcial o Pago pendiente."
+summary: "Un pedido va de Por confirmar a En cola, Preparando, Listo, En ruta y Entregado (o Cancelado); el pago es aparte: Pagado, Pago parcial o Por cobrar."
 audience: [everyone]
 permissions: [orders.view]
 appPath: /operations
@@ -37,9 +37,9 @@ El estado del pedido sigue a sus platos: con el primer plato iniciado pasa a **P
 |---|---|
 | **Pagado** | Lo pagado cubre el total |
 | **Pago parcial** | Hay pagos, pero falta |
-| **Pago pendiente** | No hay pagos |
+| **Por cobrar** | No hay pagos |
 
-Un pedido puede estar **Preparando** y **Pagado**, o **Entregado** y **Pago pendiente**: son dos cosas distintas. El pago solo lo ven los roles que ven la cartera. Ver [Registrar y anular pagos](help:register-payment).
+Un pedido puede estar **Preparando** y **Pagado**, o **Entregado** y **Por cobrar**: son dos cosas distintas. El pago solo lo ven los roles que ven la cartera. Ver [Registrar y anular pagos](help:register-payment).
 
 ## Otras marcas
 
