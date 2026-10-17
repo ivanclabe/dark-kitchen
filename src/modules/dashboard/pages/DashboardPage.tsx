@@ -96,11 +96,14 @@ function DashboardHeader({
   firstName,
   salesToday,
   ordersToday,
+  pendingIncluded,
   loading,
 }: {
   firstName: string
   salesToday: number | null
   ordersToday: number | null
+  /** The figure counts orders still to confirm (dk_dashboard_summary counts everything not cancelled). */
+  pendingIncluded: boolean
   loading: boolean
 }) {
   const [hidden, setHidden] = useState(false)
@@ -135,15 +138,17 @@ function DashboardHeader({
               <div className="mt-1.5 h-7 w-40 animate-pulse rounded bg-neutral-800 md:ml-auto" />
             ) : (
               <p className="mt-0.5 flex items-baseline gap-2 text-xl font-semibold tabular-nums text-neutral-50 md:justify-end">
-                {hidden ? '••••••' : formatMoney(salesToday ?? 0)}
+                {hidden ? '••••••' : salesToday === null ? '—' : formatMoney(salesToday)}
                 <span className="font-light text-neutral-700" aria-hidden>
                   |
                 </span>
                 <span className="text-sm font-medium text-neutral-400">
-                  {ordersToday ?? 0} pedido{ordersToday === 1 ? '' : 's'}
+                  {ordersToday === null ? '—' : `${ordersToday} pedido${ordersToday === 1 ? '' : 's'}`}
                 </span>
               </p>
             )}
+            {/* Honest about what it counts: Análisis counts only confirmed sales, so both figures can differ. */}
+            {!loading && pendingIncluded && <p className="mt-0.5 text-xs text-neutral-500 md:text-right">Incluye pedidos por confirmar</p>}
           </div>
 
           <div className="flex items-start gap-5">
@@ -404,7 +409,7 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} loading={isLoading} />
+      <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} pendingIncluded={(data?.ordersNuevo ?? 0) > 0} loading={isLoading} />
 
       <TipOfTheDay />
 

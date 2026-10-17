@@ -75,6 +75,8 @@ export function ReorderPanel({
   const aiByRef = useMemo(() => insightItemsByRef(aiResult), [aiResult])
 
   const active = useMemo(() => (ingredients ?? []).filter((i) => i.active), [ingredients])
+  // Without ingredients there is no coverage to judge: never a green «all good» (Honest Zero, DESIGN.md).
+  const noIngredients = ingredients !== undefined && active.length === 0
   const attention = useMemo(() => (suggestions ?? []).filter((s) => !s.isPreparation && needsAttention(s, coverageDays)), [suggestions, coverageDays])
   const wasted30d = useMemo(() => (suggestions ?? []).reduce((sum, s) => sum + s.wasted30d * s.avgCost, 0), [suggestions])
 
@@ -121,10 +123,10 @@ export function ReorderPanel({
         <StatCard
           loading={isLoading || isError}
           label="Piden atención"
-          value={attention.length}
-          hint={attention.length > 0 ? `Bajo mínimo o < ${coverageDays} días` : 'Todo con cobertura suficiente'}
-          icon={attention.length > 0 || !suggestions ? AlertTriangle : CheckCircle2}
-          tone={!suggestions ? 'neutral' : attention.length > 0 ? 'warn' : 'good'}
+          value={noIngredients ? '—' : attention.length}
+          hint={noIngredients ? 'Sin insumos registrados' : attention.length > 0 ? `Bajo mínimo o < ${coverageDays} días` : 'Todo con cobertura suficiente'}
+          icon={noIngredients || !suggestions ? Clock : attention.length > 0 ? AlertTriangle : CheckCircle2}
+          tone={noIngredients || !suggestions ? 'neutral' : attention.length > 0 ? 'warn' : 'good'}
         />
         <StatCard
           label="Merma (30 días)"
@@ -152,6 +154,8 @@ export function ReorderPanel({
           <ErrorState error={error} onRetry={() => void refetch()} compact />
         ) : isLoading ? (
           <LoadingState variant="block" className="!border-0 !bg-transparent !p-0" />
+        ) : noIngredients ? (
+          <EmptyState icon={PackagePlus} title="Todavía no hay insumos" description="Registra tus insumos con su mínimo y aquí verás qué reponer y a quién comprárselo." compact />
         ) : attention.length === 0 ? (
           <EmptyState icon={CheckCircle2} title="Nada por reponer" description="Ningún insumo activo está bajo mínimo ni se queda corto esta semana." compact />
         ) : (

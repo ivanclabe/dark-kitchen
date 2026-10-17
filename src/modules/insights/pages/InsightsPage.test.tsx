@@ -88,6 +88,16 @@ describe('Insights (ADR 0027)', () => {
     expect(screen.queryByText('Margen bruto')).toBeNull()
   })
 
+  it('no sale with a cost: cost, profit and margin are unknown («—»), never $0 and 100 % (Honest Zero)', () => {
+    state.data = { ...full, current: { ...full.current, cogs: 0, grossProfit: 21000, grossMargin: 1, estimatedCogs: 0, costCoverage: 0 } }
+    renderAt()
+    const strip = screen.getByText('Ingresos').closest('div.grid') as HTMLElement
+    expect(within(strip).queryByText('100 %')).toBeNull()
+    expect(within(strip).getAllByText('—').length).toBeGreaterThanOrEqual(3)
+    expect(within(strip).getAllByText('Sin costo registrado').length).toBe(2)
+    expect(within(strip).getByText('Registra el costo de tus platos')).toBeTruthy()
+  })
+
   it('Productos: profitability table, sortable; products without cost go last', () => {
     state.data = full
     renderAt('/k/centro/insights?tab=products')
