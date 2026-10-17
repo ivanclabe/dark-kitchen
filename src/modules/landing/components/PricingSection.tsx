@@ -1,5 +1,3 @@
-import { useAuth } from '@/shared/hooks/useAuth'
-import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanComparison } from '@/shared/plans/PlanComparison'
 import { hasAnnualBilling, signupPath, type BillingPeriod, type Plan } from '@/shared/plans/plans'
@@ -14,7 +12,6 @@ const CTA_BASE = 'flex h-11 w-full items-center justify-center rounded-xl text-s
 
 /** Botón de cada plan: registro con el plan elegido, o ventas (ADR 0010, 3.4). */
 function PlanCta({ plan, period }: { plan: Plan; period: BillingPeriod }) {
-  const { session } = useAuth()
   const style = clsx(CTA_BASE, plan.badge ? 'bg-primary text-on-primary hover:bg-primary-hover' : 'border border-neutral-700 text-neutral-100 hover:border-neutral-500 hover:bg-neutral-800/60')
   if (plan.cta === 'contact_sales' && plan.contactUrl) {
     return (
@@ -23,14 +20,7 @@ function PlanCta({ plan, period }: { plan: Plan; period: BillingPeriod }) {
       </a>
     )
   }
-  // Una organización por persona (ADR 0008): quien ya entró va a su cuenta.
-  if (session) {
-    return (
-      <Link to={APP_ENTRY} className={style}>
-        Ir a mi cuenta
-      </Link>
-    )
-  }
+  // With a session open too: the sign-up offers to keep that account or close it and create a new one.
   return (
     <Link to={signupPath(plan.key, period)} className={style}>
       {plan.ctaLabel}
