@@ -138,25 +138,31 @@
     padding: 32px 40px;
   }
 }
-/* The robot's thought: a bubble one step lighter than the stage, its trail of dots running to the robot. */
+/* The robot's thought: a light bubble on the dark stage, with its name, its trail of dots running to the robot. */
 .landing-thought {
   position: relative;
   max-width: 24rem;
   margin-top: 8px;
   margin-right: 14px;
   border-radius: 20px;
-  background: #2e2420;
+  background: #fbf5ef;
   padding: 12px 16px;
-  color: #f6eee8;
+  color: var(--l-ink);
   font-size: var(--l-size-small);
   line-height: 1.45;
+}
+.landing-thought-name {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--l-accent);
+  font-weight: 700;
 }
 .landing-thought::before,
 .landing-thought::after {
   content: '';
   position: absolute;
   border-radius: 9999px;
-  background: #2e2420;
+  background: #fbf5ef;
 }
 .landing-thought::before {
   right: -10px;

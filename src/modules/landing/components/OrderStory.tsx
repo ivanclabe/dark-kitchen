@@ -258,6 +258,7 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
           {/* Quanela's robot lives in the stage's top corner and thinks aloud what the app just did with the order. */}
           <div className="flex w-full items-start justify-end gap-2">
             <p key={index} className="landing-thought" aria-live="polite">
+              <span className="landing-thought-name">Quanela</span>
               {state.thought}
             </p>
             <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop landing-stage-robot" />
