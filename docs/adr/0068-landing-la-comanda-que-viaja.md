@@ -34,7 +34,7 @@ La crítica de la landing (`.impeccable/critique/…__src-modules-landing.md`) d
   - el resto del día, con una prueba pequeña al lado de cada texto;
   - los planes como tres bloques que crecen con el plan, más la comparativa;
   - las preguntas como texto corrido;
-  - un cierre con el primer paso del registro ya abierto: elegir el plan y la periodicidad lleva a `/registro` con esa elección, igual que los botones de los planes.
+  - un cierre con el primer paso del registro ya abierto: elegir el plan y la periodicidad lleva a `/registro` con esa elección, igual que los botones de los planes. El cierre es un panel oscuro como el escenario del pedido (la página abre y cierra con el mismo objeto), con el robot y su pensamiento en la esquina superior y la tarjeta en blanco con la acción en ember.
 - **Nada inventado:** ni clientes, ni testimonios, ni cifras de uso. Los datos del pedido de ejemplo cuadran: 22.000 + 6.000 = 28.000; costo 9.800; margen 65 %.
 - **Rendimiento:**
   - cada pantalla de la app se descarga al abrirla (`lazy` de React Router): el JS inicial de la landing baja de 667 KB a 234 KB comprimidos;

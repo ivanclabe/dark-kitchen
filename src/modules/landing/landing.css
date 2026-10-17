@@ -170,6 +170,19 @@
   width: 7px;
   height: 7px;
 }
+/* The same thought, to the right of a robot that sits on its left (the closing panel). */
+.landing-thought-left {
+  margin-right: 0;
+  margin-left: 14px;
+}
+.landing-thought-left::before {
+  right: auto;
+  left: -10px;
+}
+.landing-thought-left::after {
+  right: auto;
+  left: -20px;
+}
 /* The robot on the stage: small on phones, beside the order on wide screens. */
 .landing-stage-robot {
   height: 64px;

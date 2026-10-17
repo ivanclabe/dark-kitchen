@@ -189,7 +189,7 @@ export function LandingPage() {
         <ClosingSection />
       </main>
 
-      <footer className="grid gap-2 px-[var(--l-margin)] pt-[20svh] pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:pb-[30px]">
+      <footer className="grid gap-2 px-[var(--l-margin)] pt-20 pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:pb-[30px]">
         <span className="flex items-center gap-2.5 text-[var(--l-soft)]">
           <RobotFace mood="info" size={32} lazy />
           Quanela · operación e IA para cocinas
