@@ -7,7 +7,9 @@ import { BILLING_ACCESS_KEY, billingNotice, fetchBillingAccess } from './billing
 
 export function BillingBanner() {
   const { organization } = useActiveKitchen()
-  const { data } = useQuery({ queryKey: BILLING_ACCESS_KEY, queryFn: fetchBillingAccess, staleTime: 60_000 })
+  // Reads what KitchenScope already asked (it owns the fetch): a second fetcher of a failed
+  // query reset it to «loading» on mount and KitchenScope went back to its splash, in a loop.
+  const { data } = useQuery({ queryKey: BILLING_ACCESS_KEY, queryFn: fetchBillingAccess, enabled: false })
   const access = data?.find((a) => a.organizationId === organization?.id)
   const notice = access ? billingNotice(access) : null
   if (!notice) return null

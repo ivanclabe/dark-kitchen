@@ -56,7 +56,14 @@ export function KitchenScope() {
   const { data: features } = useQuery({ queryKey: FEATURES_KEY, queryFn: fetchMyFeatures, enabled: Boolean(kitchen) && !crossHost, staleTime: 60_000 })
 
   // ADR 0066: is this organization's subscription current? (the database blocks the data anyway)
-  const billing = useQuery({ queryKey: BILLING_ACCESS_KEY, queryFn: fetchBillingAccess, enabled: Boolean(kitchen) && !crossHost, staleTime: 60_000 })
+  const billing = useQuery({
+    queryKey: BILLING_ACCESS_KEY,
+    queryFn: fetchBillingAccess,
+    enabled: Boolean(kitchen) && !crossHost,
+    staleTime: 60_000,
+    // A failure opens the app (the database still closes the data); it is not asked again on every mount.
+    retryOnMount: false,
+  })
   const access = billing.data?.find((a) => a.organizationId === account?.organizationId)
 
   const value = useMemo(
