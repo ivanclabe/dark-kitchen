@@ -32,7 +32,7 @@ type Message = CopilotMessage
 const SCREEN_NAME: Record<string, string> = {
   '/dashboard': 'Inicio',
   '/operations': 'Centro de operaciones',
-  '/menu-planner': 'Catálogo',
+  '/menu-planner': 'Planificador de Menús',
   '/recipes': 'Recetas',
   '/supply': 'Abastecimiento',
   '/customers': 'Clientes',

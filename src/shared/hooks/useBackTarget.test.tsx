@@ -12,7 +12,7 @@ const at = (entry: string | { pathname: string; search?: string; state?: unknown
 describe('«Volver» to where the person was (ADR 0030, ADR 0031)', () => {
   it('names the screen a link leaves from', () => {
     expect(renderHook(() => useHere(), { wrapper: at('/k/centro/operations/o1?view=kitchen') }).result.current).toEqual({ to: '/k/centro/operations/o1?view=kitchen', label: 'Pedido' })
-    expect(renderHook(() => useHere(), { wrapper: at('/k/centro/operations?view=list') }).result.current.label).toBe('Operación')
+    expect(renderHook(() => useHere(), { wrapper: at('/k/centro/operations?view=list') }).result.current.label).toBe('Centro de operaciones')
     expect(renderHook(() => useHere(), { wrapper: at('/k/centro/customers/c1') }).result.current.label).toBe('Cliente')
     expect(renderHook(() => useHere(), { wrapper: at('/k/centro/supply/stock/i1') }).result.current.label).toBe('Abastecimiento')
     expect(renderHook(() => useHere('Insights'), { wrapper: at('/k/centro/insights') }).result.current.label).toBe('Insights')

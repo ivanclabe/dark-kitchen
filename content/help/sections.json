@@ -2,7 +2,7 @@
   "sections": [
     { "id": "intro", "title": "Introducción", "description": "Qué es Quanela y cómo está organizado." },
     { "id": "getting-started", "title": "Primeros pasos", "description": "De crear tu negocio a tu primer pedido." },
-    { "id": "orders", "title": "Pedidos (Operación)", "description": "Crear, confirmar, despachar, entregar y cobrar." },
+    { "id": "orders", "title": "Pedidos (Centro de operaciones)", "description": "Crear, confirmar, despachar, entregar y cobrar." },
     { "id": "kitchen", "title": "Cocina", "description": "La pantalla de la línea, los tiempos y la voz." },
     { "id": "inventory", "title": "Inventario (Abastecimiento)", "description": "Stock, compras, proveedores y mermas." },
     { "id": "catalog", "title": "Catálogo", "description": "Platos, menú del día y recetas." },

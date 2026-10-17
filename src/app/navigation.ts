@@ -32,8 +32,8 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Inicio', description: 'La operación de hoy y lo que necesita atención', modules: ['dashboard'], icon: LayoutDashboard, group: 'daily' },
   {
     to: '/operations',
-    label: 'Operación',
-    description: 'Centro de operaciones: pedidos, cocina y despacho',
+    label: 'Centro de operaciones',
+    description: 'Pedidos, cocina y despacho',
     modules: ['orders', 'kitchen'],
     icon: Activity,
     group: 'daily',
@@ -41,8 +41,8 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/menu-planner',
-    label: 'Catálogo',
-    description: 'Planificador de menús, platos y recetas',
+    label: 'Planificador de Menús',
+    description: 'Platos, menú del día y recetas',
     modules: ['menuPlanner'],
     icon: Soup,
     group: 'daily',
@@ -76,8 +76,8 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/integrations',
-    label: 'WhatsApp',
-    description: 'WhatsApp e Integraciones: tu número oficial, avisos de pedidos y n8n',
+    label: 'WhatsApp e Integraciones',
+    description: 'Tu número oficial, avisos de pedidos y n8n',
     modules: ['integrations'],
     icon: MessageCircle,
     group: 'sales',

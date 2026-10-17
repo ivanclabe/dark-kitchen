@@ -32,7 +32,7 @@ screenshots:
 
 ## Crear un plato
 
-1. Abre **Catálogo** y, en **Catálogo de platos**, toca **Nuevo**.
+1. Abre **Planificador de Menús** y, en **Catálogo de platos**, toca **Nuevo**.
 2. Escribe el **Nombre** y el **Precio de venta** (obligatorios). Opcional: **Código**, **Categoría** (o crea una nueva ahí mismo), **Descripción** y fotos.
 3. Deja encendido **Descuenta inventario** si el plato se prepara con tus insumos. Apágalo si no los controlas en el inventario (por ejemplo, una gaseosa que compras lista).
 4. Toca **Crear plato**.

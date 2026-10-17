@@ -2,7 +2,7 @@
 id: operations-center
 section: orders
 title: El Centro de operaciones
-summary: Operación es donde se trabaja el día, con cuatro vistas del mismo pedido (Tablero, Cocina, Despacho y Lista) y las cifras de hoy arriba.
+summary: El Centro de operaciones es donde se trabaja el día, con cuatro vistas del mismo pedido (Tablero, Cocina, Despacho y Lista) y las cifras de hoy arriba.
 audience: [owner, admin, manager, cashier, kitchen, delivery]
 permissions: [orders.view, kitchen.view, dispatch.view]
 appPath: /operations
@@ -26,7 +26,7 @@ screenshots:
       - «Nuevo pedido» (tecla N).
 ---
 
-**Operación** responde: *¿qué tengo que hacer ahora?* Pedidos y cocina trabajan sobre el mismo pedido, en vistas distintas.
+**El Centro de operaciones** responde: *¿qué tengo que hacer ahora?* Pedidos y cocina trabajan sobre el mismo pedido, en vistas distintas.
 
 {{screenshot:operations-board}}
 

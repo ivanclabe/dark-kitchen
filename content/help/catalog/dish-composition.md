@@ -22,7 +22,7 @@ Un plato **configurable** tiene grupos de opciones que el cliente elige. Por eje
 
 ## Armar la composición
 
-1. En **Catálogo**, abre el plato (**Editar plato**) y toca **Composición**.
+1. En **Planificador de Menús**, abre el plato (**Editar plato**) y toca **Composición**.
 2. Empieza con una **plantilla** («Corrientazo» o «Combo») o con un grupo en blanco.
 3. En cada **grupo**:
    - escribe el nombre;

@@ -37,4 +37,4 @@ Abre **Configuración** en el menú de la izquierda (o en el menú de tu avatar 
 
 > **Cuidado:** la **zona horaria** define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país.
 
-> **Bueno saber:** el horario de la cocina y sus alertas están en **Operación → Cocina → ⋯ → Configuración de cocina**. Ver [Horario de la cocina y tiempos objetivo](help:kitchen-hours). Los usuarios y roles están en **Usuarios**: ver [Usuarios y roles](help:users-and-roles).
+> **Bueno saber:** el horario de la cocina y sus alertas están en **Centro de operaciones → Cocina → ⋯ → Configuración de cocina**. Ver [Horario de la cocina y tiempos objetivo](help:kitchen-hours). Los usuarios y roles están en **Usuarios**: ver [Usuarios y roles](help:users-and-roles).

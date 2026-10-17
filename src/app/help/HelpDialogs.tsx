@@ -7,8 +7,8 @@ import { useState } from 'react'
 import { diagnosticsText, reportMailto, supportEmail } from './support'
 
 const SHORTCUTS: { keys: string[]; what: string; where: string }[] = [
-  { keys: ['N'], what: 'Nuevo pedido', where: 'Operación' },
-  { keys: ['/'], what: 'Buscar', where: 'Operación' },
+  { keys: ['N'], what: 'Nuevo pedido', where: 'Centro de operaciones' },
+  { keys: ['/'], what: 'Buscar', where: 'Centro de operaciones' },
   { keys: ['Ctrl/⌘', 'J'], what: 'Abrir o cerrar Copilot', where: 'Toda la cuenta' },
   { keys: ['Ctrl/⌘', 'Shift', 'J'], what: 'Hablarle a Quanela (sin decir «Oye Quanela»)', where: 'Toda la cuenta' },
   { keys: ['Esc'], what: 'Cerrar un panel, un menú o una ventana', where: 'Toda la app' },

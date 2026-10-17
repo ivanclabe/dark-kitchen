@@ -27,7 +27,7 @@ screenshots:
       - «Guardar como nueva versión».
 ---
 
-1. En **Catálogo**, toca el lápiz del plato (**Editar plato**) y luego **Crear receta** (si ya tiene, dice **Receta v1**, **v2**…).
+1. En **Planificador de Menús**, toca el lápiz del plato (**Editar plato**) y luego **Crear receta** (si ya tiene, dice **Receta v1**, **v2**…).
 2. Toca **Agregar ingrediente**, busca el insumo por nombre o código, escribe la **Cantidad** y elige la **Unidad** (por ejemplo, 150 **g** de carne aunque la compres en kilos).
 3. Repite con cada insumo. Abajo ves el **Costo estimado** y el **Margen** frente al precio de venta.
 4. Toca **Guardar como nueva versión**.

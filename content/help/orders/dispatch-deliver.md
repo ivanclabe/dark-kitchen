@@ -2,7 +2,7 @@
 id: dispatch-deliver
 section: orders
 title: Despachar y entregar
-summary: En Operación → Despacho toca Despachar en un pedido listo, elige el domiciliario y confirma; cuando llegue, toca Entregar.
+summary: En Centro de operaciones → Despacho toca Despachar en un pedido listo, elige el domiciliario y confirma; cuando llegue, toca Entregar.
 audience: [owner, admin, manager, cashier, delivery]
 permissions: [dispatch.view, dispatch.assign, dispatch.deliver]
 appPath: /operations?view=dispatch
@@ -28,7 +28,7 @@ screenshots:
 
 ## Despachar
 
-1. En **Operación**, abre la vista **Despacho**.
+1. En **Centro de operaciones**, abre la vista **Despacho**.
 2. En **Listos para salir**, toca **Despachar** en el pedido.
 3. Elige el **Domiciliario** (los que están de turno aparecen primero) y escribe **Notas para el reparto** si hace falta («tocar el timbre», «paga en efectivo»).
 4. Toca **Despachar**. El pedido pasa a **En ruta**.
@@ -40,6 +40,6 @@ screenshots:
 
 ## Domiciliarios
 
-En **Operación → ⋯ → Domiciliarios** agregas uno nuevo (nombre, teléfono y vehículo) y activas o desactivas los existentes. **Solo los activos** aparecen al despachar. Agregarlos es de administración.
+En **Centro de operaciones → ⋯ → Domiciliarios** agregas uno nuevo (nombre, teléfono y vehículo) y activas o desactivas los existentes. **Solo los activos** aparecen al despachar. Agregarlos es de administración.
 
 > **Bueno saber:** el **DOMICILIARIO** entra directo a Despacho y solo ve los pedidos que le asignaron, con la dirección y el teléfono del cliente. Puede marcarlos **Entregados**, pero no despachar.
