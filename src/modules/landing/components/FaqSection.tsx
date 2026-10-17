@@ -36,7 +36,7 @@ const FAQ: { q: string; a: string }[] = [
 /** Questions and answers as reading text, like the notes at the back of a programme: all answered at a glance. */
 export function FaqSection() {
   return (
-    <section id="faq" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-faq">
+    <section id="faq" className="scroll-mt-24 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-faq">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-6">
         <div className="lg:col-span-3">
           <h2 id="landing-faq" data-reveal className="landing-display text-[length:var(--l-size-title)]">

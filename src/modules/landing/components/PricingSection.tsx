@@ -47,7 +47,7 @@ export function PricingSection() {
   const annual = data ? hasAnnualBilling(data.plans) : false
 
   return (
-    <section id="precios" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-pricing">
+    <section id="precios" className="scroll-mt-24 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-pricing">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div className="max-w-[40ch]">
           <h2 id="landing-pricing" data-reveal className="landing-display text-[length:var(--l-size-title)]">

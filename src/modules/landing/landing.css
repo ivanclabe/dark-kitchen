@@ -108,7 +108,7 @@
 }
 .landing-stage {
   position: relative;
-  padding: 76px 12px 0;
+  padding: 88px 12px 0;
 }
 .landing-stage-field {
   display: flex;
@@ -119,16 +119,16 @@
   padding: 20px 16px;
 }
 @media (min-width: 1024px) {
-  /* The bar spans the whole width (64 px); the stage and the first screen start under it. */
+  /* The bar floats 12 px from the top and is 64 px tall; the stage and the first screen start under it. */
   .landing-split {
     grid-template-columns: 47fr 53fr;
-    padding-top: 64px;
+    padding-top: 88px;
   }
   .landing-stage {
     position: sticky;
-    top: 64px;
-    height: calc(100svh - 64px);
-    padding: 4px 0 20px 20px;
+    top: 88px;
+    height: calc(100svh - 88px);
+    padding: 0 0 16px 16px;
   }
   /* Caption, robot and order from the top-left: the bottom-right stays free for the name to cross in. */
   .landing-stage-field {
@@ -180,11 +180,17 @@
 .landing-name-over {
   display: none;
 }
+/* The first screen keeps a clear space between its button and the name below it (the name's box, its 40 px
+   from the bottom and 148 px of ground), so the button never reads as a label of the name. */
 @media (min-width: 1024px) {
+  .landing-hero {
+    --name-box: 9vw;
+    padding-bottom: calc(40px + var(--name-box) + 148px);
+  }
   .landing-name {
     position: absolute;
     left: var(--l-margin);
-    bottom: 72px;
+    bottom: 40px;
     margin: 0;
     font-size: 10vw;
     z-index: 20;
@@ -192,6 +198,9 @@
 }
 /* From 1280 px the stage is wide enough for the name to cross 6vw into it without meeting the order. */
 @media (min-width: 1280px) {
+  .landing-hero {
+    --name-box: min(10.8vw, 180px);
+  }
   .landing-name {
     left: -6vw;
     font-size: var(--l-size-name);

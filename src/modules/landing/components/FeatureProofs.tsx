@@ -5,7 +5,7 @@ import type { CSSProperties, ReactNode } from 'react'
 /** A small, exact piece of the app (its dark theme, its words), cropped into the panel. */
 function Proof({ children }: { children: ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-[var(--l-radius)] bg-[var(--l-stage)] p-5 sm:w-[360px] sm:shrink-0">
+    <div className="overflow-hidden rounded-[var(--l-radius)] bg-[var(--l-stage)] p-6 sm:w-[400px] sm:shrink-0">
       <div data-ui className="text-sm text-neutral-100">
         {children}
       </div>
@@ -124,17 +124,17 @@ const FEATURES: { title: string; body: string[]; proof: ReactNode }[] = [
 /** The rest of the day, each with a small proof beside it: one module down the page, never alternating. */
 export function FeatureProofs() {
   return (
-    <section id="funcionalidades" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)] lg:pl-[22vw]" aria-labelledby="landing-features">
+    <section id="funcionalidades" className="scroll-mt-24 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)] lg:pl-[22vw]" aria-labelledby="landing-features">
       <h2 id="landing-features" data-reveal className="landing-display max-w-[20ch] text-[length:var(--l-size-title)]">
         Y el resto del día, en el mismo lugar
       </h2>
-      <div className="mt-16 space-y-16 lg:space-y-28">
+      <div className="mt-16 space-y-14 lg:space-y-20">
         {FEATURES.map((f) => (
-          <article key={f.title} className="flex max-w-[680px] flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+          <article key={f.title} className="flex max-w-[800px] flex-col gap-5 sm:flex-row sm:items-start sm:gap-8">
             <div data-reveal>
               <Proof>{f.proof}</Proof>
             </div>
-            <div data-reveal style={{ '--i': 1 } as CSSProperties} className="sm:max-w-[290px]">
+            <div data-reveal style={{ '--i': 1 } as CSSProperties} className="sm:max-w-[340px]">
               <h3 className="text-[length:var(--l-size-text)] font-semibold">{f.title}</h3>
               {f.body.map((p) => (
                 <p key={p} className="mt-2 text-[length:var(--l-size-small)] leading-relaxed text-[var(--l-soft)]">

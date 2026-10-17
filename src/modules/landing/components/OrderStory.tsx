@@ -226,7 +226,7 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
 
       <div className="min-w-0">
         {hero}
-        <div id="como-funciona" className="scroll-mt-16">
+        <div id="como-funciona" className="scroll-mt-24">
           {steps.map((step, i) => (
             <section
               key={step.title}

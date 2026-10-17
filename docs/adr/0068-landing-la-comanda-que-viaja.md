@@ -16,6 +16,12 @@ La crítica de la landing (`.impeccable/critique/…__src-modules-landing.md`) d
   - Al leer cada paso, el pedido cambia de estado. Su botón usa los verbos del tablero (Confirmar, Iniciar, Marcar listo, Despachar, Entregar) y lo avanza; es lo único con lo que el visitante juega.
   - En el celular el pedido va arriba, sin quedarse fijo, para no tapar el texto.
 - **El nombre en grande** («quanela») cruza del escenario a la columna, con una tinta para cada fondo.
+- **Barra flotante** (pedida con una referencia, aunque la regla de taste prohíbe la navegación flotante: manda el pedido):
+  - va separada de los bordes, con esquinas redondeadas y borde fino;
+  - lleva el logo, las secciones al centro y la sesión, con «Crear cuenta» o «Ir a mi cuenta» en el color de la acción;
+  - la sección que se está leyendo va en ember, subrayada en el borde de la barra;
+  - por debajo de 1280 px las secciones se abren en un panel con fondo oscurecido, sin repetir lo que la barra muestra.
+- **El título de la página** (`h1`) es la frase «Del pedido a la caja, tu cocina en un solo lugar.»; el nombre en grande es imagen del nombre. Entre el botón y el nombre queda siempre un espacio libre.
 - **Fondo blanco** (pedido después de la primera versión, que usaba el crema de la marca): blanco para la página y un solo tono de panel, piedra casi neutra (`#F3F2F0`).
 - **El robot de Quanela** (ADR 0060):
   - vive en el escenario, asomado sobre el pedido, y cambia de expresión con cada estado: emocionado cuando llega, contento en cola, guiña mientras se prepara, enamorado cuando está listo, contento en ruta, emocionado al entregar y con la idea cuando sugiere;

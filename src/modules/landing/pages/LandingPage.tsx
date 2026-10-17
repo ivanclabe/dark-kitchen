@@ -157,20 +157,17 @@ export function LandingPage() {
         <OrderStory
           steps={STEPS}
           hero={
-            <section id="producto" className="relative flex scroll-mt-16 flex-col px-[var(--l-margin)] pt-8 pb-16 lg:min-h-[calc(100svh-64px)] lg:justify-center lg:pt-12 lg:pb-[clamp(160px,16vw,260px)]" aria-labelledby="landing-name">
-              <h1 id="landing-name" className="landing-display landing-name order-first leading-[0.9] lg:order-none">
-                <span className="sr-only">Quanela</span>
-                <span className="landing-name-ink landing-rise" aria-hidden>
-                  quanela
-                </span>
-                <span className="landing-name-over landing-rise" aria-hidden>
-                  quanela
-                </span>
-              </h1>
-              <div className="mt-6 max-w-[30ch] lg:mt-0 lg:ml-[clamp(0px,4vw,72px)]">
-                <p className="landing-display landing-rise text-[length:var(--l-size-title)] leading-[1.15] text-balance" style={rise(1)}>
+            <section id="producto" className="landing-hero relative flex scroll-mt-24 flex-col px-[var(--l-margin)] pt-8 pb-16 lg:min-h-[calc(100svh-88px)] lg:justify-center lg:pt-12" aria-labelledby="landing-title">
+              {/* The brand's name, huge: an image of the name (the page's heading is the sentence that says what it is). */}
+              <p className="landing-display landing-name order-first leading-[0.9] lg:order-none" aria-hidden>
+                <span className="landing-name-ink landing-rise">quanela</span>
+                <span className="landing-name-over landing-rise">quanela</span>
+              </p>
+              <div className="mt-6 max-w-[36rem] lg:mt-0 lg:ml-[clamp(0px,4vw,72px)]">
+                <h1 id="landing-title" className="landing-display landing-rise text-[length:var(--l-size-title)] leading-[1.15] text-balance" style={rise(1)}>
+                  <span className="sr-only">Quanela: </span>
                   Del pedido a la caja, tu cocina en un solo lugar.
-                </p>
+                </h1>
                 <p className="landing-rise mt-5 max-w-[46ch]" style={rise(2)}>
                   Pedidos por WhatsApp y menú web, cocina, domicilios, inventario, costos y clientes, con agentes de IA que recomiendan sobre tus datos reales.
                 </p>
