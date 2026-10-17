@@ -107,15 +107,15 @@ export function LandingPage() {
             src={HERO_IMAGE}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 hidden size-full object-cover object-[70%_100%] lg:block"
+            className="pointer-events-none absolute inset-0 -z-10 hidden size-full object-cover object-[70%_100%] xl:block"
           />
 
-          <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-10 sm:px-6 sm:pt-28 lg:flex lg:min-h-[100svh] lg:items-center lg:pt-24 lg:pb-14">
-            <div className="relative z-10 max-w-xl lg:max-w-[37rem]">
-              <BrandLogo className="animate-landing-rise hidden h-24 lg:block xl:h-28" />
+          <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-10 sm:px-6 sm:pt-28 xl:flex xl:min-h-[100svh] xl:items-center xl:pt-24 xl:pb-14">
+            <div className="relative z-10 max-w-xl xl:max-w-[37rem]">
+              <BrandLogo className="animate-landing-rise hidden h-28 xl:block" />
               <GhostHeadline
                 style={{ ...display, ...delay(60) }}
-                className="animate-landing-rise text-[3.1rem] leading-[1.02] font-black tracking-[-0.02em] text-[#1C1310] sm:text-6xl lg:mt-8 lg:text-[3.6rem] xl:text-[4.1rem] 2xl:text-[4.6rem]"
+                className="animate-landing-rise text-[3.1rem] leading-[1.02] font-black tracking-[-0.02em] text-[#1C1310] sm:text-6xl xl:mt-8 lg:text-[3.6rem] xl:text-[4.1rem] 2xl:text-[4.6rem]"
               />
               <p className="animate-landing-rise mt-6 max-w-lg text-lg leading-snug text-pretty text-[#5B4A42] sm:text-[1.4rem]" style={delay(120)}>
                 La plataforma con agentes de IA para gestionar pedidos, inventario, menús y mucho más en tu dark kitchen o restaurante.
@@ -148,14 +148,14 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* The product (wide screens): the orders board on a laptop and the web menu on a phone. */}
-          <div className="animate-landing-rise pointer-events-none absolute right-[1.5%] bottom-[2%] hidden w-[min(47vw,78svh)] lg:block" style={delay(380)}>
+          {/* The product (wide screens, from 1280 px: below it the text and the laptop overlapped): the orders board on a laptop and the web menu on a phone. */}
+          <div className="animate-landing-rise pointer-events-none absolute right-[1.5%] bottom-[2%] hidden w-[min(47vw,78svh)] xl:block" style={delay(380)}>
             <LaptopMockup className="origin-right [transform:perspective(2400px)_rotateY(-9deg)_rotateX(2deg)]" />
             <PhoneMockup className="absolute bottom-[1%] left-[1%] w-[22%]" />
           </div>
 
           {/* Phones and tablets: the scene, then the product. */}
-          <div className="relative px-4 pb-14 sm:px-6 lg:hidden">
+          <div className="relative mx-auto max-w-4xl px-4 pb-14 sm:px-6 xl:hidden">
             <img src={HERO_IMAGE} alt="" aria-hidden className="aspect-[16/11] w-full rounded-3xl object-cover object-[88%_25%]" />
             <div className="relative -mt-16 sm:-mt-28">
               <LaptopMockup className="ml-auto w-[86%]" />

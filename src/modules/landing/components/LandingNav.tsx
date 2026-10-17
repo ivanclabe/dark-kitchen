@@ -57,13 +57,13 @@ export function LandingNav() {
     <header
       className={clsx(
         'fixed inset-x-0 top-0 z-30 border-b transition-colors duration-300',
-        scrolled || open ? 'border-[#1C1310]/[0.07] bg-[#FDF7F1]/90 backdrop-blur-md' : 'border-transparent bg-[#FDF7F1]/80 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none',
+        scrolled || open ? 'border-[#1C1310]/[0.07] bg-[#FDF7F1]/90 backdrop-blur-md' : 'border-transparent bg-[#FDF7F1]/80 backdrop-blur-sm xl:bg-transparent xl:backdrop-blur-none',
       )}
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
           <a href="#producto" className="flex items-center gap-2.5" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
-            <BrandLogo className={clsx('h-11 transition-opacity duration-300', !scrolled && 'lg:pointer-events-none lg:opacity-0')} />
+            <BrandLogo className={clsx('h-11 transition-opacity duration-300', !scrolled && 'xl:pointer-events-none xl:opacity-0')} />
           </a>
 
           <nav aria-label="Secciones" className="hidden items-center gap-0.5 md:flex">
