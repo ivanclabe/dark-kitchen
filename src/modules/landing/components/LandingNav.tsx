@@ -44,12 +44,10 @@ export function LandingNav() {
   const { session, loading } = useAuth()
   const signOut = useLandingSignOut()
   const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   // Past the order's stage (ADR 0068) the bar spans the whole width again.
   const [pastStage, setPastStage] = useState(false)
   useEffect(() => {
     const update = () => {
-      setScrolled(window.scrollY > 120)
       const stage = document.querySelector('.landing-split')
       setPastStage(stage ? stage.getBoundingClientRect().bottom <= 64 : true)
     }
@@ -65,7 +63,8 @@ export function LandingNav() {
         // Wide screens: over the reading column only, the order's stage keeps its whole height (ADR 0068).
         'fixed top-0 right-0 left-0 z-30 transition-colors duration-300',
         !pastStage && 'lg:left-[47%]',
-        scrolled || open ? 'bg-white' : 'bg-white lg:bg-transparent',
+        // Always solid: the headline scrolls under it and must never show through.
+        'bg-white',
       )}
     >
       <div>
@@ -76,7 +75,8 @@ export function LandingNav() {
             <BrandLogo className="h-11" />
           </a>
 
-          <nav aria-label="Secciones" className="hidden items-center gap-0.5 xl:flex">
+          {/* The sections fit beside the actions over the reading column from 1536 px, over the whole width from 1280 px. */}
+          <nav aria-label="Secciones" className={clsx('hidden items-center gap-0.5', pastStage ? 'xl:flex' : '2xl:flex')}>
             {LANDING_SECTIONS.map((s) => (
               <a key={s.id} href={`#${s.id}`} className={link}>
                 {s.label}
@@ -87,7 +87,7 @@ export function LandingNav() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             {loading ? (
               // Same width as the buttons that come: nothing jumps when the session is confirmed.
               <span role="status" aria-label="Comprobando tu sesión" className="inline-flex h-9 w-36 items-center justify-center text-[#5B4A42]">
@@ -99,12 +99,12 @@ export function LandingNav() {
                   type="button"
                   onClick={() => void signOut.run()}
                   disabled={signOut.busy}
-                  className="hidden items-center gap-1.5 rounded-full px-3.5 py-2 text-[15px] text-[#5B4A42] transition-colors hover:text-[#1C1310] disabled:opacity-60 sm:inline-flex"
+                  className="hidden items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[15px] text-[#5B4A42] transition-colors hover:text-[#1C1310] disabled:opacity-60 sm:inline-flex"
                 >
                   {signOut.busy ? <Loader2 size={15} className="animate-spin" aria-hidden /> : <LogOut size={15} aria-hidden />}
                   {signOut.busy ? 'Cerrando…' : 'Cerrar sesión'}
                 </button>
-                <Link to={APP_ENTRY} className="inline-flex items-center gap-1.5 rounded-full bg-[#1C1310] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3B2C26]">
+                <Link to={APP_ENTRY} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#1C1310] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3B2C26]">
                   Ir a mi cuenta <ArrowRight size={16} aria-hidden />
                 </Link>
               </>
@@ -123,7 +123,7 @@ export function LandingNav() {
             )}
             <button
               type="button"
-              className="rounded-full p-2 text-[#5B4A42] hover:text-[#1C1310] xl:hidden"
+              className={clsx('rounded-full p-2 text-[#5B4A42] hover:text-[#1C1310]', pastStage ? 'xl:hidden' : '2xl:hidden')}
               aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
               aria-expanded={open}
               aria-controls="landing-mobile-nav"
@@ -134,7 +134,7 @@ export function LandingNav() {
           </div>
         </div>
 
-        <nav id="landing-mobile-nav" aria-label="Secciones" className={clsx('px-3 pb-3 xl:hidden', open ? 'block' : 'hidden')}>
+        <nav id="landing-mobile-nav" aria-label="Secciones" className={clsx('px-3 pb-3', pastStage ? 'xl:hidden' : '2xl:hidden', open ? 'block' : 'hidden')}>
           {LANDING_SECTIONS.map((s) => (
             <a key={s.id} href={`#${s.id}`} onClick={() => setOpen(false)} className="block rounded-lg px-2 py-3 text-base text-[#3B2C26] hover:bg-[#1C1310]/[0.05]">
               {s.label}
