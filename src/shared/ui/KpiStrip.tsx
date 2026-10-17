@@ -92,7 +92,8 @@ export function KpiStrip({
             {!loading && k.series && <Sparkline values={k.series} />}
           </>
         )
-        const cell = 'min-w-0 bg-neutral-900 p-4'
+        // A column from the top: a button cell would otherwise center its content and sit lower than its neighbours.
+        const cell = 'flex min-w-0 flex-col justify-start bg-neutral-900 p-4'
         return k.onSelect ? (
           <button key={k.id} type="button" onClick={k.onSelect} className={clsx(cell, 'text-left transition-colors hover:bg-neutral-800/30 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none')}>
             {body}
