@@ -18,18 +18,63 @@ interface OrderState {
   action: { label: string; icon: LucideIcon }
   /** How the robot on the stage takes this moment (ADR 0060: a purpose, not a file). */
   robot: RobotMood
+  /** What Quanela did in the app at this step, said by the robot. Only what the app really does. */
+  thought: string
   /** Quanela's suggestion, after the delivery. */
   suggestion?: boolean
 }
 
 const STATES: OrderState[] = [
-  { status: 'NUEVO', clock: 'Llegó hace 1 min', action: { label: 'Confirmar', icon: CheckCircle2 }, robot: 'celebrate' },
-  { status: 'CONFIRMADO', clock: 'En cola hace 3 min', action: { label: 'Iniciar', icon: Play }, robot: 'success' },
-  { status: 'EN_PREPARACION', clock: 'Preparando hace 9 min', action: { label: 'Marcar listo', icon: ChevronRight }, robot: 'info' },
-  { status: 'LISTO', clock: 'Listo hace 1 min', action: { label: 'Despachar', icon: Bike }, robot: 'thanks' },
-  { status: 'DESPACHADO', clock: 'En ruta hace 12 min', action: { label: 'Entregar', icon: PackageCheck }, robot: 'success' },
-  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Qué sigue', icon: Sparkles }, robot: 'celebrate' },
-  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Verlo otra vez', icon: RotateCcw }, robot: 'ai', suggestion: true },
+  {
+    status: 'NUEVO',
+    clock: 'Llegó hace 1 min',
+    action: { label: 'Confirmar', icon: CheckCircle2 },
+    robot: 'celebrate',
+    thought: '¡Llegó un pedido por WhatsApp! Lo dejé por confirmar, con su cliente y su total. Avánzalo con su botón, o sigue leyendo.',
+  },
+  {
+    status: 'CONFIRMADO',
+    clock: 'En cola hace 3 min',
+    action: { label: 'Iniciar', icon: Play },
+    robot: 'success',
+    thought: 'Confirmado. Aparté los insumos de cada receta y ya está en la cola de la cocina.',
+  },
+  {
+    status: 'EN_PREPARACION',
+    clock: 'Preparando hace 9 min',
+    action: { label: 'Marcar listo', icon: ChevronRight },
+    robot: 'info',
+    thought: 'La cocina ya lo está haciendo. Cuento su tiempo: si pasa del objetivo, lo pongo en rojo.',
+  },
+  {
+    status: 'LISTO',
+    clock: 'Listo hace 1 min',
+    action: { label: 'Despachar', icon: Bike },
+    robot: 'thanks',
+    thought: 'Listo para salir. Lo que llevaba cada plato ya salió del inventario.',
+  },
+  {
+    status: 'DESPACHADO',
+    clock: 'En ruta hace 12 min',
+    action: { label: 'Entregar', icon: PackageCheck },
+    robot: 'success',
+    thought: 'Va con Andrés. Ahora cuento desde que salió, no desde que llegó.',
+  },
+  {
+    status: 'ENTREGADO',
+    clock: 'Entregado a las 12:41',
+    action: { label: 'Qué sigue', icon: Sparkles },
+    robot: 'celebrate',
+    thought: 'Entregado y pagado. La venta quedó con su costo y su margen, sin pasar nada a mano.',
+  },
+  {
+    status: 'ENTREGADO',
+    clock: 'Entregado a las 12:41',
+    action: { label: 'Verlo otra vez', icon: RotateCcw },
+    robot: 'ai',
+    suggestion: true,
+    thought: 'Con lo que se vendió revisé el inventario. Te dejé una sugerencia de compra, con su porqué.',
+  },
 ]
 
 /** Which step of the story each state belongs to, and the state each step shows when it is read. */
@@ -210,17 +255,16 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
     <div className="landing-split">
       <aside className="landing-stage" aria-label="Un pedido de ejemplo">
         <div className="landing-stage-field flex-col gap-4">
-          <p className="landing-stage-width hidden text-[15px] text-[#d9cbbf] lg:block">Un pedido de ejemplo. Avánzalo con su botón, o sigue leyendo.</p>
-          {/* Quanela's robot lives on the stage and reacts to every step of the order. */}
-          <div className="landing-stage-width -mb-6 flex justify-end pr-4 lg:-mb-8">
-            <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop landing-stage-robot relative z-0" />
+          {/* Quanela's robot lives in the stage's top corner and thinks aloud what the app just did with the order. */}
+          <div className="flex w-full items-start justify-end gap-2">
+            <p key={index} className="landing-thought" aria-live="polite">
+              {state.thought}
+            </p>
+            <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop landing-stage-robot" />
           </div>
-          <div key={index} className="landing-order-swap relative z-10 flex w-full justify-center lg:justify-start">
+          <div key={index} className="landing-order-swap flex w-full justify-center lg:justify-start">
             <OrderTicket index={index} onAdvance={advance} />
           </div>
-          <p className="sr-only" aria-live="polite">
-            Pedido 1004: {state.suggestion ? 'Quanela sugiere una compra' : state.clock}
-          </p>
         </div>
       </aside>
 

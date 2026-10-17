@@ -138,10 +138,37 @@
     padding: 32px 40px;
   }
 }
-/* The robot and the caption keep the order's width (26rem, or 1.25× of it where the order is enlarged). */
-.landing-stage-width {
-  width: 100%;
-  max-width: 26rem;
+/* The robot's thought: a bubble one step lighter than the stage, its trail of dots running to the robot. */
+.landing-thought {
+  position: relative;
+  max-width: 24rem;
+  margin-top: 8px;
+  margin-right: 14px;
+  border-radius: 20px;
+  background: #2e2420;
+  padding: 12px 16px;
+  color: #f6eee8;
+  font-size: var(--l-size-small);
+  line-height: 1.45;
+}
+.landing-thought::before,
+.landing-thought::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  background: #2e2420;
+}
+.landing-thought::before {
+  right: -10px;
+  top: 22px;
+  width: 12px;
+  height: 12px;
+}
+.landing-thought::after {
+  right: -20px;
+  top: 38px;
+  width: 7px;
+  height: 7px;
 }
 /* The robot on the stage: small on phones, beside the order on wide screens. */
 .landing-stage-robot {
@@ -158,9 +185,6 @@
 @media (min-width: 1024px) and (min-height: 900px) {
   .landing-stage [data-ui] {
     zoom: 1.15;
-  }
-  .landing-stage-width {
-    max-width: 30rem;
   }
   .landing-stage-robot {
     height: 120px;
@@ -253,6 +277,17 @@
     from {
       opacity: 0;
       transform: translateY(-6px) scale(0.98);
+    }
+  }
+  /* The thought appears with the robot's new face. */
+  .landing-thought {
+    animation: landing-thought-in 360ms var(--l-ease-out);
+    transform-origin: right top;
+  }
+  @keyframes landing-thought-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.96);
     }
   }
   /* The robot changes face with the order: a small pop, never a loop. */
