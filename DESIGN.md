@@ -26,6 +26,12 @@ colors:
   danger: "#f87171"
   info: "#38bdf8"
 typography:
+  landing-display:
+    fontFamily: "Nunito, ui-rounded, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(26px, 2.4vw, 36px)"
+    fontWeight: 900
+    lineHeight: 0.98
+    letterSpacing: "-0.03em"
   display:
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.25rem"
@@ -119,7 +125,7 @@ The pass is the counter between the kitchen and the dining room: dark, ordered, 
 
 The system is dense but never cramped, and calm by default. Hierarchy comes from type weight, a strict text-color ladder and spacing, not from color or decoration. Three themes (dark by default, light and a warm neutral) are the same system: the neutral scale is remapped per theme and every semantic token follows it. The mascot, the Quanela robot chef, carries personality in messages and empty states so the working surfaces do not have to.
 
-The operational screens (the Centro de operaciones) are the strictest part of the system: nothing moves for decoration, every figure is real or shown as «—», and the same order looks the same in every view. The public landing is a different surface (a warm cream world with the brand brown and orange) and is not governed by this file beyond the brand colors and the logo.
+The operational screens (the Centro de operaciones) are the strictest part of the system: nothing moves for decoration, every figure is real or shown as «—», and the same order looks the same in every view. The public landing is a different surface (a warm cream world with the brand brown and orange): it follows the brand colors and the logo here and its own composition in ADR 0068 (the split stage, «La comanda que viaja»).
 
 **Key Characteristics:**
 - Night surfaces with hairline borders; depth by tone, shadow only on what floats.
@@ -160,6 +166,8 @@ A near-monochrome night palette with a single warm accent and four quiet state c
 **Body Font:** Inter (with ui-sans-serif, system-ui, -apple-system), with the `cv11` and `ss01` features on.
 
 **Character:** One neutral grotesque, tightened for headings and set with tabular figures wherever numbers line up. The voice comes from weight and color steps, not from a second family.
+
+**Landing Display Font:** Nunito (700–900, rounded like the logo), loaded only on the public landing for the name, headings and prices; its text stays in Inter. Nunito never appears in the app.
 
 ### Hierarchy
 - **Display** (600, 1.875–2.25rem, tight tracking): the one headline figure of a summary (sales today, inventory value).

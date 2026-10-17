@@ -1,5 +1,4 @@
-import { ChevronDown } from 'lucide-react'
-import { display } from '../lib/typography'
+import type { CSSProperties } from 'react'
 
 /** Solo lo que es cierto hoy en el producto (ADR 0010). */
 const FAQ: { q: string; a: string }[] = [
@@ -33,22 +32,19 @@ const FAQ: { q: string; a: string }[] = [
   },
 ]
 
+/** Questions and answers as reading text, like the notes at the back of a programme: all answered at a glance. */
 export function FaqSection() {
   return (
-    <section id="faq" className="theme-light scroll-mt-16 bg-white text-neutral-50" aria-labelledby="landing-faq">
-      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
-        <h2 id="landing-faq" style={display} className="text-3xl font-black tracking-[-0.02em] text-[#1C1310] sm:text-5xl">
+    <section id="faq" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-faq">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-6">
+        <h2 id="landing-faq" data-reveal className="landing-display text-[length:var(--l-size-title)] lg:col-span-3">
           Preguntas frecuentes
         </h2>
-        <div className="mt-10 divide-y divide-[#1C1310]/10 border-y border-[#1C1310]/10">
-          {FAQ.map(({ q, a }) => (
-            <details key={q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-[#1C1310] [&::-webkit-details-marker]:hidden">
-                {q}
-                <ChevronDown size={18} className="shrink-0 text-brasa-600 transition-transform group-open:rotate-180" aria-hidden />
-              </summary>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#5B4A42]">{a}</p>
-            </details>
+        <div className="lg:col-span-8 lg:col-start-5 lg:columns-2 lg:gap-14">
+          {FAQ.map(({ q, a }, i) => (
+            <p key={q} data-reveal style={{ '--i': i % 3 } as CSSProperties} className="mb-5 break-inside-avoid leading-[1.55]">
+              <strong className="font-semibold">{q}</strong> {a}
+            </p>
           ))}
         </div>
       </div>

@@ -1,0 +1,150 @@
+import { formatMoney } from '@/shared/utils/format'
+import { Mic } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
+
+/** A small, exact piece of the app (its dark theme, its words), cropped into the panel. */
+function Proof({ children }: { children: ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-[var(--l-radius)] bg-[var(--l-stage)] p-5 sm:w-[360px] sm:shrink-0">
+      <div data-ui className="text-sm text-neutral-100">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+const RECIPE = [
+  { name: 'Pan brioche', cost: 1200 },
+  { name: 'Carne de res, 150 g', cost: 4300 },
+  { name: 'Queso', cost: 900 },
+  { name: 'Tocineta', cost: 1000 },
+]
+
+/** Everything here exists in the app today (PRODUCT.md): no «próximamente», no invented figures. */
+const FEATURES: { title: string; body: string[]; proof: ReactNode }[] = [
+  {
+    title: 'Inventario y compras',
+    body: [
+      'Stock, compras y proveedores en un lugar. Te avisa qué insumo quedó por debajo de su mínimo y te sugiere cuánto reponer según lo que de verdad gastas.',
+      'Sube la foto o el PDF de una factura: Quanela la lee y la deja lista para que la revises y la confirmes.',
+    ],
+    proof: (
+      <ul className="space-y-2 tabular-nums">
+        <li className="flex justify-between gap-3">
+          <span>Pan brioche</span>
+          <span className="text-amber-400">11 und · mínimo 20</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Carne de res</span>
+          <span className="text-neutral-300">2,25 kg</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Mora</span>
+          <span className="text-neutral-300">1,60 kg</span>
+        </li>
+      </ul>
+    ),
+  },
+  {
+    title: 'Recetas y costo por plato',
+    body: [
+      'Cada plato con su receta: lo que lleva, cuánto cuesta y cuánto te deja. El costo sale de lo que pagas por cada insumo.',
+      'Así sabes qué plato vende mucho y deja poco, antes de que se note en la caja.',
+    ],
+    proof: (
+      <div className="tabular-nums">
+        <p className="font-medium">Hamburguesa de la casa</p>
+        <ul className="mt-2 space-y-1 text-neutral-400">
+          {RECIPE.map((r) => (
+            <li key={r.name} className="flex justify-between gap-3">
+              <span>{r.name}</span>
+              <span>{formatMoney(r.cost)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2.5 flex justify-between gap-3 font-medium">
+          <span>Costo {formatMoney(7400)}</span>
+          <span className="text-emerald-400">Margen 66 %</span>
+        </p>
+      </div>
+    ),
+  },
+  {
+    title: 'Oye Quanela',
+    body: [
+      'Comandos de voz y avisos hablados para la cocina, en español. La línea avanza los pedidos sin soltar la espátula.',
+      'Y Quanela Copilot responde preguntas sobre tu operación con tus datos.',
+    ],
+    proof: (
+      <div className="space-y-2.5">
+        <p className="flex items-center gap-2 text-neutral-300">
+          <Mic size={14} className="text-brasa-400" aria-hidden /> «Oye Quanela, pedido 1004 listo»
+        </p>
+        <p className="rounded-lg bg-neutral-900 px-3 py-2 text-neutral-100">Pedido 1004 listo para despachar.</p>
+      </div>
+    ),
+  },
+  {
+    title: 'Clientes y cartera',
+    body: [
+      'Saldos, pagos e historial de cada cliente. Quién te debe, cuánto y desde cuándo, sin hojas de cálculo.',
+      'Cada pedido lleva su pago aparte, en efectivo, transferencia o tarjeta; lo que no se paga queda en el saldo del cliente.',
+    ],
+    proof: (
+      <ul className="space-y-2 tabular-nums">
+        <li className="flex justify-between gap-3">
+          <span>Valentina Ríos</span>
+          <span className="text-amber-400">Debe {formatMoney(24000)}</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Andrés Pérez</span>
+          <span className="text-neutral-300">Al día</span>
+        </li>
+      </ul>
+    ),
+  },
+  {
+    title: 'Tu equipo, cada quien en lo suyo',
+    body: [
+      'La caja cobra, la cocina cocina, el domiciliario ve sus entregas. Cada persona entra solo a las cuentas que le asignas y con el rol que le das.',
+      'Si tienes varios locales, cada uno es una cuenta con sus datos separados.',
+    ],
+    proof: (
+      <ul className="flex flex-wrap gap-1.5 text-xs">
+        {['Administrador', 'Gerente', 'Caja', 'Cocina', 'Domiciliario'].map((role) => (
+          <li key={role} className="rounded-full bg-neutral-800 px-2.5 py-1 text-neutral-200">
+            {role}
+          </li>
+        ))}
+      </ul>
+    ),
+  },
+]
+
+/** The rest of the day, each with a small proof beside it: one module down the page, never alternating. */
+export function FeatureProofs() {
+  return (
+    <section id="funcionalidades" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)] lg:pl-[22vw]" aria-labelledby="landing-features">
+      <h2 id="landing-features" data-reveal className="landing-display max-w-[20ch] text-[length:var(--l-size-title)]">
+        Y el resto del día, en el mismo lugar
+      </h2>
+      <div className="mt-16 space-y-16 lg:space-y-28">
+        {FEATURES.map((f) => (
+          <article key={f.title} className="flex max-w-[680px] flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+            <div data-reveal>
+              <Proof>{f.proof}</Proof>
+            </div>
+            <div data-reveal style={{ '--i': 1 } as CSSProperties} className="sm:max-w-[290px]">
+              <h3 className="text-[length:var(--l-size-text)] font-semibold">{f.title}</h3>
+              {f.body.map((p) => (
+                <p key={p} className="mt-2 text-[length:var(--l-size-small)] leading-relaxed text-[var(--l-soft)]">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}

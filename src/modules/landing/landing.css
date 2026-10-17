@@ -1,0 +1,252 @@
+/*
+ * The landing (ADR 0068): «La comanda que viaja», a split stage. Half the screen holds one order that
+ * never leaves; the other half reads. The brand's own palette and faces (DESIGN.md: cream, roast brown,
+ * ember; Nunito for display, the app's sans for text). One radius for panels, pill buttons.
+ */
+.landing {
+  --l-ground: #fdf7f1;
+  --l-field: #f4e9dd;
+  --l-ink: #1c1310;
+  --l-soft: #5b4a42;
+  --l-stage: #1c1310;
+  --l-on-stage: #fdf7f1;
+  --l-accent: #c2410c;
+  --l-accent-hover: #9a3412;
+  --l-ember: #f97316;
+  --l-radius: 24px;
+  --l-margin: clamp(20px, 3vw, 40px);
+  --l-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --l-ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+
+  /* Five sizes do all the visible work. */
+  --l-size-name: clamp(120px, 12vw, 200px);
+  --l-size-display: clamp(44px, 5vw, 80px);
+  --l-size-title: clamp(26px, 2.4vw, 36px);
+  --l-size-text: 17px;
+  --l-size-small: 15px;
+
+  background: var(--l-ground);
+  color: var(--l-ink);
+  font-size: var(--l-size-text);
+  line-height: 1.55;
+}
+
+.landing-display {
+  font-family: 'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+/* The one button shape. */
+.landing-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: 9999px;
+  font-size: var(--l-size-text);
+  font-weight: 600;
+  transition:
+    background-color 180ms var(--l-ease-out),
+    transform 140ms var(--l-ease-out);
+}
+.landing-button:active {
+  transform: scale(0.97);
+}
+.landing-button svg {
+  transition: transform 180ms var(--l-ease-out);
+}
+.landing-button:hover svg {
+  transform: translateX(3px);
+}
+.landing-button-accent {
+  background: var(--l-accent);
+  color: #fff;
+}
+.landing-button-accent:hover {
+  background: var(--l-accent-hover);
+}
+.landing-button-ink {
+  background: var(--l-ink);
+  color: var(--l-ground);
+}
+.landing-button-ink:hover {
+  background: #3b2c26;
+}
+.landing-button-light {
+  background: var(--l-ground);
+  color: var(--l-ink);
+}
+.landing-button-light:hover {
+  background: #fff;
+}
+.landing :focus-visible {
+  outline: 3px solid var(--l-accent);
+  outline-offset: 3px;
+}
+
+.landing-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color 180ms var(--l-ease-out);
+}
+.landing-link:hover {
+  color: var(--l-accent);
+}
+
+/* ---------------------------------------------------------------- the split stage */
+
+.landing-split {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.landing-stage {
+  position: relative;
+  padding: 76px 12px 0;
+}
+.landing-stage-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--l-radius);
+  background: var(--l-stage);
+  padding: 20px 16px;
+}
+@media (min-width: 1024px) {
+  .landing-split {
+    grid-template-columns: 47fr 53fr;
+  }
+  .landing-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 20px 0 20px 20px;
+  }
+  /* The order is the one object on its field: at its true size it would be lost in it. */
+  .landing-stage [data-ui] {
+    zoom: 1.25;
+  }
+  .landing-stage-field {
+    height: 100%;
+    padding: 40px;
+  }
+}
+
+/* The name runs along the bottom of the first screen and crosses into the stage: one solid ink per ground. */
+.landing-name {
+  position: relative;
+  display: block;
+  font-size: 21vw;
+  white-space: nowrap;
+}
+.landing-name-ink {
+  display: block;
+}
+.landing-name-over {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .landing-name {
+    position: absolute;
+    left: -10vw;
+    bottom: 72px;
+    margin: 0;
+    font-size: var(--l-size-name);
+    z-index: 20;
+  }
+  .landing-name-ink {
+    clip-path: inset(0 0 0 10vw);
+  }
+  .landing-name-over {
+    display: block;
+    position: absolute;
+    inset: 0;
+    color: var(--l-on-stage);
+    clip-path: inset(0 calc(100% - 10vw) 0 0);
+  }
+}
+
+/* The story: each step a screen tall on wide screens, so the stage changes once per step. */
+.landing-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 70svh;
+  padding: 48px var(--l-margin);
+}
+@media (min-width: 1024px) {
+  .landing-step {
+    min-height: 92svh;
+    padding: 0 clamp(48px, 6vw, 96px);
+  }
+}
+
+/* ---------------------------------------------------------------- motion */
+
+.landing-order-swap {
+  animation: landing-swap 240ms var(--l-ease-out);
+}
+@keyframes landing-swap {
+  from {
+    opacity: 0.4;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Entrances: only once the page knows it can reveal them (`landing-motion` is set by script). */
+  .landing-motion [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 700ms var(--l-ease-out),
+      transform 900ms var(--l-ease-out);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+  .landing-motion [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .landing-rise {
+    animation: landing-rise-in 800ms var(--l-ease-out) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+  }
+  @keyframes landing-rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* The showcase's picture opens from the top as it changes. */
+  .landing-shutter {
+    animation: landing-shutter 700ms var(--l-ease-soft) both;
+  }
+  @keyframes landing-shutter {
+    from {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(16px);
+    }
+  }
+
+  /* The signature move: the name feels heavy, it gives a little as the first screen leaves. */
+  @supports (animation-timeline: view()) {
+    .landing-name {
+      transform-origin: left bottom;
+      animation: landing-name-give linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+    @keyframes landing-name-give {
+      to {
+        scale: 0.94;
+      }
+    }
+  }
+}

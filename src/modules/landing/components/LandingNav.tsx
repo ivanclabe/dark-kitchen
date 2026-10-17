@@ -36,8 +36,8 @@ function useLandingSignOut() {
 /**
  * Navegación de la landing (ADR 0010, 3.5): Producto · Funcionalidades ·
  * Precios · FAQ · Ayuda (doc.quanela.com, ADR 0035) · Iniciar sesión · Crear cuenta.
- * Una barra a todo lo ancho: sobre el hero es transparente y, en pantallas anchas, sin logo (el hero ya lo muestra
- * en grande); al bajar toma fondo y muestra el logo. En el celular, las secciones van en un menú desplegable.
+ * Una barra lisa, sin borde ni vidrio: en pantallas anchas va sobre la columna de lectura y, arriba, sin logo (el
+ * nombre ya está en grande); al bajar toma fondo y muestra el logo. En el celular, las secciones van en un menú desplegable.
  */
 export function LandingNav() {
   // The session is shown only once Supabase confirmed it (useAuth verifies it with the server).
@@ -45,28 +45,36 @@ export function LandingNav() {
   const signOut = useLandingSignOut()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  // Past the order's stage (ADR 0068) the bar spans the whole width again.
+  const [pastStage, setPastStage] = useState(false)
   useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 120)
+    const update = () => {
+      setScrolled(window.scrollY > 120)
+      const stage = document.querySelector('.landing-split')
+      setPastStage(stage ? stage.getBoundingClientRect().bottom <= 64 : true)
+    }
     update()
     window.addEventListener('scroll', update, { passive: true })
     return () => window.removeEventListener('scroll', update)
   }, [])
-  const link = 'rounded-full px-3.5 py-2 text-[15px] text-[#5B4A42] transition-colors hover:bg-[#1C1310]/[0.05] hover:text-[#1C1310]'
+  const link = 'whitespace-nowrap rounded-full px-3 py-2 text-[15px] text-[#5B4A42] transition-colors hover:bg-[#1C1310]/[0.05] hover:text-[#1C1310]'
 
   return (
     <header
       className={clsx(
-        'fixed inset-x-0 top-0 z-30 border-b transition-colors duration-300',
-        scrolled || open ? 'border-[#1C1310]/[0.07] bg-[#FDF7F1]/90 backdrop-blur-md' : 'border-transparent bg-[#FDF7F1]/80 backdrop-blur-sm xl:bg-transparent xl:backdrop-blur-none',
+        // Wide screens: over the reading column only, the order's stage keeps its whole height (ADR 0068).
+        'fixed top-0 right-0 left-0 z-30 transition-colors duration-300',
+        !pastStage && 'lg:left-[47%]',
+        scrolled || open ? 'bg-[#FDF7F1]' : 'bg-[#FDF7F1] lg:bg-transparent',
       )}
     >
-      <div className="mx-auto max-w-7xl">
+      <div>
         <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
-          <a href="#producto" className="flex items-center gap-2.5" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
-            <BrandLogo className={clsx('h-11 transition-opacity duration-300', !scrolled && 'xl:pointer-events-none xl:opacity-0')} />
+          <a href="#producto" className="flex shrink-0 items-center gap-2.5" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
+            <BrandLogo className={clsx('h-11 transition-opacity duration-300', !scrolled && 'lg:pointer-events-none lg:opacity-0')} />
           </a>
 
-          <nav aria-label="Secciones" className="hidden items-center gap-0.5 md:flex">
+          <nav aria-label="Secciones" className="hidden items-center gap-0.5 xl:flex">
             {LANDING_SECTIONS.map((s) => (
               <a key={s.id} href={`#${s.id}`} className={link}>
                 {s.label}
@@ -100,12 +108,12 @@ export function LandingNav() {
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden rounded-full px-3.5 py-2 text-[15px] text-[#5B4A42] transition-colors hover:text-[#1C1310] sm:block">
+                <Link to="/login" className="hidden whitespace-nowrap rounded-full px-3 py-2 text-[15px] text-[#5B4A42] transition-colors hover:text-[#1C1310] sm:block">
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/registro"
-                  className="inline-flex items-center rounded-full bg-[#1C1310] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3B2C26]"
+                  className="inline-flex items-center whitespace-nowrap rounded-full bg-[#1C1310] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3B2C26]"
                 >
                   Crear cuenta
                 </Link>
@@ -113,7 +121,7 @@ export function LandingNav() {
             )}
             <button
               type="button"
-              className="rounded-full p-2 text-[#5B4A42] hover:text-[#1C1310] md:hidden"
+              className="rounded-full p-2 text-[#5B4A42] hover:text-[#1C1310] xl:hidden"
               aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
               aria-expanded={open}
               aria-controls="landing-mobile-nav"
@@ -124,7 +132,7 @@ export function LandingNav() {
           </div>
         </div>
 
-        <nav id="landing-mobile-nav" aria-label="Secciones" className={clsx('border-t border-[#1C1310]/[0.07] px-3 pb-3 md:hidden', open ? 'block' : 'hidden')}>
+        <nav id="landing-mobile-nav" aria-label="Secciones" className={clsx('px-3 pb-3 xl:hidden', open ? 'block' : 'hidden')}>
           {LANDING_SECTIONS.map((s) => (
             <a key={s.id} href={`#${s.id}`} onClick={() => setOpen(false)} className="block rounded-lg px-2 py-3 text-base text-[#3B2C26] hover:bg-[#1C1310]/[0.05]">
               {s.label}

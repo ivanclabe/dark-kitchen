@@ -1,37 +1,45 @@
-import { PlanCard } from '@/shared/plans/PlanCard'
 import { PlanComparison } from '@/shared/plans/PlanComparison'
-import { hasAnnualBilling, signupPath, type BillingPeriod, type Plan } from '@/shared/plans/plans'
+import { formatAmount, hasAnnualBilling, signupPath, type BillingPeriod, type Plan } from '@/shared/plans/plans'
 import { usePublicPricing } from '@/shared/plans/usePlans'
 import clsx from 'clsx'
 import { RotateCw } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { display } from '../lib/typography'
 
-const CTA_BASE = 'flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold transition-colors'
+/** The fields of the tiles, from the lightest plan to the largest: cream, ember, roast brown. */
+const TILE = [
+  { field: 'bg-[var(--l-field)] text-[var(--l-ink)]', soft: 'text-[var(--l-soft)]', button: 'landing-button-ink', height: 'lg:min-h-[500px]' },
+  { field: 'bg-[var(--l-accent)] text-white', soft: 'text-white/85', button: 'landing-button-light', height: 'lg:min-h-[580px]' },
+  { field: 'bg-[var(--l-stage)] text-[var(--l-on-stage)]', soft: 'text-[#d9cbbf]', button: 'landing-button-light', height: 'lg:min-h-[660px]' },
+]
 
-/** Botón de cada plan: registro con el plan elegido, o ventas (ADR 0010, 3.4). */
-function PlanCta({ plan, period }: { plan: Plan; period: BillingPeriod }) {
-  const style = clsx(CTA_BASE, plan.badge ? 'bg-primary text-on-primary hover:bg-primary-hover' : 'border border-neutral-700 text-neutral-100 hover:border-neutral-500 hover:bg-neutral-800/60')
+/** What the plan's price line says under it (the same rules as the sign-up's cards). */
+function priceNote(plan: Plan, annual: boolean): string {
+  if (plan.trialDays > 0) return `${plan.trialDays} días gratis, sin tarjeta`
+  if (!plan.selfServe) return 'Con acompañamiento de nuestro equipo'
+  return annual ? 'Pagas el año y te regalamos dos meses' : 'Sin permanencia: cancelas cuando quieras'
+}
+
+/** Each plan's button: the sign-up with that plan, or sales (ADR 0010, 3.4). With a session too: the sign-up offers to keep it or switch. */
+function PlanCta({ plan, period, className }: { plan: Plan; period: BillingPeriod; className: string }) {
+  const content = plan.ctaLabel
   if (plan.cta === 'contact_sales' && plan.contactUrl) {
     return (
-      <a href={plan.contactUrl} className={style}>
-        {plan.ctaLabel}
+      <a href={plan.contactUrl} className={className}>
+        {content}
       </a>
     )
   }
-  // With a session open too: the sign-up offers to keep that account or close it and create a new one.
   return (
-    <Link to={signupPath(plan.key, period)} className={style}>
-      {plan.ctaLabel}
+    <Link to={signupPath(plan.key, period)} className={className}>
+      {content}
     </Link>
   )
 }
 
 /**
- * Precios (ADR 0010): sin registrarse se ven los planes, qué incluye cada
- * uno, sus límites y la comparativa. Todo viene de la base (dk_plans).
- * Va en la paleta clara (.theme-light): las tarjetas son las mismas del registro.
+ * Precios (ADR 0010, ADR 0068): the plans as tiles that step up, so the bigger plan is literally bigger,
+ * then the full comparison. Everything comes from the database (dk_plans).
  */
 export function PricingSection() {
   const { data, isLoading, isError, refetch } = usePublicPricing()
@@ -39,17 +47,18 @@ export function PricingSection() {
   const annual = data ? hasAnnualBilling(data.plans) : false
 
   return (
-    <section id="precios" className="theme-light scroll-mt-16 border-t border-[#1C1310]/[0.07] bg-[#FBF6EF] text-neutral-50" aria-labelledby="landing-pricing">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="max-w-2xl">
-          <h2 id="landing-pricing" style={display} className="text-3xl font-black tracking-[-0.02em] text-balance text-[#1C1310] sm:text-5xl">
-            Un plan para cada etapa de <span className="text-brasa-500">tu negocio.</span>
+    <section id="precios" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-pricing">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="max-w-[40ch]">
+          <h2 id="landing-pricing" data-reveal className="landing-display text-[length:var(--l-size-title)]">
+            Un plan para cada etapa de tu negocio
           </h2>
-          <p className="mt-4 text-lg text-[#5B4A42]">Crea tu cuenta, configura tu negocio y paga en línea con tarjeta, PSE o Nequi. Cambia de plan cuando tu operación crezca.</p>
+          <p data-reveal style={{ '--i': 1 } as CSSProperties} className="mt-4">
+            Creas tu cuenta, configuras tu negocio y pagas en línea con tarjeta, PSE o Nequi. Cambias de plan cuando tu operación crezca.
+          </p>
         </div>
-
         {annual && (
-          <div role="radiogroup" aria-label="Facturación" className="mt-8 inline-flex rounded-full bg-white p-1 text-sm ring-1 ring-[#1C1310]/10">
+          <div role="radiogroup" aria-label="Facturación" className="inline-flex rounded-full bg-[var(--l-field)] p-1 text-[length:var(--l-size-small)]">
             {(['monthly', 'annual'] as const).map((p) => (
               <button
                 key={p}
@@ -57,41 +66,69 @@ export function PricingSection() {
                 role="radio"
                 aria-checked={period === p}
                 onClick={() => setPeriod(p)}
-                className={clsx('rounded-full px-4 py-1.5', period === p ? 'bg-[#1C1310] text-white' : 'text-[#5B4A42] hover:text-[#1C1310]')}
+                className={clsx('rounded-full px-5 py-2 font-medium transition-colors duration-200', period === p ? 'bg-[var(--l-ink)] text-[var(--l-ground)]' : 'text-[var(--l-soft)] hover:text-[var(--l-ink)]')}
               >
                 {p === 'monthly' ? 'Mensual' : 'Anual'}
               </button>
             ))}
           </div>
         )}
-
-        {isLoading ? (
-          <div className="mt-10 grid gap-4 lg:grid-cols-3" aria-busy="true" aria-label="Cargando planes">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-[30rem] animate-pulse rounded-2xl border border-neutral-800/60 bg-neutral-900/40" />
-            ))}
-          </div>
-        ) : isError || !data ? (
-          <div className="mt-10 rounded-2xl border border-neutral-800/60 p-8 text-center">
-            <p className="text-neutral-300">No pudimos cargar los precios.</p>
-            <button type="button" onClick={() => void refetch()} className="mt-3 inline-flex items-center gap-2 text-sm text-brasa-400 hover:underline">
-              <RotateCw size={14} aria-hidden /> Reintentar
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="mt-10 grid gap-4 lg:grid-cols-3">
-              {data.plans.map((plan) => (
-                <PlanCard key={plan.key} plan={plan} period={period} action={<PlanCta plan={plan} period={period} />} />
-              ))}
-            </div>
-            <h3 style={display} className="mt-16 text-2xl font-extrabold tracking-[-0.01em] text-[#1C1310]">Compara los planes</h3>
-            <div className="mt-6">
-              <PlanComparison pricing={data} period={period} />
-            </div>
-          </>
-        )}
       </div>
+
+      {isLoading ? (
+        <div className="mt-12 grid gap-2 lg:grid-cols-3 lg:items-end" aria-busy="true" aria-label="Cargando planes">
+          {TILE.map((t, i) => (
+            <div key={i} className={clsx('h-[420px] motion-safe:animate-pulse rounded-[var(--l-radius)] bg-[var(--l-field)]', t.height)} />
+          ))}
+        </div>
+      ) : isError || !data ? (
+        <div className="mt-12 rounded-[var(--l-radius)] bg-[var(--l-field)] p-8">
+          <p>No pudimos cargar los precios.</p>
+          <button type="button" onClick={() => void refetch()} className="landing-link mt-3 inline-flex items-center gap-2">
+            <RotateCw size={15} aria-hidden /> Reintentar
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mt-12 grid gap-2 lg:grid-cols-3 lg:items-end">
+            {data.plans.map((plan, i) => {
+              const tile = TILE[Math.min(i, TILE.length - 1)]
+              const isAnnual = period === 'annual' && plan.priceYearly !== null
+              return (
+                <article
+                  key={plan.key}
+                  aria-label={`Plan ${plan.name}`}
+                  data-reveal
+                  style={{ '--i': i } as CSSProperties}
+                  className={clsx('flex flex-col rounded-[var(--l-radius)] p-7 sm:p-9', tile.field, tile.height)}
+                >
+                  <h3 className="landing-display text-[length:var(--l-size-title)]">{plan.name}</h3>
+                  {plan.badge && <p className={clsx('mt-1 font-semibold', tile.soft)}>{plan.badge}</p>}
+                  <p className="mt-4 max-w-[30ch]">{plan.description}</p>
+                  <p className={clsx('mt-4 max-w-[36ch] text-[length:var(--l-size-small)] leading-relaxed', tile.soft)}>{plan.highlights.join('. ')}.</p>
+
+                  <div className="mt-auto pt-10">
+                    <p className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="landing-display text-[length:var(--l-size-display)] tabular-nums">{formatAmount(isAnnual ? plan.priceYearly! : plan.priceMonthly)}</span>
+                      <span className={tile.soft}>
+                        {plan.currency}/{isAnnual ? 'año' : 'mes'}
+                      </span>
+                    </p>
+                    <p className={clsx('mt-1 text-[length:var(--l-size-small)]', tile.soft)}>{priceNote(plan, isAnnual)}</p>
+                    <PlanCta plan={plan} period={period} className={clsx('landing-button mt-6 w-full', tile.button)} />
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+
+          <h3 className="landing-display mt-24 text-[length:var(--l-size-title)]">Compara los planes</h3>
+          {/* The comparison is the app's own table (the same as in the sign-up), in its light palette. */}
+          <div className="theme-light mt-8 text-neutral-50">
+            <PlanComparison pricing={data} period={period} />
+          </div>
+        </>
+      )}
     </section>
   )
 }

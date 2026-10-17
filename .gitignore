@@ -24,3 +24,6 @@ dist-admin
 *.sln
 *.sw?
 .responsive-audit/
+
+# taste skill: inspector screenshots (the dealt direction in .taste-skill/direction.json is kept)
+.taste-skill/inspect/

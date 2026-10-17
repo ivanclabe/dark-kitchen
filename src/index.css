@@ -273,50 +273,6 @@ html {
   animation: ember-rise var(--ember-duration, 6s) ease-in-out var(--ember-delay, 0s) infinite;
 }
 
-@keyframes landing-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-landing-rise {
-  animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Landing headline (GhostHeadline): the blinking caret and the flash of an accepted suggestion. */
-@keyframes caret-blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  55%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@utility animate-caret {
-  animation: caret-blink 1s step-end infinite;
-}
-
-@keyframes ghost-accept {
-  from {
-    background-color: rgb(249 115 22 / 0.18);
-  }
-  to {
-    background-color: rgb(249 115 22 / 0);
-  }
-}
-
-@utility animate-ghost-accept {
-  animation: ghost-accept 0.9s ease-out both;
-}
-
 /* The robot during long work (ADR 0060): a slow bob. Used with motion-safe:, so it stops with reduced motion. */
 @keyframes robot-bob {
   0%,
