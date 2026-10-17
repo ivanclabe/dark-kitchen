@@ -32,11 +32,11 @@ export interface TabProps {
 
 /** Theme tokens (ADR 0061): the same series read well in dark, light and neutral. */
 const COLORS = {
-  revenue: 'var(--color-brasa-500)',
+  revenue: 'var(--color-neutral-300)',
   profit: 'var(--color-emerald-400)',
   cogs: 'var(--color-red-400)',
-  margin: 'var(--color-neutral-400)',
-  orders: 'var(--color-neutral-400)',
+  margin: 'var(--color-neutral-500)',
+  orders: 'var(--color-neutral-500)',
 }
 
 function ChangeCell({ value, goodWhen = 'up' }: { value: number | null; goodWhen?: 'up' | 'down' }) {

@@ -14,6 +14,7 @@ colors:
   night-raised: "#262626"
   night-line: "#404040"
   smoke-text: "#fafafa"
+  ink: "#f5f5f5"
   ash-text: "#a3a3a3"
   ash-muted: "#858585"
   paper-canvas: "#f5f5f5"
@@ -97,8 +98,8 @@ components:
     rounded: "{rounded.card}"
     padding: "24px"
   chip-active:
-    backgroundColor: "{colors.ember-deep}"
-    textColor: "{colors.on-ember}"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.night-canvas}"
     rounded: "{rounded.pill}"
     padding: "6px 12px"
   chip:
@@ -122,7 +123,7 @@ The operational screens (the Centro de operaciones) are the strictest part of th
 
 **Key Characteristics:**
 - Night surfaces with hairline borders; depth by tone, shadow only on what floats.
-- One accent: ember orange, rationed to action, selection, focus and live state.
+- One accent: ember orange, rationed to action, focus and live state; selection is ink.
 - Inter with tabular figures; small type set with uppercase micro-labels.
 - Pills for actions and filters, softly rounded cards, gently rounded fields.
 - Light, dark and neutral themes from one token set; AA contrast in all three.
@@ -132,8 +133,8 @@ The operational screens (the Centro de operaciones) are the strictest part of th
 A near-monochrome night palette with a single warm accent and four quiet state colors.
 
 ### Primary
-- **Ember** (#f97316): the brand's own orange. Keyboard focus on dark themes, the live accent of the brand (logo, selection, caret, the active tab underline). Never as a fill under white text: it fails contrast.
-- **Deep Ember** (#c2410c): the action color. The primary button, the active chip, the switch when on, counters. White on it reads at 5.2:1. On light themes it is also the focus ring.
+- **Ember** (#f97316): the brand's own orange. Keyboard focus on dark themes, the live accent of the brand (logo, caret, the active tab underline). Never as a fill under white text: it fails contrast.
+- **Deep Ember** (#c2410c): the action color. The primary button, the switch when on, unread counters. White on it reads at 5.2:1. On light themes it is also the focus ring.
 - **Deeper / Darkest Ember** (#9a3412 / #7c2d12): hover and press of the primary action. Pressed actions go darker, never lighter.
 
 ### Neutral
@@ -141,6 +142,7 @@ A near-monochrome night palette with a single warm accent and four quiet state c
 - **Night Surface** (#171717): cards, fields, menus, dialogs.
 - **Night Raised** (#262626): hover rows, the highlighted option, subtle fills.
 - **Night Line** (#404040): strong borders; hairlines use the surface step at 60–80 % opacity.
+- **Ink** (#f5f5f5): the selected chip, segment or pill tab, with Night Canvas text: the inverted neutral, so it inverts again on the light themes. A filter at rest is a selection, not an action.
 - **Smoke Text** (#fafafa), **Ash Text** (#a3a3a3), **Ash Muted** (#858585): the three text levels — primary, secondary, metadata. Muted text reaches 4.5:1 on cards.
 - **Paper Canvas** (#f5f5f5) and **Linen Canvas** (#f2f0ed): the grounds of the light and the warm neutral themes.
 - **Roast Brown** (#1C1310) and **Landing Cream** (#FDF7F1): the brand's own brown and the landing ground; the landing only.
@@ -149,7 +151,7 @@ A near-monochrome night palette with a single warm accent and four quiet state c
 - **Success** (#34d399), **Warning** (#fbbf24), **Danger** (#f87171), **Info** (#38bdf8): badges, notices and figure tones, always as text on a 15 % tint of themselves. Light themes swap them for their 800-tone equivalents.
 
 ### Named Rules
-**The One Ember Rule.** Orange means «act here» or «this is live». If something orange cannot be clicked, selected or is not a live state, it should be neutral.
+**The One Ember Rule.** Orange means «act here» or «this is live». If something orange is not an action, the focus or a live state, it should be neutral: data series and bars use ink, metric icons are neutral, tips and the Copilot trigger sit on the night surface, and selection is Ink.
 
 **The Honest Zero Rule.** A figure that is not known yet is «—» in a muted tone, never a 0 and never a green «all good».
 
@@ -202,7 +204,7 @@ Precise and calm: thin borders, quiet fills, the accent reserved for the one act
 - **Feedback:** 150 ms color transitions; pressing scales to 0.97. Focus is a 2 px ring in the focus token with a 2 px offset.
 
 ### Chips
-- **Style:** pills with micro-text counts; inactive on the night surface with secondary text, active in Deep Ember with white text. Long labels truncate inside the pill.
+- **Style:** pills with micro-text counts; inactive on the night surface with secondary text, active in Ink with Night Canvas text (the same fill for segmented controls and pill tabs). Long labels truncate inside the pill.
 
 ### Cards / Containers
 - **Corner Style:** 16px.
@@ -225,7 +227,7 @@ The card of the operation board: the dishes first (one per line in the Cocina vi
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep orange to action, selection, focus and live state (The One Ember Rule).
+- **Do** keep orange to action, focus and live state; selection is ink (The One Ember Rule).
 - **Do** use Deep Ember (#c2410c) under white text; the bright Ember (#f97316) only as text, ring or accent.
 - **Do** show unknown figures as «—» and empty or failed states with what happened and what to do next.
 - **Do** use the shared components in `src/shared/ui` (Button, Card, DataTable, Badge, Modal, Drawer, StatCard, EmptyState) instead of hand-made variants.

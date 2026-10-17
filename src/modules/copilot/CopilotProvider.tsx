@@ -573,7 +573,7 @@ export function CopilotButton({ compact = false }: { compact?: boolean }) {
       title={`${label} (Ctrl/⌘ + J)`}
       aria-label={label}
       className={clsx(
-        'relative inline-flex items-center gap-1.5 rounded-full border border-brasa-500/30 bg-brasa-500/10 text-brasa-300 transition-colors hover:bg-brasa-500/20',
+        'relative inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900 text-neutral-200 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
         compact ? 'size-10 justify-center' : 'h-8 px-3 text-xs font-medium',
       )}
     >

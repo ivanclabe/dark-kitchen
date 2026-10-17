@@ -8,7 +8,7 @@ import { formatAmount, formatPlanPrice, hasAnnualBilling, type BillingPeriod } f
 import type { Subscription } from '@/shared/plans/subscription'
 import { usePublicPricing } from '@/shared/plans/usePlans'
 import { Button } from '@/shared/ui/Button'
-import { cardClass } from '@/shared/ui/formClasses'
+import { cardClass, selectedFillClass } from '@/shared/ui/formClasses'
 import { ConfirmDialog, Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
 import { typography } from '@/shared/ui/typography'
@@ -258,7 +258,7 @@ function ChangePlanDialog({
                 type="button"
                 aria-pressed={period === p}
                 onClick={() => setPeriod(p)}
-                className={clsx('rounded-full px-3 py-1 text-sm font-medium', period === p ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:text-neutral-100')}
+                className={clsx('rounded-full px-3 py-1 text-sm font-medium', period === p ? selectedFillClass : 'text-neutral-400 hover:text-neutral-100')}
               >
                 {p === 'monthly' ? 'Mensual' : 'Anual'}
               </button>

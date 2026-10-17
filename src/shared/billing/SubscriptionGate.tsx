@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 import type { BillingAccess } from './billing'
 import { CardPaymentDialog } from './CardPaymentDialog'
 import { useCheckout, usePaymentReturn } from './usePayment'
+import { selectedFillClass } from '@/shared/ui/formClasses'
 
 const TITLE: Partial<Record<BillingAccess['status'], string>> = {
   incomplete: 'Activa tu suscripción',
@@ -122,7 +123,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
                     onClick={() => setPeriod(p)}
                     className={clsx(
                       'rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                      period === p ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:text-neutral-100',
+                      period === p ? selectedFillClass : 'text-neutral-400 hover:text-neutral-100',
                     )}
                   >
                     {p === 'monthly' ? 'Mensual' : 'Anual · 2 meses gratis'}

@@ -30,7 +30,7 @@ export function BarList({ items, emptyText = 'Sin datos en este periodo.' }: { i
               </span>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-neutral-800">
-              <div className="h-full rounded-full bg-brasa-500" style={{ width: `${Math.max(2, (i.value / max) * 100)}%` }} />
+              <div className="h-full rounded-full bg-neutral-300" style={{ width: `${Math.max(2, (i.value / max) * 100)}%` }} />
             </div>
           </>
         )

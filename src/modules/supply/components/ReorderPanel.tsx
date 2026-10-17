@@ -116,7 +116,6 @@ export function ReorderPanel({
           value={formatMoney(inventoryValue(active))}
           hint={`${active.length} insumos activos`}
           icon={Wallet}
-          tone="brand"
           emphasis
           loading={ingredientsLoading || ingredientsError}
         />

@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Chip } from '@/shared/ui/Chip'
 import { Textarea } from '@/shared/ui/FormField'
-import { chipClass } from '@/shared/ui/formClasses'
+import { chipClass, selectedFillClass } from '@/shared/ui/formClasses'
 import clsx from 'clsx'
 import { ArrowRight, PencilRuler, Send, Sparkles, Wand2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -187,7 +187,7 @@ export function AiDesigner({
                         onClick={() => setSelectedId(v.id)}
                         aria-current={v.id === selected.id}
                         title={v.prompt ?? v.name}
-                        className={clsx('rounded-full px-2 py-0.5', v.id === selected.id ? 'bg-primary text-on-primary' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700')}
+                        className={clsx('rounded-full px-2 py-0.5', v.id === selected.id ? selectedFillClass : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700')}
                       >
                         v{i + 1}
                       </button>

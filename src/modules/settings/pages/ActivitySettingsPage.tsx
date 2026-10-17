@@ -1,5 +1,5 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
-import { chartAxisTick, chartBrand, chartCursor, chartTooltip } from '@/shared/ui/chartTheme'
+import { chartAxisTick, chartInk, chartCursor, chartTooltip } from '@/shared/ui/chartTheme'
 import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -69,7 +69,7 @@ function AccountOperation({ data, onOpenLog }: { data: AccountObservability; onO
                 {...chartTooltip}
                 formatter={(value, name) => (name === 'orders' ? [value, 'Pedidos'] : [formatMoney(Number(value)), 'Ventas'])}
               />
-              <Bar dataKey="orders" fill={chartBrand} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="orders" fill={chartInk} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

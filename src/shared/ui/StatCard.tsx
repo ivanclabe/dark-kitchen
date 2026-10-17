@@ -6,11 +6,10 @@ import { cardClass } from './formClasses'
 import { Skeleton } from './Skeleton'
 import { typography } from './typography'
 
-export type StatTone = 'neutral' | 'brand' | 'good' | 'warn'
+export type StatTone = 'neutral' | 'good' | 'warn'
 
 const ICON_TONE: Record<StatTone, string> = {
   neutral: 'bg-neutral-800/80 text-neutral-300',
-  brand: 'bg-brasa-500/10 text-brasa-400',
   good: 'bg-emerald-500/10 text-emerald-400',
   warn: 'bg-red-500/10 text-red-400',
 }

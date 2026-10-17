@@ -1,4 +1,5 @@
 import { useRef, type ComponentType, type KeyboardEvent } from 'react'
+import { selectedFillClass } from './formClasses'
 
 export interface TabItem<T extends string> {
   value: T
@@ -62,7 +63,7 @@ export function Tabs<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(item.value)}
             className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
-              active ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:text-neutral-200'
+              active ? selectedFillClass : 'text-neutral-400 hover:text-neutral-200'
             }`}
           >
             {Icon && <Icon size={15} />}

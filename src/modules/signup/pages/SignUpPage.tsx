@@ -28,6 +28,7 @@ import { OwnerMethodButtons, PhoneSignIn } from '../components/OwnerMethods'
 import { TurnstileWidget } from '../components/TurnstileWidget'
 import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
 import { hasOwnerSignInMark, NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
+import { selectedFillClass } from '@/shared/ui/formClasses'
 
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
@@ -379,7 +380,7 @@ export function SignUpPage() {
                     onClick={() => setPeriod(p)}
                     className={clsx(
                       'rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                      period === p ? 'bg-primary text-on-primary' : 'text-neutral-400 hover:text-neutral-100',
+                      period === p ? selectedFillClass : 'text-neutral-400 hover:text-neutral-100',
                     )}
                   >
                     {p === 'monthly' ? 'Mensual' : 'Anual · 2 meses gratis'}

@@ -18,6 +18,9 @@ export const chartTooltip = {
   labelStyle: { color: 'var(--color-neutral-300)' },
   itemStyle: { color: 'var(--color-neutral-100)' },
 }
-/** Series: the brand for the main one, the danger color for errors. */
-export const chartBrand = 'var(--color-brasa-500)'
+/**
+ * Series: data ink for the main one (orange means «act here», not «this is a number»: DESIGN.md,
+ * The One Ember Rule), the danger color for errors.
+ */
+export const chartInk = 'var(--color-neutral-300)'
 export const chartDanger = 'var(--color-red-400)'

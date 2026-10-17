@@ -144,7 +144,8 @@ export function OperationsShell({
                 )}
                 {canSeeOrders && (
                   <Tooltip label={canCreate ? 'Crear un pedido nuevo (N)' : ACTION_DENIED_REASON.create} side="bottom">
-                    <Button variant="primary" icon={Plus} onClick={ops.openNewOrder} disabled={!canCreate}>
+                    {/* In the Cocina view the line's action is advancing the orders: creating one steps back to secondary. */}
+                    <Button variant={ops.view === 'kitchen' ? 'secondary' : 'primary'} icon={Plus} onClick={ops.openNewOrder} disabled={!canCreate}>
                       Nuevo pedido
                     </Button>
                   </Tooltip>

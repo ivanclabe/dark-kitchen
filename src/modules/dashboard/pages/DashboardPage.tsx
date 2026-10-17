@@ -411,9 +411,9 @@ export function DashboardPage() {
     <Page>
       <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} pendingIncluded={(data?.ordersNuevo ?? 0) > 0} loading={isLoading} />
 
-      <TipOfTheDay />
-
       <NeedsAttention />
+
+      <TipOfTheDay />
 
       {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
 
