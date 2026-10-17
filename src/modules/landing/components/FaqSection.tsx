@@ -1,3 +1,4 @@
+import { RobotFace } from '@/shared/robot/RobotFace'
 import type { CSSProperties } from 'react'
 
 /** Solo lo que es cierto hoy en el producto (ADR 0010). */
@@ -37,9 +38,14 @@ export function FaqSection() {
   return (
     <section id="faq" className="scroll-mt-16 px-[var(--l-margin)] pb-[clamp(96px,12vw,180px)]" aria-labelledby="landing-faq">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-6">
-        <h2 id="landing-faq" data-reveal className="landing-display text-[length:var(--l-size-title)] lg:col-span-3">
-          Preguntas frecuentes
-        </h2>
+        <div className="lg:col-span-3">
+          <h2 id="landing-faq" data-reveal className="landing-display text-[length:var(--l-size-title)]">
+            Preguntas frecuentes
+          </h2>
+          <div data-reveal style={{ '--i': 1 } as CSSProperties}>
+            <RobotFace mood="help" size={120} lazy className="mt-6 h-24 w-auto lg:h-[120px]" />
+          </div>
+        </div>
         <div className="lg:col-span-8 lg:col-start-5 lg:columns-2 lg:gap-14">
           {FAQ.map(({ q, a }, i) => (
             <p key={q} data-reveal style={{ '--i': i % 3 } as CSSProperties} className="mb-5 break-inside-avoid leading-[1.55]">

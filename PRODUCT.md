@@ -31,7 +31,7 @@ Operation and AI in one place. Orders (WhatsApp included), kitchen, inventory, r
 ## Brand Commitments
 - Name: **Quanela** (the repository is «Dark Kitchen»). Voice: plain, warm Spanish; says what happened and what to do next; never English technical errors.
 - Mascot: the Quanela robot chef, with its expressions (`docs/brand/robot`, `public/robot`), used in messages and empty states (ADR 0060).
-- Brand colors: orange `#F97316` (brasa), dark brown `#1C1310`, white; the landing uses a warm cream ground. Logo and app icon in `docs/brand` and `public/brand`.
+- Brand colors: orange `#F97316` (brasa), dark brown `#1C1310`, white; the landing uses a white ground with the brown and the orange. Logo and app icon in `docs/brand` and `public/brand`.
 
 ## Evidence on Hand
 - Product screenshots and device mockups of the real app (`public/brand/app-tablero.webp`, `app-menu.webp`, landing hero art).

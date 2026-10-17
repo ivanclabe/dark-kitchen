@@ -16,6 +16,11 @@ La crítica de la landing (`.impeccable/critique/…__src-modules-landing.md`) d
   - Al leer cada paso, el pedido cambia de estado. Su botón usa los verbos del tablero (Confirmar, Iniciar, Marcar listo, Despachar, Entregar) y lo avanza; es lo único con lo que el visitante juega.
   - En el celular el pedido va arriba, sin quedarse fijo, para no tapar el texto.
 - **El nombre en grande** («quanela») cruza del escenario a la columna, con una tinta para cada fondo.
+- **Fondo blanco** (pedido después de la primera versión, que usaba el crema de la marca): blanco para la página y un solo tono de panel, piedra casi neutra (`#F3F2F0`).
+- **El robot de Quanela** (ADR 0060):
+  - vive en el escenario, asomado sobre el pedido, y cambia de expresión con cada estado: emocionado cuando llega, contento en cola, guiña mientras se prepara, enamorado cuando está listo, contento en ruta, emocionado al entregar y con la idea cuando sugiere;
+  - aparece junto a las preguntas frecuentes, en el cierre y en el pie;
+  - en el celular, donde el escenario no queda fijo, el paso de la IA lleva su propio robot.
 - **Después, a todo lo ancho:**
   - la app por dentro, con pantallas reales tomadas de un negocio de ejemplo con datos ficticios (`public/brand/landing`) y el menú web;
   - el resto del día, con una prueba pequeña al lado de cada texto;

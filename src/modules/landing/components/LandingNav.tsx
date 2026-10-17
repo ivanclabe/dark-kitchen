@@ -36,8 +36,8 @@ function useLandingSignOut() {
 /**
  * Navegación de la landing (ADR 0010, 3.5): Producto · Funcionalidades ·
  * Precios · FAQ · Ayuda (doc.quanela.com, ADR 0035) · Iniciar sesión · Crear cuenta.
- * Una barra lisa, sin borde ni vidrio: en pantallas anchas va sobre la columna de lectura y, arriba, sin logo (el
- * nombre ya está en grande); al bajar toma fondo y muestra el logo. En el celular, las secciones van en un menú desplegable.
+ * Una barra lisa, sin borde ni vidrio: en pantallas anchas va sobre la columna de lectura, sin logo (el nombre ya
+ * está en grande); pasado el escenario del pedido ocupa todo el ancho y muestra el logo. En el celular, las secciones van en un menú desplegable.
  */
 export function LandingNav() {
   // The session is shown only once Supabase confirmed it (useAuth verifies it with the server).
@@ -65,13 +65,15 @@ export function LandingNav() {
         // Wide screens: over the reading column only, the order's stage keeps its whole height (ADR 0068).
         'fixed top-0 right-0 left-0 z-30 transition-colors duration-300',
         !pastStage && 'lg:left-[47%]',
-        scrolled || open ? 'bg-[#FDF7F1]' : 'bg-[#FDF7F1] lg:bg-transparent',
+        scrolled || open ? 'bg-white' : 'bg-white lg:bg-transparent',
       )}
     >
       <div>
         <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
-          <a href="#producto" className="flex shrink-0 items-center gap-2.5" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
-            <BrandLogo className={clsx('h-11 transition-opacity duration-300', !scrolled && 'lg:pointer-events-none lg:opacity-0')} />
+          {/* Wide screens, while the bar sits over the reading column: the name and the robot are on the page, and the
+              column has no room for the logo too. It returns when the bar spans the whole width. */}
+          <a href="#producto" className={clsx('flex shrink-0 items-center gap-2.5', !pastStage && 'lg:hidden')} aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
+            <BrandLogo className="h-11" />
           </a>
 
           <nav aria-label="Secciones" className="hidden items-center gap-0.5 xl:flex">

@@ -20,7 +20,8 @@ colors:
   paper-canvas: "#f5f5f5"
   linen-canvas: "#f2f0ed"
   roast-brown: "#1C1310"
-  cream-landing: "#FDF7F1"
+  landing-ground: "#FFFFFF"
+  landing-field: "#F3F2F0"
   success: "#34d399"
   warning: "#fbbf24"
   danger: "#f87171"
@@ -125,7 +126,7 @@ The pass is the counter between the kitchen and the dining room: dark, ordered, 
 
 The system is dense but never cramped, and calm by default. Hierarchy comes from type weight, a strict text-color ladder and spacing, not from color or decoration. Three themes (dark by default, light and a warm neutral) are the same system: the neutral scale is remapped per theme and every semantic token follows it. The mascot, the Quanela robot chef, carries personality in messages and empty states so the working surfaces do not have to.
 
-The operational screens (the Centro de operaciones) are the strictest part of the system: nothing moves for decoration, every figure is real or shown as «—», and the same order looks the same in every view. The public landing is a different surface (a warm cream world with the brand brown and orange): it follows the brand colors and the logo here and its own composition in ADR 0068 (the split stage, «La comanda que viaja»).
+The operational screens (the Centro de operaciones) are the strictest part of the system: nothing moves for decoration, every figure is real or shown as «—», and the same order looks the same in every view. The public landing is a different surface (a white world with the brand brown and orange): it follows the brand colors and the logo here and its own composition in ADR 0068 (the split stage, «La comanda que viaja»).
 
 **Key Characteristics:**
 - Night surfaces with hairline borders; depth by tone, shadow only on what floats.
@@ -151,7 +152,8 @@ A near-monochrome night palette with a single warm accent and four quiet state c
 - **Ink** (#f5f5f5): the selected chip, segment or pill tab, with Night Canvas text: the inverted neutral, so it inverts again on the light themes. A filter at rest is a selection, not an action.
 - **Smoke Text** (#fafafa), **Ash Text** (#a3a3a3), **Ash Muted** (#858585): the three text levels — primary, secondary, metadata. Muted text reaches 4.5:1 on cards.
 - **Paper Canvas** (#f5f5f5) and **Linen Canvas** (#f2f0ed): the grounds of the light and the warm neutral themes.
-- **Roast Brown** (#1C1310) and **Landing Cream** (#FDF7F1): the brand's own brown and the landing ground; the landing only.
+- **Roast Brown** (#1C1310): the brand's own brown; on the landing, the stage of the order and the largest plan.
+- **Landing White** (#FFFFFF) and **Landing Stone** (#F3F2F0): the landing's ground and its one panel tone, a step off the white with almost no chroma; the landing only.
 
 ### Tertiary (states)
 - **Success** (#34d399), **Warning** (#fbbf24), **Danger** (#f87171), **Info** (#38bdf8): badges, notices and figure tones, always as text on a 15 % tint of themselves. Light themes swap them for their 800-tone equivalents.

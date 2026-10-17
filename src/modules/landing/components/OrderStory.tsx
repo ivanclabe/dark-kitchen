@@ -1,5 +1,6 @@
 import { OrderStatusBadge } from '@/modules/orders/lib/orderStatus'
 import type { OrderStatus } from '@/modules/orders/types'
+import { MOOD_EXPRESSION, robotSrc, type RobotMood } from '@/shared/robot/expressions'
 import { RobotFace } from '@/shared/robot/RobotFace'
 import { formatMoney } from '@/shared/utils/format'
 import clsx from 'clsx'
@@ -15,18 +16,20 @@ interface OrderState {
   status: OrderStatus
   clock: string
   action: { label: string; icon: LucideIcon }
+  /** How the robot on the stage takes this moment (ADR 0060: a purpose, not a file). */
+  robot: RobotMood
   /** Quanela's suggestion, after the delivery. */
   suggestion?: boolean
 }
 
 const STATES: OrderState[] = [
-  { status: 'NUEVO', clock: 'Llegó hace 1 min', action: { label: 'Confirmar', icon: CheckCircle2 } },
-  { status: 'CONFIRMADO', clock: 'En cola hace 3 min', action: { label: 'Iniciar', icon: Play } },
-  { status: 'EN_PREPARACION', clock: 'Preparando hace 9 min', action: { label: 'Marcar listo', icon: ChevronRight } },
-  { status: 'LISTO', clock: 'Listo hace 1 min', action: { label: 'Despachar', icon: Bike } },
-  { status: 'DESPACHADO', clock: 'En ruta hace 12 min', action: { label: 'Entregar', icon: PackageCheck } },
-  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Qué sigue', icon: Sparkles } },
-  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Verlo otra vez', icon: RotateCcw }, suggestion: true },
+  { status: 'NUEVO', clock: 'Llegó hace 1 min', action: { label: 'Confirmar', icon: CheckCircle2 }, robot: 'celebrate' },
+  { status: 'CONFIRMADO', clock: 'En cola hace 3 min', action: { label: 'Iniciar', icon: Play }, robot: 'success' },
+  { status: 'EN_PREPARACION', clock: 'Preparando hace 9 min', action: { label: 'Marcar listo', icon: ChevronRight }, robot: 'info' },
+  { status: 'LISTO', clock: 'Listo hace 1 min', action: { label: 'Despachar', icon: Bike }, robot: 'thanks' },
+  { status: 'DESPACHADO', clock: 'En ruta hace 12 min', action: { label: 'Entregar', icon: PackageCheck }, robot: 'success' },
+  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Qué sigue', icon: Sparkles }, robot: 'celebrate' },
+  { status: 'ENTREGADO', clock: 'Entregado a las 12:41', action: { label: 'Verlo otra vez', icon: RotateCcw }, robot: 'ai', suggestion: true },
 ]
 
 /** Which step of the story each state belongs to, and the state each step shows when it is read. */
@@ -87,8 +90,7 @@ function OrderTicket({ index, onAdvance }: { index: number; onAdvance: () => voi
       </ul>
       {index === 2 && <p className="mt-1.5 text-xs text-neutral-400">1 de 2 platos listos</p>}
 
-      {/* taste-skill-ignore: the total line of the app's own order card (inside data-ui). */}
-      <div className="mt-3 flex items-center justify-between gap-3 border-t border-neutral-800 pt-3 text-sm">
+      <div className="mt-3 flex items-center justify-between gap-3 border-t border-neutral-800 pt-3 text-sm">{/* taste-skill-ignore: the app's own total line (data-ui) */}
         <span className={clsx('rounded px-1.5 text-xs font-medium', paid ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400')}>
           {paid ? 'Pagado · Transferencia' : 'Por cobrar'}
         </span>
@@ -164,6 +166,11 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
   // While the button brings a step into view, the steps the page scrolls past do not move the order.
   const driving = useRef(false)
 
+  // The robot's faces are small; load them once the page is up so each change is instant.
+  useEffect(() => {
+    for (const mood of new Set(STATES.map((s) => s.robot))) new Image().src = robotSrc(MOOD_EXPRESSION[mood], 120)
+  }, [])
+
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return
     const observer = new IntersectionObserver(
@@ -203,7 +210,11 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
     <div className="landing-split">
       <aside className="landing-stage" aria-label="Un pedido de ejemplo">
         <div className="landing-stage-field flex-col gap-4">
-          <div key={index} className="landing-order-swap flex w-full justify-center">
+          {/* Quanela's robot lives on the stage and reacts to every step of the order. */}
+          <div className="-mb-6 flex w-full max-w-[26rem] justify-end pr-4 lg:-mb-8 lg:max-w-[32.5rem]">
+            <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop relative z-0 h-16 w-auto lg:h-[120px]" />
+          </div>
+          <div key={index} className="landing-order-swap relative z-10 flex w-full justify-center">
             <OrderTicket index={index} onAdvance={advance} />
           </div>
           <p className="hidden w-full max-w-[32.5rem] text-[15px] text-[#d9cbbf] lg:block">Un pedido de ejemplo. Avánzalo con su botón, o sigue leyendo.</p>

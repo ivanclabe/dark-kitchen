@@ -1,4 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
+import { RobotFace } from '@/shared/robot/RobotFace'
 import { applyAppearance, applyRouteDefault, savedTheme } from '@/shared/appearance/appearance'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
@@ -62,7 +63,7 @@ const STEPS: StoryStep[] = [
           quedó quieto.
         </p>
         <p>Recomiendan y te dicen por qué. Tú decides.</p>
-        <img src="/robot/robot-idea-lg.webp" width={381} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-40 w-auto" />
+        <img src="/robot/robot-idea-lg.webp" width={381} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-40 w-auto lg:hidden" />
       </>
     ),
   },
@@ -125,7 +126,10 @@ export function LandingPage() {
     root.dataset.theme = 'dark'
     // The page itself is light: native controls and the scrollbar too (ADR 0061).
     root.style.colorScheme = 'light'
+    // The landing's white reaches the edges, also when the page is pulled past its end.
+    root.style.backgroundColor = '#ffffff'
     return () => {
+      root.style.backgroundColor = ''
       // Leaving the landing (to the login, for instance): the chosen theme, or the next page's default.
       if (savedTheme() !== null) applyAppearance()
       else applyRouteDefault(window.location.pathname)
@@ -188,8 +192,11 @@ export function LandingPage() {
         <ClosingSection />
       </main>
 
-      <footer className="grid gap-2 px-[var(--l-margin)] pt-[20svh] pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-baseline sm:gap-6 sm:pb-[30px]">
-        <span className="text-[var(--l-soft)]">Quanela · operación e IA para cocinas</span>
+      <footer className="grid gap-2 px-[var(--l-margin)] pt-[20svh] pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:pb-[30px]">
+        <span className="flex items-center gap-2.5 text-[var(--l-soft)]">
+          <RobotFace mood="info" size={32} lazy />
+          Quanela · operación e IA para cocinas
+        </span>
         <nav aria-label="Pie de página" className="flex flex-wrap gap-x-6 gap-y-1">
           <a href="#precios" className="landing-link">
             Precios

@@ -1,15 +1,16 @@
 /*
  * The landing (ADR 0068): «La comanda que viaja», a split stage. Half the screen holds one order that
  * never leaves; the other half reads. The brand's own palette and faces (DESIGN.md: cream, roast brown,
- * ember; Nunito for display, the app's sans for text). One radius for panels, pill buttons.
+ * ember on a white ground; Nunito for display, the app's sans for text). One radius for panels, pill buttons.
  */
 .landing {
-  --l-ground: #fdf7f1;
-  --l-field: #f4e9dd;
+  --l-ground: #ffffff;
+  /* One quiet step off the white, low in chroma: panels, the showcase's stage, the first plan. */
+  --l-field: #f3f2f0;
   --l-ink: #1c1310;
   --l-soft: #5b4a42;
   --l-stage: #1c1310;
-  --l-on-stage: #fdf7f1;
+  --l-on-stage: #ffffff;
   --l-accent: #c2410c;
   --l-accent-hover: #9a3412;
   --l-ember: #f97316;
@@ -81,7 +82,7 @@
   color: var(--l-ink);
 }
 .landing-button-light:hover {
-  background: #fff;
+  background: var(--l-field);
 }
 .landing :focus-visible {
   outline: 3px solid var(--l-accent);
@@ -188,17 +189,28 @@
 
 /* ---------------------------------------------------------------- motion */
 
-.landing-order-swap {
-  animation: landing-swap 240ms var(--l-ease-out);
-}
-@keyframes landing-swap {
-  from {
-    opacity: 0.4;
-    transform: translateY(6px);
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
+  .landing-order-swap {
+    animation: landing-swap 240ms var(--l-ease-out);
+  }
+  @keyframes landing-swap {
+    from {
+      opacity: 0.4;
+      transform: translateY(6px);
+    }
+  }
+  /* The robot changes face with the order: a small pop, never a loop. */
+  .landing-robot-pop {
+    animation: landing-robot-pop 420ms var(--l-ease-out);
+    transform-origin: bottom center;
+  }
+  @keyframes landing-robot-pop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.92);
+    }
+  }
+
   /* Entrances: only once the page knows it can reveal them (`landing-motion` is set by script). */
   .landing-motion [data-reveal] {
     opacity: 0;

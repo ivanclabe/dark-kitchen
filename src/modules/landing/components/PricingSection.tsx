@@ -6,7 +6,7 @@ import { RotateCw } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 
-/** The fields of the tiles, from the lightest plan to the largest: cream, ember, roast brown. */
+/** The fields of the tiles, from the lightest plan to the largest: stone, ember, roast brown. */
 const TILE = [
   { field: 'bg-[var(--l-field)] text-[var(--l-ink)]', soft: 'text-[var(--l-soft)]', button: 'landing-button-ink', height: 'lg:min-h-[500px]' },
   { field: 'bg-[var(--l-accent)] text-white', soft: 'text-white/85', button: 'landing-button-light', height: 'lg:min-h-[580px]' },
