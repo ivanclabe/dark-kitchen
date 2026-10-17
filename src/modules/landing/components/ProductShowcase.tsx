@@ -8,8 +8,8 @@ const SCREENS = [
     name: 'Inicio',
     note: 'Lo que vendiste hoy, lo que necesita atención y cómo va la cocina.',
     src: '/brand/landing/inicio.webp',
-    width: 1720,
-    height: 1065,
+    width: 2752,
+    height: 1704,
     phone: false,
   },
   {
@@ -17,8 +17,8 @@ const SCREENS = [
     name: 'Tablero',
     note: 'Todos los pedidos del día por estado, con su tiempo y su siguiente paso.',
     src: '/brand/landing/tablero.webp',
-    width: 1720,
-    height: 1065,
+    width: 2752,
+    height: 1704,
     phone: false,
   },
   {
@@ -26,8 +26,8 @@ const SCREENS = [
     name: 'Cocina',
     note: 'Para la línea: los platos enteros, grandes, y nada que distraiga.',
     src: '/brand/landing/cocina.webp',
-    width: 1720,
-    height: 1065,
+    width: 2752,
+    height: 1704,
     phone: false,
   },
   {
@@ -35,8 +35,8 @@ const SCREENS = [
     name: 'Pedidos',
     note: 'Buscar cualquier pedido por número, cliente, teléfono o plato, y ver qué falta por cobrar.',
     src: '/brand/landing/lista.webp',
-    width: 1720,
-    height: 1065,
+    width: 2752,
+    height: 1704,
     phone: false,
   },
   {
