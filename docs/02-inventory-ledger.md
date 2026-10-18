@@ -15,7 +15,7 @@ stock(insumo) = SUM(quantity_base_unit) FROM dk_inventory_movements WHERE ingred
 | `COMPRA` | + | `dk_confirm_purchase()` | `dk_purchase_items.id` |
 | `MERMA` | − | `dk_register_waste()` (manual, rol INVENTORY/ADMIN) | null o justificación |
 | `AJUSTE` | + o − | `dk_register_adjustment()` (manual, rol INVENTORY/ADMIN) | null |
-| `CONSUMO` | − | `dk_mark_order_item_ready()` | `dk_order_items.id` |
+| `CONSUMO` | − | `dk_advance_kitchen_item()` al pasar el ítem a `EN_PREPARACION` (ADR 0069) | `dk_order_items.id` |
 | `DEVOLUCION` | + | `dk_cancel_order()` (cancelación tardía) o devolución de compra | `dk_order_items.id` / `dk_purchase_items.id` |
 
 Cada fila almacena: `ingredient_id`, `movement_type`, `quantity_base_unit` (siempre en la unidad base del insumo, ya convertida), `unit_cost` (costo unitario aplicado, relevante para `COMPRA` y para costear `CONSUMO` al costo promedio vigente), `reference_type` + `reference_id` (polimórfico: a qué operación de negocio pertenece), `created_by`, `reason` (enum corto para mermas: `VENCIMIENTO`, `DANO`, `ERROR_PREPARACION`, `OTRO`), `observation` (texto libre), `created_at`.

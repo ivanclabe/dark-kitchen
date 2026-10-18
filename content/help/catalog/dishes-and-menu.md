@@ -42,7 +42,7 @@ Para cambiar el precio o el nombre, toca **Editar plato**, cambia lo que necesit
 
 ## Platos sin receta
 
-Un plato con **Descuenta inventario** apagado se vende **sin receta**: al confirmar el pedido no reserva nada y, cuando está listo, no descuenta nada. En el catálogo dice **No usa inventario**. Si le pones receta, solo sirve para ver su costo.
+Un plato con **Descuenta inventario** apagado se vende **sin receta**: al confirmar el pedido no reserva nada y, cuando se prepara, no descuenta nada. En el catálogo dice **No usa inventario**. Si le pones receta, solo sirve para ver su costo.
 
 > **Cuidado:** un plato que descuenta inventario y no tiene receta muestra **Sin receta** (en ámbar) y **no se puede confirmar** en un pedido. Créale la receta o apaga **Descuenta inventario**.
 

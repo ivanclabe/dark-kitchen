@@ -29,7 +29,7 @@ Ahora están juntos en **Centro de operaciones**, con las vistas Tablero, Cocina
 Abre el pedido y, en **Pago**, toca **Registrar pago**. Ver [Registrar y anular pagos](help:register-payment).
 
 ### Cancelé un pedido y el stock no volvió
-Si algún plato ya estaba **Listo**, sus insumos ya se usaron: se registra una devolución y el pedido queda para **Revisar**. Ver [Cómo se descuenta el inventario](help:inventory-deduction).
+Si algún plato ya había empezado a prepararse, sus insumos ya se usaron: vuelven al inventario una sola vez y el pedido queda para **Revisar**. Ver [Cómo se descuenta el inventario](help:inventory-deduction).
 
 ## Inventario
 
