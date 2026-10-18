@@ -5,6 +5,7 @@ import { InfoTip } from './InfoTip'
 import { Modal } from './Modal'
 import { StatCard } from './StatCard'
 import { Tooltip } from './Tooltip'
+import { Combobox } from './Combobox'
 
 afterEach(cleanup)
 
@@ -58,6 +59,21 @@ describe('design system overlays (ADR 0065)', () => {
     expect(tip.className).not.toContain('invisible')
     fireEvent.pointerLeave(button.parentElement!)
     expect(tip.className).toContain('invisible')
+  })
+
+  it('Combobox: the list lives outside a table that scrolls sideways, and choosing from it still works', () => {
+    const onChange = vi.fn()
+    render(
+      <div style={{ overflowX: 'auto' }} data-testid="table">
+        <Combobox aria-label="Insumo" value="" onChange={onChange} options={[{ value: 'a', label: 'Aceite' }, { value: 't', label: 'Tomate' }]} />
+      </div>,
+    )
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Insumo' }))
+    const list = screen.getByRole('listbox')
+    expect(screen.getByTestId('table').contains(list)).toBe(false)
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Tomate' }))
+    expect(onChange).toHaveBeenCalledWith('t')
+    expect(screen.queryByRole('listbox')).toBeNull()
   })
 
   it('StatCard: while loading there is no figure (never a fake 0) and the card is busy', () => {

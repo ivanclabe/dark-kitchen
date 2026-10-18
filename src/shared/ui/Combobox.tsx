@@ -1,5 +1,6 @@
 import { Check, ChevronDown, Plus, Search, X } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 export interface ComboboxOption {
   value: string
@@ -32,6 +33,9 @@ interface ComboboxProps {
   'aria-required'?: boolean
 }
 
+const GAP = 4
+const EDGE = 8
+
 function normalize(s: string) {
   return s.trim().toLowerCase()
 }
@@ -60,6 +64,8 @@ export function Combobox({
   const [highlighted, setHighlighted] = useState(0)
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null)
   // ARIA combobox (ADR 0065): the list is a listbox and the input points at the highlighted option.
   const listId = useId()
   const optionId = (i: number) => `${listId}-option-${i}`
@@ -88,10 +94,43 @@ export function Combobox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlighted, open])
 
+  // Like InfoTip and Tooltip (ADR 0065), the list lives in a portal with fixed
+  // coordinates: inside a table that scrolls sideways (the recipe editor), a
+  // drawer or a modal it used to be clipped by the scroll container. Below the
+  // input when it fits, above when there is more room there.
+  useLayoutEffect(() => {
+    if (!open || disabled) return
+    function place() {
+      const input = inputRef.current
+      const list = listRef.current
+      if (!input || !list) return
+      const r = input.getBoundingClientRect()
+      const height = Math.min(list.scrollHeight, 256)
+      const below = window.innerHeight - EDGE - (r.bottom + GAP)
+      const above = r.top - GAP - EDGE
+      const up = below < height && above > below
+      const maxHeight = Math.max(Math.min(256, up ? above : below), 96)
+      setPos({
+        left: Math.round(r.left),
+        top: Math.round(up ? r.top - GAP - Math.min(height, maxHeight) : r.bottom + GAP),
+        width: Math.round(r.width),
+        maxHeight: Math.round(maxHeight),
+      })
+    }
+    place()
+    window.addEventListener('scroll', place, true)
+    window.addEventListener('resize', place)
+    return () => {
+      window.removeEventListener('scroll', place, true)
+      window.removeEventListener('resize', place)
+    }
+  }, [open, disabled, totalRows])
+
   useEffect(() => {
     if (!rootRef.current) return
     function handleClickOutside(e: MouseEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (rootRef.current && !rootRef.current.contains(target) && !listRef.current?.contains(target)) {
         setOpen(false)
         setInputValue(selected?.label ?? '')
       }
@@ -202,57 +241,66 @@ export function Combobox({
         </div>
       </div>
 
-      {open && !disabled && (
-        <div id={listId} role="listbox" className="animate-fade-in absolute z-20 mt-1 max-h-64 w-full overflow-y-auto overscroll-contain rounded-xl border border-neutral-800 bg-neutral-900 py-1 shadow-float">
-          {filtered.length === 0 && !showCreateRow && (
-            <p role="presentation" className="px-3 py-2 text-sm text-neutral-500">
-              {emptyMessage}
-            </p>
-          )}
-          {filtered.map((option, i) => (
-            <div
-              key={option.value}
-              id={optionId(i)}
-              role="option"
-              aria-selected={option.value === value}
-              onMouseDown={(e) => {
-                e.preventDefault()
-                selectOption(option)
-              }}
-              onMouseEnter={() => setHighlighted(i)}
-              className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-sm pointer-coarse:py-3 ${
-                i === highlighted ? 'bg-neutral-800 text-neutral-50' : 'text-neutral-200'
-              }`}
-            >
-              <span className="flex min-w-0 items-center gap-2.5">
-                {option.leading}
-                <span className="min-w-0">
-                  <span className="block truncate">{option.label}</span>
-                  {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
+      {open &&
+        !disabled &&
+        createPortal(
+          <div
+            ref={listRef}
+            id={listId}
+            role="listbox"
+            style={pos ? { left: pos.left, top: pos.top, width: pos.width, maxHeight: pos.maxHeight } : { left: 0, top: 0 }}
+            className={`animate-fade-in fixed z-[70] max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-neutral-800 bg-neutral-900 py-1 shadow-float ${pos ? '' : 'invisible'}`}
+          >
+            {filtered.length === 0 && !showCreateRow && (
+              <p role="presentation" className="px-3 py-2 text-sm text-neutral-500">
+                {emptyMessage}
+              </p>
+            )}
+            {filtered.map((option, i) => (
+              <div
+                key={option.value}
+                id={optionId(i)}
+                role="option"
+                aria-selected={option.value === value}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  selectOption(option)
+                }}
+                onMouseEnter={() => setHighlighted(i)}
+                className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-sm pointer-coarse:py-3 ${
+                  i === highlighted ? 'bg-neutral-800 text-neutral-50' : 'text-neutral-200'
+                }`}
+              >
+                <span className="flex min-w-0 items-center gap-2.5">
+                  {option.leading}
+                  <span className="min-w-0">
+                    <span className="block truncate">{option.label}</span>
+                    {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
+                  </span>
                 </span>
-              </span>
-              {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" aria-hidden />}
-            </div>
-          ))}
-          {showCreateRow && (
-            <div
-              id={optionId(filtered.length)}
-              role="option"
-              aria-selected={false}
-              onMouseDown={(e) => {
-                e.preventDefault()
-                handleCreate()
-              }}
-              onMouseEnter={() => setHighlighted(filtered.length)}
-              className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-brasa-400 pointer-coarse:py-3 ${
-                highlighted === filtered.length ? 'bg-neutral-800' : ''
-              }`}
-            >
-              <Plus size={14} aria-hidden /> {createLabel(inputValue.trim())}
-            </div>
-          )}
-        </div>
-      )}
+                {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" aria-hidden />}
+              </div>
+            ))}
+            {showCreateRow && (
+              <div
+                id={optionId(filtered.length)}
+                role="option"
+                aria-selected={false}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  handleCreate()
+                }}
+                onMouseEnter={() => setHighlighted(filtered.length)}
+                className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-brasa-400 pointer-coarse:py-3 ${
+                  highlighted === filtered.length ? 'bg-neutral-800' : ''
+                }`}
+              >
+                <Plus size={14} aria-hidden /> {createLabel(inputValue.trim())}
+              </div>
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }
