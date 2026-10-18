@@ -28,18 +28,36 @@ describe('design system overlays (ADR 0065)', () => {
     expect(close).not.toHaveBeenCalled()
   })
 
-  it('Tooltip: Escape hides it until the pointer or focus leaves', () => {
+  it('Tooltip: lives outside the scroll container, hides the native title, Escape hides it until the pointer or focus leaves', () => {
     render(
-      <Tooltip label="Archivar">
-        <button>Icono</button>
-      </Tooltip>,
+      <div style={{ overflowY: 'auto' }} data-testid="list">
+        <Tooltip label="Archivar">
+          <button aria-label="Archivar pedido" title="Archivar pedido">
+            Icono
+          </button>
+        </Tooltip>
+      </div>,
     )
+    const button = screen.getByRole('button')
     const tip = screen.getByRole('tooltip', { hidden: true })
-    expect(tip.className).toContain('group-hover:block')
-    fireEvent.keyDown(screen.getByRole('button'), { key: 'Escape' })
-    expect(tip.className).not.toContain('group-hover:block')
-    fireEvent.blur(screen.getByRole('button'))
-    expect(tip.className).toContain('group-hover:block')
+    expect(screen.getByTestId('list').contains(tip)).toBe(false)
+    expect(button.getAttribute('aria-describedby')).toBe(tip.id)
+    expect(button.getAttribute('title')).toBe('')
+    expect(tip.className).toContain('invisible')
+
+    fireEvent.focus(button)
+    expect(tip.className).not.toContain('invisible')
+    fireEvent.keyDown(button, { key: 'Escape' })
+    expect(tip.className).toContain('invisible')
+    fireEvent.blur(button)
+    fireEvent.focus(button)
+    expect(tip.className).not.toContain('invisible')
+    fireEvent.blur(button)
+
+    fireEvent.pointerEnter(button.parentElement!)
+    expect(tip.className).not.toContain('invisible')
+    fireEvent.pointerLeave(button.parentElement!)
+    expect(tip.className).toContain('invisible')
   })
 
   it('StatCard: while loading there is no figure (never a fake 0) and the card is busy', () => {
