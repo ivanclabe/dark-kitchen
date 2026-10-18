@@ -6,7 +6,7 @@ import {
   setIngredientActive,
   updateIngredient,
 } from '../api/ingredients'
-import type { IngredientInput } from '../types'
+import type { Ingredient, IngredientInput } from '../types'
 
 const INGREDIENTS_KEY = ['ingredients'] as const
 const CATEGORIES_KEY = ['ingredient-categories'] as const
@@ -31,7 +31,11 @@ export function useCreateIngredient() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: IngredientInput) => createIngredient(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY }),
+    // In the list at once (a recipe line selects it right away), then refreshed.
+    onSuccess: (created) => {
+      queryClient.setQueryData<Ingredient[]>(INGREDIENTS_KEY, (list) => (list ? [...list, created].sort((a, b) => a.name.localeCompare(b.name)) : list))
+      return queryClient.invalidateQueries({ queryKey: INGREDIENTS_KEY })
+    },
   })
 }
 

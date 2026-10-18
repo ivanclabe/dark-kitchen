@@ -70,25 +70,35 @@ export async function listIngredients(): Promise<Ingredient[]> {
   return (data as unknown as IngredientRow[]).map(mapRow)
 }
 
+/**
+ * ADR 0069: every ingredient is created by dk_create_ingredient — from the inventory, a purchase or a recipe. It
+ * starts at zero stock (no movement), with a real base unit, and a name the account does not have yet (an empty
+ * code is generated).
+ */
 export async function createIngredient(input: IngredientInput): Promise<Ingredient> {
-  const { data, error } = await supabase
-    .from('dk_ingredients')
-    .insert({
-      code: input.code,
-      name: input.name,
-      description: input.description ?? null,
-      category_id: input.categoryId ?? null,
-      base_unit_id: input.baseUnitId,
-      primary_supplier_id: input.primarySupplierId ?? null,
-      min_stock: input.minStock,
-      max_stock: input.maxStock ?? null,
-      perishable: input.perishable,
-      shelf_life_days: input.shelfLifeDays ?? null,
-    })
-    .select(SELECT)
-    .single()
+  const { data: id, error } = await supabase.rpc('dk_create_ingredient', {
+    p_name: input.name,
+    p_base_unit_id: input.baseUnitId,
+    p_code: input.code?.trim() || undefined,
+    p_category_id: input.categoryId ?? undefined,
+    p_min_stock: input.minStock,
+    p_max_stock: input.maxStock ?? undefined,
+    p_description: input.description ?? undefined,
+    p_primary_supplier_id: input.primarySupplierId ?? undefined,
+    p_perishable: input.perishable,
+    p_shelf_life_days: input.shelfLifeDays ?? undefined,
+  })
   if (error) throw error
+  const { data, error: readError } = await supabase.from('dk_ingredients').select(SELECT).eq('id', id as string).single()
+  if (readError) throw readError
   return mapRow(data as unknown as IngredientRow)
+}
+
+/** The ingredient that already has that name, when dk_create_ingredient refused a duplicate (its id is in the detail). */
+export function duplicateIngredientId(err: unknown): string | null {
+  if (typeof err !== 'object' || err === null) return null
+  const { hint, details } = err as { hint?: unknown; details?: unknown }
+  return hint === 'duplicate_ingredient' && typeof details === 'string' && details ? details : null
 }
 
 export async function updateIngredient(id: string, input: IngredientInput): Promise<void> {

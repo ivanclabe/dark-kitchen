@@ -12,9 +12,14 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-15
+updated: 2026-10-18
 order: 1
 ---
+
+## 18 de octubre de 2026
+
+- **Recetas sin esperar al inventario.** En la receta de un plato o de una preparación, si un insumo no existe, lo creas ahí mismo («Crear el insumo…») y queda en la línea. Entra al inventario con existencia **cero** y sube cuando confirmas su compra. Quanela no deja crear dos insumos con el mismo nombre. Ver [Recetas y costo de un plato](help:recipes-and-cost).
+- **El inventario se descuenta al empezar cada plato.** Ya no al marcarlo listo: cuando la cocina toca **Iniciar**, salen sus insumos. Si algo ya no alcanza, la cocina lo sabe antes de empezar. Devolver un plato a pendiente o cancelar el pedido devuelve lo usado **una sola vez**. Ver [Cómo se descuenta el inventario](help:inventory-deduction).
 
 ## 15 de octubre de 2026
 

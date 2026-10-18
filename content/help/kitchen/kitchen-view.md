@@ -35,8 +35,8 @@ La vista **Cocina** es la pantalla de la línea: solo lo que hay que preparar.
 
 1. Abre **Centro de operaciones → Cocina**. Si tu rol es COCINA, entras directo aquí.
 2. Los pedidos confirmados aparecen solos en **En cola**, con un sonido, los más antiguos y los **prioritarios** primero.
-3. Toca **Iniciar** en la tarjeta: pasa a **Preparando**.
-4. Cuando todo esté listo, toca **Marcar listo**: pasa a **Listo** y sus insumos se descuentan del inventario.
+3. Toca **Iniciar** en la tarjeta: pasa a **Preparando** y sus insumos se descuentan del inventario. Si ya no alcanza alguno, no empieza y el mensaje dice cuál falta.
+4. Cuando todo esté listo, toca **Marcar listo**: pasa a **Listo**.
 5. También puedes **arrastrar** la tarjeta entre En cola, Preparando y Listo, en los dos sentidos.
 
 ## Plato por plato

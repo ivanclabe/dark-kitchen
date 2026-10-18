@@ -255,7 +255,7 @@ create type dk_delivery_status as enum ('ASIGNADO','EN_RUTA','ENTREGADO','FALLID
 
 - `dk_confirm_purchase(purchase_id)` → genera movimientos `COMPRA`, actualiza costo promedio, cambia estado.
 - `dk_confirm_order(order_id)` → valida stock disponible, crea reservas, genera `dk_kitchen_tickets`, cambia estado a `CONFIRMADO`.
-- `dk_mark_order_item_ready(order_item_id)` → consume reserva del ítem (movimiento `CONSUMO`), actualiza `kitchen_status`; si todos los ítems quedan listos, transiciona el pedido a `LISTO`.
+- `dk_advance_kitchen_item(order_item_id)` → avanza `kitchen_status`; al pasar a `EN_PREPARACION` valida el stock en mano y consume la reserva del ítem (movimiento `CONSUMO`, ADR 0069); si todos los ítems quedan listos, transiciona el pedido a `LISTO`.
 - `dk_cancel_order(order_id, reason)` → libera reservas activas o genera `DEVOLUCION` si ya hubo consumo.
 - `dk_register_waste(ingredient_id, quantity, reason, observation)` → movimiento `MERMA`.
 - `dk_register_adjustment(ingredient_id, quantity, observation)` → movimiento `AJUSTE`.

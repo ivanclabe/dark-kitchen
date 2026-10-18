@@ -7,7 +7,7 @@ Aceptado (propuesto para aprobación del usuario)
 Operaciones como confirmar un pedido (validar stock + crear reservas + generar comanda + cambiar estado) tocan múltiples tablas y deben ser atómicas. Hacerlo como varias llamadas separadas desde el cliente (`supabase-js`) expone a condiciones de carrera y escrituras parciales si el cliente falla a mitad de camino.
 
 ## Decisión
-Las operaciones que combinan cambio de estado + efecto en inventario se implementan como funciones SQL (`SECURITY DEFINER`) expuestas vía RPC de Supabase: `dk_confirm_order`, `dk_mark_order_item_ready`, `dk_cancel_order`, `dk_confirm_purchase`, `dk_register_waste`, `dk_register_adjustment`. El frontend las invoca a través de la capa `services/`, que valida inputs antes de llamar y traduce errores del RPC a mensajes de UI.
+Las operaciones que combinan cambio de estado + efecto en inventario se implementan como funciones SQL (`SECURITY DEFINER`) expuestas vía RPC de Supabase: `dk_confirm_order`, `dk_advance_kitchen_item` / `dk_revert_kitchen_item`, `dk_cancel_order`, `dk_confirm_purchase`, `dk_register_waste`, `dk_register_adjustment`. El frontend las invoca a través de la capa `services/`, que valida inputs antes de llamar y traduce errores del RPC a mensajes de UI.
 
 Los CRUD simples de una sola tabla (crear insumo, editar proveedor, editar datos de cliente) siguen el camino directo: `repositories/` → `supabase-js` `insert`/`update`, protegido por RLS normal.
 

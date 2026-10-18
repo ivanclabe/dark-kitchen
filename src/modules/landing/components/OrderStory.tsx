@@ -44,14 +44,14 @@ const STATES: OrderState[] = [
     clock: 'Preparando hace 9 min',
     action: { label: 'Marcar listo', icon: ChevronRight },
     robot: 'info',
-    thought: 'La cocina ya lo está haciendo. Cuento su tiempo: si pasa del objetivo, lo pongo en rojo.',
+    thought: 'La cocina lo empezó: lo que lleva cada plato ya salió del inventario. Cuento su tiempo y, si pasa del objetivo, lo pongo en rojo.',
   },
   {
     status: 'LISTO',
     clock: 'Listo hace 1 min',
     action: { label: 'Despachar', icon: Bike },
     robot: 'thanks',
-    thought: 'Listo para salir. Lo que llevaba cada plato ya salió del inventario.',
+    thought: 'Listo para salir. Solo falta quién lo lleve.',
   },
   {
     status: 'DESPACHADO',

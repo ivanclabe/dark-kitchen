@@ -29,10 +29,13 @@ screenshots:
 
 1. En **Planificador de Menús**, toca el lápiz del plato (**Editar plato**) y luego **Crear receta** (si ya tiene, dice **Receta v1**, **v2**…).
 2. Toca **Agregar ingrediente**, busca el insumo por nombre o código, escribe la **Cantidad** y elige la **Unidad** (por ejemplo, 150 **g** de carne aunque la compres en kilos).
+   Si el insumo todavía no existe, escribe su nombre y toca **Crear el insumo «…»**: le pones la unidad base (g, kg, ml, l o unidad) y queda en la línea, sin salir de la receta.
 3. Repite con cada insumo. Abajo ves el **Costo estimado** y el **Margen** frente al precio de venta.
 4. Toca **Guardar como nueva versión**.
 
 {{screenshot:recipe}}
+
+> **Bueno saber:** la receta **no depende del inventario**. Puedes guardarla aunque sus insumos estén en cero; un insumo nuevo entra al inventario con **existencia cero** y sube cuando confirmas su compra. Si el nombre ya existe (aunque cambien mayúsculas o tildes), Quanela te ofrece el que ya tienes en vez de duplicarlo.
 
 ## Cómo se calcula el costo
 

@@ -53,4 +53,4 @@ Para contar la bodega y corregir el inventario de una vez, toca **Contar inventa
 3. Opcional: **Categoría**, **Proveedor principal**, **Stock mínimo** (dispara la alerta), **Stock máximo** (meta de reposición) y si es **Perecedero** (con su vida útil).
 4. Toca **Crear insumo**.
 
-> **Bueno saber:** el stock **no se escribe a mano**: entra con las compras confirmadas, sale con los platos listos y se corrige con mermas y ajustes. Ver [Cómo se descuenta el inventario](help:inventory-deduction).
+> **Bueno saber:** el stock **no se escribe a mano**: entra con las compras confirmadas, sale cuando la cocina empieza cada plato y se corrige con mermas y ajustes. Ver [Cómo se descuenta el inventario](help:inventory-deduction).

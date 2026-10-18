@@ -1,7 +1,7 @@
 # ADR 0002 — Punto de reserva y consumo de inventario en el ciclo de vida del pedido
 
 ## Estado
-Aceptado (propuesto para aprobación del usuario)
+Aceptado. **Revisado por [ADR 0069](./0069-recetas-sin-depender-del-inventario.md) (2026-10-18):** el consumo pasó de `LISTO` al momento en que cada plato empieza a prepararse (`EN_PREPARACION`); la reserva en `CONFIRMADO` se mantiene.
 
 ## Contexto
 La sección 11 del brief plantea la pregunta abierta explícitamente: ¿cuándo debe descontarse (o reservarse) el inventario dentro del flujo `NUEVO → CONFIRMADO → EN_PREPARACION → LISTO → DESPACHADO → ENTREGADO`? El brief propone como punto de partida "reserva en preparación, consumo al completar", pero pide que se analice y determine la mejor arquitectura.

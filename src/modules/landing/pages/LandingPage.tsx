@@ -51,7 +51,7 @@ const STEPS: StoryStep[] = [
     title: 'Se descuenta y se costea solo',
     body: (
       <>
-        <p>Al marcar cada plato listo, sus insumos salen del inventario según la receta. Cada venta sabe cuánto costó y cuánto te dejó.</p>
+        <p>Cuando la cocina empieza cada plato, sus insumos salen del inventario según la receta. Cada venta sabe cuánto costó y cuánto te dejó.</p>
         <p>Sin pasar nada a mano a una hoja de cálculo al final del día.</p>
       </>
     ),

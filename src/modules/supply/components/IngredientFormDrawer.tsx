@@ -1,4 +1,5 @@
 import { useUnits } from '@/shared/hooks/useUnits'
+import { canBeBaseUnit } from '@/shared/units/conversion'
 import { NumberInput } from '@/shared/ui/NumberInput'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
@@ -144,12 +145,15 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
             {(a11y) => (
               <Select {...a11y} {...register('baseUnitId')}>
                 <option value="">Selecciona…</option>
-                {units?.map((unit) => (
-                  <option key={unit.id} value={unit.id}>
-                    {unit.name} ({unit.code})
-                    {['g', 'ml', 'unidad'].includes(unit.code) ? ' · recomendada' : ''}
-                  </option>
-                ))}
+                {/* ADR 0069: a package or a portion is not a base unit (one already chosen stays visible). */}
+                {units
+                  ?.filter((unit) => canBeBaseUnit(unit.code) || unit.id === ingredient?.baseUnitId)
+                  .map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.name} ({unit.code})
+                      {['g', 'ml', 'unidad'].includes(unit.code) ? ' · recomendada' : ''}
+                    </option>
+                  ))}
               </Select>
             )}
           </FormField>
