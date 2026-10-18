@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/shared/ui/Toast'
@@ -86,7 +86,8 @@ describe('Receta de una preparación (ADR 0057)', () => {
     // The preparation is not offered as its own ingredient.
     fireEvent.focus(pickers[0])
     fireEvent.change(pickers[0], { target: { value: 'Salsa' } })
-    expect(screen.getByText('Sin insumos con ese nombre o código')).toBeTruthy()
+    // ADR 0069: only the row to create an ingredient with that name is offered, never the preparation itself.
+    expect(within(screen.getByRole('listbox')).getAllByRole('option').map((o) => o.textContent?.trim())).toEqual(['Crear el insumo «Salsa»'])
     fireEvent.change(pickers[0], { target: { value: 'Mayo' } })
     fireEvent.mouseDown(screen.getByRole('option', { name: /^Mayonesa/ }))
     fireEvent.focus(pickers[1])

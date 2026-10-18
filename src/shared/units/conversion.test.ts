@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Unit } from '@/shared/api/units'
-import { compatibleUnits, equivalence, formatNumber, formatQuantity, toBase, unitFactor, type IngredientUnitInfo } from './conversion'
+import { compatibleUnits, equivalence, formatNumber, formatQuantity, toBase, unitFactor, type IngredientUnitInfo, canBeBaseUnit } from './conversion'
 
 // ADR 0056: the same rule as dk_unit_factor (the cases of supabase/tests/unit_conversion.sql).
 const units: Unit[] = [
@@ -54,5 +54,12 @@ describe('unit conversion (ADR 0056)', () => {
     expect(formatQuantity(1, 'unidad')).toBe('1 unidad')
     expect(formatQuantity(-2500, 'g')).toBe('-2,5 kg')
     expect(formatNumber(1234.5678)).toBe('1.234,568')
+  })
+})
+
+describe('canBeBaseUnit (ADR 0069)', () => {
+  it('weights, volumes and units are; packages and portions are not', () => {
+    expect(['g', 'kg', 'ml', 'l', 'unidad', 'docena'].every(canBeBaseUnit)).toBe(true)
+    expect(['caja', 'bolsa', 'paquete', 'porcion'].some(canBeBaseUnit)).toBe(false)
   })
 })

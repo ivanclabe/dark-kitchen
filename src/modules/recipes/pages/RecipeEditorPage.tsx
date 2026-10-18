@@ -4,6 +4,7 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { Page } from '@/shared/ui/Page'
 import { useIngredients } from '@/modules/supply/hooks/useIngredients'
+import { CreateIngredientModal } from '@/modules/supply/components/CreateIngredientModal'
 import type { Ingredient } from '@/modules/supply/types'
 import { useProducts } from '@/modules/products/hooks/useProducts'
 import type { Product } from '@/modules/products/types'
@@ -94,6 +95,8 @@ export function RecipeForm({
   const readOnly = Boolean(product?.masterProductId) || !can('recipes.edit')
   const [rows, setRows] = useState<DraftRow[]>(() => initialRows.map((row) => ({ key: crypto.randomUUID(), ...row })))
   const [error, setError] = useState<string | null>(null)
+  // ADR 0069: the row an ingredient is being created for (from the selector), without leaving the recipe.
+  const [creating, setCreating] = useState<{ rowKey: string; query: string } | null>(null)
   // ADR 0057: a preparation's yield and portion, as written («0,85 kg», «25 g»).
   const [yieldQty, setYieldQty] = useState<number | null>(prep ? (prep.yieldUnitQuantity ?? prep.yieldQuantity) : null)
   const [yieldUnit, setYieldUnit] = useState<string | null>(prep?.yieldUnitCode ?? null)
@@ -200,6 +203,9 @@ export function RecipeForm({
               placeholder="Nombre o código…"
               emptyMessage="Sin insumos con ese nombre o código"
               disabled={readOnly}
+              // A new ingredient, created here at zero stock: the recipe never waits for the inventory.
+              onCreateNew={readOnly ? undefined : (query) => setCreating({ rowKey: row.key, query })}
+              createLabel={(query) => `Crear el insumo «${query}»`}
             />
           </span>
           {/* ADR 0031: from the dish to the stock of what it takes. */}
@@ -455,6 +461,19 @@ export function RecipeForm({
           : ' Una preparación (una salsa, una ensalada base) se agrega como cualquier insumo y lleva su costo real.'}
       </p>
       <p className={typography.caption}>Guardar crea una nueva versión de la receta (v{nextVersion}) sin borrar el historial de versiones anteriores.</p>
+      <p className={typography.caption}>
+        La receta no depende de lo que haya en el inventario: si un insumo no existe, créalo desde la lista y queda en cero hasta que lo compres. Los insumos se descuentan cuando el plato empieza a prepararse en cocina.
+      </p>
+
+      <CreateIngredientModal
+        open={creating !== null}
+        initialQuery={creating?.query ?? ''}
+        onClose={() => setCreating(null)}
+        onCreated={(ingredient) => {
+          if (creating) updateRow(creating.rowKey, { ingredientId: ingredient.id, unitCode: null })
+          setCreating(null)
+        }}
+      />
     </Page>
   )
 }

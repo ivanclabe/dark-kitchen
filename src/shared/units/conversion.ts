@@ -14,6 +14,11 @@ export const PACKAGING_UNITS = ['caja', 'bolsa', 'paquete']
 /** ADR 0057: «1 porción = 150 g» of a preparation — like a package, only with the ingredient's own factor. Never bought. */
 export const PORTION_UNIT = 'porcion'
 
+/** ADR 0069: what an ingredient can be counted in (g, kg, ml, l, unidad…) — not a package or a portion, as dk_create_ingredient checks. */
+export function canBeBaseUnit(code: string): boolean {
+  return !PACKAGING_UNITS.includes(code) && code !== PORTION_UNIT
+}
+
 /** How a unit reads on screen: «porcion» → «porción» / «porciones». */
 export function unitLabel(code: string, quantity = 1): string {
   if (code === PORTION_UNIT) return Math.abs(quantity) === 1 ? 'porción' : 'porciones'

@@ -6566,6 +6566,21 @@ export type Database = {
         }
         Returns: string
       }
+      dk_create_ingredient: {
+        Args: {
+          p_base_unit_id: string
+          p_category_id?: string
+          p_code?: string
+          p_description?: string
+          p_max_stock?: number
+          p_min_stock?: number
+          p_name: string
+          p_perishable?: boolean
+          p_primary_supplier_id?: string
+          p_shelf_life_days?: number
+        }
+        Returns: string
+      }
       dk_create_kitchen: {
         Args: {
           p_currency?: string
