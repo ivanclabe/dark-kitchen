@@ -360,6 +360,208 @@ html {
 }
 
 /* ---------------------------------------------------------------------------
+   Bienvenida al entrar (ADR 0070): el robot con un borde de luz, un degradado vivo
+   detrás y «Quanela» que sale a su lado. CSS para lo predeterminado (sigue suave
+   mientras la app carga debajo); el seguimiento del puntero lo hace BrandIntro.
+   --------------------------------------------------------------------------- */
+
+.brand-intro {
+  --brand-intro-move: cubic-bezier(0.77, 0, 0.175, 1);
+  animation: brand-intro-in 250ms var(--ease-snappy) both;
+  transition: opacity 450ms var(--ease-snappy);
+}
+.brand-intro-leaving {
+  opacity: 0;
+}
+.brand-intro-stage {
+  transition: transform 450ms var(--ease-snappy);
+}
+.brand-intro-leaving .brand-intro-stage {
+  transform: scale(1.04);
+}
+
+@keyframes brand-intro-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 1. The robot. */
+.brand-intro-mark {
+  animation: brand-intro-mark 650ms var(--ease-snappy) 120ms both;
+}
+@keyframes brand-intro-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* Its neon rim: a turning band of colour, blurred and cut to the robot's shape, just behind it. */
+.brand-intro-glow {
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  filter: blur(10px);
+  animation: brand-intro-glow 1400ms var(--ease-snappy) 250ms both;
+}
+.brand-intro-glow-light {
+  background: conic-gradient(from 0deg, #5eead4, #fbbf24, #f97316, #fb7185, #c4b5fd, #5eead4);
+  animation: brand-intro-turn 3s linear infinite;
+}
+@keyframes brand-intro-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+}
+@keyframes brand-intro-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The wink: the happy face hands over to the winking one and back. */
+.brand-intro-happy {
+  animation: brand-intro-happy 2800ms linear both;
+}
+.brand-intro-wink {
+  opacity: 0;
+  animation: brand-intro-wink 2800ms linear both;
+}
+@keyframes brand-intro-happy {
+  0%,
+  66% {
+    opacity: 1;
+  }
+  67%,
+  80% {
+    opacity: 0;
+  }
+  81%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes brand-intro-wink {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  67%,
+  80% {
+    opacity: 1;
+  }
+  81%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 2. The gradient grows behind, and the robot moves aside for the wordmark. */
+.brand-intro-blob {
+  animation: brand-intro-blob 1200ms var(--ease-snappy) 800ms both;
+}
+@keyframes brand-intro-blob {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+/* On the dark theme the orbs add light (screen) instead of mixing into a muddy brown. */
+html[data-theme='dark'] .brand-intro-blob {
+  --brand-intro-orb-alpha: 0.75;
+  --brand-intro-orb-blend: screen;
+}
+.brand-intro-orb {
+  position: absolute;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  opacity: var(--brand-intro-orb-alpha, 0.85);
+  mix-blend-mode: var(--brand-intro-orb-blend, normal);
+  background: radial-gradient(circle closest-side, var(--orb) 0%, transparent 100%);
+}
+/* Each orb circles its own pivot at its own pace, so the shape keeps changing. */
+.brand-intro-orb-a {
+  --orb: #5eead4;
+  left: 6%;
+  top: 22%;
+  transform-origin: 70% 40%;
+  animation: brand-intro-turn 9s linear infinite;
+}
+.brand-intro-orb-b {
+  --orb: #fbbf24;
+  left: 22%;
+  top: 8%;
+  transform-origin: 40% 75%;
+  animation: brand-intro-turn 7s linear infinite reverse;
+}
+.brand-intro-orb-c {
+  --orb: #fb7185;
+  left: 34%;
+  top: 26%;
+  transform-origin: 25% 40%;
+  animation: brand-intro-turn 11s linear infinite;
+}
+.brand-intro-orb-d {
+  --orb: #f97316;
+  left: 20%;
+  top: 34%;
+  width: 52%;
+  transform-origin: 55% 20%;
+  animation: brand-intro-turn 8s linear infinite reverse;
+}
+
+.brand-intro-row {
+  animation: brand-intro-row 800ms var(--brand-intro-move) 950ms both;
+}
+@keyframes brand-intro-row {
+  from {
+    transform: translateX(var(--brand-intro-shift, 0px));
+  }
+}
+.brand-intro-wordmark {
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  animation: brand-intro-wordmark 700ms var(--ease-snappy) 1050ms both;
+}
+@keyframes brand-intro-wordmark {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Reduced motion: gentler, not zero — it fades in and out, everything already in place, nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .brand-intro {
+    animation: brand-intro-in 200ms ease-out both !important;
+    transition-property: opacity !important;
+    transition-duration: 200ms !important;
+  }
+  /* Everything already in its final place from the first frame (the delays would leave the robot alone). */
+  .brand-intro * {
+    animation-delay: 0s !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Apariencia (ADR 0023). data-theme / data-text-size los pone en <html> el
    script de index.html (antes del primer pintado) y useAppearance.
    --------------------------------------------------------------------------- */
