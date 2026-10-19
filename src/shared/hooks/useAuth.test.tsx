@@ -37,6 +37,7 @@ vi.mock('@/shared/lib/supabase', () => ({
 const { AuthProvider, useAuth } = await import('./useAuth')
 const { queryClient } = await import('@/shared/lib/queryClient')
 const { getActiveKitchenId, setActiveKitchenId } = await import('@/shared/kitchen/activeKitchen')
+const { finishBrandIntro, useBrandIntroRequested } = await import('@/shared/brand/brandIntroState')
 
 const probe: { api: ReturnType<typeof useAuth> | null } = { api: null }
 function Probe() {
@@ -47,6 +48,10 @@ function Probe() {
   return <p data-testid="state">{auth.loading ? 'cargando' : auth.session ? `con sesión ${auth.profile?.fullName ?? ''}` : 'sin sesión'}</p>
 }
 const state = () => screen.getByTestId('state').textContent
+function IntroProbe() {
+  return <p data-testid="intro">{useBrandIntroRequested() ? 'bienvenida' : 'nada'}</p>
+}
+const intro = () => screen.getByTestId('intro').textContent
 
 beforeEach(() => {
   sb.stored = { user: { id: 'u1', email: 'laura@negocio.co' } }
@@ -54,7 +59,10 @@ beforeEach(() => {
   sb.signOutError = null
   sb.signOut.mockClear()
 })
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  finishBrandIntro()
+})
 
 describe('the session (useAuth)', () => {
   it('a stored session confirmed by Supabase is shown, with its profile', async () => {
@@ -116,5 +124,22 @@ describe('the session (useAuth)', () => {
     queryClient.setQueryData(['my-kitchens'], { secret: 'de Laura' })
     act(() => sb.listener?.('SIGNED_IN', { user: { id: 'u2', email: 'otra@negocio.co' } }))
     expect(queryClient.getQueryData(['my-kitchens'])).toBeUndefined()
+  })
+
+  it('the welcome intro plays when someone signs in here, never for a session that was already open (ADR 0070)', async () => {
+    sb.stored = null
+    render(<AuthProvider><Probe /><IntroProbe /></AuthProvider>)
+    await waitFor(() => expect(state()).toBe('sin sesión'))
+    expect(intro()).toBe('nada')
+    act(() => sb.listener?.('SIGNED_IN', { user: { id: 'u1', email: 'laura@negocio.co' } }))
+    expect(intro()).toBe('bienvenida')
+  })
+
+  it('reopening the app, a token refresh or a tab coming back does not replay it', async () => {
+    render(<AuthProvider><Probe /><IntroProbe /></AuthProvider>)
+    await waitFor(() => expect(state()).toBe('con sesión Laura Gómez'))
+    act(() => sb.listener?.('TOKEN_REFRESHED', { user: { id: 'u1', email: 'laura@negocio.co' } }))
+    act(() => sb.listener?.('SIGNED_IN', { user: { id: 'u1', email: 'laura@negocio.co' } }))
+    expect(intro()).toBe('nada')
   })
 })

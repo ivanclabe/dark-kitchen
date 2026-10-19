@@ -1,4 +1,5 @@
 import { router } from '@/app/routes'
+import { BrandIntro } from '@/shared/brand/BrandIntro'
 import { AuthProvider } from '@/shared/hooks/useAuth'
 import { queryClient } from '@/shared/lib/queryClient'
 import { TenantProvider } from '@/shared/tenant/TenantProvider'
@@ -15,6 +16,8 @@ export function App() {
           <TenantProvider>
             <RouterProvider router={router} />
           </TenantProvider>
+          {/* Over everything, once, right after signing in (ADR 0070). */}
+          <BrandIntro />
         </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>

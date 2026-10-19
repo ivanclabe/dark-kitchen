@@ -1,3 +1,4 @@
+import { requestBrandIntro } from '@/shared/brand/brandIntroState'
 import { signInErrorMessage } from '@/shared/utils/authErrors'
 import { clearAccountChoice } from '@/shared/kitchen/accountChoice'
 import { setActiveKitchenId, setActiveRoleId } from '@/shared/kitchen/activeKitchen'
@@ -112,6 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'INITIAL_SESSION') return
       // Signed out (here or in another tab), or another person signed in: nothing of before stays.
       if (event === 'SIGNED_OUT' || (newSession && lastUserId && newSession.user.id !== lastUserId)) forgetAppState()
+      // Someone just signed in here (there was no session before): the welcome intro (ADR 0070).
+      // A token refresh or a tab coming back keeps the same person, so it never replays.
+      if (event === 'SIGNED_IN' && newSession && !lastUserId) requestBrandIntro()
       lastUserId = newSession?.user.id ?? null
       setSession(newSession)
       // Bitácora (ADR 0012): el inicio de sesión lo registra la base (1 por minuto como mucho).
