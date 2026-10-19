@@ -10,6 +10,8 @@ const LEAVE_MS = 450
 const LEAVE_REDUCED_MS = 200
 const ROBOT_HAPPY = robotSrc('happy', 128)
 const ROBOT_WINK = robotSrc('wink', 128)
+/** The brand wordmark «quanela» (docs/brand/quanela-wordmark.png), used as a mask so it takes the theme's text colour. */
+const WORDMARK = '/brand/quanela-wordmark.webp'
 
 function matches(query: string) {
   return typeof window.matchMedia === 'function' && window.matchMedia(query).matches
@@ -121,9 +123,11 @@ function BrandIntroOverlay() {
               <img src={ROBOT_WINK} alt="" draggable={false} className="brand-intro-wink absolute inset-0 size-full object-contain" />
             </div>
           </div>
-          <span ref={wordmarkRef} className="brand-intro-wordmark text-5xl font-semibold tracking-tight text-neutral-50 sm:text-7xl">
-            Quanela
-          </span>
+          <span
+            ref={wordmarkRef}
+            className="brand-intro-wordmark block shrink-0 aspect-[1431/353] h-11 bg-neutral-50 sm:h-20"
+            style={{ maskImage: `url(${WORDMARK})`, WebkitMaskImage: `url(${WORDMARK})` }}
+          />
         </div>
       </div>
     </div>

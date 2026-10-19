@@ -532,6 +532,8 @@ html[data-theme='dark'] .brand-intro-blob {
   }
 }
 .brand-intro-wordmark {
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
   animation: brand-intro-wordmark 700ms var(--ease-snappy) 1050ms both;
 }
 @keyframes brand-intro-wordmark {

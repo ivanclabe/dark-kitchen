@@ -26,7 +26,9 @@ Se monta sobre toda la app, que carga debajo mientras tanto.
 2. **Crece un degradado vivo detrás:** cuatro orbes que giran cada uno alrededor de su propio pivote.
    - Tema claro: colores pastel.
    - Tema oscuro: los orbes suman luz (`screen`).
-   - Mientras tanto, el robot se corre y aparece «Quanela» a su lado.
+   - Mientras tanto, el robot se corre y aparece a su lado el logotipo «quanela», con la tipografía de la marca.
+     - Es una imagen sacada del logo (`docs/brand/quanela-wordmark.png`; original en `quanela-wordmark-original.png`), sin el bloque que rodeaba la «q».
+     - Se usa como máscara (`public/brand/quanela-wordmark.webp`, 7 KB), así toma el color del texto de cada tema.
 3. **El robot guiña** y todo se desvanece con un leve acercamiento.
 
 ### Interacción
