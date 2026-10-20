@@ -6276,6 +6276,10 @@ export type Database = {
         Returns: Json
       }
       dk_export_my_data: { Args: never; Returns: Json }
+      dk_dashboard_series: {
+        Args: { p_from: string; p_granularity?: string; p_to: string }
+        Returns: Json
+      }
       dk_ga_pqr_requests: {
         Args: never
         Returns: {
