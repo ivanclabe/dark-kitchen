@@ -1,7 +1,7 @@
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
+import { SubNav } from '@/shared/ui/SubNav'
 import { Landmark } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ExpensesTab } from '../components/ExpensesTab'
@@ -9,17 +9,7 @@ import { PayablesTab } from '../components/PayablesTab'
 import { CashflowTab, PaymentsTab } from '../components/PaymentsTab'
 import { PayrollTab } from '../components/PayrollTab'
 import { ProfitTab } from '../components/ProfitTab'
-
-type FinanceTab = 'profit' | 'payables' | 'payments' | 'expenses' | 'payroll' | 'cashflow'
-
-const TABS: SubNavItem<FinanceTab>[] = [
-  { value: 'profit', label: 'Rentabilidad' },
-  { value: 'payables', label: 'Por pagar' },
-  { value: 'payments', label: 'Pagos' },
-  { value: 'expenses', label: 'Gastos' },
-  { value: 'payroll', label: 'Nómina' },
-  { value: 'cashflow', label: 'Flujo de caja' },
-]
+import { financeTabs, type FinanceTab } from '../lib/tabs'
 
 /** Help article of each tab (ADR 0034). */
 const HELP: Record<FinanceTab, string> = {
@@ -40,7 +30,7 @@ export function FinancePage() {
   const { tab: tabParam } = useParams<{ tab?: string }>()
   const navigate = useNavigate()
   const { path, can } = useActiveKitchen()
-  const tabs = TABS.filter((t) => t.value !== 'payroll' || can('finance.payroll'))
+  const tabs = financeTabs(can)
   const fallback: FinanceTab = can('reports.profitability') ? 'profit' : 'payables'
   const tab = tabs.find((t) => t.value === tabParam)?.value ?? fallback
 
