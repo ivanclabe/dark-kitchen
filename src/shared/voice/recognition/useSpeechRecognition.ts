@@ -51,10 +51,12 @@ export function useSpeechRecognition({
     onStartRef.current = onStart
   })
 
-  // Offline engine: load the model in the background so the microphone answers at once.
+  // Offline engine: load the model in the background so the microphone answers at once — only where it has
+  // a vocabulary to listen for (the kitchen's). The local engine is the default (ADR 0071): elsewhere the
+  // ~40 MB model is not downloaded until someone uses it.
   useEffect(() => {
-    if (engineId === 'vosk' && engine.supported()) void loadVoskModel().catch(() => undefined)
-  }, [engineId, engine])
+    if (engineId === 'vosk' && grammar && engine.supported()) void loadVoskModel().catch(() => undefined)
+  }, [engineId, engine, grammar])
 
   useEffect(() => {
     return () => {

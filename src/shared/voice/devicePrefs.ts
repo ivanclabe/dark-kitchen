@@ -13,6 +13,8 @@ export const VOICE_KEYS = {
   readTyped: { key: 'dk-voice-read-typed', legacy: null },
   /** After «Oye Quanela», keep listening for the next question (ADR 0038). New: no legacy key. */
   followUp: { key: 'dk-voice-follow-up', legacy: null },
+  /** When this device accepted the online recognition notice (ADR 0071): an ISO timestamp. New: no legacy key. */
+  onlineConsent: { key: 'dk-voice-online-consent', legacy: null },
 } as const
 
 export type VoicePref = keyof typeof VOICE_KEYS

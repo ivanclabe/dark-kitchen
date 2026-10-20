@@ -293,20 +293,22 @@ export function contrastIssues(theme: ResolvedTheme): ContrastIssue[] {
 // ---------------------------------------------------------------------------
 // CSS
 // ---------------------------------------------------------------------------
+// Self-hosted (ADR 0071, Fontsource): the variable faces register as «<Name> Variable»; Poppins and
+// DM Serif Display only come in static weights and keep their name.
 const FONT_STACK: Record<FontName, string> = {
-  Inter: "'Inter', ui-sans-serif, system-ui, sans-serif",
+  Inter: "'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif",
   Poppins: "'Poppins', ui-sans-serif, system-ui, sans-serif",
-  Nunito: "'Nunito', ui-sans-serif, system-ui, sans-serif",
-  Montserrat: "'Montserrat', ui-sans-serif, system-ui, sans-serif",
-  Lora: "'Lora', ui-serif, Georgia, serif",
-  'Playfair Display': "'Playfair Display', ui-serif, Georgia, serif",
-  'Cormorant Garamond': "'Cormorant Garamond', ui-serif, Georgia, serif",
+  Nunito: "'Nunito Variable', 'Nunito', ui-sans-serif, system-ui, sans-serif",
+  Montserrat: "'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, sans-serif",
+  Lora: "'Lora Variable', 'Lora', ui-serif, Georgia, serif",
+  'Playfair Display': "'Playfair Display Variable', 'Playfair Display', ui-serif, Georgia, serif",
+  'Cormorant Garamond': "'Cormorant Garamond Variable', 'Cormorant Garamond', ui-serif, Georgia, serif",
   'DM Serif Display': "'DM Serif Display', ui-serif, Georgia, serif",
-  Fraunces: "'Fraunces', ui-serif, Georgia, serif",
-  Caveat: "'Caveat', 'Comic Sans MS', cursive",
-  'Plus Jakarta Sans': "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
-  Outfit: "'Outfit', ui-sans-serif, system-ui, sans-serif",
-  'Bricolage Grotesque': "'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif",
+  Fraunces: "'Fraunces Variable', 'Fraunces', ui-serif, Georgia, serif",
+  Caveat: "'Caveat Variable', 'Caveat', 'Comic Sans MS', cursive",
+  'Plus Jakarta Sans': "'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
+  Outfit: "'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif",
+  'Bricolage Grotesque': "'Bricolage Grotesque Variable', 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif",
 }
 
 const SCALE = { S: '15px', M: '16px', L: '17.5px' } as const
@@ -314,11 +316,9 @@ const SCALE = { S: '15px', M: '16px', L: '17.5px' } as const
 const VEIL: Record<Overlay, number> = { light: 0.62, medium: 0.8, strong: 0.92 }
 const BUTTON_RADIUS: Record<ButtonShape, string> = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' }
 
-/** The Google Fonts stylesheet for the two fonts of a theme (only those). */
-export function fontsHref(theme: ResolvedTheme): string {
-  const families = [...new Set([theme.fonts.heading, theme.fonts.body])]
-  const spec = (f: FontName) => (f === 'Caveat' ? 'Caveat:wght@500;700' : f === 'DM Serif Display' ? 'DM+Serif+Display' : `${f.replace(/ /g, '+')}:wght@400;500;600;700`)
-  return `https://fonts.googleapis.com/css2?${families.map((f) => `family=${spec(f)}`).join('&')}&display=swap`
+/** The fonts a theme needs (only its two, once each): useThemeFonts loads them. */
+export function themeFonts(theme: ResolvedTheme): FontName[] {
+  return [...new Set([theme.fonts.heading, theme.fonts.body])]
 }
 
 function textureImage(texture: Texture, text: string): string {

@@ -1,4 +1,4 @@
-/* Inter loads from index.html (preconnect + link): an @import here blocked the first render. */
+/* Inter is self-hosted (ADR 0071, @fontsource-variable/inter): main.tsx imports it, so it ships in the main stylesheet. */
 @import 'tailwindcss';
 
 /* Public menu (ADR 0053): wide layout by the page's own width, so the phone preview inside the editor looks like a phone. */
@@ -6,7 +6,7 @@
 
 @theme {
   --font-sans:
-    'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   /* "Brasa" — acento naranja de marca, mismo tono ya usado en toda la app
      (orange-*) pero declarado como escala semantica para poder afinarlo

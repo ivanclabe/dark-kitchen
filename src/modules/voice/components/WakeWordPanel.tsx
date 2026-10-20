@@ -56,7 +56,7 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
           <p className="text-sm text-neutral-200">Manos libres (Oye Quanela)</p>
           <p className={typography.caption}>
             Di «Oye Quanela» en cualquier pantalla y luego tu pregunta (o, en Cocina, el comando), sin tocar la pantalla. La frase se detecta en este equipo y ese audio no se guarda ni se
-            envía; lo que dices después lo reconoce el servicio de voz del navegador. Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
+            envía; lo que dices después lo reconoce el reconocimiento de voz elegido arriba (local o en línea). Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
           </p>
         </div>
         <Switch checked={on} onChange={setOn} label="Manos libres (Oye Quanela)" disabled={!supported} />

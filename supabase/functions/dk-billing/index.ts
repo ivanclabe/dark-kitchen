@@ -105,12 +105,11 @@ Deno.serve(async (req: Request) => {
       if (error) return dbError(error)
       const start = data as { applied: boolean; reference: string; amountInCents: number; currency: string; customerEmail: string | null }
       if (start.applied) return json({ applied: true })
-      const email = body.email && EMAIL.test(body.email) ? body.email : start.customerEmail
       const signature = await integritySignature(start.reference, start.amountInCents, start.currency, cfg.integritySecret)
       return json({
         applied: false,
         ...start,
-        url: checkoutUrl({ base: Deno.env.get('WOMPI_CHECKOUT_URL') || undefined, publicKey: cfg.publicKey, currency: start.currency, amountInCents: start.amountInCents, reference: start.reference, signature, redirectUrl: body.redirectUrl, email }),
+        url: checkoutUrl({ base: Deno.env.get('WOMPI_CHECKOUT_URL') || undefined, publicKey: cfg.publicKey, currency: start.currency, amountInCents: start.amountInCents, reference: start.reference, signature, redirectUrl: body.redirectUrl }),
       })
     }
 
