@@ -18,7 +18,7 @@ questions:
   - ¿Por qué Quanela tarda en responder?
 keywords: [oye quanela, voz, manos libres, micrófono, hablar, escuchar, respuestas habladas, dictar, palabra clave, conversación, seguir escuchando, gracias, terminar, lento, tarda, rápido, voz instalada]
 related: [ask-copilot, kitchen-voice, copilot-limits]
-updated: 2026-10-07
+updated: 2026-10-19
 order: 2
 ---
 
@@ -56,7 +56,10 @@ Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos.
 
 > **Bueno saber:** el botón **Hablar ahora** y Ctrl/⌘ + Shift + J son para **una sola pregunta**. La conversación es solo con «Oye Quanela».
 
-> **Bueno saber:** la frase «Oye Quanela» se detecta **en tu equipo**: ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador.
+> **Bueno saber:** la frase «Oye Quanela» se detecta **en tu equipo**: ese audio no se guarda ni se envía. Lo que dices después lo reconoce el reconocedor que elijas:
+>
+> - **Local** (el predeterminado): funciona en tu equipo, el audio no sale de él. La primera vez descarga el modelo de voz. Entiende las órdenes de la cocina.
+> - **En línea**: el audio se envía a Google para convertirlo en texto. Lo necesitas para preguntas libres a Copilot y para dictar; Quanela te lo pregunta antes de activarlo, una sola vez en cada equipo.
 
 ## Que responda más rápido
 

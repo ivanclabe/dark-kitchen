@@ -12,9 +12,17 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-18
+updated: 2026-10-19
 order: 1
 ---
+
+## 19 de octubre de 2026
+
+- **Documentos legales.** Términos y Condiciones, Política de Tratamiento de Datos, Política de Cookies, Cancelaciones y Reembolsos, y Suscripciones, siempre a la vista en el pie de la página y descargables. Al crear tu cuenta o activar tu usuario aceptas los Términos y la Política de datos con **dos casillas separadas**; si un documento cambia, Quanela te pide aceptar la nueva versión.
+- **Privacidad y datos.** En el menú de tu avatar ves lo que aceptaste, **descargas tus datos** y radicas consultas, reclamos o reembolsos con su plazo. Ver [Privacidad, tus datos y solicitudes](help:privacy-and-data).
+- **Tus clientes deciden.** Tu menú web muestra la política de datos de tu negocio y el cliente la acepta al pedir. Desde la ficha de un cliente puedes **borrar sus datos personales** si te lo pide.
+- **Renovación automática con autorización expresa.** Al guardar la tarjeta marcas una casilla aparte. Ver [Suscripción, renovación y reembolsos](help:subscription-billing).
+- **Voz local por defecto.** El reconocimiento de voz funciona en tu equipo; el reconocimiento en línea (Google) se activa solo si lo aceptas.
 
 ## 18 de octubre de 2026
 

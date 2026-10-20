@@ -49,7 +49,9 @@ export const HELP_PATHS: Record<string, string> = {
   "insights": "/help/reports/insights",
   "product-profitability": "/help/reports/product-profitability",
   "screen-tour": "/help/screenshots/screen-tour",
+  "privacy-and-data": "/help/settings/privacy-and-data",
   "settings": "/help/settings/settings",
+  "subscription-billing": "/help/settings/subscription-billing",
   "whatsapp": "/help/settings/whatsapp",
   "shifts": "/help/team/shifts",
   "users-and-roles": "/help/team/users-and-roles"

@@ -1324,7 +1324,7 @@ export const KB: KbArticle[] = [
       "Ajustar la voz",
       "Si no lo ves o no funciona"
     ],
-    "body": "Hablarle una vez Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J . La primera vez, el navegador pide permiso para el micrófono: toca Permitir . Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa. Quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace Abrir guía . El chat de Copilot no se abre solo : la respuesta queda guardada y el botón ✦ Copilot muestra un número con las respuestas sin ver. Tócalo para leerlas completas. Manos libres Toca el micrófono de arriba → Manos libres en este equipo . Di «Oye Quanela» y, sin pausa larga, tu pregunta. Ya te escucha mientras suena el tono: no hace falta esperar a que termine. En la vista Cocina, también tus comandos (ver Comandos de voz en cocina). Para dejar de escuchar un rato, Pausar ; luego Reanudar . Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida. Conversar sin repetir «Oye Quanela» Después de «Oye Quanela», Quanela sigue escuchando : cuando termina de responder suena un tono corto y tienes unos 8 segundos para la siguiente pregunta, sin repetir la frase. Arriba dice «Conversación · te escucho» . «¿Cuánto vendimos hoy?» … «¿Y ayer?» … «¿Y cuál plato vendió más?» — entiende que hablas de lo mismo. En la cocina también puedes decir comandos («pedido 1042 listo») dentro de la conversación. Para terminar: Quédate en silencio unos segundos. Di «gracias» , «listo» o «eso es todo» (responde «Con gusto.»), o «para» . En el micrófono de arriba → Terminar conversación . Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos. Bueno saber: el botón Hablar ahora y Ctrl/⌘ + Shift + J son para una sola pregunta . La conversación es solo con «Oye Quanela». Bueno saber: la frase «Oye Quanela» se detecta en tu equipo : ese audio no se guarda ni se envía. Lo que dices después lo reconoce el servicio de voz del navegador. Que responda más rápido Quanela empieza a hablar en cuanto tiene la frase de respuesta, mientras el detalle sigue llegando al chat de Copilot. Para que tarde menos: Termina la pregunta y haz una pausa corta : cuando el navegador entiende la frase completa, Quanela la envía enseguida. En Voz en este equipo → Hablar , mira con qué voz habla: si dice en línea , elige una voz instalada , que empieza a hablar antes. En Chrome y Edge, justo después de una respuesta ya puedes volver a decir «Oye Quanela». Ajustar la voz En el micrófono → Voz en este equipo : Escuchar : cómo te oye Quanela y"
+    "body": "Hablarle una vez Toca el micrófono de la barra de arriba → Hablar ahora , o presiona Ctrl/⌘ + Shift + J . La primera vez, el navegador pide permiso para el micrófono: toca Permitir . Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa. Quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace Abrir guía . El chat de Copilot no se abre solo : la respuesta queda guardada y el botón ✦ Copilot muestra un número con las respuestas sin ver. Tócalo para leerlas completas. Manos libres Toca el micrófono de arriba → Manos libres en este equipo . Di «Oye Quanela» y, sin pausa larga, tu pregunta. Ya te escucha mientras suena el tono: no hace falta esperar a que termine. En la vista Cocina, también tus comandos (ver Comandos de voz en cocina). Para dejar de escuchar un rato, Pausar ; luego Reanudar . Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida. Conversar sin repetir «Oye Quanela» Después de «Oye Quanela», Quanela sigue escuchando : cuando termina de responder suena un tono corto y tienes unos 8 segundos para la siguiente pregunta, sin repetir la frase. Arriba dice «Conversación · te escucho» . «¿Cuánto vendimos hoy?» … «¿Y ayer?» … «¿Y cuál plato vendió más?» — entiende que hablas de lo mismo. En la cocina también puedes decir comandos («pedido 1042 listo») dentro de la conversación. Para terminar: Quédate en silencio unos segundos. Di «gracias» , «listo» o «eso es todo» (responde «Con gusto.»), o «para» . En el micrófono de arriba → Terminar conversación . Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos. Bueno saber: el botón Hablar ahora y Ctrl/⌘ + Shift + J son para una sola pregunta . La conversación es solo con «Oye Quanela». Bueno saber: la frase «Oye Quanela» se detecta en tu equipo : ese audio no se guarda ni se envía. Lo que dices después lo reconoce el reconocedor que elijas: Local (el predeterminado): funciona en tu equipo, el audio no sale de él. La primera vez descarga el modelo de voz. Entiende las órdenes de la cocina. En línea : el audio se envía a Google para convertirlo en texto. Lo necesitas para preguntas libres a Copilot y para dictar; Quanela te lo pregunta antes de activarlo, una sola vez en cada equipo. Que responda más rápido Quanela empieza a hablar en cuanto tiene la frase de respuesta, mientras el detalle sigue llegando al chat de Copilot. Para que tarde menos: Termina la pregunta y haz una pausa corta : cuando el navegador entiende la frase co"
   },
   {
     "id": "payables",
@@ -1479,6 +1479,55 @@ export const KB: KbArticle[] = [
       "Dependencias"
     ],
     "body": "Una preparación (o sub-receta) es algo que haces en tu cocina y luego usas en varios platos: una salsa de ajo, una ensalada base, un fondo. Tiene su propia receta, lo que rinde un lote y su costo , y se guarda en el inventario como cualquier insumo. Crear una preparación Abre Abastecimiento → Preparaciones y toca Nueva . Escribe el Nombre y elige dónde se guarda: gramos, kilogramos, mililitros, litros o unidades (una aguapanela o un fondo que haces por litros puede guardarse en litros ). Toca Crear y escribir su receta . Agrega lo que lleva un lote , en la unidad que te sea cómoda: «0,05 kg de ajo» se guarda como 50 g. Puede llevar otras preparaciones. En Rinde por lote , escribe lo que sale (por ejemplo 0,85 kg , o 2.000 ml de una preparación en litros). Si quieres, define Una porción (por ejemplo 25 g). Toca Guardar como nueva versión . Ves el costo del lote , el costo por su unidad (gramo, litro…) y el costo por porción . Guardada en litros o kilos, la puedes seguir escribiendo en mililitros o gramos en su receta y en los platos (un vaso de 300 ml se descuenta como 0,3 l): se convierte sola. Preparar un lote En la preparación, toca Preparar lote . Escribe cuántos Lotes hiciste. Antes de confirmar ves lo que sale del inventario, cuánto hay de cada insumo y el costo del lote. En Rendimiento real , escribe lo que realmente salió (por ejemplo 0,82 kg). Si lo dejas vacío, se toma lo de la receta. Toca Registrar lote . Los insumos salen del inventario una sola vez , en el lote. La preparación entra al costo real : el costo del lote dividido entre lo que rindió. Si rinde menos de lo esperado, cada gramo cuesta más, y lo ves en el historial de Lotes («−3,5 %»). Usarla en los platos En la receta de un plato, busca la preparación como cualquier insumo (dice Preparación ) y escribe la cantidad: 30 g , o 1 porción si definiste una. El plato toma el costo real de la preparación, así que no copias costos a mano. Cuando preparas otro lote con precios nuevos, el costo de todos los platos que la llevan se actualiza solo. Al vender, el plato descuenta solo la preparación : sus insumos ya salieron cuando preparaste el lote. Dependencias La preparación muestra Se usa en (los platos y otras preparaciones que la llevan) y, si lleva otras preparaciones, Lleva con todo lo que hay detrás. La ficha de un insumo en Stock también dice en qué preparaciones está y qué platos lo usan a través de ellas. Cuidado: si un pedido lleva una preparación y no hay suficiente, no se puede confi"
+  },
+  {
+    "id": "privacy-and-data",
+    "section": "settings",
+    "url": "/help/settings/privacy-and-data",
+    "title": "Privacidad, tus datos y solicitudes",
+    "summary": "Dónde ves los documentos que aceptaste, cómo descargas tus datos y cómo radicas una consulta, un reclamo o una solicitud de reembolso, con su plazo.",
+    "audience": [
+      "everyone"
+    ],
+    "permissions": [],
+    "appPath": "/perfil/privacidad",
+    "questions": [
+      "¿Qué documentos acepté?",
+      "¿Cómo descargo mis datos?",
+      "¿Cómo pido que borren mis datos?",
+      "¿Cómo hago un reclamo sobre mis datos?",
+      "¿Cuánto tardan en responder una solicitud?",
+      "¿Qué es el radicado?",
+      "¿Quanela usa cookies?",
+      "¿Cómo borro los datos de un cliente que me lo pidió?"
+    ],
+    "keywords": [
+      "privacidad",
+      "datos personales",
+      "habeas data",
+      "términos",
+      "política de datos",
+      "cookies",
+      "preferencias",
+      "radicado",
+      "PQR",
+      "consulta",
+      "reclamo",
+      "supresión",
+      "borrar datos",
+      "descargar datos",
+      "autorización",
+      "Ley 1581"
+    ],
+    "steps": [],
+    "headings": [
+      "Documentos que aceptaste",
+      "Descargar tus datos",
+      "Radicar una solicitud",
+      "Cookies y preferencias",
+      "Los datos de tus clientes"
+    ],
+    "body": "En el menú de tu avatar → Privacidad y datos (también desde Mi perfil ) tienes todo lo que tiene que ver con tus datos personales. Documentos que aceptaste Al crear tu cuenta aceptas, cada uno con su propia casilla, los Términos y Condiciones y la Política de Tratamiento de Datos Personales. Cada aceptación queda guardada con la versión del documento , la fecha y hora , y desde qué navegador, y nunca se borra ni se modifica . Si un documento cambia y la nueva versión necesita tu aceptación, Quanela te la pide antes de seguir. Lo que aceptaste antes se conserva en tu historial. Descargar tus datos Descargar mis datos te entrega un archivo con tu perfil, tus negocios, los documentos que aceptaste y tus solicitudes. Radicar una solicitud En Nueva solicitud eliges el tipo y la cuentas con tus palabras. Recibes un radicado (por ejemplo PQR-2026-00012 ) y ves la fecha límite de respuesta: Tipo Plazo --- Consulta sobre tus datos 10 días hábiles Corregir, eliminar, revocar la autorización o reclamo 15 días hábiles Reembolso, retracto u otra queja 15 días hábiles Los días hábiles no cuentan sábados, domingos ni festivos de Colombia. La respuesta aparece en Tus solicitudes . Bueno saber: el reembolso y el retracto los pide quien administra la facturación del negocio. Ver Suscripción, renovación y reembolsos. Cookies y preferencias Quanela no usa analítica ni publicidad . Solo guarda en tu navegador lo necesario para tu sesión y lo que tú eliges (tema, voz, vista de la cocina). En Preferencias de privacidad lo ves por categoría y puedes borrar tus preferencias guardadas. Los datos de tus clientes De los clientes que te compran, el responsable es tu negocio ; Quanela los guarda por encargo tuyo. Tu menú web muestra la política de datos de tu negocio, hecha con los datos de Configuración → General (razón social, NIT, dirección y teléfono). Complétalos para que aparezcan. El cliente acepta esa política con una casilla al pedir. Si un cliente te pide borrar sus datos , abre su ficha → Borrar datos personales . Se borran su nombre, celular, direcciones, notas, preferencias y conversaciones; sus pedidos se conservan sin identificarlo. Una preferencia alimentaria puede revelar la salud o las creencias del cliente: anótala solo si él te autorizó expresamente."
   },
   {
     "id": "product-profitability",
@@ -1897,6 +1946,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "19 de octubre de 2026",
       "18 de octubre de 2026",
       "15 de octubre de 2026",
       "13 de octubre de 2026",
@@ -1912,7 +1962,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Recetas sin esperar al inventario. En la receta de un plato o de una preparación, si un insumo no existe, lo creas ahí mismo («Crear el insumo…») y queda en la línea. Entra al inventario con existencia cero y sube cuando confirmas su compra. Quanela no deja crear dos insumos con el mismo nombre. Ver Recetas y costo de un plato. El inventario se descuenta al empezar cada plato. Ya no al marcarlo listo: cuando la cocina toca Iniciar , salen sus insumos. Si algo ya no alcanza, la cocina lo sabe antes de empezar. Devolver un plato a pendiente o cancelar el pedido devuelve lo usado una sola vez . Ver Cómo se descuenta el inventario. de octubre de 2026 IA sin gastos de más. Las sugerencias de IA ya no vuelven a llamar al modelo si los datos no cambiaron, esperan después de un error y Copilot se puede detener de verdad. En Configuración → IA ves Este mes : consultas, costo estimado, llamadas evitadas y un presupuesto mensual opcional que avisa y, al llegar, pausa solo los análisis automáticos. Compras más flexibles. El número de factura puede esperar hasta confirmar, el IVA va en % (con el habitual de cada proveedor) y cada línea avisa si el precio subió o bajó más de lo normal frente a la última compra y al promedio de 90 días. Ver Registrar una compra. Conteo físico. En Stock → Contar inventario cuentas la bodega (toda, una categoría o un proveedor) y las diferencias quedan como un ajuste «Conteo físico». Ver Conteo físico del inventario. Control de costos. Los platos muestran su costo de comida frente a tu objetivo y un precio sugerido ; la reposición sugiere según tu consumo real. Ver Control de costos. Perecederos y Poco movimiento en todos los planes , como reglas; la IA solo los ordena y explica. Cartera que vence. Cada cliente puede tener plazo de pago : sus pedidos vencen solos, el «saldo vencido» se calcula y ves la antigüedad de la cartera . Ver Clientes. Gastos fijos automáticos. Se crean cada día sin abrir Finanzas; los de monto variable (luz, gas) esperan el valor real antes de pagarse, y puedes pagar varias obligaciones de un mismo proveedor de una vez. Turnos sin salida. Se avisan en la campana, no suman horas hasta corregirlos y quien gestiona el personal puede corregir la marcación (queda en la bitácora). Más avisos útiles en la campana e Inicio: cuentas por pagar vencidas y de la semana, compras en borrador olvidadas, facturas leídas sin guardar, subidas de precio, platos fuera de margen y turnos sin salida; cada uno solo par"
+    "body": "de octubre de 2026 Documentos legales. Términos y Condiciones, Política de Tratamiento de Datos, Política de Cookies, Cancelaciones y Reembolsos, y Suscripciones, siempre a la vista en el pie de la página y descargables. Al crear tu cuenta o activar tu usuario aceptas los Términos y la Política de datos con dos casillas separadas ; si un documento cambia, Quanela te pide aceptar la nueva versión. Privacidad y datos. En el menú de tu avatar ves lo que aceptaste, descargas tus datos y radicas consultas, reclamos o reembolsos con su plazo. Ver Privacidad, tus datos y solicitudes. Tus clientes deciden. Tu menú web muestra la política de datos de tu negocio y el cliente la acepta al pedir. Desde la ficha de un cliente puedes borrar sus datos personales si te lo pide. Renovación automática con autorización expresa. Al guardar la tarjeta marcas una casilla aparte. Ver Suscripción, renovación y reembolsos. Voz local por defecto. El reconocimiento de voz funciona en tu equipo; el reconocimiento en línea (Google) se activa solo si lo aceptas. de octubre de 2026 Recetas sin esperar al inventario. En la receta de un plato o de una preparación, si un insumo no existe, lo creas ahí mismo («Crear el insumo…») y queda en la línea. Entra al inventario con existencia cero y sube cuando confirmas su compra. Quanela no deja crear dos insumos con el mismo nombre. Ver Recetas y costo de un plato. El inventario se descuenta al empezar cada plato. Ya no al marcarlo listo: cuando la cocina toca Iniciar , salen sus insumos. Si algo ya no alcanza, la cocina lo sabe antes de empezar. Devolver un plato a pendiente o cancelar el pedido devuelve lo usado una sola vez . Ver Cómo se descuenta el inventario. de octubre de 2026 IA sin gastos de más. Las sugerencias de IA ya no vuelven a llamar al modelo si los datos no cambiaron, esperan después de un error y Copilot se puede detener de verdad. En Configuración → IA ves Este mes : consultas, costo estimado, llamadas evitadas y un presupuesto mensual opcional que avisa y, al llegar, pausa solo los análisis automáticos. Compras más flexibles. El número de factura puede esperar hasta confirmar, el IVA va en % (con el habitual de cada proveedor) y cada línea avisa si el precio subió o bajó más de lo normal frente a la última compra y al promedio de 90 días. Ver Registrar una compra. Conteo físico. En Stock → Contar inventario cuentas la bodega (toda, una categoría o un proveedor) y las diferencias quedan como un ajuste «Conteo físico». Ver Cont"
   },
   {
     "id": "roles",
@@ -2246,6 +2296,54 @@ export const KB: KbArticle[] = [
     ],
     "headings": [],
     "body": "Abre Abastecimiento → Stock y toca Contar inventario . Elige qué contar: Todo el inventario , Una categoría o Un proveedor , y toca Empezar conteo . Quanela guarda lo que dice el sistema en ese momento. Escribe lo que hay de cada insumo. Puedes contar en kg o l (vienen propuestos) o en cualquier unidad del insumo, incluidas sus cajas. Se guarda al salir del campo y al lado ves la diferencia y lo que vale. Usa Por contar , Contados y el buscador para no perderte. Puedes cerrar y volver después: el conteo queda abierto. Toca Aplicar ajustes y confirma. Al aplicar, cada insumo contado que no coincide registra un ajuste «Conteo físico» por la diferencia con el stock de ese momento (si se vendió algo mientras contabas, no se cuenta dos veces). Los insumos que no contaste no cambian. Descartar cierra el conteo sin tocar el inventario. Bueno saber: hay un conteo abierto a la vez por cuenta. Los anteriores aparecen en Conteos anteriores , y cada ajuste queda en los movimientos del insumo. Cuidado: aplicar no se puede deshacer. Si te equivocaste, registra otro ajuste. Ver Mermas y ajustes."
+  },
+  {
+    "id": "subscription-billing",
+    "section": "settings",
+    "url": "/help/settings/subscription-billing",
+    "title": "Suscripción, renovación y reembolsos",
+    "summary": "Cómo se renueva tu plan, cómo autorizas los cobros con tarjeta, cómo cancelas y cuándo hay reembolso (retracto y cobros errados).",
+    "audience": [
+      "owner",
+      "admin"
+    ],
+    "permissions": [
+      "billing.view"
+    ],
+    "appPath": "/settings/billing",
+    "questions": [
+      "¿Cómo cancelo mi suscripción?",
+      "¿Se renueva sola?",
+      "¿Cómo quito mi tarjeta?",
+      "¿Me devuelven el dinero si cancelo?",
+      "¿Qué es el retracto?",
+      "¿Qué pasa si no pago?"
+    ],
+    "keywords": [
+      "suscripción",
+      "plan",
+      "renovación automática",
+      "cobro",
+      "tarjeta",
+      "cancelar",
+      "reembolso",
+      "retracto",
+      "devolución",
+      "Wompi",
+      "PSE",
+      "Nequi",
+      "factura",
+      "pago fallido",
+      "suspensión"
+    ],
+    "steps": [],
+    "headings": [
+      "Renovación",
+      "Cancelar",
+      "Reembolsos",
+      "Si un pago falla"
+    ],
+    "body": "Tu plan se paga por periodos (mes o año) en Configuración → Facturación . Las reglas completas están en Suscripciones, renovación automática y cobros y en la Política de Cancelaciones y Reembolsos. Renovación Con tarjeta: al guardarla marcas una casilla aparte que autoriza la renovación automática . Cada periodo se cobra sola, hasta que canceles o quites la tarjeta. Con PSE, Nequi o transferencia: no hay cobro automático; pagas cada periodo desde el aviso. La factura de la renovación aparece 5 días antes del fin del periodo, en la campana y en el aviso de la cuenta. Cancelar En Configuración → Facturación → Cancelar suscripción . Cancelar no pide más pasos que contratar. El servicio sigue hasta el final del periodo pagado y no se hacen más cobros; puedes reanudarla antes de que termine. Reembolsos Situación Reembolso --- Te arrepientes dentro de los 5 días hábiles siguientes al primer pago (retracto) Total Un cobro duplicado o errado Total, una vez verificado Cancelas a mitad de un periodo No; sigues usando el servicio hasta el final Para pedirlo: menú de tu avatar → Privacidad y datos → Nueva solicitud → «Retracto» o «Reembolso». Recibes un radicado y la respuesta en máximo 15 días hábiles. Si un pago falla Hay 3 días de gracia ; después la cuenta se suspende hasta que pagues. No se borra nada : al pagar vuelves a entrar con todo como estaba."
   },
   {
     "id": "suppliers",
