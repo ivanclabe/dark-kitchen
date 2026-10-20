@@ -2,10 +2,22 @@
 const NETWORK_ERROR = /^(TypeError: )?(Failed to fetch|NetworkError when attempting to fetch resource\.?|Load failed|Network request failed)$/i
 export const NETWORK_ERROR_MESSAGE = 'No pudimos conectarnos con Quanela. Revisa tu conexión e inténtalo de nuevo.'
 
+/**
+ * The app asks the database for a function or table it does not have yet (PostgREST PGRST202/PGRST205: the
+ * frontend went out before its migration). Never the raw English «schema cache» text.
+ */
+export const OUTDATED_DATABASE_MESSAGE = 'Esta parte de Quanela todavía no está lista en el servidor: falta aplicar una actualización de la base de datos. Avísale al equipo de Quanela.'
+
 export function getErrorMessage(err: unknown, fallback: string): string {
   const raw = rawMessage(err)
   if (raw === null) return fallback
+  if (isMissingInDatabase(err, raw)) return OUTDATED_DATABASE_MESSAGE
   return NETWORK_ERROR.test(raw.trim()) ? NETWORK_ERROR_MESSAGE : raw
+}
+
+function isMissingInDatabase(err: unknown, raw: string): boolean {
+  const code = typeof err === 'object' && err !== null && 'code' in err ? (err as { code?: unknown }).code : null
+  return code === 'PGRST202' || code === 'PGRST205' || /in the schema cache$/i.test(raw.trim())
 }
 
 /**
