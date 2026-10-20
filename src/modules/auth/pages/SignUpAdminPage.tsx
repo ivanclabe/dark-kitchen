@@ -21,6 +21,11 @@ export function SignUpAdminPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    // The same minimum as every other password in Quanela (ADR 0071).
+    if (password.length < 8) {
+      setError('La contraseña debe tener mínimo 8 caracteres.')
+      return
+    }
     setSubmitting(true)
     setError(null)
     setInfo(null)
@@ -72,9 +77,9 @@ export function SignUpAdminPage() {
           <FormField label="Correo" required>
             {(a11y) => <EmailInput {...a11y} required autoComplete="username" value={email} onValueChange={setEmail} />}
           </FormField>
-          <FormField label="Contraseña" required hint="Mínimo 6 caracteres.">
+          <FormField label="Contraseña" required hint="Mínimo 8 caracteres.">
             {(a11y) => (
-              <Input {...a11y} type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input {...a11y} type="password" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             )}
           </FormField>
 

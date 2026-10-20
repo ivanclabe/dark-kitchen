@@ -248,3 +248,32 @@ export interface PasswordLink {
 
 /** One-time link for the person to create their own password; nothing is e-mailed. */
 export const createPasswordLink = (userId: string) => invoke<PasswordLink>({ action: 'password_link', userId })
+
+// ---------------------------------------------------------------------------
+// PQR (ADR 0071)
+// ---------------------------------------------------------------------------
+
+export interface PqrRow {
+  id: string
+  radicado: string
+  kind: string
+  status: string
+  description: string
+  requester_email: string | null
+  organization_name: string | null
+  legal_basis: string
+  due_date: string
+  extended_due_date: string | null
+  response: string | null
+  created_at: string
+  answered_at: string | null
+  details: unknown
+}
+
+export function fetchPqrRequests(): Promise<PqrRow[]> {
+  return rpc<PqrRow[]>('dk_ga_pqr_requests')
+}
+
+export function updatePqrRequest(input: { id: string; status: string; message?: string; extend: boolean }): Promise<void> {
+  return rpc<void>('dk_ga_update_pqr', { p_id: input.id, p_status: input.status, p_message: input.message, p_extend: input.extend })
+}

@@ -443,6 +443,8 @@ export async function runTurn(ctx: Context, text: string, deps: TurnDeps): Promi
   const out: string[] = [];
   if (!state.greeted) {
     out.push(ctx.business.greeting || `¡Hola! Te atiende el asistente de *${ctx.business.name}*. 🍽️`);
+    // ADR 0071: the business's data policy before asking for any data; ordering after it is the authorization.
+    out.push(`Para tomar tu pedido usamos tu nombre, celular y dirección según la política de datos de ${ctx.business.name}: ${deps.appUrl}/menu/${ctx.business.slug}/privacidad`);
     state.greeted = true;
     if (o.openState.state === "closed") out.push(`Ahora estamos cerrados${o.openState.opens_at ? `; abrimos a las ${hour(o.openState.opens_at.slice(11, 16))}` : ""}. Puedes dejar tu pedido listo.`);
   }

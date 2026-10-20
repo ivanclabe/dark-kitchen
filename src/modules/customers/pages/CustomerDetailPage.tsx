@@ -18,8 +18,8 @@ import { KpiStrip, type Kpi } from '@/shared/ui/KpiStrip'
 import { LoadingState } from '@/shared/ui/LoadingState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { formatDate, formatDateTime, formatMoney } from '@/shared/utils/format'
-import { Banknote, Building2, ChevronLeft, ChevronRight, MessageSquareWarning, Pencil, Plus, Receipt, Users } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
+import { Banknote, Building2, ChevronLeft, ChevronRight, MessageSquareWarning, Pencil, Plus, Receipt, UserX, Users } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { CustomerFormModal } from '../components/CreateCustomerModal'
@@ -35,6 +35,10 @@ import { CustomerRecommendations } from '../components/profile/CustomerRecommend
 import { CustomerProfile } from '../components/profile/CustomerProfile'
 import { relativeDay } from '../lib/dates'
 import type { CustomerDetail } from '../types'
+import { anonymizeCustomer } from '../api/profile'
+import { ConfirmDialog } from '@/shared/ui/Modal'
+import { useToast } from '@/shared/ui/Toast'
+import { getErrorMessage } from '@/shared/utils/errors'
 
 type Tab = 'summary' | 'orders' | 'preferences' | 'addresses' | 'complaints' | 'account'
 const ORDERS_PAGE = 20
@@ -170,8 +174,19 @@ export function CustomerDetailPage() {
   const [payOpen, setPayOpen] = useState(false)
   const [openOrder, setOpenOrder] = useState<string | null>(null)
   const [newOrderOpen, setNewOrderOpen] = useState(false)
+  const [anonymizeOpen, setAnonymizeOpen] = useState(false)
   const back = useBackTarget({ to: '/customers', label: 'Clientes' })
   const queryClient = useQueryClient()
+  const { show } = useToast()
+  const anonymize = useMutation({
+    mutationFn: () => anonymizeCustomer(id),
+    onSuccess: async () => {
+      setAnonymizeOpen(false)
+      show('Borramos los datos personales del cliente. Sus pedidos se conservan sin identificarlo.', 'success')
+      await queryClient.invalidateQueries()
+    },
+    onError: (err) => show(getErrorMessage(err, 'No se pudieron borrar los datos del cliente'), 'error'),
+  })
   const receivables = useCustomerReceivables(id, payOpen)
 
   const showDebt = customer?.balance !== undefined
@@ -273,12 +288,35 @@ export function CustomerDetailPage() {
                 Registrar pago
               </Button>
             )}
+            {can('customers.delete') && (
+              <Button variant="ghost" icon={UserX} onClick={() => setAnonymizeOpen(true)}>
+                Borrar datos personales
+              </Button>
+            )}
             {can('orders.create') && (
               <Button variant="primary" icon={Plus} onClick={() => setNewOrderOpen(true)}>
                 Nuevo pedido
               </Button>
             )}
           </>
+        }
+      />
+
+      <ConfirmDialog
+        open={anonymizeOpen}
+        onClose={() => setAnonymizeOpen(false)}
+        onConfirm={() => anonymize.mutate()}
+        pending={anonymize.isPending}
+        danger
+        title="¿Borrar los datos personales de este cliente?"
+        confirmLabel="Borrar datos"
+        description={
+          <div className="space-y-2">
+            <p>
+              Úsalo cuando {customer.fullName} te pida suprimir sus datos. Se borran su nombre, celular, correo, direcciones, notas, preferencias y conversaciones de WhatsApp, y deja de recibir avisos.
+            </p>
+            <p>Sus pedidos se conservan para tu contabilidad, sin nada que lo identifique. No se puede deshacer.</p>
+          </div>
         }
       />
 

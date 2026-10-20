@@ -14,7 +14,7 @@ import { typography } from '@/shared/ui/typography'
 import { getErrorMessage } from '@/shared/utils/errors'
 import { initials } from '@/shared/utils/format'
 import { useMutation } from '@tanstack/react-query'
-import { KeyRound, MapPin, UserRound } from 'lucide-react'
+import { ChevronRight, KeyRound, MapPin, ShieldCheck, UserRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { AvatarPicker } from '@/shared/avatars/GalleryPicker'
@@ -29,6 +29,7 @@ import { changeMyPassword, updateMyProfile } from '../api/profile'
 export function ProfilePage() {
   const { profile, user, refreshProfile } = useAuth()
   const { show } = useToast()
+  const { path } = useActiveKitchen()
 
   const savedAvatar = resolveAvatarKey(profile?.avatarKey, profile?.id)
   const [fullName, setFullName] = useState<string | null>(null)
@@ -99,6 +100,15 @@ export function ProfilePage() {
 
         <SecurityCard email={user?.email ?? ''} providers={signInProviders(user)} />
         <AccessCard />
+        {/* ADR 0071: documents accepted, my data and requests (consultas, reclamos, reembolsos). */}
+        <Link to={path('/perfil/privacidad')} className="flex items-center gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900 p-4 transition-colors hover:border-neutral-700">
+          <ShieldCheck size={18} className="shrink-0 text-neutral-400" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-medium text-neutral-100">Privacidad y datos</span>
+            <span className="block text-xs text-neutral-400">Documentos que aceptaste, descarga de tus datos y solicitudes con radicado.</span>
+          </span>
+          <ChevronRight size={16} className="text-neutral-500" aria-hidden />
+        </Link>
       </div>
     </Page>
   )

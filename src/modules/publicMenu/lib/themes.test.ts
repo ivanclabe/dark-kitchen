@@ -8,12 +8,12 @@ import {
   designFrom,
   designKey,
   fixContrast,
-  fontsHref,
   normalizeDesign,
   PALETTES,
   resolveTheme,
   TEMPLATE_IDS,
   TEMPLATES,
+  themeFonts,
   themeStyle,
   withTemplate,
 } from './themes'
@@ -103,10 +103,8 @@ describe('themes (ADR 0053)', () => {
   })
 
   it('loads only the two chosen fonts and gives CSS variables', () => {
-    const href = fontsHref(TEMPLATES.elegant.theme)
-    expect(href).toContain('family=Cormorant+Garamond')
-    expect(href).toContain('family=Outfit')
-    expect(href.match(/family=/g)).toHaveLength(2)
+    expect(themeFonts(TEMPLATES.elegant.theme)).toEqual(['Cormorant Garamond', 'Outfit'])
+    expect(themeFonts({ ...TEMPLATES.elegant.theme, fonts: { heading: 'Lora', body: 'Lora', scale: 'M' } })).toEqual(['Lora'])
     const style = themeStyle(TEMPLATES.dark.theme, (p) => `/img/${p}`) as Record<string, string>
     expect(style['--pm-primary']).toBe('#E8B04B')
     expect(style['--pm-on-primary']).toBe('#111111')

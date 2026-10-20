@@ -50,6 +50,12 @@ function Where() {
   return <p data-testid="where">{`${location.pathname}|${(location.state as { notice?: string } | null)?.notice ?? ''}`}</p>
 }
 
+/** ADR 0071: the two separate boxes (Terms; Data Policy) before any method. */
+async function acceptLegal(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('checkbox', { name: /Términos y Condiciones/ }))
+  await user.click(screen.getByRole('checkbox', { name: /Política de Tratamiento de Datos/ }))
+}
+
 function renderAt(url: string) {
   return render(
     <ToastProvider>
@@ -79,6 +85,17 @@ describe('owner sign-up methods (ADR 0025)', () => {
     for (const name of ['Continuar con Google', 'Continuar con Instagram', 'Continuar con teléfono', 'Continuar con email']) {
       expect(screen.getByRole('button', { name })).toBeTruthy()
     }
+    // Without the two boxes no method continues, and it says why (ADR 0071).
+    const terms = screen.getByRole('checkbox', { name: /Términos y Condiciones/ }) as HTMLInputElement
+    const privacy = screen.getByRole('checkbox', { name: /Política de Tratamiento de Datos/ }) as HTMLInputElement
+    expect(terms.checked || privacy.checked).toBe(false)
+    await user.click(screen.getByRole('button', { name: 'Continuar con email' }))
+    expect(screen.queryByLabelText(/Tu nombre/)).toBeNull()
+    expect(screen.getAllByText('Es obligatorio para crear tu cuenta.')).toHaveLength(2)
+    await user.click(terms)
+    await user.click(screen.getByRole('button', { name: 'Continuar con email' }))
+    expect(screen.queryByLabelText(/Tu nombre/)).toBeNull()
+    await user.click(privacy)
     await user.click(screen.getByRole('button', { name: 'Continuar con email' }))
     expect(screen.getByLabelText(/Tu nombre/)).toBeTruthy()
     expect(screen.getByLabelText(/Contraseña/)).toBeTruthy()
@@ -90,13 +107,22 @@ describe('owner sign-up methods (ADR 0025)', () => {
     const user = userEvent.setup()
     renderAt('/registro')
     await user.click(screen.getByRole('button', { name: 'Continuar con Google' }))
+    expect(calls.oauth).not.toHaveBeenCalled()
+    await acceptLegal(user)
+    await user.click(screen.getByRole('button', { name: 'Continuar con Google' }))
     expect(calls.oauth).toHaveBeenCalledWith('google', undefined)
+    // The choice survives the trip to Google (this tab), to be recorded once there is a session.
+    expect(JSON.parse(sessionStorage.getItem('dk-legal-consent')!).documents).toEqual([
+      { slug: 'terminos', version: expect.any(String) },
+      { slug: 'privacidad', version: expect.any(String) },
+    ])
     expect(sessionStorage.getItem('dk-owner-sign-in')).not.toBeNull()
   })
 
   it('phone: validates the number, sends the code in E.164 (creating the user) and verifies it', async () => {
     const user = userEvent.setup()
     renderAt('/registro')
+    await acceptLegal(user)
     await user.click(screen.getByRole('button', { name: 'Continuar con teléfono' }))
     const send = screen.getByRole('button', { name: /Enviarme el código/ }) as HTMLButtonElement
     await user.type(screen.getByLabelText(/Número de celular/), '123')
@@ -123,8 +149,17 @@ describe('owner sign-up methods (ADR 0025)', () => {
     await user.type(screen.getByLabelText(/Nombre del negocio/), 'Pizzas Gabi')
     await user.selectOptions(screen.getByLabelText(/Sector/), screen.getAllByRole('option')[1])
     await user.selectOptions(screen.getByLabelText(/Categoría/), screen.getAllByRole('option', { hidden: true }).find((o) => o.closest('select')?.id === screen.getByLabelText(/Categoría/).id && (o as HTMLOptionElement).value)!)
+    // Back from Google in another tab: the boxes are asked here (ADR 0071).
+    await acceptLegal(user)
     await user.click(screen.getByRole('button', { name: 'Crear mi negocio' }))
-    expect(calls.savePending).toHaveBeenCalledWith(expect.objectContaining({ fullName: 'Gabriela Gómez', plan: 'business', organization: expect.objectContaining({ name: 'Pizzas Gabi' }) }))
+    expect(calls.savePending).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fullName: 'Gabriela Gómez',
+        plan: 'business',
+        organization: expect.objectContaining({ name: 'Pizzas Gabi' }),
+        legalConsent: expect.objectContaining({ documents: expect.arrayContaining([expect.objectContaining({ slug: 'terminos' }), expect.objectContaining({ slug: 'privacidad' })]) }),
+      }),
+    )
     await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/registro/confirmado|'))
   })
 

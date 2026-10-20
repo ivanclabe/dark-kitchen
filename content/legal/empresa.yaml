@@ -1,0 +1,36 @@
+# Datos de la empresa que opera Quanela.
+#
+# Los debe completar el propietario. No se inventan: cada campo vacío ('')
+# aparece en los documentos como un aviso resaltado «Pendiente: …» y el build
+# advierte que falta.
+#
+# Estos valores se insertan en el texto de los documentos legales (tokens
+# {{empresa.<campo>}}). Cambiar cualquier valor cambia el texto publicado y,
+# por lo tanto, su hash: exige subir la `version` (y la fecha `effective`) de
+# cada documento afectado, regenerar versions.json y registrar la nueva versión
+# en la base de datos. Ver README.md.
+
+# Nombre legal completo de la sociedad (p. ej., «… S.A.S.»).
+razonSocial: ''
+# NIT con dígito de verificación.
+nit: ''
+# Municipio de domicilio principal según el certificado de existencia y representación legal.
+domicilio: ''
+# Dirección física para notificaciones y solicitudes.
+direccion: ''
+# Ciudad de la dirección física.
+ciudad: ''
+# Teléfono de atención.
+telefono: ''
+# Correo del canal de protección de datos personales (consultas y reclamos).
+correoDatos: ''
+# Correo para peticiones, quejas, reclamos y reembolsos (PQR).
+correoPqr: ''
+# Correo comercial (ventas).
+correoComercial: ''
+# Área o persona responsable de la protección de datos personales.
+areaDatos: ''
+# Sitio web principal (p. ej., https://quanela.com).
+sitioWeb: ''
+# Frase completa sobre el IVA, p. ej. «Los precios incluyen IVA.» o «Los precios no incluyen IVA; se suma al pagar.»
+preciosIva: ''

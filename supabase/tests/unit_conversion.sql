@@ -38,7 +38,7 @@ create or replace function pg_temp.v(p_key text) returns jsonb language sql as $
 create or replace function pg_temp.web_order(p_phone text, p_opt_in boolean, p_fulfillment text default 'delivery', p_key text default null) returns jsonb language sql as $$
   select dk_public_place_order('wa-a-prueba', jsonb_build_object(
     'idempotencyKey', coalesce(p_key, gen_random_uuid()::text), 'customer', jsonb_build_object('name', 'Laura Gómez', 'phone', p_phone),
-    'fulfillment', p_fulfillment, 'address', 'Calle 10 # 20-30', 'paymentMethod', 'Efectivo', 'whatsappOptIn', p_opt_in,
+    'fulfillment', p_fulfillment, 'address', 'Calle 10 # 20-30', 'paymentMethod', 'Efectivo', 'whatsappOptIn', p_opt_in, 'privacyAccepted', true,
     'items', jsonb_build_array(jsonb_build_object('productId', '52000000-0000-0000-0000-000000057a01', 'quantity', 2))))
 $$;
 create or replace function pg_temp.order_id(p_number text) returns uuid language sql as $$

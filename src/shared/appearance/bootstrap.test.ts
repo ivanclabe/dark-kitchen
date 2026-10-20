@@ -17,22 +17,22 @@ function boot(saved: unknown, prefersLight = false, path = '/') {
 afterEach(() => localStorage.clear())
 
 describe('first paint (index.html)', () => {
-  it('applies dark, light and neutral; system follows the OS; anything else is dark', () => {
+  it('applies dark, light and neutral; system follows the OS; anything else is the default (light)', () => {
     expect(boot({ theme: 'neutral' })).toBe('neutral')
     expect(boot({ theme: 'light' })).toBe('light')
     expect(boot({ theme: 'dark' })).toBe('dark')
     expect(boot({ theme: 'system' }, true)).toBe('light')
     expect(boot({ theme: 'system' }, false)).toBe('dark')
-    expect(boot({ theme: 'sepia' })).toBe('dark')
-    expect(boot('not json')).toBe('dark')
+    expect(boot({ theme: 'sepia' })).toBe('light')
+    expect(boot('not json')).toBe('light')
   })
 
-  it('without a chosen theme: light on the login, sign-up and help center; dark elsewhere (ADR 0061)', () => {
+  it('without a chosen theme: light everywhere, the app included (ADR 0072)', () => {
     expect(boot(undefined, false, '/login')).toBe('light')
     expect(boot(undefined, false, '/registro')).toBe('light')
     expect(boot(undefined, false, '/activar/abc')).toBe('light')
     expect(boot(undefined, false, '/help/orders')).toBe('light')
-    expect(boot(undefined, false, '/k/centro/operations')).toBe('dark')
+    expect(boot(undefined, false, '/k/centro/operations')).toBe('light')
     expect(boot({ theme: 'dark' }, false, '/login')).toBe('dark')
     expect(boot({ theme: 'neutral' }, false, '/registro')).toBe('neutral')
     window.history.replaceState(null, '', '/')

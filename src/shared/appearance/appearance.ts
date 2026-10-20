@@ -26,20 +26,14 @@ export interface Appearance {
 
 export const APPEARANCE_KEY = 'dk-appearance'
 const EVENT = 'dk-appearance'
-const DEFAULTS: Appearance = { theme: 'dark', textSize: 'normal' }
+// ADR 0072: without a chosen theme, Quanela is light everywhere (it used to be dark inside the app).
+const DEFAULTS: Appearance = { theme: 'light', textSize: 'normal' }
 
 function readCookie(): string | null {
   if (typeof document === 'undefined') return null
   const match = document.cookie.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${APPEARANCE_KEY}=`))
   return match ? decodeURIComponent(match.slice(APPEARANCE_KEY.length + 1)) : null
 }
-
-/**
- * Pages that open in the light theme when the person has not chosen one (ADR 0061): signing in, creating an
- * account (sign-up, activating an invitation, setting a password) and the help center. Keep in sync with the
- * same regular expression in index.html (first paint).
- */
-export const LIGHT_DEFAULT_PATH = /^\/(login|registro|activar|set-password|signup-admin|help)(\/|$)/
 
 /** The theme this device chose, or null when it never chose one (then each page has its default). */
 export function savedTheme(): ThemePreference | null {
@@ -51,13 +45,13 @@ export function savedTheme(): ThemePreference | null {
   }
 }
 
-/** The default theme of a page: light on sign-in, account creation and the help center; dark in the app. */
-export function defaultThemeFor(pathname: string, docsHost = isDocsHost()): ResolvedTheme {
-  return docsHost || LIGHT_DEFAULT_PATH.test(pathname) ? 'light' : 'dark'
-}
-
-function isDocsHost(): boolean {
-  return typeof window !== 'undefined' && window.location.hostname.startsWith('doc.')
+/**
+ * The theme of a page when the person has not chosen one: light (ADR 0072; before, ADR 0061, only the sign-in,
+ * account creation and help were light and the app dark). Kept per page so a future exception has one place.
+ * Keep in sync with index.html (first paint).
+ */
+export function defaultThemeFor(_pathname?: string): ResolvedTheme {
+  return 'light'
 }
 
 /** The page color of each theme: the browser bar on phones follows it (ADR 0065). */
@@ -84,7 +78,7 @@ export function readAppearance(): Appearance {
   try {
     const raw = JSON.parse(readCookie() ?? localStorage.getItem(APPEARANCE_KEY) ?? '{}') as Partial<Appearance>
     return {
-      theme: THEMES.includes(raw.theme as ThemePreference) ? (raw.theme as ThemePreference) : 'dark',
+      theme: THEMES.includes(raw.theme as ThemePreference) ? (raw.theme as ThemePreference) : DEFAULTS.theme,
       textSize: raw.textSize === 'large' ? 'large' : 'normal',
     }
   } catch {

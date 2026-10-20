@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/shared/ui/Toast'
@@ -18,6 +18,8 @@ const state = vi.hoisted(() => ({
   stopped: 0,
   said: [] as { text: unknown; priority: string }[],
   features: new Set<string>(['voice_wake_word', 'voice_speech']),
+  model: Promise.resolve() as Promise<unknown>,
+  modelStatus: { state: 'ready' } as { state: string; loaded?: number; total?: number },
 }))
 vi.mock('@/shared/lib/supabase', () => ({ supabase: {} }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
@@ -26,7 +28,12 @@ vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
 vi.mock('@/shared/voice/hooks', () => ({
   useQuanelaVoice: () => ({ allowed: true, say: (text: unknown, priority: string) => (state.said.push({ text, priority }), true) }),
 }))
-vi.mock('@/shared/voice/recognition/preference', () => ({ useRecognizerPreference: () => [state.engine, vi.fn()] }))
+vi.mock('@/shared/voice/recognition/preference', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/shared/voice/recognition/preference')>()),
+  useRecognizerPreference: () => [state.engine, vi.fn()],
+  acceptOnlineRecognition: () => void (state.engine = 'browser'),
+}))
+vi.mock('@/shared/voice/recognition/voskModel', () => ({ loadVoskModel: () => state.model, useVoskModelStatus: () => state.modelStatus }))
 vi.mock('@/shared/voice/recognition/engines', () => ({ engineFor: () => ({ supported: () => true }) }))
 vi.mock('@/shared/voice/recognition/useSpeechRecognition', () => ({
   useSpeechRecognition: ({ onTranscriptChange, onStart }: { onTranscriptChange: (t: string, final?: boolean) => void; onStart?: () => void }) => {
@@ -109,6 +116,8 @@ beforeEach(() => {
   state.tone = null
   state.turns = []
   state.prepared = 0
+  state.model = Promise.resolve()
+  state.modelStatus = { state: 'ready' }
   calls.length = 0
   localStorage.clear()
 })
@@ -154,12 +163,60 @@ describe('«Oye Quanela» (ADR 0033)', () => {
     expect(screen.getByText(/state:idle/)).toBeTruthy()
   })
 
-  it('with the offline recognizer outside Cocina it says how to ask questions', async () => {
+  it('with the local recognizer outside Cocina a question asks for the online one first (ADR 0071)', async () => {
     state.engine = 'vosk'
     renderVoice(false)
     await act(async () => api!.listen())
     expect(state.started).toBe(0)
-    expect(screen.getByText(/cambia el reconocedor a «navegador»/)).toBeTruthy()
+    expect(screen.getByText(/el audio de lo que dices se envía a Google/)).toBeTruthy()
+    // Cancelled: nothing is saved, nothing listens.
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Cancelar' })))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(state.engine).toBe('vosk')
+    expect(state.started).toBe(0)
+    // Accepted: the online recognizer and the question goes on.
+    await act(async () => api!.listen())
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Aceptar y usar en línea' })))
+    expect(state.engine).toBe('browser')
+    expect(state.started).toBe(1)
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('dictating to Copilot with the local recognizer: the notice, then the dictation', async () => {
+    state.engine = 'vosk'
+    renderVoice()
+    const typed: string[] = []
+    await act(async () => api!.dictate({ onTranscript: (t) => typed.push(t), onDone: () => undefined }))
+    expect(state.started).toBe(0)
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Aceptar y usar en línea' })))
+    expect(state.started).toBe(1)
+    await say('qué plato deja más margen', DICTATION_DELAY_MS)
+    expect(typed).toEqual(['qué plato deja más margen'])
+  })
+
+  it('«Oye Quanela» outside Cocina with the local recognizer asks for the online one, without listening', async () => {
+    state.engine = 'vosk'
+    renderVoice(false)
+    await act(async () => {
+      state.onDetect!()
+      await vi.advanceTimersByTimeAsync(0)
+    })
+    expect(state.started).toBe(0)
+    expect(screen.getByRole('dialog')).toBeTruthy()
+  })
+
+  it('in Cocina the local recognizer waits for its model, showing the download, then listens', async () => {
+    state.engine = 'vosk'
+    let ready!: () => void
+    state.model = new Promise<void>((resolve) => (ready = resolve))
+    state.modelStatus = { state: 'downloading', loaded: 10 * 1_048_576, total: 38 * 1_048_576 }
+    renderVoice()
+    await act(async () => api!.listen())
+    expect(state.started).toBe(0)
+    expect(screen.getByText(/Descargando el reconocimiento de voz local: 10 de 38 MB/)).toBeTruthy()
+    await act(async () => ready())
+    expect(state.started).toBe(1)
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 
   it('dictation fills Copilot\'s field and sends after a pause, without routing', async () => {

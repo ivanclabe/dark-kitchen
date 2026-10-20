@@ -3,6 +3,7 @@ import { RobotFace } from '@/shared/robot/RobotFace'
 import { applyAppearance, applyRouteDefault, savedTheme } from '@/shared/appearance/appearance'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
+import { LEGAL_COMPANY, QUANELA_DOCUMENTS, legalHref } from '@/shared/legal/documents'
 import { ArrowRight } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -15,7 +16,7 @@ import { MenuPlannerSection } from '../components/MenuPlannerSection'
 import { OrderStory, type StoryStep } from '../components/OrderStory'
 import { PricingSection } from '../components/PricingSection'
 import { ProductShowcase } from '../components/ProductShowcase'
-import { DISPLAY_FONT } from '../lib/typography'
+import { loadDisplayFont } from '../lib/typography'
 import '../landing.css'
 
 /** How one order travels through the day. Everything it says exists in the app today: no invented figures. */
@@ -111,6 +112,17 @@ function rise(i: number): CSSProperties {
  * reales con datos de ejemplo), el resto del día, los planes (de la base), las preguntas y el registro ya
  * abierto. Todo lo que dice existe hoy en la app: ni clientes, ni testimonios, ni cifras inventadas.
  */
+/** Who sells (Ley 1480 art. 50 a): only what the company has provided in content/legal/empresa.yaml. */
+const sellerLine = [
+  LEGAL_COMPANY.razonSocial,
+  LEGAL_COMPANY.nit && `NIT ${LEGAL_COMPANY.nit}`,
+  [LEGAL_COMPANY.direccion, LEGAL_COMPANY.ciudad].filter(Boolean).join(', '),
+  LEGAL_COMPANY.telefono,
+  LEGAL_COMPANY.correoPqr,
+]
+  .filter(Boolean)
+  .join(' · ')
+
 export function LandingPage() {
   const { session } = useAuth()
   const root = useReveal()
@@ -137,13 +149,9 @@ export function LandingPage() {
       else applyRouteDefault(window.location.pathname)
     }
   }, [])
+  // Its own chunk: only the landing downloads Nunito (the module system loads it once).
   useEffect(() => {
-    if (document.querySelector('link[data-landing-font]')) return
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = DISPLAY_FONT
-    link.dataset.landingFont = 'true'
-    document.head.appendChild(link)
+    void loadDisplayFont()
   }, [])
   useEffect(() => {
     if (!hash) return
@@ -209,6 +217,21 @@ export function LandingPage() {
           </Link>
         </nav>
         <span className="text-[var(--l-soft)] sm:text-right">© {new Date().getFullYear()} Quanela</span>
+        {/* ADR 0071: the documents, who sells (Ley 1480 art. 50) and the consumer authority. */}
+        <nav aria-label="Documentos legales" className="flex flex-wrap gap-x-5 gap-y-1 border-t border-[var(--l-field)] pt-4 sm:col-span-3">
+          {QUANELA_DOCUMENTS.map((doc) => (
+            <Link key={doc.slug} to={legalHref(doc.slug)} className="landing-link">
+              {doc.title}
+            </Link>
+          ))}
+          <Link to="/legal/preferencias" className="landing-link">
+            Preferencias de privacidad
+          </Link>
+          <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer" className="landing-link">
+            Superintendencia de Industria y Comercio
+          </a>
+        </nav>
+        {sellerLine && <p className="text-[var(--l-soft)] sm:col-span-3">{sellerLine}</p>}
       </footer>
     </div>
   )

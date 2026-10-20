@@ -13,6 +13,49 @@ export const MAX_LINES = 30
 /** The cart lives in this browser, per account and per day (yesterday's cart is not today's). */
 export const cartStorageKey = (slug: string, today: string) => `quanela:cart:${slug}:${today}`
 
+const CART_KEY = /^quanela:cart:.+:(\d{4}-\d{2}-\d{2})$/
+
+/** ADR 0071: carts of previous days (any menu) leave the browser; they are never read again. */
+export function pruneOldCarts(today: string, storage?: Storage): void {
+  try {
+    const store = storage ?? localStorage
+    const stale: string[] = []
+    for (let i = 0; i < store.length; i++) {
+      const key = store.key(i)
+      const day = key ? CART_KEY.exec(key)?.[1] : undefined
+      if (key && day && day < today) stale.push(key)
+    }
+    for (const key of stale) store.removeItem(key)
+  } catch {
+    // A private window may block storage: nothing to clean.
+  }
+}
+
+/** Today's cart of a menu, as saved in this browser (an unreadable one is an empty cart). */
+export function readCart(slug: string, today: string, storage?: Storage): CartLine[] {
+  pruneOldCarts(today, storage)
+  try {
+    const raw = (storage ?? localStorage).getItem(cartStorageKey(slug, today))
+    const parsed = raw ? (JSON.parse(raw) as CartLine[]) : []
+    return Array.isArray(parsed) ? parsed.filter((l) => typeof l.productId === 'string' && l.quantity > 0) : []
+  } catch {
+    return []
+  }
+}
+
+/** Saves today's cart (an empty one is removed). */
+export function writeCart(slug: string, today: string, lines: CartLine[], storage?: Storage): void {
+  pruneOldCarts(today, storage)
+  try {
+    const store = storage ?? localStorage
+    const key = cartStorageKey(slug, today)
+    if (lines.length) store.setItem(key, JSON.stringify(lines))
+    else store.removeItem(key)
+  } catch {
+    // A private window may block storage: the cart still works in memory.
+  }
+}
+
 /** How many units of a dish can still be asked for. */
 export function maxQuantity(item: Pick<PublicMenuItem, 'remaining'>): number {
   return Math.min(MAX_UNITS_PER_LINE, item.remaining ?? MAX_UNITS_PER_LINE)

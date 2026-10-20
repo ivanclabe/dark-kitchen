@@ -14,7 +14,7 @@ vi.mock('@/shared/hooks/useAuth', () => ({
   useAuth: () => ({ profile: { id: 'p1', fullName: 'Laura Gómez', avatarKey: null }, user: state.user, refreshProfile: vi.fn() }),
 }))
 vi.mock('@/shared/kitchen/activeKitchenContext', () => ({
-  useActiveKitchen: () => ({ kitchen: { id: 'k1' } }),
+  useActiveKitchen: () => ({ kitchen: { id: 'k1' }, path: (to: string) => `/k/sopa${to}` }),
   useMyKitchens: () => ({ data: [{ id: 'k1', slug: 'centro', name: 'Centro', active: true, roleName: 'CAJA' }] }),
   kitchenPath: (slug: string, to: string) => `/k/${slug}${to}`,
 }))

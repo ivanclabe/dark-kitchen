@@ -1,9 +1,11 @@
 import { Button } from '@/shared/ui/Button'
 import { Select } from '@/shared/ui/FormField'
 import { typography } from '@/shared/ui/typography'
+import { formatDate } from '@/shared/utils/format'
 import { engineFor, type RecognitionSession } from '@/shared/voice/recognition/engines'
-import { useRecognizerPreference, type RecognizerId } from '@/shared/voice/recognition/preference'
-import { isVoskSupported, loadVoskModel, useVoskModelStatus } from '@/shared/voice/recognition/voskModel'
+import { OnlineRecognitionNotice } from '@/shared/voice/recognition/OnlineRecognitionNotice'
+import { hadOnlineWithoutNotice, onlineAcceptedAt, useRecognizerPreference, type RecognizerId } from '@/shared/voice/recognition/preference'
+import { isVoskSupported, loadVoskModel, useVoskModelStatus, VOSK_MODEL_BYTES } from '@/shared/voice/recognition/voskModel'
 import clsx from 'clsx'
 import { Mic, Square } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -24,13 +26,16 @@ const mb = (bytes: number) => Math.round(bytes / 1_048_576)
 
 /**
  * Speech recognition on this device (ADR 0015, ADR 0033: it serves «Oye
- * Quanela» in the whole app): browser engine or offline Vosk (beta, kitchen
- * commands only). "Probar" listens once and shows what was understood and
- * which command it would be — it never touches an order.
+ * Quanela» in the whole app): local Vosk (the default since ADR 0071, kitchen
+ * commands only) or the browser's online engine, only after its notice is
+ * accepted. "Probar" listens once and shows what was understood and which
+ * command it would be — it never touches an order.
  */
 export function CommandRecognitionPanel() {
   const [engineId, setEngineId] = useRecognizerPreference()
   const status = useVoskModelStatus()
+  // ADR 0071: choosing the online engine first shows its notice; nothing is saved until it is accepted.
+  const [noticeOpen, setNoticeOpen] = useState(false)
   const [testing, setTesting] = useState(false)
   const [heard, setHeard] = useState('')
   const [testError, setTestError] = useState<string | null>(null)
@@ -47,10 +52,13 @@ export function CommandRecognitionPanel() {
   )
 
   function choose(id: RecognizerId) {
-    setEngineId(id)
+    if (id === engineId) return
+    stopTest()
     setHeard('')
     setTestError(null)
-    if (id === 'vosk' && isVoskSupported()) void loadVoskModel().catch(() => undefined)
+    if (id === 'browser') return setNoticeOpen(true)
+    setEngineId(id)
+    if (isVoskSupported()) void loadVoskModel().catch(() => undefined)
   }
 
   function stopTest() {
@@ -90,6 +98,8 @@ export function CommandRecognitionPanel() {
   }
 
   const parsed = heard ? parseVoiceCommand(spokenNumbersToDigits(heard)) : null
+  const accepted = engineId === 'browser' ? onlineAcceptedAt() : null
+  const acceptedLabel = accepted ? formatDate(accepted) : null
   const voskBusy = engineId === 'vosk' && (status.state === 'downloading' || status.state === 'loading')
 
   return (
@@ -99,17 +109,23 @@ export function CommandRecognitionPanel() {
           Reconocimiento de voz
         </label>
         <Select id="recognizer" value={engineId} onChange={(e) => choose(e.target.value as RecognizerId)} className="!mt-1">
-          <option value="browser">Navegador (necesita internet)</option>
           <option value="vosk" disabled={!isVoskSupported()}>
-            Sin internet (Vosk, beta)
+            Local, en este equipo (sin internet)
           </option>
+          <option value="browser">En línea (Google, necesita internet)</option>
         </Select>
         <p className={typography.caption}>
           {engineId === 'browser'
-            ? 'Usa el reconocimiento del navegador. En Chrome el audio se procesa en servidores de Google.'
-            : 'Reconoce los comandos de Cocina en este equipo, sin internet y sin enviar el audio. Solo entiende números de pedido y acciones (cancelar se hace desde la pantalla); para hacerle preguntas a Copilot, usa el navegador.'}
+            ? `El audio de lo que dices se envía a Google para convertirlo en texto${acceptedLabel ? ` (aceptado el ${acceptedLabel})` : ''}. Elige «Local» para que no salga del equipo.`
+            : 'Reconoce los comandos de Cocina en este equipo, sin internet y sin enviar el audio. Solo entiende números de pedido y acciones (cancelar se hace desde la pantalla); para hacerle preguntas a Copilot por voz, usa el reconocimiento en línea.'}
         </p>
+        {engineId === 'vosk' && hadOnlineWithoutNotice() && (
+          <p className={clsx(typography.caption, 'mt-1 text-amber-300')}>
+            Este equipo usaba el reconocimiento en línea. Ahora el local es el predeterminado; para seguir en línea, elígelo y acepta el aviso.
+          </p>
+        )}
       </div>
+      <OnlineRecognitionNotice open={noticeOpen} onCancel={() => setNoticeOpen(false)} onAccepted={() => setNoticeOpen(false)} />
 
       {engineId === 'vosk' && (
         <div className="text-xs">
@@ -123,6 +139,7 @@ export function CommandRecognitionPanel() {
               </div>
             </div>
           )}
+          {status.state === 'idle' && <p className="text-neutral-400">El modelo de voz (unos {mb(VOSK_MODEL_BYTES)} MB) se descarga la primera vez que escuches.</p>}
           {status.state === 'loading' && <p className="text-neutral-300">Preparando el modelo de voz…</p>}
           {status.state === 'ready' && <p className="text-emerald-300">Modelo de voz listo en este equipo.</p>}
           {status.state === 'error' && (

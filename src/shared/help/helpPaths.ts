@@ -21,6 +21,7 @@ export const HELP_PATHS: Record<string, string> = {
   "switch-account": "/help/getting-started/switch-account",
   "concepts": "/help/intro/concepts",
   "home-screen": "/help/intro/home-screen",
+  "navigation": "/help/intro/navigation",
   "notifications": "/help/intro/notifications",
   "roles": "/help/intro/roles",
   "what-is-quanela": "/help/intro/what-is-quanela",
@@ -49,7 +50,9 @@ export const HELP_PATHS: Record<string, string> = {
   "insights": "/help/reports/insights",
   "product-profitability": "/help/reports/product-profitability",
   "screen-tour": "/help/screenshots/screen-tour",
+  "privacy-and-data": "/help/settings/privacy-and-data",
   "settings": "/help/settings/settings",
+  "subscription-billing": "/help/settings/subscription-billing",
   "whatsapp": "/help/settings/whatsapp",
   "shifts": "/help/team/shifts",
   "users-and-roles": "/help/team/users-and-roles"

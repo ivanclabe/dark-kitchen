@@ -1,13 +1,14 @@
 import clsx from 'clsx'
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 
-type Placement = 'bottom-start' | 'bottom-end' | 'right-end'
+type Placement = 'bottom-start' | 'bottom-end' | 'right-start' | 'right-end'
 
 const ITEM_SELECTOR = '[role="menuitem"]:not([disabled]), [role="menuitemradio"]:not([disabled])'
 
 const PLACEMENT_CLASS: Record<Placement, string> = {
   'bottom-start': 'md:top-full md:left-0 md:mt-2 md:origin-top-left',
   'bottom-end': 'md:top-full md:right-0 md:mt-2 md:origin-top-right',
+  'right-start': 'md:left-full md:top-0 md:ml-3 md:origin-top-left',
   'right-end': 'md:left-full md:bottom-0 md:ml-3 md:origin-bottom-left',
 }
 

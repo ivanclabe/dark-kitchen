@@ -1,6 +1,6 @@
 import type { AccountPermission, Can } from '@/shared/rbac/roles'
 import { describe, expect, it } from 'vitest'
-import { ADMIN_NAV_ITEMS, fitRail, homeSection, isSectionAllowed, NAV_ITEMS, RAIL_SIZES } from './navigation'
+import { ADMIN_NAV_ITEMS, homeSection, isSectionAllowed, NAV_GROUP_LABELS, NAV_ITEMS } from './navigation'
 
 const can =
   (...perms: AccountPermission[]): Can =>
@@ -61,7 +61,7 @@ describe('secciones permitidas según el rol activo', () => {
 })
 
 // ADR 0024: Usuarios and Configuración, below the rail's divider, open by module.
-describe('administración de la cuenta en el rail', () => {
+describe('administración de la cuenta', () => {
   it('Usuarios y Configuración van aparte, después de la operación', () => {
     expect(ADMIN_NAV_ITEMS.map((i) => i.label)).toEqual(['Usuarios', 'Configuración'])
   })
@@ -73,35 +73,12 @@ describe('administración de la cuenta en el rail', () => {
   })
 })
 
-// The rail fits the window: what does not fit goes into «Más», and the user menu never falls off screen.
-describe('el rail cabe en la pantalla', () => {
+// ADR 0072: the sidebar shows every module with its name, in four titled groups (no «Más»).
+describe('la barra lateral', () => {
   const all = [...NAV_ITEMS, ...ADMIN_NAV_ITEMS]
-  const { item, gap, divider } = RAIL_SIZES
 
-  it('sin medir (o con espacio de sobra) muestra todo', () => {
-    expect(fitRail(all, null).overflow).toEqual([])
-    expect(fitRail(all, 2000).visible).toHaveLength(all.length)
-  })
-
-  it('agrupa: Día a día, Clientes y ventas, Negocio y Administración, en ese orden', () => {
-    expect([...new Set(all.map((i) => i.group))]).toEqual(['daily', 'sales', 'business', 'admin'])
-    expect(all.filter((i) => i.group === 'daily').map((i) => i.label)).toEqual(['Inicio', 'Centro de operaciones', 'Planificador de Menús', 'Abastecimiento'])
-  })
-
-  it('en una pantalla baja, lo que no cabe pasa a «Más» sin perder ningún módulo', () => {
-    // Exactly the first group plus «Más»: 5 slots, 4 gaps.
-    const height = 5 * item + 4 * gap
-    const { visible, overflow } = fitRail(all, height)
-    expect(visible.map((i) => i.label)).toEqual(['Inicio', 'Centro de operaciones', 'Planificador de Menús', 'Abastecimiento'])
-    expect([...visible, ...overflow]).toEqual(all)
-    // One pixel less and Abastecimiento moves too.
-    expect(fitRail(all, height - 1).visible).toHaveLength(3)
-  })
-
-  it('cuenta los separadores entre grupos', () => {
-    // Daily (4) + divider + Clientes + «Más».
-    const height = 6 * item + divider + 6 * gap
-    expect(fitRail(all, height).visible.at(-1)?.label).toBe('Clientes')
-    expect(fitRail(all, height - 1).visible.at(-1)?.label).toBe('Abastecimiento')
+  it('agrupa: Operar, Vender, Gestionar y Administrar, en ese orden', () => {
+    expect([...new Set(all.map((i) => NAV_GROUP_LABELS[i.group]))]).toEqual(['Operar', 'Vender', 'Gestionar', 'Administrar'])
+    expect(all.filter((i) => i.group === 'daily').map((i) => i.label)).toEqual(['Inicio', 'Centro de operaciones', 'Planificador de menús', 'Abastecimiento'])
   })
 })

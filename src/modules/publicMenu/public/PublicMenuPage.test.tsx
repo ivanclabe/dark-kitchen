@@ -69,6 +69,11 @@ describe('Menú público (ADR 0052)', () => {
     fireEvent.change(screen.getByLabelText('Tu nombre'), { target: { value: 'Ana' } })
     fireEvent.change(screen.getByLabelText(/Tu celular/), { target: { value: '300 111 2233' } })
     fireEvent.change(screen.getByLabelText('Dirección de entrega'), { target: { value: 'Calle 10 # 20-30' } })
+    // ADR 0071: without the business's data authorization the order is not sent.
+    expect(screen.getByRole('button', { name: 'Acepta el tratamiento de tus datos' })).toHaveProperty('disabled', true)
+    const policy = screen.getByRole('link', { name: 'política de tratamiento de datos' })
+    expect(policy.getAttribute('href')).toBe('/menu/sopa/privacidad')
+    fireEvent.click(screen.getByRole('checkbox', { name: /usar mis datos para preparar/ }))
     // 2 × 5.000 + 3.000 of delivery.
     fireEvent.click(screen.getByRole('button', { name: 'Hacer pedido · $13.000' }))
     await waitFor(() => expect(screen.getByText('Seguimiento')).toBeTruthy())
@@ -80,6 +85,7 @@ describe('Menú público (ADR 0052)', () => {
       address: 'Calle 10 # 20-30',
       paymentMethod: 'Efectivo',
       items: [{ productId: 'p1', quantity: 2, note: 'sin cilantro' }],
+      privacyAccepted: true,
       website: '',
     })
     expect(input.idempotencyKey).toMatch(/^[0-9a-f-]{36}$/)
@@ -94,6 +100,7 @@ describe('Menú público (ADR 0052)', () => {
     fireEvent.click(screen.getByLabelText('Recoger'))
     fireEvent.change(screen.getByLabelText('Tu nombre'), { target: { value: 'Ana' } })
     fireEvent.change(screen.getByLabelText(/Tu celular/), { target: { value: '3001112233' } })
+    fireEvent.click(screen.getByRole('checkbox', { name: /usar mis datos para preparar/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Hacer pedido · $5.000' }))
     expect(await screen.findByRole('alert')).toBeTruthy()
     expect(screen.getByRole('alert').textContent).toMatch(/no está disponible/)
@@ -124,7 +131,7 @@ describe('Menú público con diseño (ADR 0053)', () => {
     const root = container.querySelector('[data-template]') as HTMLElement
     expect(root.dataset.template).toBe('classic')
     expect(root.style.getPropertyValue('--pm-primary')).toBe('#123456')
-    expect(document.querySelector('link[data-pm-fonts*="Playfair+Display"]')).toBeTruthy()
+    expect(root.style.getPropertyValue('--pm-font-heading')).toContain('Playfair Display')
     // Same content and logic as before: the classic menu has no photos but the price and the button.
     expect(screen.getByText('$5.000')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Agregar Sopa' })).toBeTruthy()

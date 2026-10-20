@@ -60,6 +60,8 @@ export function CartSheet({
   const [payment, setPayment] = useState<PublicPaymentMethod>(ordering.paymentMethods[0] ?? 'Efectivo')
   const [notes, setNotes] = useState('')
   const [whatsappOptIn, setWhatsappOptIn] = useState(false)
+  // ADR 0071: the business's data authorization, required and never pre-ticked (separate from WhatsApp notices).
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [website, setWebsite] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -88,7 +90,9 @@ export function CartSheet({
         ? 'Escribe tu celular'
         : fulfillment === 'delivery' && address.trim().length < 5
           ? 'Escribe la dirección'
-          : null
+          : !privacyAccepted
+            ? 'Acepta el tratamiento de tus datos'
+            : null
 
   // ADR 0059: what was chosen in each line, «Sancocho · Res · Patacones ×2».
   const summaryOf = (l: CartLine) => {
@@ -121,6 +125,7 @@ export function CartSheet({
         notes: notes.trim(),
         items: lines,
         whatsappOptIn: ordering.whatsappNotices ? whatsappOptIn : false,
+        privacyAccepted,
         website,
       })
       onPlaced(result.token)
@@ -295,6 +300,17 @@ export function CartSheet({
               <Field label="Notas del pedido (opcional)">
                 <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={300} />
               </Field>
+              <label className="flex items-start gap-2.5 rounded-xl bg-(--pm-soft) px-3 py-2.5 text-sm">
+                <input type="checkbox" required className="mt-0.5 size-4 accent-(--pm-primary)" checked={privacyAccepted} onChange={(e) => setPrivacyAccepted(e.target.checked)} />
+                <span>
+                  Autorizo a {menu.business.name} a usar mis datos para preparar, entregar y atender mi pedido, según su{' '}
+                  <a href={`/menu/${slug}/privacidad`} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2">
+                    política de tratamiento de datos
+                  </a>
+                  .
+                  <span className="block text-xs text-(--pm-muted)">Quanela opera este menú por encargo del negocio.</span>
+                </span>
+              </label>
               {/* A trap for robots: hidden from people. */}
               <input type="text" name="website" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-0 w-0 opacity-0" />
             </form>

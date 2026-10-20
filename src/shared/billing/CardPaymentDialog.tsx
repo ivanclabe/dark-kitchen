@@ -6,6 +6,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Lock } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import type { BillingPeriod } from '@/shared/plans/plans'
+import { recordLegalAcceptance } from '@/shared/legal/api'
+import { documentRef, legalHref } from '@/shared/legal/documents'
 import {
   billingMessage,
   fetchWompiConfig,
@@ -20,7 +22,8 @@ import {
 /**
  * Pay with a card and keep it for the renewals (ADR 0066). The card is tokenized by
  * Wompi from this browser; Quanela only keeps Wompi's token and «Visa •••• 4242».
- * The two acceptances are the ones Colombian law asks for, with Wompi's own texts.
+ * The two acceptances are the ones Colombian law asks for, with Wompi's own texts. ADR 0071: a third, separate
+ * one authorizes the automatic renewal (D1074 2.2.2.37.9 par. 2), recorded as evidence before any charge.
  */
 export function CardPaymentDialog({
   open,
@@ -49,6 +52,7 @@ export function CardPaymentDialog({
   const [email, setEmail] = useState(defaultEmail ?? '')
   const [acceptPrivacy, setAcceptPrivacy] = useState(false)
   const [acceptData, setAcceptData] = useState(false)
+  const [acceptRenewal, setAcceptRenewal] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [touched, setTouched] = useState(false)
@@ -61,7 +65,7 @@ export function CardPaymentDialog({
     holder: holder.trim().length >= 3 ? null : 'Como aparece en la tarjeta',
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? null : 'Escribe un correo válido',
   }
-  const valid = Object.values(errors).every((e) => e === null) && acceptPrivacy && acceptData
+  const valid = Object.values(errors).every((e) => e === null) && acceptPrivacy && acceptData && acceptRenewal
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -70,6 +74,19 @@ export function CardPaymentDialog({
     setBusy(true)
     setError(null)
     try {
+      await recordLegalAcceptance({
+        documents: [documentRef('suscripciones')],
+        context: 'billing_renewal',
+        organizationId,
+        details: {
+          plan: planKey ?? null,
+          billingPeriod: billingPeriod ?? null,
+          wompiTermsAccepted: acceptPrivacy,
+          wompiPersonalDataAccepted: acceptData,
+          wompiTermsUrl: config.data.acceptance.privacy.permalink ?? null,
+          wompiPersonalDataUrl: config.data.acceptance.personalData.permalink ?? null,
+        },
+      })
       const cardToken = await tokenizeCard(config.data, { number, expMonth, expYear, cvc, holder })
       const result = await payWithCard({
         organizationId,
@@ -160,7 +177,18 @@ export function CardPaymentDialog({
                 para los cobros de la suscripción.
               </span>
             </label>
-            {touched && !(acceptPrivacy && acceptData) && <p className="text-xs text-red-400">Para guardar la tarjeta hay que aceptar las dos.</p>}
+            <label className="flex items-start gap-2.5">
+              <input type="checkbox" className="mt-1 size-4 accent-[var(--color-primary)]" checked={acceptRenewal} onChange={(e) => setAcceptRenewal(e.target.checked)} />
+              <span>
+                Autorizo la <strong className="font-medium text-neutral-100">renovación automática</strong>: Quanela cobrará a esta tarjeta el valor del plan al
+                empezar cada periodo, hasta que cancele o quite la tarjeta. Leí{' '}
+                <a href={legalHref('suscripciones')} target="_blank" rel="noopener noreferrer" className="text-brasa-400 underline-offset-4 hover:underline">
+                  cómo funcionan las suscripciones y los cobros
+                </a>
+                .
+              </span>
+            </label>
+            {touched && !(acceptPrivacy && acceptData && acceptRenewal) && <p className="text-xs text-red-400">Para guardar la tarjeta hay que aceptar las tres.</p>}
           </div>
 
           {error && (

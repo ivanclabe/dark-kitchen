@@ -43,12 +43,13 @@ describe('Wompi signatures (ADR 0066)', () => {
 })
 
 describe('Wompi checkout', () => {
-  it('builds the Web Checkout address with the integrity signature', () => {
-    const url = new URL(checkoutUrl({ publicKey: 'pub_test_x', currency: 'COP', amountInCents: 4990000, reference: 'R-1', signature: 'abc', redirectUrl: 'https://9vj58y.quanela.com/k/x/', email: 'laura@negocio.co' }))
+  it('builds the Web Checkout address with the integrity signature and no personal data', () => {
+    const url = new URL(checkoutUrl({ publicKey: 'pub_test_x', currency: 'COP', amountInCents: 4990000, reference: 'R-1', signature: 'abc', redirectUrl: 'https://9vj58y.quanela.com/k/x/' }))
     expect(url.origin + url.pathname).toBe('https://checkout.wompi.co/p/')
     expect(url.searchParams.get('amount-in-cents')).toBe('4990000')
     expect(url.searchParams.get('signature:integrity')).toBe('abc')
-    expect(url.searchParams.get('customer-data:email')).toBe('laura@negocio.co')
+    // No personal data in the address (ADR 0071): the customer types it on Wompi's page.
+    expect([...url.searchParams.keys()].some((k) => k.startsWith('customer-data'))).toBe(false)
   })
 
   it('returns only to the app', () => {

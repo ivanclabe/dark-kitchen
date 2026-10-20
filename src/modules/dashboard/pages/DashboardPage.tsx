@@ -26,22 +26,20 @@ import {
   CheckCircle2,
   ChevronRight,
   Sparkles,
-  BarChart3,
   CalendarClock,
   ChefHat,
   ClipboardList,
   Eye,
   EyeOff,
   LayoutDashboard,
-  ShoppingCart,
-  Users,
   Wallet,
-  type LucideIcon,
 } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { KitchenLink as Link } from '@/shared/kitchen/KitchenLink'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { useDashboardSummary } from '../hooks/useDashboard'
+import { HomeHighlights } from '../components/HomeHighlights'
+import { HomeMetrics } from '../components/HomeMetrics'
 import type { DashboardSummary } from '../types'
 
 /** Lista compacta label → valor con divisores — el mismo patrón de "Cierre anterior / Precio máximo / …" de una ficha de mercado. */
@@ -76,22 +74,6 @@ function StatList({ items }: { items: { label: string; value: ReactNode; tone?: 
 // ---------------------------------------------------------------------------
 
 /** Acción de la barra superior: botón circular con la etiqueta debajo, como "Depositar / Retirar / Buscar". */
-function HeroAction({ icon: Icon, label, to }: { icon: LucideIcon; label: string; to: string }) {
-  return (
-    <Link to={to} className="group flex flex-col items-center gap-1.5 text-xs font-medium text-neutral-300 transition-colors hover:text-neutral-50">
-      <span className="flex size-11 items-center justify-center rounded-full border border-neutral-800 bg-neutral-900 transition-colors group-hover:border-neutral-700 group-hover:bg-neutral-800">
-        <Icon size={17} aria-hidden />
-      </span>
-      {label}
-    </Link>
-  )
-}
-
-/**
- * The header of Inicio (ADR 0032): the same PageHeader as every screen —
- * the greeting with the date and a real clock, today's sales (that can be
- * hidden) and the quick accesses on the right.
- */
 function DashboardHeader({
   firstName,
   salesToday,
@@ -113,7 +95,7 @@ function DashboardHeader({
 
   return (
     <PageHeader help="home-screen"
-      title="Inicio"
+      title="Destacado"
       icon={LayoutDashboard}
       description={
         <span className="inline-flex flex-wrap items-center gap-x-2">
@@ -151,11 +133,6 @@ function DashboardHeader({
             {!loading && pendingIncluded && <p className="mt-0.5 text-xs text-neutral-500 md:text-right">Incluye pedidos por confirmar</p>}
           </div>
 
-          <div className="flex items-start gap-5">
-            <HeroAction icon={ShoppingCart} label="Compras" to="/supply/compras" />
-            <HeroAction icon={Users} label="Clientes" to="/customers" />
-            <HeroAction icon={BarChart3} label="Análisis" to="/insights" />
-          </div>
         </div>
       }
     />
@@ -343,9 +320,9 @@ function NeedsAttention() {
   const ai = unreadAiAdvice(data.items)
   return (
     <section aria-labelledby="necesita-atencion" className="space-y-3">
-      <h2 id="necesita-atencion" className={typography.h3}>
+      <h3 id="necesita-atencion" className="text-sm font-medium text-neutral-300">
         Necesita atención
-      </h2>
+      </h3>
       {notices.length === 0 ? (
         <p className="flex items-center gap-2.5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-200">
           <CheckCircle2 size={17} className="shrink-0 text-emerald-400" aria-hidden /> Todo al día: nada pendiente por ahora.
@@ -407,22 +384,31 @@ export function DashboardPage() {
   const canSeeLiveOps = can('dispatch.assign')
   const firstName = profile?.fullName?.split(' ')[0] ?? 'usuario'
 
+  // ADR 0072: «Destacado» — what needs you, how the business is moving (range, by hour or day), and
+  // «Ahora mismo», the operation of this moment (what Inicio used to be).
   return (
     <Page>
       <DashboardHeader firstName={firstName} salesToday={data?.salesToday ?? null} ordersToday={data?.ordersToday ?? null} pendingIncluded={(data?.ordersNuevo ?? 0) > 0} loading={isLoading} />
 
-      <NeedsAttention />
+      <HomeHighlights />
+
+      <HomeMetrics />
+
+      <section aria-labelledby="ahora-mismo" className="space-y-4">
+        <h2 id="ahora-mismo" className={typography.h3}>
+          Ahora mismo
+        </h2>
+        <NeedsAttention />
+        {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {canSeeLiveOps && <RecentOrdersCard />}
+          <KitchenNowCard summary={data} liveOps={canSeeLiveOps} />
+          <CarteraCard summary={data} liveOps={canSeeLiveOps} />
+          {can('staff.view') && <OnShiftCard />}
+        </div>
+      </section>
 
       <TipOfTheDay />
-
-      {isError && <ErrorState error={error} onRetry={() => void refetch()} compact />}
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {canSeeLiveOps && <RecentOrdersCard />}
-        <KitchenNowCard summary={data} liveOps={canSeeLiveOps} />
-        <CarteraCard summary={data} liveOps={canSeeLiveOps} />
-        {can('staff.view') && <OnShiftCard />}
-      </div>
     </Page>
   )
 }

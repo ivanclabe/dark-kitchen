@@ -1,0 +1,13 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "nunito variable",
+        "createdAt": "2026-10-20T13:14:34.050Z"
+      }
+    ]
+  }
+}

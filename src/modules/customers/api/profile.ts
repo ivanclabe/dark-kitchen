@@ -62,6 +62,8 @@ export async function addCustomerPreference(input: {
   ingredientId?: string | null
   label?: string | null
   note?: string | null
+  /** Dietary preferences: the customer authorized it expressly (sensitive data, ADR 0071; recorded as evidence). */
+  authorizedByCustomer?: boolean
 }): Promise<void> {
   const { error } = await supabase.from('dk_customer_preferences').insert({
     customer_id: input.customerId,
@@ -70,6 +72,7 @@ export async function addCustomerPreference(input: {
     ingredient_id: input.ingredientId ?? null,
     label: input.label?.trim() || null,
     note: input.note?.trim() || null,
+    authorized_by_customer: input.authorizedByCustomer ?? false,
   })
   if (error) throw error
 }
@@ -122,5 +125,14 @@ export async function setRecommendationStatus(id: string, status: 'active' | 'di
 /** The general note (dk_customers.notes), on its own: nothing else of the customer is touched. */
 export async function updateCustomerNotes(id: string, notes: string): Promise<void> {
   const { error } = await supabase.from('dk_customers').update({ notes: notes.trim() || null }).eq('id', id)
+  if (error) throw error
+}
+
+/**
+ * ADR 0071: a customer asked the business to delete their data. Their personal data goes away (name, phone,
+ * addresses, notes, preferences, WhatsApp chats); the orders stay for the accounts, without identifying them.
+ */
+export async function anonymizeCustomer(customerId: string): Promise<void> {
+  const { error } = await supabase.rpc('dk_anonymize_customer', { p_customer: customerId })
   if (error) throw error
 }

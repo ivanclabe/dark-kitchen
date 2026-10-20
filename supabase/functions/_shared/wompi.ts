@@ -73,7 +73,10 @@ export async function verifyEvent(event: WompiEvent, eventsSecret: string, heade
   return { valid: sameText(received, expected) && sameText(bodyChecksum, expected), checksum: received }
 }
 
-/** Web Checkout: Wompi's page with every method (card, PSE, Nequi, Bancolombia). */
+/**
+ * Web Checkout: Wompi's page with every method (card, PSE, Nequi, Bancolombia).
+ * No personal data in the address (ADR 0071): the customer types the email on Wompi's page.
+ */
 export function checkoutUrl(input: {
   /** Only local tests replace Wompi's page (WOMPI_CHECKOUT_URL). */
   base?: string
@@ -83,7 +86,6 @@ export function checkoutUrl(input: {
   reference: string
   signature: string
   redirectUrl: string
-  email?: string | null
 }): string {
   const params = new URLSearchParams({
     'public-key': input.publicKey,
@@ -93,7 +95,6 @@ export function checkoutUrl(input: {
     'signature:integrity': input.signature,
     'redirect-url': input.redirectUrl,
   })
-  if (input.email) params.set('customer-data:email', input.email)
   return `${input.base ?? WOMPI_CHECKOUT_URL}?${params.toString()}`
 }
 

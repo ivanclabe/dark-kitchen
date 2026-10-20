@@ -81,8 +81,14 @@ const routes: RouteObject[] = [
   // Registro público de un negocio (ADR 0008, Fase F) y la vuelta del enlace de confirmación.
   { path: '/registro', element: <SignUpPage /> },
   { path: '/registro/confirmado', element: <SignUpConfirmedPage /> },
+  // Documentos legales (ADR 0071): públicos, sin sesión, en cualquier host.
+  { path: '/legal', ...page(() => import('@/modules/legal/pages/LegalDocumentPage'), 'LegalIndexPage') },
+  { path: '/legal/preferencias', ...page(() => import('@/modules/legal/pages/PrivacyPreferencesPage'), 'PrivacyPreferencesPage') },
+  { path: '/legal/:slug', ...page(() => import('@/modules/legal/pages/LegalDocumentPage'), 'LegalDocumentPage') },
   // Menú público (ADR 0052): today's menu of a business and its orders, without a session, on any host.
   { path: '/menu/:slug', element: <PublicMenuRoute /> },
+  // The business's own data policy (ADR 0071): it is the Responsable of its customers' data.
+  { path: '/menu/:slug/privacidad', ...page(() => import('@/modules/publicMenu/public/KitchenPolicyPage'), 'KitchenPolicyPage') },
   { path: '/menu/:slug/pedido/:token', element: <OrderTrackingRoute /> },
 
   // "/" (ADR 0036): en quanela.com, siempre la landing (con sesión, «Ir a mi cuenta»). En el subdominio
@@ -198,6 +204,7 @@ const routes: RouteObject[] = [
           { path: 'reports', element: <KitchenRedirect to="/insights" /> },
           // Mi perfil: nombre, avatar y contraseña de la persona (ADR 0008, Fase A).
           { path: 'perfil', ...page(() => import('@/modules/profile/pages/ProfilePage'), 'ProfilePage') },
+          { path: 'perfil/privacidad', ...page(() => import('@/modules/profile/pages/PrivacyCenterPage'), 'PrivacyCenterPage') },
           // Usuarios: Usuarios · Roles y permisos, always of this account (ADR 0024), in the shell of Configuración (ADR 0026).
           {
             path: 'users',

@@ -10,7 +10,7 @@ import {
   applyDesignAsDraft,
   discardThemeDraft, getPublicMenu, getPublicMenuPreview, getPublicMenuSettings, publishTheme, revertTheme, savePublicMenuSettings, saveThemeDraft } from './api/publicMenu'
 
-export const usePublicMenuSettings = () => useQuery({ queryKey: ['public-menu-settings'], queryFn: getPublicMenuSettings })
+export const usePublicMenuSettings = (enabled = true) => useQuery({ queryKey: ['public-menu-settings'], queryFn: getPublicMenuSettings, enabled })
 
 /** Today's public menu as customers see it (only once published). */
 export const usePublicMenuPreview = (slug: string | undefined, enabled: boolean) =>

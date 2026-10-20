@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest'
 const SOURCES = import.meta.glob<string>('../../modules/*/pages/*.tsx', { query: '?raw', import: 'default', eager: true })
 
 /** Screens outside the app (no AppLayout): they have their own design. */
-const OUTSIDE_APP = new Set(['auth', 'signup', 'landing', 'invitations', 'kitchens', 'help'])
+const OUTSIDE_APP = new Set(['auth', 'signup', 'landing', 'invitations', 'kitchens', 'help', 'legal'])
 /** Pages that only choose another page, or hand their data to a shared screen that has the header (no UI of their own). */
 const ROUTERS = new Set(['menuPlanner/pages/CatalogPage.tsx', 'supply/pages/PreparationRecipePage.tsx'])
 

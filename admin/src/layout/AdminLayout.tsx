@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Activity, Building2, LayoutDashboard, LogOut, Menu, Settings2, Sparkles, Users, X } from 'lucide-react'
+import { Activity, Building2, Inbox, LayoutDashboard, LogOut, Menu, Settings2, Sparkles, Users, X } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAdminSession } from '../auth/session'
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/users', label: 'Users', icon: Users },
   { to: '/ai', label: 'AI Monitoring', icon: Sparkles },
   { to: '/activity', label: 'Activity', icon: Activity },
+  { to: '/requests', label: 'Requests (PQR)', icon: Inbox },
   { to: '/administration', label: 'Administration', icon: Settings2 },
 ] as const
 

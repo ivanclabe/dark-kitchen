@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { whatsappLink } from '@/shared/utils/whatsapp'
 import type { PublicMenu, PublicMenuItem } from '../types'
-import { addLine, availabilityLabel, byCategory, cartIssues, cartTotals, formatHour, lineKey, lineUnitPrice, maxQuantity, openLabel, quantityOf, replaceLine, setLineQuantity, setNote, setQuantity, shareText } from './cart'
+import { addLine, availabilityLabel, byCategory, cartIssues, cartStorageKey, cartTotals, formatHour, lineKey, lineUnitPrice, maxQuantity, openLabel, pruneOldCarts, quantityOf, readCart, replaceLine, setLineQuantity, setNote, setQuantity, shareText, writeCart } from './cart'
 
 // ADR 0052: the cart does the same arithmetic as the server and says what changed.
 const item = (over: Partial<PublicMenuItem>): PublicMenuItem => ({
@@ -115,5 +115,54 @@ describe('cart with options', () => {
   it('an option that ran out since it went into the cart is said', () => {
     const lines = addLine([], corr, [{ optionId: 'pata', quantity: 1 }, { optionId: 'pollo', quantity: 1 }], 1)
     expect(cartIssues(lines, withCorr.items).map((i) => i.message)).toEqual(['Corrientazo: se agotó «Patacones»'])
+  })
+})
+
+/** A Storage backed by a Map (the test runs without a browser). */
+function memoryStorage(entries: Record<string, string> = {}): Storage {
+  const map = new Map(Object.entries(entries))
+  return {
+    get length() {
+      return map.size
+    },
+    key: (i) => [...map.keys()][i] ?? null,
+    getItem: (k) => map.get(k) ?? null,
+    setItem: (k, v) => void map.set(k, String(v)),
+    removeItem: (k) => void map.delete(k),
+    clear: () => map.clear(),
+  }
+}
+
+// ADR 0071: carts of previous days do not pile up in the browser.
+describe('cart storage', () => {
+  const line = { productId: 'sopa', quantity: 1, note: '' }
+
+  it('reading or writing removes the carts of previous days, of any menu', () => {
+    const storage = memoryStorage({
+      'quanela:cart:sopa:2026-10-10': '[]',
+      'quanela:cart:otro:2026-09-30': '[]',
+      'quanela:cart:otro:2026-10-11': JSON.stringify([line]),
+      'dk-appearance': '{}',
+    })
+    expect(readCart('sopa', '2026-10-11', storage)).toEqual([])
+    expect(Array.from({ length: storage.length }, (_, i) => storage.key(i))).toEqual(['quanela:cart:otro:2026-10-11', 'dk-appearance'])
+    writeCart('sopa', '2026-10-12', [line], storage)
+    expect(storage.getItem('quanela:cart:otro:2026-10-11')).toBeNull()
+    expect(readCart('sopa', '2026-10-12', storage)).toEqual([line])
+    expect(storage.getItem('dk-appearance')).toBe('{}')
+  })
+
+  it('an empty cart is removed; a broken one reads as empty', () => {
+    const storage = memoryStorage({ [cartStorageKey('sopa', '2026-10-11')]: '{broken' })
+    expect(readCart('sopa', '2026-10-11', storage)).toEqual([])
+    writeCart('sopa', '2026-10-11', [], storage)
+    expect(storage.length).toBe(0)
+  })
+
+  it('a blocked storage (private window) never throws', () => {
+    const blocked = { get length(): number { throw new Error('SecurityError') }, getItem: () => { throw new Error('SecurityError') }, setItem: () => { throw new Error('SecurityError') } } as unknown as Storage
+    expect(() => pruneOldCarts('2026-10-11', blocked)).not.toThrow()
+    expect(readCart('sopa', '2026-10-11', blocked)).toEqual([])
+    expect(() => writeCart('sopa', '2026-10-11', [line], blocked)).not.toThrow()
   })
 })

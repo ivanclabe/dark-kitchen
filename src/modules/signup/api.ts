@@ -1,6 +1,7 @@
 import { appUrl } from '@/shared/lib/appUrl'
 import { supabase } from '@/shared/lib/supabase'
 import type { BillingPeriod } from '@/shared/plans/plans'
+import type { PreConsent } from '@/shared/legal/preConsent'
 
 /** ¿Está abierto el registro público? (ADR 0008 D8: se activa con SMTP y CAPTCHA configurados). */
 export const PUBLIC_SIGNUP_ENABLED = import.meta.env.VITE_PUBLIC_SIGNUP === 'true'
@@ -36,12 +37,20 @@ export async function signUpBusiness(input: {
   plan: string
   billingPeriod?: BillingPeriod
   captchaToken?: string
+  /** ADR 0071: the Terms and Data Policy versions ticked; recorded as evidence at /registro/confirmado. */
+  legalConsent?: PreConsent
 }): Promise<{ hasSession: boolean }> {
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
     options: {
-      data: { full_name: input.fullName.trim(), pending_organization: input.organization, plan: input.plan, billing_period: input.billingPeriod ?? 'monthly' },
+      data: {
+        full_name: input.fullName.trim(),
+        pending_organization: input.organization,
+        plan: input.plan,
+        billing_period: input.billingPeriod ?? 'monthly',
+        legal_consent: input.legalConsent ?? null,
+      },
       emailRedirectTo: appUrl(CONFIRMED_PATH),
       captchaToken: input.captchaToken,
     },
@@ -105,9 +114,9 @@ export function pendingPlanOf(metadata: Record<string, unknown> | undefined): st
  * business data on their user (the same metadata the email sign-up carries),
  * and /registro/confirmado creates everything at once.
  */
-export async function savePendingBusiness(input: { fullName: string; organization: PendingOrganization; plan: string; billingPeriod?: BillingPeriod }): Promise<void> {
+export async function savePendingBusiness(input: { fullName: string; organization: PendingOrganization; plan: string; billingPeriod?: BillingPeriod; legalConsent?: PreConsent }): Promise<void> {
   const { error } = await supabase.auth.updateUser({
-    data: { full_name: input.fullName, pending_organization: input.organization, plan: input.plan, billing_period: input.billingPeriod ?? 'monthly' },
+    data: { full_name: input.fullName, pending_organization: input.organization, plan: input.plan, billing_period: input.billingPeriod ?? 'monthly', legal_consent: input.legalConsent ?? null },
   })
   if (error) throw error
 }

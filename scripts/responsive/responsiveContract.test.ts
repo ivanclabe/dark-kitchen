@@ -35,7 +35,8 @@ describe('responsive contract (ADR 0064)', () => {
   })
 
   it('keeps filters off the mobile app bar (a filter traps its position:fixed menus)', () => {
-    const mobileBar = source('app/AppLayout.tsx').match(/<header className="([^"]*md:hidden[^"]*)"/)?.[1] ?? ''
+    // ADR 0072: one top bar for every size (src/app/shell/TopBar.tsx) holds the phone's menus too.
+    const mobileBar = source('app/shell/TopBar.tsx').match(/<header className="([^"]*)"/)?.[1] ?? ''
     expect(mobileBar).not.toBe('')
     expect(mobileBar).not.toMatch(/backdrop-|(?<![\w-])blur|(?<![\w-])filter|transform|translate/)
   })

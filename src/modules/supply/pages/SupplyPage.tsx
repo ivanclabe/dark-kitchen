@@ -1,7 +1,7 @@
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Page } from '@/shared/ui/Page'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { SubNav, type SubNavItem } from '@/shared/ui/SubNav'
+import { SubNav } from '@/shared/ui/SubNav'
 import { CookingPot, ShoppingCart, Truck, Warehouse } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -25,30 +25,14 @@ import { SupplierPanel } from '../components/SupplierPanel'
 import { useIngredients } from '../hooks/useIngredients'
 import { useSuppliers } from '../hooks/useSuppliers'
 import { setPendingInvoiceFile } from '../lib/invoiceFile'
+import { supplyViews, type SupplyView } from '../lib/views'
 import type { Ingredient } from '../types'
-
-type SupplyView = 'stock' | 'preparaciones' | 'compras' | 'proveedores'
 
 /** The physical count lives at /supply/stock/conteo (ADR 0063 D5). */
 const STOCK_COUNT_ID = 'conteo'
 
 /** The help center article of each section (ADR 0034). */
 const SUPPLY_HELP: Record<SupplyView, string> = { stock: 'stock', preparaciones: 'preparations', compras: 'purchases', proveedores: 'suppliers' }
-const VIEWS: SubNavItem<SupplyView>[] = [
-  { value: 'stock', label: 'Stock' },
-  // ADR 0057: sub-recipes made in batches.
-  { value: 'preparaciones', label: 'Preparaciones' },
-  { value: 'compras', label: 'Compras' },
-  { value: 'proveedores', label: 'Proveedores' },
-]
-
-/** Who sees each section: the kitchen (inventory.produce) only sees Preparaciones. */
-const VIEW_PERMISSIONS: Record<SupplyView, Parameters<ReturnType<typeof useActiveKitchen>['can']>[0][]> = {
-  stock: ['inventory.view'],
-  preparaciones: ['inventory.view', 'inventory.produce', 'recipes.view'],
-  compras: ['purchasing.view'],
-  proveedores: ['suppliers.view'],
-}
 
 function isView(value: string | undefined): value is SupplyView {
   return value === 'stock' || value === 'preparaciones' || value === 'compras' || value === 'proveedores'
@@ -67,7 +51,7 @@ export function SupplyPage() {
   const { path, can } = useActiveKitchen()
   // ADR 0031: arriving from a recipe (or Insights), «Volver» takes the person back there.
   const cameFrom = useCameFrom()
-  const views = VIEWS.filter((v) => VIEW_PERMISSIONS[v.value].some((p) => can(p)))
+  const views = supplyViews(can)
   const view: SupplyView = isView(viewParam) && views.some((v) => v.value === viewParam) ? viewParam : (views[0]?.value ?? 'stock')
   const selectedId = id ?? null
 

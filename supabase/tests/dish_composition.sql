@@ -49,7 +49,7 @@ $$;
 -- A public order: lines [productKey, quantity, options], the browser always claims a price of $1.
 create or replace function pg_temp.order_json(p_key text, p_phone text, p_lines jsonb) returns jsonb language sql as $$
   select jsonb_build_object('idempotencyKey', p_key, 'customer', jsonb_build_object('name', 'Laura Gómez', 'phone', p_phone),
-    'fulfillment', 'pickup', 'paymentMethod', 'Efectivo',
+    'fulfillment', 'pickup', 'paymentMethod', 'Efectivo', 'privacyAccepted', true,
     'items', (select jsonb_agg(jsonb_build_object('productId', pg_temp.k(l ->> 0), 'quantity', (l ->> 1)::integer, 'price', 1, 'options', l -> 2)) from jsonb_array_elements(p_lines) l))
 $$;
 -- The order behind a public answer (the public function gives the tracking token, not the internal id).

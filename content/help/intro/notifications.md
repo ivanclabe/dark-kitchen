@@ -2,7 +2,7 @@
 id: notifications
 section: intro
 title: Notificaciones (la campana)
-summary: La campana junto a tu avatar junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.
+summary: La campana, al pie de la barra lateral junto a tu avatar, junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.
 audience: [everyone]
 permissions: []
 appPath: /dashboard
@@ -28,7 +28,7 @@ screenshots:
 
 {{screenshot:notifications}}
 
-1. Toca la **campana** (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones **sin leer**.
+1. Toca la **campana** (al pie de la barra lateral, junto a tu avatar; en el celular, abre el menú ☰). El número son las notificaciones **sin leer**.
 2. Elige **Todas** o **IA**.
 3. Toca un aviso para ir a su pantalla: queda como leído.
 4. Para limpiar la lista, toca **Marcar todo como leído**.

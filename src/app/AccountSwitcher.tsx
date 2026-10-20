@@ -153,37 +153,64 @@ export function RoleList({ onDone }: { onDone: () => void }) {
  * ADR 0024): Cuenta · rol activo. Si hay más de un rol o más de una cuenta,
  * al pulsarlo se cambia de rol o de cuenta.
  */
-export function ContextIndicator({ compact = false }: { compact?: boolean }) {
+export function ContextIndicator({ compact = false, variant = 'bar' }: { compact?: boolean; variant?: 'bar' | 'sidebar' | 'icon' }) {
   const { kitchen } = useActiveKitchen()
   const { data: kitchens } = useMyKitchens()
   const canSwitchAccount = (kitchens?.length ?? 0) > 1
   const canSwitchRole = kitchen.roleOptions.length > 1
+  const switchable = canSwitchAccount || canSwitchRole
 
-  const content = (
-    <>
+  // ADR 0072: in the sidebar, the account is a card — its name, and the role under it.
+  const content =
+    variant === 'sidebar' ? (
+      <>
+        <AccountIcon iconKey={kitchen.iconKey} seed={kitchen.id} size="sm" />
+        <span className="min-w-0 flex-1 text-left">
+          <span className="block truncate text-sm font-semibold text-neutral-50">{kitchen.name}</span>
+          <span className="block truncate text-xs text-neutral-500">{kitchen.roleName}</span>
+        </span>
+      </>
+    ) : variant === 'icon' ? (
       <AccountIcon iconKey={kitchen.iconKey} seed={kitchen.id} size="sm" />
-      <span className="min-w-0 truncate text-sm font-semibold text-neutral-100">{kitchen.name}</span>
-      <span className={clsx('shrink-0 text-sm text-neutral-500', compact && 'hidden sm:inline')}>· {kitchen.roleName}</span>
-    </>
-  )
+    ) : (
+      <>
+        <AccountIcon iconKey={kitchen.iconKey} seed={kitchen.id} size="sm" />
+        <span className="min-w-0 truncate text-sm font-semibold text-neutral-100">{kitchen.name}</span>
+        <span className={clsx('shrink-0 text-sm text-neutral-500', compact && 'hidden sm:inline')}>· {kitchen.roleName}</span>
+      </>
+    )
+  const frame =
+    variant === 'sidebar'
+      ? 'flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-neutral-800 bg-neutral-900 px-2 py-1.5'
+      : variant === 'icon'
+        ? 'flex size-10 items-center justify-center rounded-xl'
+        : 'flex max-w-full min-w-0 items-center gap-2 px-1.5 py-1'
 
-  if (!canSwitchAccount && !canSwitchRole) {
-    return <div className="flex max-w-full min-w-0 items-center gap-2 px-1.5 py-1">{content}</div>
+  if (!switchable) {
+    return (
+      <div className={frame} title={variant === 'icon' ? `${kitchen.name} · ${kitchen.roleName}` : undefined}>
+        {content}
+      </div>
+    )
   }
 
   return (
     <Popover
       label="Cambiar de rol o de cuenta"
-      placement="bottom-start"
+      placement={variant === 'bar' ? 'bottom-start' : 'right-start'}
       trigger={(props) => (
         <button
           type="button"
           {...props}
           aria-label={`Cuenta ${kitchen.name}, rol ${kitchen.roleName}. Cambiar`}
-          className="flex max-w-full min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className={clsx(
+            frame,
+            'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+            variant === 'sidebar' ? 'hover:border-neutral-700' : 'rounded-xl hover:bg-neutral-900',
+          )}
         >
           {content}
-          <ChevronDown size={14} className="shrink-0 text-neutral-500" aria-hidden />
+          {variant !== 'icon' && <ChevronDown size={14} className="shrink-0 text-neutral-500" aria-hidden />}
         </button>
       )}
     >

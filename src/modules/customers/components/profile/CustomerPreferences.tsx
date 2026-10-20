@@ -20,7 +20,7 @@ const INFO: Record<PreferenceKind, string> = {
   favorite_dish: 'Platos del catálogo que el cliente pide o dice que le encantan.',
   liked_ingredient: 'Ingredientes que el cliente pide de más o le gustan.',
   disliked_ingredient: 'Lo que no quiere en sus platos. Tenlo en cuenta al tomar el pedido (por ejemplo, como observación del plato).',
-  dietary: 'Lo que el cliente indica de su alimentación (vegetariano, sin gluten…). Es lo que el cliente dijo, no un diagnóstico.',
+  dietary: 'Lo que el cliente indica de su alimentación (vegetariano, vegano…). Solo con su autorización expresa: no es un diagnóstico.',
 }
 
 function PrefChip({ pref, tone, onRemove }: { pref: CustomerPreference; tone: (typeof PREFERENCE_KIND)[PreferenceKind]['tone']; onRemove?: () => void }) {
@@ -44,10 +44,11 @@ function AddPreference({ customerId, kind, existing }: { customerId: string; kin
   const add = useAddPreference(customerId)
   const { show } = useToast()
   const [text, setText] = useState('')
+  const [authorized, setAuthorized] = useState(false)
 
   async function save(input: { productId?: string; ingredientId?: string; label?: string }) {
     try {
-      await add.mutateAsync({ customerId, kind, ...input })
+      await add.mutateAsync({ customerId, kind, ...input, authorizedByCustomer: kind === 'dietary' ? authorized : undefined })
       setText('')
     } catch (err) {
       show(isUniqueViolation(err) ? 'Ya estaba anotado.' : getErrorMessage(err, 'No se pudo guardar la preferencia'), isUniqueViolation(err) ? 'info' : 'error')
@@ -58,9 +59,16 @@ function AddPreference({ customerId, kind, existing }: { customerId: string; kin
     const taken = new Set(existing.map((p) => p.name.toLowerCase()))
     return (
       <div className="space-y-2">
+        {/* ADR 0071: what someone eats can reveal health or religion (sensitive data, Ley 1581 arts. 5-6). */}
+        <label className="flex items-start gap-2 text-xs leading-snug text-neutral-400">
+          <input type="checkbox" checked={authorized} onChange={(e) => setAuthorized(e.target.checked)} className="mt-0.5 size-3.5 shrink-0 accent-[var(--color-primary)]" />
+          <span>
+            El cliente me pidió anotarlo y me autorizó expresamente. Es opcional para él: si se refiere a su salud o sus creencias, es un dato sensible.
+          </span>
+        </label>
         <div className="flex flex-wrap gap-1.5">
           {DIETARY_SUGGESTIONS.filter((s) => !taken.has(s.toLowerCase())).map((s) => (
-            <button key={s} type="button" onClick={() => void save({ label: s })} className="rounded-full border border-dashed border-neutral-700 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-500 hover:text-neutral-100">
+            <button key={s} type="button" disabled={!authorized} onClick={() => void save({ label: s })} className="rounded-full border border-dashed border-neutral-700 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-500 hover:text-neutral-100 disabled:cursor-not-allowed disabled:opacity-50">
               + {s}
             </button>
           ))}
@@ -69,11 +77,11 @@ function AddPreference({ customerId, kind, existing }: { customerId: string; kin
           className="flex gap-2"
           onSubmit={(e) => {
             e.preventDefault()
-            if (text.trim()) void save({ label: text })
+            if (text.trim() && authorized) void save({ label: text })
           }}
         >
           <Input aria-label="Otra preferencia alimentaria" value={text} onChange={(e) => setText(e.target.value)} maxLength={80} placeholder="Otra (ej. sin cebolla cruda)" className="!mt-0" />
-          <Button type="submit" variant="secondary" size="sm" icon={Plus} disabled={!text.trim()} loading={add.isPending}>
+          <Button type="submit" variant="secondary" size="sm" icon={Plus} disabled={!text.trim() || !authorized} loading={add.isPending}>
             Agregar
           </Button>
         </form>

@@ -3,7 +3,9 @@ import { useToast } from '@/shared/ui/Toast'
 import { useQuanelaVoice } from '@/shared/voice/hooks'
 import { useRecognizerPreference } from '@/shared/voice/recognition/preference'
 import { engineFor } from '@/shared/voice/recognition/engines'
+import { OnlineRecognitionNotice } from '@/shared/voice/recognition/OnlineRecognitionNotice'
 import { useSpeechRecognition } from '@/shared/voice/recognition/useSpeechRecognition'
+import { loadVoskModel, useVoskModelStatus } from '@/shared/voice/recognition/voskModel'
 import { deviceSpeech } from '@/shared/voice/speechQueue'
 import { useWakeWordPreference } from '@/shared/voice/wakeWord/preference'
 import { playFollowUpTone, playWakeTone } from '@/shared/voice/wakeWord/tone'
@@ -45,6 +47,26 @@ function speechErrorMessage(code: string): string {
     default:
       return 'Error de reconocimiento de voz.'
   }
+}
+
+const mb = (bytes: number) => Math.round(bytes / 1_048_576)
+
+/**
+ * ADR 0071: while the local model downloads (the first time on a device), what is said is the progress — the
+ * microphone opens when it is ready. Its own component: only it re-renders with every downloaded chunk.
+ */
+function VoskModelProgress({ onProgress }: { onProgress: (message: string) => void }) {
+  const status = useVoskModelStatus()
+  const message =
+    status.state === 'downloading'
+      ? `Descargando el reconocimiento de voz local: ${mb(status.loaded)} de ${mb(status.total)} MB (solo la primera vez).`
+      : status.state === 'loading'
+        ? 'Preparando el reconocimiento de voz local…'
+        : null
+  useEffect(() => {
+    if (message) onProgress(message)
+  }, [message, onProgress])
+  return null
 }
 
 function usePageVisible(): boolean {
@@ -100,6 +122,11 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const [lastReply, setLastReply] = useState<VoiceReply | null>(null)
   const [paused, setPaused] = useState(false)
   const [conversing, setConversing] = useState(false)
+  // ADR 0071: the online recognizer is opt-in — what was asked waits for its notice; the local one, for its model.
+  const [noticeOpen, setNoticeOpen] = useState(false)
+  const pendingOnlineRef = useRef<{ kind: 'listen' } | { kind: 'dictate'; dictation: Dictation } | null>(null)
+  const [waitingModel, setWaitingModel] = useState(false)
+  const modelWaitRef = useRef(0)
 
   const modeRef = useRef<'route' | 'dictate'>('route')
   /** The conversation in course (null: none), and whether this listening turn is one of its follow-ups. */
@@ -228,7 +255,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         }
         present(
           route.reason === 'offline-question'
-            ? { tone: 'info', message: 'Para preguntas, cambia el reconocedor a «navegador» en este equipo.', spoken: 'Para preguntas, cambia el reconocedor en este equipo.' }
+            ? { tone: 'info', message: 'Para preguntas, activa el reconocimiento en línea en este equipo.', spoken: 'Para preguntas, activa el reconocimiento en línea.' }
             : { tone: 'error', message: 'No entendí.', spoken: 'No entendí.' },
         )
         return continueConversation()
@@ -358,24 +385,70 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     startSessionRef.current = startSession
   })
 
+  /** The local engine listens once its model is on the device (downloaded the first time, with its progress shown). */
+  const startRouted = useCallback(
+    (handsFree: boolean) => {
+      if (engineId !== 'vosk') return void startSession('route', handsFree)
+      const wait = ++modelWaitRef.current
+      setWaitingModel(true)
+      loadVoskModel().then(
+        () => {
+          if (modelWaitRef.current !== wait) return
+          setWaitingModel(false)
+          void startSession('route', handsFree)
+        },
+        () => {
+          if (modelWaitRef.current !== wait) return
+          setWaitingModel(false)
+          endConversation()
+          present({ tone: 'error', message: 'No se pudo descargar el reconocimiento de voz local. Inténtalo de nuevo.' })
+        },
+      )
+    },
+    [engineId, startSession, present, endConversation],
+  )
+  const showModelProgress = useCallback((message: string) => present({ tone: 'info', message }), [present])
+
+  /** Questions need the online recognizer (the local one only knows the kitchen's words): ask first (ADR 0071). */
+  const askOnline = useCallback(
+    (pending: { kind: 'listen' } | { kind: 'dictate'; dictation: Dictation }) => {
+      if (!engineFor('browser').supported()) {
+        return present({ tone: 'info', message: 'Para preguntas por voz se necesita el reconocimiento en línea, y este navegador no lo tiene. Puedes escribir.' })
+      }
+      pendingOnlineRef.current = pending
+      setNoticeOpen(true)
+    },
+    [present],
+  )
+
   const listen = useCallback(() => {
+    if (engineId === 'vosk' && !handlersListRef.current.some((h) => h.grammar)) return askOnline({ kind: 'listen' })
     if (!supported) return present({ tone: 'error', message: 'Este navegador no reconoce la voz. Puedes escribir.' })
-    if (engineId === 'vosk' && !handlersListRef.current.some((h) => h.grammar)) {
-      return present({ tone: 'info', message: 'Para preguntas, cambia el reconocedor a «navegador» en este equipo.' })
-    }
-    void startSession('route', false)
-  }, [supported, engineId, present, startSession])
+    startRouted(false)
+  }, [supported, engineId, present, askOnline, startRouted])
 
   const dictate = useCallback(
     (d: Dictation) => {
-      if (!supported || engineId === 'vosk') return present({ tone: 'info', message: 'Para dictar preguntas, usa el reconocedor «navegador» en este equipo.' })
+      if (engineId === 'vosk') return askOnline({ kind: 'dictate', dictation: d })
+      if (!supported) return present({ tone: 'info', message: 'Este navegador no reconoce la voz. Puedes escribir.' })
       dictationRef.current = d
       void startSession('dictate', false)
     },
-    [supported, engineId, present, startSession],
+    [supported, engineId, present, askOnline, startSession],
   )
 
+  // The notice was accepted: what was asked goes on, now with the online recognizer.
+  useEffect(() => {
+    const pending = pendingOnlineRef.current
+    if (engineId !== 'browser' || !pending) return
+    pendingOnlineRef.current = null
+    if (pending.kind === 'dictate') dictate(pending.dictation)
+    else listen()
+  }, [engineId, listen, dictate])
+
   const stop = useCallback(() => {
+    modelWaitRef.current++
+    setWaitingModel(false)
     endConversation()
     clearTimer('debounce')
     clearTimer('noSpeech')
@@ -400,9 +473,10 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const busy = state === 'listening' || state === 'processing'
   const wake = useWakeWord({
     active: handsFreeAllowed && handsFreeOn && !paused && visible && available,
-    suspended: busy || conversing,
+    suspended: busy || conversing || noticeOpen || waitingModel,
     tuning: wakeWordTuning(feature('voice_wake_word')),
     onDetect: () => {
+      if (engineId === 'vosk' && !handlersListRef.current.some((h) => h.grammar)) return askOnline({ kind: 'listen' })
       // ADR 0041 (D4): whoever may answer gets ready while the person is still speaking.
       if (engineId !== 'vosk') for (const h of handlersListRef.current) h.prepare?.()
       // «Oye Quanela» starts a conversation (when this device keeps listening after answering).
@@ -410,7 +484,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         conversationRef.current = { turns: 0, startedAt: Date.now() }
         setConversing(true)
       }
-      void startSession('route', true)
+      startRouted(true)
     },
   })
 
@@ -475,5 +549,18 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     ],
   )
 
-  return <VoiceContext value={value}>{children}</VoiceContext>
+  return (
+    <VoiceContext value={value}>
+      {children}
+      {waitingModel && <VoskModelProgress onProgress={showModelProgress} />}
+      <OnlineRecognitionNotice
+        open={noticeOpen}
+        onCancel={() => {
+          pendingOnlineRef.current = null
+          setNoticeOpen(false)
+        }}
+        onAccepted={() => setNoticeOpen(false)}
+      />
+    </VoiceContext>
+  )
 }

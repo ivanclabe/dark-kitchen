@@ -14,6 +14,8 @@ import { AlertTriangle, ArrowRight, CheckCircle2, Copy, Loader2, RotateCw } from
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { createOrganization, PLAN_NOT_AVAILABLE, pendingOrganizationOf, pendingPeriodOf, pendingPlanOf, updatePendingPlan } from '../api'
+import { LEGAL_PENDING_KEY, recordLegalAcceptance } from '@/shared/legal/api'
+import { clearPreConsent, preConsentOf, readPreConsent } from '@/shared/legal/preConsent'
 
 /**
  * Vuelta del enlace de confirmación (y "termina de crear tu negocio" si la
@@ -44,7 +46,19 @@ export function SignUpConfirmedPage() {
   useEffect(() => {
     if (!session || !pending || planRejected || started.current === attempt) return
     started.current = attempt
-    createOrganization(pending, plan, fullName, period)
+    // ADR 0071: what was ticked at sign-up becomes evidence first (if it fails, the app asks before entering).
+    const consent = preConsentOf(session.user.user_metadata) ?? readPreConsent()
+    const provider = String(session.user.app_metadata?.provider ?? 'email')
+    const recorded = consent && attempt === 0
+      ? recordLegalAcceptance({ documents: consent.documents, context: 'signup', details: { method: provider, tickedAt: consent.at } })
+          .then(() => {
+            clearPreConsent()
+            return queryClient.invalidateQueries({ queryKey: LEGAL_PENDING_KEY })
+          })
+          .catch(() => undefined)
+      : Promise.resolve()
+    recorded
+      .then(() => createOrganization(pending, plan, fullName, period))
       .then(async (slug) => {
         clearSelectedPlan()
         await refreshProfile()
