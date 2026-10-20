@@ -715,6 +715,7 @@ export type Database = {
       }
       dk_customer_preferences: {
         Row: {
+          authorized_by_customer: boolean
           created_at: string
           created_by: string | null
           customer_id: string
@@ -727,6 +728,7 @@ export type Database = {
           product_id: string | null
         }
         Insert: {
+          authorized_by_customer?: boolean
           created_at?: string
           created_by?: string | null
           customer_id: string
@@ -739,6 +741,7 @@ export type Database = {
           product_id?: string | null
         }
         Update: {
+          authorized_by_customer?: boolean
           created_at?: string
           created_by?: string | null
           customer_id?: string
@@ -6267,6 +6270,73 @@ export type Database = {
         }
         Returns: Json
       }
+      dk_anonymize_customer: { Args: { p_customer: string }; Returns: undefined }
+      dk_create_pqr: {
+        Args: { p_description: string; p_kind: string; p_organization_id?: string }
+        Returns: Json
+      }
+      dk_export_my_data: { Args: never; Returns: Json }
+      dk_ga_pqr_requests: {
+        Args: never
+        Returns: {
+          answered_at: string | null
+          created_at: string
+          description: string
+          details: Json
+          due_date: string
+          extended_due_date: string | null
+          id: string
+          kind: string
+          legal_basis: string
+          organization_name: string | null
+          radicado: string
+          requester_email: string | null
+          response: string | null
+          status: string
+        }[]
+      }
+      dk_ga_update_pqr: {
+        Args: { p_extend?: boolean; p_id: string; p_message?: string; p_status: string }
+        Returns: undefined
+      }
+      dk_my_legal_acceptances: {
+        Args: never
+        Returns: {
+          action: string
+          consented_at: string
+          context: string
+          document_slug: string
+          document_version: string
+          recorded_at: string
+          title: string
+        }[]
+      }
+      dk_my_pending_legal_documents: {
+        Args: never
+        Returns: { effective_date: string; reason: string; slug: string; title: string; version: string }[]
+      }
+      dk_my_pqr_requests: {
+        Args: never
+        Returns: {
+          answered_at: string | null
+          created_at: string
+          description: string
+          due_date: string
+          extended_due_date: string | null
+          id: string
+          kind: string
+          legal_basis: string
+          radicado: string
+          response: string | null
+          status: string
+        }[]
+      }
+      dk_public_kitchen_privacy: { Args: { p_slug: string }; Returns: Json }
+      dk_record_legal_acceptance: {
+        Args: { p_context: string; p_details?: Json; p_documents: Json; p_organization_id?: string }
+        Returns: number
+      }
+      dk_verify_evidence_chain: { Args: { p_table: string }; Returns: number }
       dk_billing_cancel: {
         Args: { p_organization_id: string }
         Returns: undefined

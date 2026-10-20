@@ -95,7 +95,8 @@ insert into _r values ('direct-write', to_jsonb(pg_temp.blocked(format('insert i
 
 insert into dk_customer_preferences (customer_id, kind, product_id) values ('30000000-0000-0000-0000-000000040a01', 'favorite_dish', pg_temp.k('dish1'));
 insert into dk_customer_preferences (customer_id, kind, ingredient_id) values ('30000000-0000-0000-0000-000000040a01', 'disliked_ingredient', pg_temp.k('ing'));
-insert into dk_customer_preferences (customer_id, kind, label) values ('30000000-0000-0000-0000-000000040a01', 'dietary', 'Sin gluten');
+-- ADR 0071: a dietary preference needs the customer's express authorization.
+insert into dk_customer_preferences (customer_id, kind, label, authorized_by_customer) values ('30000000-0000-0000-0000-000000040a01', 'dietary', 'Sin gluten', true);
 insert into _r values ('pref-dup', to_jsonb(pg_temp.blocked(format('insert into dk_customer_preferences (customer_id, kind, product_id) values (%L, %L, %L)', '30000000-0000-0000-0000-000000040a01', 'favorite_dish', pg_temp.k('dish1')))));
 insert into _r values ('pref-dish-text', to_jsonb(pg_temp.blocked(format('insert into dk_customer_preferences (customer_id, kind, label) values (%L, %L, %L)', '30000000-0000-0000-0000-000000040a01', 'favorite_dish', 'Hamburguesa'))));
 

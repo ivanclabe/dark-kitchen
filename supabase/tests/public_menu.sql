@@ -36,7 +36,7 @@ $$;
 -- An order payload: lines as [productKey, quantity, (price the browser claims)].
 create or replace function pg_temp.order_json(p_key text, p_phone text, p_lines jsonb, p_extra jsonb default '{}') returns jsonb language sql as $$
   select jsonb_build_object('idempotencyKey', p_key, 'customer', jsonb_build_object('name', 'Ana Ruiz', 'phone', p_phone),
-    'fulfillment', 'delivery', 'address', 'Calle 10 # 20-30', 'reference', 'Casa azul', 'paymentMethod', 'Efectivo',
+    'fulfillment', 'delivery', 'address', 'Calle 10 # 20-30', 'reference', 'Casa azul', 'paymentMethod', 'Efectivo', 'privacyAccepted', true,
     'items', (select jsonb_agg(jsonb_build_object('productId', pg_temp.k(l ->> 0), 'quantity', (l ->> 1)::integer, 'price', 1, 'note', l ->> 2)) from jsonb_array_elements(p_lines) l))
     || p_extra
 $$;
@@ -173,7 +173,10 @@ begin
     ('Datos', 'Domicilio sin dirección', 'invalid', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-12', '3005556677', '[["sopa", 2]]', '{"address": ""}'))$q$)),
     ('Datos', 'Forma de pago que el negocio no acepta', 'invalid', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-13', '3005556677', '[["sopa", 2]]', '{"paymentMethod": "Tarjeta"}'))$q$)),
     ('Datos', 'Celular inválido', 'invalid', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-14', '12', '[["sopa", 2]]'))$q$)),
-    ('Datos', 'Robot (campo trampa lleno)', 'invalid', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-15', '3005556677', '[["sopa", 2]]', '{"website": "x"}'))$q$));
+    ('Datos', 'Robot (campo trampa lleno)', 'invalid', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-15', '3005556677', '[["sopa", 2]]', '{"website": "x"}'))$q$)),
+    -- ADR 0071: the business's data authorization is required (checked here, not only in the browser).
+    ('Datos', 'Sin autorizar el tratamiento de datos', 'privacy_required', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-18', '3005556677', '[["sopa", 2]]', '{"privacyAccepted": false}'))$q$)),
+    ('Datos', 'Sin el campo de autorización (página vieja)', 'privacy_required', pg_temp.code($q$select pg_temp.place(pg_temp.order_json('k-19', '3005556677', '[["sopa", 2]]') - 'privacyAccepted')$q$));
 
   v := pg_temp.place(pg_temp.order_json('k-16', '3006667788', '[["sopa", 2]]', '{"fulfillment": "pickup", "address": ""}'));
   insert into _ctx (key, v) values ('pickup', v);
@@ -188,6 +191,13 @@ reset role;
 select pg_temp.as_owner();
 
 insert into _t (area, test, expected, got) values
+  ('Datos', 'La autorización queda como evidencia (casilla, política de la cocina, datos del negocio)', '1 · checkbox · politica-cocina 1.0 · Menú A',
+    (select count(*)::text || ' · ' || min(c.method) || ' · ' || min(c.document_slug) || ' ' || min(c.document_version) || ' · ' || min(c.kitchen_snapshot ->> 'name')
+     from dk_customer_consents c join dk_orders o on o.id = c.order_id
+     where o.public_token = (pg_temp.v('o1') ->> 'token')::uuid and c.purpose = 'order_processing' and c.channel = 'public_menu')),
+  ('Datos', 'Repetir el mismo pedido no duplica la autorización', '1',
+    (select count(*)::text from dk_customer_consents c join dk_orders o on o.customer_id = c.customer_id
+     where o.public_token = (pg_temp.v('o1') ->> 'token')::uuid and c.purpose = 'order_processing')),
   ('Cocina', 'El pedido confirmado tiene su comanda en Cocina', '1',
     (select count(*)::text from dk_kitchen_tickets t join dk_orders o on o.id = t.order_id where o.public_token = (pg_temp.v('o1') ->> 'token')::uuid)),
   ('Cocina', 'Canal Menú web, entrega y dirección en el pedido', 'WEB · delivery · Calle 10 # 20-30 · Casa azul · Efectivo',
