@@ -110,7 +110,7 @@ export function SetPasswordPage() {
           <AlertTriangle size={16} className="text-amber-400" aria-hidden /> {linkFailed ? 'El enlace ya se usó o venció' : 'Enlace no válido'}
         </p>
         <p className={typography.small}>Los enlaces para crear contraseña son de un solo uso y vencen en poco tiempo. Pide uno nuevo a quien te lo envió.</p>
-        <Link to="/login" className="block text-sm text-brasa-400 hover:underline">
+        <Link to="/login" className="block text-sm text-neutral-50 hover:underline">
           Ir a iniciar sesión
         </Link>
       </Shell>

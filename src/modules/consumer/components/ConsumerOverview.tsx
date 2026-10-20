@@ -35,11 +35,11 @@ function dataOf(s: NonNullable<StorefrontState['storefront']>): StorefrontData {
 function ReadinessRow({ item, onGoTo }: { item: ReadinessItem; onGoTo: (section: ConsumerSection) => void }) {
   const Icon = item.done ? CheckCircle2 : Circle
   const fix = !item.done && ('section' in item.fix ? (
-    <button type="button" onClick={() => onGoTo((item.fix as { section: ConsumerSection }).section)} className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-brasa-400 hover:text-brasa-300">
+    <button type="button" onClick={() => onGoTo((item.fix as { section: ConsumerSection }).section)} className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-50 hover:text-neutral-50">
       Completar <ArrowRight size={12} aria-hidden />
     </button>
   ) : (
-    <KitchenLink to={item.fix.path} className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-brasa-400 hover:text-brasa-300">
+    <KitchenLink to={item.fix.path} className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-50 hover:text-neutral-50">
       Configurar <ArrowRight size={12} aria-hidden />
     </KitchenLink>
   ))
@@ -112,7 +112,7 @@ function Preview({ state }: { state: StorefrontState }) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-neutral-100">{dish.name}</p>
               <p className="text-xs text-neutral-400 tabular-nums">{formatMoney(dish.price)}</p>
-              {dish.dietary_tags.length > 0 && <p className="truncate text-[11px] text-brasa-300">{dish.dietary_tags.map(tagLabel).join(' · ')}</p>}
+              {dish.dietary_tags.length > 0 && <p className="truncate text-[11px] text-neutral-50">{dish.dietary_tags.map(tagLabel).join(' · ')}</p>}
             </div>
           </div>
         ) : (

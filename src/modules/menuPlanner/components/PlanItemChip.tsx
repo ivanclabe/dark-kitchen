@@ -60,7 +60,7 @@ export function PlanItemChip({
       onKeyDown={handleKeyDown}
       className={clsx(
         'group relative flex w-full cursor-grab touch-none items-center gap-1.5 rounded-lg border px-1.5 py-1.5 text-left transition-colors select-none active:cursor-grabbing',
-        isOver ? 'border-brasa-500/60 bg-brasa-500/10' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
+        isOver ? 'border-neutral-50/60 bg-neutral-50/10' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
         !item.isActive && 'opacity-50',
         isDragging && 'opacity-30',
         optimistic && 'animate-pulse',

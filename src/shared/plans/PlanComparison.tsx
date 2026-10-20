@@ -25,7 +25,7 @@ export function PlanComparison({ pricing, period = 'monthly' }: { pricing: Publi
       ))}
     </tr>
   )
-  const yes = <Check size={17} className="mx-auto text-brasa-400" aria-label="Incluido" />
+  const yes = <Check size={17} className="mx-auto text-neutral-50" aria-label="Incluido" />
   const no = <Minus size={17} className="mx-auto text-neutral-600" aria-label="No incluido" />
 
   return (
@@ -38,7 +38,7 @@ export function PlanComparison({ pricing, period = 'monthly' }: { pricing: Publi
               <span className="sr-only">Característica</span>
             </th>
             {plans.map((p) => (
-              <th key={p.key} scope="col" className={clsx('px-4 py-4 text-center text-sm font-semibold', p.badge ? 'text-brasa-300' : 'text-neutral-100')}>
+              <th key={p.key} scope="col" className={clsx('px-4 py-4 text-center text-sm font-semibold', p.badge ? 'text-neutral-50' : 'text-neutral-100')}>
                 {p.name}
               </th>
             ))}

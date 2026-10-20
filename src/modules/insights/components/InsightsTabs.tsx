@@ -395,7 +395,7 @@ export function CostsTab({ data, compareLabel }: TabProps) {
       </Section>
       <p className={typography.caption}>
         Aquí está la utilidad bruta (ventas menos ingredientes). La utilidad real, con nómina, arriendo, gastos, mermas y el IVA de las compras, está en{' '}
-        <KitchenLink to="/finance/profit" className="text-brasa-400 hover:underline">
+        <KitchenLink to="/finance/profit" className="text-neutral-50 hover:underline">
           Finanzas → Rentabilidad
         </KitchenLink>
         .

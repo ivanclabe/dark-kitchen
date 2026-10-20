@@ -115,7 +115,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     toast.action?.onClick()
                     dismiss(toast.id)
                   }}
-                  className="shrink-0 rounded-md px-1.5 text-sm font-semibold text-brasa-300 transition-colors hover:bg-white/5 hover:text-brasa-200"
+                  className="shrink-0 rounded-md px-1.5 text-sm font-semibold text-neutral-50 transition-colors hover:bg-white/5 hover:text-neutral-50"
                 >
                   {toast.action.label}
                 </button>

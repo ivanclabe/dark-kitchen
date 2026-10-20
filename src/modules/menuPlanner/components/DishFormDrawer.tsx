@@ -165,9 +165,9 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
             onPendingChange={setPendingPhotos}
           />
           {shared && product && (
-            <div className="space-y-1 rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm">
+            <div className="space-y-1 rounded-xl border border-neutral-50/30 bg-neutral-50/5 p-3 text-sm">
               <p className="flex items-center gap-1.5 font-medium text-neutral-100">
-                <Layers size={14} className="text-brasa-400" aria-hidden /> Plato del menú maestro
+                <Layers size={14} className="text-neutral-50" aria-hidden /> Plato del menú maestro
               </p>
               <p className="text-xs text-neutral-400">
                 Nombre, categoría y receta los define el menú maestro. Aquí puedes ajustar el precio y, en el calendario, qué días se ofrece.
@@ -186,7 +186,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
                       },
                     )
                   }
-                  className="text-xs font-medium text-brasa-400 hover:underline"
+                  className="text-xs font-medium text-neutral-50 hover:underline"
                 >
                   Usar el precio del menú maestro
                 </button>
@@ -224,7 +224,7 @@ export function DishFormDrawer({ product, open, onClose }: { product: Product | 
                   </Button>
                 </div>
               ) : (
-                <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
+                <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-neutral-50 hover:underline">
                   + Crear categoría nueva
                 </button>
               )}

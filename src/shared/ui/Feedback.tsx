@@ -21,7 +21,7 @@ const INLINE_BOX: Record<FeedbackTone, string> = {
   noResults: 'border-neutral-800 bg-neutral-900/60',
   idle: 'border-neutral-800 bg-neutral-900/60',
   help: 'border-neutral-800 bg-neutral-900/60',
-  ai: 'border-brasa-500/25 bg-brasa-500/[0.06]',
+  ai: 'border-neutral-50/25 bg-neutral-50/[0.06]',
 }
 
 /** Errors and warnings interrupt (alert); good news and progress are announced politely (status). */

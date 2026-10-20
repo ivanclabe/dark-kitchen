@@ -74,9 +74,9 @@ export function InsightSummary({ feature, result, isLoading }: { feature: AiInsi
 
   if (!body) return null
   return (
-    <div className="mb-3 flex items-start justify-between gap-3 rounded-xl border border-brasa-500/20 bg-brasa-500/[0.05] px-3 py-2 text-xs">
+    <div className="mb-3 flex items-start justify-between gap-3 rounded-xl border border-neutral-50/20 bg-neutral-50/[0.05] px-3 py-2 text-xs">
       <p className="flex min-w-0 items-start gap-2">
-        <Sparkles size={13} className="mt-px shrink-0 text-brasa-400" aria-hidden />
+        <Sparkles size={13} className="mt-px shrink-0 text-neutral-50" aria-hidden />
         {body}
       </p>
       {!busy && result?.kind !== 'not_configured' && (
@@ -99,7 +99,7 @@ export function InsightExplanation({ item, className }: { item: InsightItem; cla
         <span className="font-medium">{item.title}</span>
       </span>
       <span className="block text-neutral-400">{item.explanation}</span>
-      <span className="block text-[11px] text-brasa-300/90">Sugerencia: {ACTION_LABEL[item.action] ?? item.action}</span>
+      <span className="block text-[11px] text-neutral-50/90">Sugerencia: {ACTION_LABEL[item.action] ?? item.action}</span>
     </span>
   )
 }

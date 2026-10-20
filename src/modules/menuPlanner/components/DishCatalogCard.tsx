@@ -100,7 +100,7 @@ export function DishCatalogCard({
             </span>
           )}
           {product.masterProductId && (
-            <span className="shrink-0 text-brasa-400" title="Plato del menú maestro: nombre y receta los define el maestro">
+            <span className="shrink-0 text-neutral-50" title="Plato del menú maestro: nombre y receta los define el maestro">
               · Maestro
             </span>
           )}
@@ -113,7 +113,7 @@ export function DishCatalogCard({
                 <span
                   key={date}
                   title={`${formatDayHeader(date).weekday}${on ? ': en el menú' : ''}`}
-                  className={clsx('size-1.5 rounded-full transition-colors', on ? 'bg-brasa-400' : 'bg-neutral-800', date === selectedDate && 'ring-1 ring-neutral-500 ring-offset-1 ring-offset-neutral-900')}
+                  className={clsx('size-1.5 rounded-full transition-colors', on ? 'bg-neutral-50' : 'bg-neutral-800', date === selectedDate && 'ring-1 ring-neutral-500 ring-offset-1 ring-offset-neutral-900')}
                 />
               )
             })}

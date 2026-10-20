@@ -54,7 +54,7 @@ export function DashboardPage() {
             <Panel title="Alertas administrativas" className="lg:col-span-2">
               <Alerts alerts={data.alerts} />
             </Panel>
-            <Panel title="Actividad reciente" actions={<Link to="/activity" className="text-xs text-brasa-400 hover:underline">Ver todo</Link>} className="lg:col-span-3">
+            <Panel title="Actividad reciente" actions={<Link to="/activity" className="text-xs text-neutral-50 hover:underline">Ver todo</Link>} className="lg:col-span-3">
               <ActivityFeed items={data.recentActivity} />
             </Panel>
           </div>

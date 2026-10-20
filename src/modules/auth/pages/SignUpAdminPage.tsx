@@ -100,7 +100,7 @@ export function SignUpAdminPage() {
         </form>
 
         <Link to="/login" className="mt-6 block text-center text-sm text-neutral-400 transition-colors hover:text-neutral-200">
-          ¿Ya tienes cuenta? <span className="text-brasa-400">Iniciar sesión</span>
+          ¿Ya tienes cuenta? <span className="text-neutral-50">Iniciar sesión</span>
         </Link>
       </div>
     </div>

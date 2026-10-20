@@ -72,7 +72,7 @@ export function OrganizationsPage() {
       cell: (o) => {
         const url = tenantUrl(o.tenantCode)
         return url ? (
-          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono text-[11px] text-brasa-300 hover:underline" title="Abrir organización">
+          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono text-[11px] text-neutral-50 hover:underline" title="Abrir organización">
             {tenantHost(o.tenantCode)}
           </a>
         ) : (
@@ -115,7 +115,7 @@ export function OrganizationsPage() {
       cell: (o) =>
         o.aiFeatures.length ? (
           <span className="inline-flex items-center gap-1 text-xs text-neutral-300" title={`${o.aiRuns30d} análisis en 30 días`}>
-            <Sparkles size={11} className="text-brasa-400" aria-hidden /> {o.aiFeatures.length}
+            <Sparkles size={11} className="text-neutral-50" aria-hidden /> {o.aiFeatures.length}
           </span>
         ) : (
           <span className="text-xs text-neutral-600">—</span>

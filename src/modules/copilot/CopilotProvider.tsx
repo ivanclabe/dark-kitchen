@@ -463,7 +463,7 @@ function CopilotPanel({
                   key={s}
                   type="button"
                   onClick={() => onSend(s)}
-                  className="rounded-xl border border-neutral-800 bg-neutral-950/40 px-3 py-2 text-left text-sm text-neutral-200 transition-colors hover:border-brasa-500/50 hover:bg-neutral-800/60"
+                  className="rounded-xl border border-neutral-800 bg-neutral-950/40 px-3 py-2 text-left text-sm text-neutral-200 transition-colors hover:border-neutral-50/50 hover:bg-neutral-800/60"
                 >
                   {s}
                 </button>
@@ -474,7 +474,7 @@ function CopilotPanel({
 
         {messages.map((m, i) =>
           m.role === 'user' ? (
-            <div key={i} className="ml-8 rounded-2xl rounded-br-md bg-brasa-500/15 px-3.5 py-2 text-sm text-neutral-100">
+            <div key={i} className="ml-8 rounded-2xl rounded-br-md bg-neutral-50/15 px-3.5 py-2 text-sm text-neutral-100">
               {m.content}
             </div>
           ) : (
@@ -490,9 +490,9 @@ function CopilotPanel({
                       href={helpHref(l.url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-3 py-2 text-sm text-neutral-100 transition-colors hover:border-brasa-500/60 hover:bg-brasa-500/10"
+                      className="flex items-center gap-2 rounded-xl border border-neutral-50/30 bg-neutral-50/5 px-3 py-2 text-sm text-neutral-100 transition-colors hover:border-neutral-50/60 hover:bg-neutral-50/10"
                     >
-                      <BookOpen size={14} className="shrink-0 text-brasa-400" aria-hidden />
+                      <BookOpen size={14} className="shrink-0 text-neutral-50" aria-hidden />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{l.title}</span>
                         <span className="block text-[11px] text-neutral-500">Centro de ayuda</span>
@@ -540,7 +540,7 @@ function CopilotPanel({
               {i === last && !pending && m.followUp && m.followUp.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {m.followUp.map((q) => (
-                    <button key={q} type="button" onClick={() => onSend(q)} className="rounded-full border border-neutral-800 px-2.5 py-1 text-xs text-neutral-300 hover:border-brasa-500/50 hover:text-neutral-100">
+                    <button key={q} type="button" onClick={() => onSend(q)} className="rounded-full border border-neutral-800 px-2.5 py-1 text-xs text-neutral-300 hover:border-neutral-50/50 hover:text-neutral-100">
                       {q}
                     </button>
                   ))}
@@ -585,7 +585,7 @@ export function CopilotButton({ compact = false }: { compact?: boolean }) {
           {unseen > 9 ? '9+' : unseen}
         </span>
       ) : (
-        pending && <span className="absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full bg-brasa-400 ring-2 ring-neutral-950" aria-hidden />
+        pending && <span className="absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full bg-neutral-50 ring-2 ring-neutral-950" aria-hidden />
       )}
     </button>
   )

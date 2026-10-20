@@ -19,7 +19,7 @@ export function IntegrationsSettingsPage() {
   return (
     <SettingsPage title="Integraciones" description="Conecta sistemas externos a esta cuenta.">
       <Section title="WhatsApp e Integraciones" description="Tu número oficial de WhatsApp, los avisos de pedidos y n8n tienen su propio módulo (ADR 0055)." card>
-        <KitchenLink to="/integrations" className="inline-flex items-center gap-1.5 text-sm text-brasa-400 hover:underline">
+        <KitchenLink to="/integrations" className="inline-flex items-center gap-1.5 text-sm text-neutral-50 hover:underline">
           <MessageCircle size={14} aria-hidden /> Ir a WhatsApp e Integraciones
         </KitchenLink>
       </Section>

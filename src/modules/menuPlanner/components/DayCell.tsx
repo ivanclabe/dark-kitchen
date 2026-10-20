@@ -43,9 +43,9 @@ export function DayCell({
         blocked
           ? 'border-neutral-800/60 bg-neutral-900/20 opacity-60'
           : isOver
-            ? 'border-brasa-500/70 bg-brasa-500/10 ring-1 ring-brasa-500/40 ring-inset'
+            ? 'border-neutral-50/70 bg-neutral-50/10 ring-1 ring-neutral-50/40 ring-inset'
             : selected
-              ? 'border-brasa-500/60 bg-neutral-900/40 ring-1 ring-brasa-500/30 ring-inset'
+              ? 'border-neutral-50/60 bg-neutral-900/40 ring-1 ring-neutral-50/30 ring-inset'
               : dragging
                 ? 'border-dashed border-neutral-700 bg-neutral-900/40'
                 : 'border-neutral-800/60 bg-neutral-900/40',
@@ -58,7 +58,7 @@ export function DayCell({
         aria-pressed={selected}
         className={clsx(
           'flex shrink-0 items-center justify-between gap-1 rounded-t-xl px-2 py-1.5 text-left transition-colors hover:bg-neutral-800/40',
-          isToday ? 'text-brasa-400' : 'text-neutral-300',
+          isToday ? 'text-neutral-50' : 'text-neutral-300',
         )}
       >
         <span className="text-[11px] font-semibold tracking-wide uppercase">
@@ -84,7 +84,7 @@ export function DayCell({
             <p
               className={clsx(
                 'flex items-center justify-center gap-1 rounded-lg border border-dashed px-2 py-3 text-center text-[11px] transition-colors',
-                isOver ? 'border-brasa-500/50 text-brasa-300' : 'border-neutral-800 text-neutral-600',
+                isOver ? 'border-neutral-50/50 text-neutral-50' : 'border-neutral-800 text-neutral-600',
               )}
             >
               <Plus size={11} /> {isOver ? 'Suelta para agregar' : 'Arrastra un plato aquí'}

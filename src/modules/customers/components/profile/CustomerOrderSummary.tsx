@@ -89,7 +89,7 @@ export function CustomerOrderSummary({ customer, onOpenOrder }: { customer: Cust
                       </span>
                     </div>
                     <div className="mt-1 h-1.5 rounded-full bg-neutral-800">
-                      <div className="h-1.5 rounded-full bg-brasa-500/70" style={{ width: `${(d.units / maxUnits) * 100}%` }} />
+                      <div className="h-1.5 rounded-full bg-neutral-50/70" style={{ width: `${(d.units / maxUnits) * 100}%` }} />
                     </div>
                   </li>
                 ))}

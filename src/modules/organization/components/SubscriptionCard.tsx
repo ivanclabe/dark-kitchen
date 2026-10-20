@@ -104,7 +104,7 @@ export function SubscriptionCard({ sub, organizationId }: { sub: Subscription; o
           {canPay && (
             <button
               type="button"
-              className="text-brasa-400 underline-offset-4 hover:underline"
+              className="text-neutral-50 underline-offset-4 hover:underline"
               disabled={busy}
               onClick={() => void run(() => scheduleChange(organizationId, sub.plan.key, sub.billingPeriod), 'Cambio deshecho')}
             >

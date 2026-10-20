@@ -53,11 +53,11 @@ function AddressDrawer({ customerId, editing, onClose }: { customerId: string; e
           {(a11y) => <Textarea {...a11y} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} placeholder="Llamar al llegar; no timbrar después de las 9 p. m." />}
         </FormField>
         <label className="flex items-center gap-2 text-sm text-neutral-300">
-          <input type="checkbox" checked={frequent} onChange={(e) => setFrequent(e.target.checked)} className="size-4 rounded border-neutral-700 bg-neutral-900 text-brasa-500" />
+          <input type="checkbox" checked={frequent} onChange={(e) => setFrequent(e.target.checked)} className="size-4 rounded border-neutral-700 bg-neutral-900 text-neutral-50" />
           Dirección frecuente
         </label>
         <label className="flex items-start gap-2 text-sm text-neutral-300">
-          <input type="checkbox" checked={makeCurrent} onChange={(e) => setMakeCurrent(e.target.checked)} disabled={editing?.isCurrent} className="mt-0.5 size-4 rounded border-neutral-700 bg-neutral-900 text-brasa-500" />
+          <input type="checkbox" checked={makeCurrent} onChange={(e) => setMakeCurrent(e.target.checked)} disabled={editing?.isCurrent} className="mt-0.5 size-4 rounded border-neutral-700 bg-neutral-900 text-neutral-50" />
           <span>
             Usar como última dirección de envío
             <span className={`block ${typography.caption}`}>Es la que verán los pedidos y el despacho.</span>
@@ -115,10 +115,10 @@ export function CustomerAddresses({ customerId, addresses, canEdit, compact = fa
   }
 
   const currentCard = (
-    <div className={clsx('rounded-xl border p-4', current ? 'border-brasa-500/30 bg-brasa-500/5' : 'border-dashed border-neutral-800')}>
+    <div className={clsx('rounded-xl border p-4', current ? 'border-neutral-50/30 bg-neutral-50/5' : 'border-dashed border-neutral-800')}>
       <div className="flex items-start justify-between gap-3">
         <span className="flex min-w-0 items-start gap-2.5">
-          <Navigation size={16} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden />
+          <Navigation size={16} className="mt-0.5 shrink-0 text-neutral-50" aria-hidden />
           {current ? <AddressBody a={current} /> : <span className="text-sm text-neutral-500">Sin dirección de envío.</span>}
         </span>
         {current && canEdit && !compact && (

@@ -223,7 +223,7 @@ export function MenuPanel({
                 {node.hint && <span className="block truncate text-xs text-neutral-500">{node.hint}</span>}
               </span>
               {node.external && <ExternalLink size={14} className="shrink-0 text-neutral-500" aria-hidden />}
-              {node.checked && <Check size={16} className="shrink-0 text-brasa-400" aria-hidden />}
+              {node.checked && <Check size={16} className="shrink-0 text-neutral-50" aria-hidden />}
             </button>
           )
       }

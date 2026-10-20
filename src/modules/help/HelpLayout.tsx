@@ -54,7 +54,7 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                       to={helpPath(a.url)}
                       onClick={onNavigate}
                       className={({ isActive }) =>
-                        clsx('block rounded-md px-2 py-1 transition-colors', isActive ? 'bg-brasa-500/10 text-brasa-300' : 'text-neutral-400 hover:text-neutral-100')
+                        clsx('block rounded-md px-2 py-1 transition-colors', isActive ? 'bg-neutral-50/10 text-neutral-50' : 'text-neutral-400 hover:text-neutral-100')
                       }
                     >
                       {a.title}

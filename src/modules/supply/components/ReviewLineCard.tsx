@@ -140,7 +140,7 @@ export function ReviewLineCard({
           <div className="space-y-1.5">
             <p className={labelClass}>Insumo</p>
             {line.ingredient?.kind === 'new' ? (
-              <div className="space-y-2 rounded-lg border border-brasa-500/30 bg-brasa-500/5 p-2.5">
+              <div className="space-y-2 rounded-lg border border-neutral-50/30 bg-neutral-50/5 p-2.5">
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
                     aria-label="Nombre del insumo nuevo"
@@ -165,7 +165,7 @@ export function ReviewLineCard({
                 </div>
                 <p className="text-xs text-neutral-400">
                   Insumo nuevo: se crea al guardar. Si ya existe uno con ese nombre, se usa ese.{' '}
-                  <button type="button" onClick={() => onChange({ ingredient: null })} className="font-medium text-brasa-400 hover:underline">
+                  <button type="button" onClick={() => onChange({ ingredient: null })} className="font-medium text-neutral-50 hover:underline">
                     Elegir uno existente
                   </button>
                 </p>
@@ -183,7 +183,7 @@ export function ReviewLineCard({
             )}
             {chosenId && line.suggestions[0]?.ingredientId === chosenId && (
               <p className="flex items-center gap-1 text-xs text-neutral-500">
-                <Sparkles size={12} className="text-brasa-400" aria-hidden /> Sugerido: {reasonLabel(line.suggestions[0].reason, line.suggestions[0].score)}
+                <Sparkles size={12} className="text-neutral-50" aria-hidden /> Sugerido: {reasonLabel(line.suggestions[0].reason, line.suggestions[0].score)}
               </p>
             )}
             {line.ingredient?.kind !== 'new' && (otherSuggestions.length > 0 || (!line.ingredient && canCreateIngredient)) && (
@@ -194,7 +194,7 @@ export function ReviewLineCard({
                     key={s.ingredientId}
                     type="button"
                     onClick={() => chooseExisting(s.ingredientId, s)}
-                    className="rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-200 hover:border-brasa-500/60 hover:bg-brasa-500/5"
+                    className="rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-200 hover:border-neutral-50/60 hover:bg-neutral-50/5"
                   >
                     {s.name} <span className="text-neutral-500">· {reasonLabel(s.reason, s.score)}</span>
                   </button>
@@ -203,7 +203,7 @@ export function ReviewLineCard({
                   <button
                     type="button"
                     onClick={() => createNew(line.text)}
-                    className="rounded-full border border-dashed border-neutral-700 px-2.5 py-1 text-xs text-neutral-400 hover:border-brasa-500/60 hover:text-neutral-100"
+                    className="rounded-full border border-dashed border-neutral-700 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-50/60 hover:text-neutral-100"
                   >
                     + Crear insumo nuevo
                   </button>
@@ -287,7 +287,7 @@ export function ReviewLineCard({
 
           {!line.added && (
           <label className="flex items-center gap-2 text-xs text-neutral-400">
-            <input type="checkbox" checked={line.remember} onChange={(e) => onChange({ remember: e.target.checked })} className="accent-brasa-500" />
+            <input type="checkbox" checked={line.remember} onChange={(e) => onChange({ remember: e.target.checked })} className="accent-neutral-50" />
             Recordar esta asociación para las próximas facturas de este proveedor
           </label>
           )}

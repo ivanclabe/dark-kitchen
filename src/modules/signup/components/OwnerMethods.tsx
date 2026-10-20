@@ -208,7 +208,7 @@ export function PhoneSignIn({ create, onBack, onSignedIn }: { create: boolean; o
           <button type="button" className="text-neutral-400 hover:text-neutral-200" onClick={() => setPhone(null)} disabled={busy}>
             Cambiar el número
           </button>
-          <button type="button" className="text-brasa-400 hover:underline disabled:text-neutral-600 disabled:no-underline" onClick={() => void send(phone)} disabled={busy || wait > 0}>
+          <button type="button" className="text-neutral-50 hover:underline disabled:text-neutral-600 disabled:no-underline" onClick={() => void send(phone)} disabled={busy || wait > 0}>
             {wait > 0 ? `Reenviar en ${wait} s` : 'Reenviar el código'}
           </button>
         </div>

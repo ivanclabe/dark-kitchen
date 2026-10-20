@@ -72,7 +72,7 @@ export function OrderingTab({ settings }: { settings: WaSettings }) {
               onClick={() => void setMode(m.value)}
               className={clsx(
                 'flex gap-3 rounded-xl border p-4 text-left transition-colors',
-                account.orderingMode === m.value ? 'border-brasa-500/70 bg-brasa-500/5' : 'border-neutral-800 hover:border-neutral-600',
+                account.orderingMode === m.value ? 'border-neutral-50/70 bg-neutral-50/5' : 'border-neutral-800 hover:border-neutral-600',
               )}
             >
               <m.icon size={18} className="mt-0.5 shrink-0 text-neutral-400" aria-hidden />
@@ -116,7 +116,7 @@ export function OrderingTab({ settings }: { settings: WaSettings }) {
         </ul>
         <p className="mt-3 text-xs text-neutral-500">
           Las reglas de pedido (domicilio, recoger, pago, mínimo) son las de{' '}
-          <KitchenLink to="/public-menu" className="text-brasa-400 hover:underline">
+          <KitchenLink to="/public-menu" className="text-neutral-50 hover:underline">
             Menú público
           </KitchenLink>
           . El asistente tiene su propio cupo diario de IA.

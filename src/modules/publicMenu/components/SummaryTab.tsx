@@ -182,7 +182,7 @@ export function SummaryTab({ settings, onEditDesign }: { settings: PublicMenuSet
                     <label key={m.value} className="flex items-center gap-2 text-sm text-neutral-300">
                       <input
                         type="checkbox"
-                        className="accent-brasa-500"
+                        className="accent-neutral-50"
                         checked={draft.paymentMethods.includes(m.value)}
                         onChange={(e) =>
                           setDraft((d) => {
@@ -235,7 +235,7 @@ export function SummaryTab({ settings, onEditDesign }: { settings: PublicMenuSet
                     </li>
                   ))}
                 </ul>
-                <KitchenLink to="/menu-planner" className="inline-block text-xs text-brasa-400 hover:underline">
+                <KitchenLink to="/menu-planner" className="inline-block text-xs text-neutral-50 hover:underline">
                   Cambiar el menú de hoy en el planificador
                 </KitchenLink>
               </div>

@@ -331,7 +331,7 @@ export function PhotoViewer({ name, images, start, onClose }: { name: string; im
                 onClick={() => setCurrent(i.position)}
                 aria-label={i.position === 1 ? 'Ver la foto principal' : 'Ver la segunda foto'}
                 aria-pressed={i.position === current}
-                className={clsx('size-14 overflow-hidden rounded-lg border-2 transition-colors', i.position === current ? 'border-brasa-500' : 'border-transparent opacity-60 hover:opacity-100')}
+                className={clsx('size-14 overflow-hidden rounded-lg border-2 transition-colors', i.position === current ? 'border-neutral-50' : 'border-transparent opacity-60 hover:opacity-100')}
               >
                 <img src={productImageUrl(i.path)} alt="" className="size-full object-cover" />
               </button>

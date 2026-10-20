@@ -37,7 +37,7 @@ function Heading({ icon: Icon, title, children }: { icon: typeof Lock; title: st
   return (
     <div className="mb-5">
       <h1 className="flex items-center gap-2 text-base font-semibold text-neutral-50">
-        <Icon size={16} className="text-brasa-400" aria-hidden /> {title}
+        <Icon size={16} className="text-neutral-50" aria-hidden /> {title}
       </h1>
       {children && <p className="mt-1.5 text-xs leading-relaxed text-neutral-400">{children}</p>}
     </div>

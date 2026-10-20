@@ -167,7 +167,7 @@ function ReadingState({ step }: { step: 'upload' | 'read' }) {
       <div className="min-w-0 flex-1 space-y-3">
         {steps.map((s, i) => (
           <p key={s.key} className={i <= current ? 'flex items-center gap-2 text-sm text-neutral-100' : 'flex items-center gap-2 text-sm text-neutral-500'}>
-            {i < current ? <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> : i === current ? <Loader2 size={16} className="animate-spin text-brasa-400" aria-hidden /> : <span className="size-4" />}
+            {i < current ? <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> : i === current ? <Loader2 size={16} className="animate-spin text-neutral-50" aria-hidden /> : <span className="size-4" />}
             {s.label}
           </p>
         ))}

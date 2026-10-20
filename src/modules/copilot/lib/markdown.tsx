@@ -11,7 +11,7 @@ function inline(text: string, onLink?: () => void): ReactNode[] {
     if (link) {
       const to = linkTarget(link[2])
       return to ? (
-        <KitchenLink key={i} to={to} onClick={onLink} className="text-brasa-300 underline decoration-brasa-500/40 underline-offset-2 hover:text-brasa-200">
+        <KitchenLink key={i} to={to} onClick={onLink} className="text-neutral-50 underline decoration-neutral-50/40 underline-offset-2 hover:text-neutral-50">
           {link[1]}
         </KitchenLink>
       ) : (

@@ -13,7 +13,7 @@ export function PurchasePaymentChoice({ value, onChange }: { value: PurchasePaym
     <label
       className={clsx(
         'flex flex-1 cursor-pointer flex-col gap-0.5 rounded-xl border px-3 py-2.5 text-sm',
-        value.mode === mode ? 'border-brasa-500/60 bg-brasa-500/5 text-neutral-100' : 'border-neutral-800 text-neutral-300 hover:border-neutral-700',
+        value.mode === mode ? 'border-neutral-50/60 bg-neutral-50/5 text-neutral-100' : 'border-neutral-800 text-neutral-300 hover:border-neutral-700',
       )}
     >
       <span className="flex items-center gap-2">
@@ -22,7 +22,7 @@ export function PurchasePaymentChoice({ value, onChange }: { value: PurchasePaym
           name="purchase-payment"
           checked={value.mode === mode}
           onChange={() => onChange(mode === 'cash' ? { mode: 'cash', method: 'Efectivo' } : { mode: 'credit', dueDate: value.mode === 'credit' ? value.dueDate : undefined })}
-          className="accent-brasa-500"
+          className="accent-neutral-50"
         />
         {label}
       </span>

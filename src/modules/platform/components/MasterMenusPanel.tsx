@@ -241,7 +241,7 @@ export function MasterMenusPanel({ organizationId, account }: { organizationId: 
             key={m.id}
             type="button"
             onClick={() => setSelectedId(m.id)}
-            className={clsx('w-full rounded-xl border px-3 py-2.5 text-left transition-colors', selected?.id === m.id ? 'border-brasa-500/50 bg-brasa-500/5' : 'border-neutral-800/60 hover:bg-neutral-900')}
+            className={clsx('w-full rounded-xl border px-3 py-2.5 text-left transition-colors', selected?.id === m.id ? 'border-neutral-50/50 bg-neutral-50/5' : 'border-neutral-800/60 hover:bg-neutral-900')}
           >
             <p className="font-medium text-neutral-100">{m.name}</p>
             <p className="text-xs text-neutral-500">

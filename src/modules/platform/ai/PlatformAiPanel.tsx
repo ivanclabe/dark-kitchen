@@ -77,7 +77,7 @@ export function PlatformAiPanel() {
       key: 'label',
       header: 'Función',
       cell: (f) => (
-        <button type="button" onClick={() => setOpenKey(f.key)} className="min-w-0 text-left hover:text-brasa-300">
+        <button type="button" onClick={() => setOpenKey(f.key)} className="min-w-0 text-left hover:text-neutral-50">
           <span className="flex flex-wrap items-center gap-2 font-medium text-neutral-100">
             {f.label}
             {f.category === 'ai' &&

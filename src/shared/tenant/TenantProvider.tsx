@@ -58,7 +58,7 @@ function Screen({ icon: Icon, title, children }: { icon: typeof Flame; title: st
   return (
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className="w-full max-w-md space-y-5 text-center">
-        <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-neutral-900 text-brasa-400">
+        <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-neutral-900 text-neutral-50">
           <Icon size={22} aria-hidden />
         </span>
         <h1 className="text-xl font-semibold">{title}</h1>
@@ -130,7 +130,7 @@ export function TenantGate() {
               <div className="flex flex-col items-center gap-2">
                 {others.map((o) => (
                   <a key={o.id} href={tenantUrl(o.tenantCode, '/') ?? '/'} className={linkClass}>
-                    <Flame size={14} className="text-brasa-400" aria-hidden /> {o.name} <span className="font-mono text-xs text-neutral-500">{o.tenantCode}</span>
+                    <Flame size={14} className="text-neutral-50" aria-hidden /> {o.name} <span className="font-mono text-xs text-neutral-500">{o.tenantCode}</span>
                   </a>
                 ))}
               </div>

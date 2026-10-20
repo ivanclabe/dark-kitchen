@@ -12,7 +12,7 @@ export function SubdomainBar({ code }: { code: string }) {
   const url = tenantUrl(code)
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-console-700 bg-console-900 px-3 py-2.5">
-      <Globe size={15} className="shrink-0 text-brasa-400" aria-hidden />
+      <Globe size={15} className="shrink-0 text-neutral-50" aria-hidden />
       <span className="font-mono text-sm font-semibold tracking-widest text-neutral-50">{code}</span>
       <span className="min-w-0 flex-1 truncate font-mono text-sm text-neutral-400">{tenantHost(code)}</span>
       {url && (

@@ -161,7 +161,7 @@ export function CardPaymentDialog({
               <input type="checkbox" className="mt-1 size-4 accent-[var(--color-primary)]" checked={acceptPrivacy} onChange={(e) => setAcceptPrivacy(e.target.checked)} />
               <span>
                 Acepto los{' '}
-                <a href={config.data?.acceptance.privacy.permalink} target="_blank" rel="noreferrer" className="text-brasa-400 underline-offset-4 hover:underline">
+                <a href={config.data?.acceptance.privacy.permalink} target="_blank" rel="noreferrer" className="text-neutral-50 underline-offset-4 hover:underline">
                   términos y la política de privacidad de Wompi
                 </a>
                 .
@@ -171,7 +171,7 @@ export function CardPaymentDialog({
               <input type="checkbox" className="mt-1 size-4 accent-[var(--color-primary)]" checked={acceptData} onChange={(e) => setAcceptData(e.target.checked)} />
               <span>
                 Autorizo el{' '}
-                <a href={config.data?.acceptance.personalData.permalink} target="_blank" rel="noreferrer" className="text-brasa-400 underline-offset-4 hover:underline">
+                <a href={config.data?.acceptance.personalData.permalink} target="_blank" rel="noreferrer" className="text-neutral-50 underline-offset-4 hover:underline">
                   tratamiento de mis datos personales
                 </a>{' '}
                 para los cobros de la suscripción.
@@ -182,7 +182,7 @@ export function CardPaymentDialog({
               <span>
                 Autorizo la <strong className="font-medium text-neutral-100">renovación automática</strong>: quanela cobrará a esta tarjeta el valor del plan al
                 empezar cada periodo, hasta que cancele o quite la tarjeta. Leí{' '}
-                <a href={legalHref('suscripciones')} target="_blank" rel="noopener noreferrer" className="text-brasa-400 underline-offset-4 hover:underline">
+                <a href={legalHref('suscripciones')} target="_blank" rel="noopener noreferrer" className="text-neutral-50 underline-offset-4 hover:underline">
                   cómo funcionan las suscripciones y los cobros
                 </a>
                 .

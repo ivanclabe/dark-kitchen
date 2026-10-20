@@ -47,17 +47,18 @@
   --color-danger: var(--color-red-400);
   --color-info: var(--color-sky-400);
 
-  /* Acción principal (ADR 0065): botón primario, chip activo, interruptor
-     encendido y contadores. brasa-700 con texto blanco llega a 5,2:1 (brasa-500
-     con blanco daba 2,8:1); el naranja vivo queda para la marca y los acentos. */
-  --color-primary: #c2410c;
-  --color-primary-hover: #9a3412;
-  --color-primary-active: #7c2d12;
-  --color-on-primary: #ffffff;
+  /* Acción principal (ADR 0073): una sola gama. El botón primario, el chip
+     activo, el interruptor encendido y los contadores usan la tinta del tema
+     (neutral-50): blanco sobre el fondo oscuro, casi negro sobre el claro, con
+     el fondo del tema como texto. Al pasar el cursor se apaga un paso. El
+     naranja queda solo para la marca (logo, landing, bienvenida). */
+  --color-primary: var(--color-neutral-50);
+  --color-primary-hover: var(--color-neutral-200);
+  --color-primary-active: var(--color-neutral-300);
+  --color-on-primary: var(--color-neutral-950);
 
-  /* Foco por teclado: brasa-500 sobre el fondo oscuro (7:1). La familia clara
-     lo oscurece a brasa-700 para pasar 3:1 (ver abajo). */
-  --color-focus: #f97316;
+  /* Foco por teclado: la misma tinta, con su separación del fondo. */
+  --color-focus: var(--color-neutral-50);
 
   /* Texto mínimo de la interfaz: 11 px (antes había 10 y 11 px sueltos). */
   /* Motion (ADR 0065): a strong ease-out for UI, and the drawer curve for sheets and side panels. */
@@ -78,7 +79,7 @@ body {
 /* Superficies del navegador con la paleta (ADR 0065): selección, cursor de
    texto y el destello gris al tocar en el celular. */
 ::selection {
-  background: color-mix(in oklab, var(--color-brasa-500) 32%, transparent);
+  background: color-mix(in oklab, var(--color-neutral-50) 24%, transparent);
 }
 html {
   -webkit-tap-highlight-color: transparent;
@@ -87,7 +88,7 @@ html {
 @layer base {
   input,
   textarea {
-    caret-color: var(--color-brasa-500);
+    caret-color: var(--color-neutral-50);
   }
   /* Sin la espera del doble toque (zoom) en controles; en una capa para que
      touch-none del arrastre (tablero) siga ganando. */
@@ -331,7 +332,7 @@ html {
     100deg,
     currentColor 0%,
     currentColor 40%,
-    var(--color-brasa-300) 50%,
+    var(--color-neutral-50) 50%,
     currentColor 60%,
     currentColor 100%
   );
@@ -602,7 +603,6 @@ html[data-theme='neutral'],
   --color-brasa-300: #7c2d12;
   /* 800: orange text and links pass 4.5:1 on the soft brand tint too (ADR 0065). */
   --color-brasa-400: #9a3412;
-  --color-focus: #c2410c;
   /* Each accent's pale shades (200-400, text on a soft tint) become its 700. */
   --color-red-200: oklch(50.5% 0.213 27.518);
   --color-amber-200: oklch(55.5% 0.163 48.998);
@@ -639,6 +639,11 @@ html[data-theme='neutral'],
   --color-warning: var(--color-amber-400);
   --color-danger: var(--color-red-400);
   --color-info: var(--color-sky-400);
+  --color-primary: var(--color-neutral-50);
+  --color-primary-hover: var(--color-neutral-200);
+  --color-primary-active: var(--color-neutral-300);
+  --color-on-primary: var(--color-neutral-950);
+  --color-focus: var(--color-neutral-50);
 }
 
 /* Claro: blanco y gris frío, la escala invertida. */

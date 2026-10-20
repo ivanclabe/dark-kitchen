@@ -5,7 +5,7 @@ import { legalHref } from './documents'
 function DocLink({ slug, children }: { slug: string; children: string }) {
   // A new tab: what was already typed in the form stays.
   return (
-    <a href={legalHref(slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-brasa-400 underline underline-offset-2 hover:text-brasa-300">
+    <a href={legalHref(slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-50 underline underline-offset-2 hover:text-neutral-50">
       {children}
     </a>
   )

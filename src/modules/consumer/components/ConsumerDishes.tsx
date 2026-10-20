@@ -109,7 +109,7 @@ export function ConsumerDishes({ state }: { state: StorefrontState }) {
               type="checkbox"
               checked={allVisibleSelected}
               onChange={() => setSelected(allVisibleSelected ? new Set() : new Set(visible.map((p) => p.id)))}
-              className="size-4 accent-brasa-500"
+              className="size-4 accent-neutral-50"
               aria-label="Seleccionar los platos de la lista"
             />
             {selected.size > 0 ? `${selected.size} ${selected.size === 1 ? 'seleccionado' : 'seleccionados'}` : `${visible.length} ${visible.length === 1 ? 'plato' : 'platos'}`}
@@ -133,8 +133,8 @@ export function ConsumerDishes({ state }: { state: StorefrontState }) {
             {visible.map((p) => {
               const d = drafts[p.id]
               return (
-                <li key={p.id} className={clsx('flex gap-3 px-4 py-3.5', selected.has(p.id) && 'bg-brasa-500/[0.04]')}>
-                  <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelected(p.id)} className="mt-3 size-4 shrink-0 accent-brasa-500" aria-label={`Seleccionar ${p.name}`} />
+                <li key={p.id} className={clsx('flex gap-3 px-4 py-3.5', selected.has(p.id) && 'bg-neutral-50/[0.04]')}>
+                  <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelected(p.id)} className="mt-3 size-4 shrink-0 accent-neutral-50" aria-label={`Seleccionar ${p.name}`} />
                   <ProductThumb name={p.name} path={p.image_path} toneSeed={p.category} size="md" />
                   <div className="min-w-0 flex-1 space-y-2">
                     <div className="flex items-start justify-between gap-3">
@@ -164,7 +164,7 @@ export function ConsumerDishes({ state }: { state: StorefrontState }) {
                               onClick={() => update(p.id, { dietary_tags: on ? d.dietary_tags.filter((x) => x !== t.value) : [...d.dietary_tags, t.value] })}
                               className={clsx(
                                 'rounded-full px-2.5 py-1 text-xs transition',
-                                on ? 'bg-brasa-500/15 text-brasa-300 ring-1 ring-brasa-500/40' : 'bg-neutral-900 text-neutral-400 ring-1 ring-neutral-800 hover:text-neutral-200',
+                                on ? 'bg-neutral-50/15 text-neutral-50 ring-1 ring-neutral-50/40' : 'bg-neutral-900 text-neutral-400 ring-1 ring-neutral-800 hover:text-neutral-200',
                               )}
                             >
                               {t.label}

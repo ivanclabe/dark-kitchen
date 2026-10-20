@@ -86,7 +86,7 @@ export const OrderCard = memo(function OrderCard({
         board.density === 'grande' ? 'px-4 py-3' : 'px-3 py-2',
         accentClass,
         isDragging && 'opacity-30',
-        isNew && 'shadow-[0_0_0_1px_var(--color-brasa-500)]',
+        isNew && 'shadow-[0_0_0_1px_var(--color-neutral-50)]',
       )}
     >
       <OrderCardBody

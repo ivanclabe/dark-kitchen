@@ -155,8 +155,8 @@ export function KitchenView() {
           <>
             {mode === 'sla' && (
               <p className={clsx('flex items-center gap-2', typography.small)}>
-                <Gauge size={14} className="text-brasa-400" aria-hidden /> Tiempos por pedido (SLA)
-                <button type="button" onClick={() => changeMode('tablero')} className="text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline">
+                <Gauge size={14} className="text-neutral-50" aria-hidden /> Tiempos por pedido (SLA)
+                <button type="button" onClick={() => changeMode('tablero')} className="text-neutral-50 underline-offset-4 hover:text-neutral-50 hover:underline">
                   Volver a la pantalla de cocina
                 </button>
               </p>

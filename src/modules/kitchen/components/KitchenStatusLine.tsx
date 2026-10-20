@@ -49,7 +49,7 @@ export function KitchenStatusLine({ lateCount, canConfigure, onConfigure }: { la
       )}
       <span className="hidden shrink-0 tabular-nums sm:inline">· {clock(now)}</span>
       {status.state === 'unconfigured' && canConfigure && (
-        <button type="button" onClick={onConfigure} className="min-w-0 truncate text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4">
+        <button type="button" onClick={onConfigure} className="min-w-0 truncate text-neutral-50 hover:text-neutral-50 hover:underline underline-offset-4">
           · Configurar horario
         </button>
       )}

@@ -55,7 +55,7 @@ export function LegalDocumentPage() {
             <ol className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
               {doc.toc.map((item) => (
                 <li key={item.id}>
-                  <a href={`#${item.id}`} className="text-neutral-300 hover:text-brasa-300">
+                  <a href={`#${item.id}`} className="text-neutral-300 hover:text-neutral-50">
                     {item.text}
                   </a>
                 </li>
@@ -81,7 +81,7 @@ export function LegalIndexPage() {
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
           {QUANELA_DOCUMENTS.map((doc) => (
             <li key={doc.slug}>
-              <Link to={legalHref(doc.slug)} className="block h-full rounded-2xl border border-neutral-800 p-4 transition-colors hover:border-brasa-500/40 hover:bg-neutral-900">
+              <Link to={legalHref(doc.slug)} className="block h-full rounded-2xl border border-neutral-800 p-4 transition-colors hover:border-neutral-50/40 hover:bg-neutral-900">
                 <span className="block font-medium text-neutral-100">{doc.title}</span>
                 <span className="mt-1 block text-sm text-neutral-400">{doc.summary}</span>
                 <span className="mt-2 block text-xs text-neutral-500">
@@ -91,7 +91,7 @@ export function LegalIndexPage() {
             </li>
           ))}
           <li>
-            <Link to="/legal/preferencias" className="block h-full rounded-2xl border border-neutral-800 p-4 transition-colors hover:border-brasa-500/40 hover:bg-neutral-900">
+            <Link to="/legal/preferencias" className="block h-full rounded-2xl border border-neutral-800 p-4 transition-colors hover:border-neutral-50/40 hover:bg-neutral-900">
               <span className="block font-medium text-neutral-100">Preferencias de privacidad</span>
               <span className="mt-1 block text-sm text-neutral-400">Qué guarda quanela en tu navegador y qué puedes apagar.</span>
             </Link>

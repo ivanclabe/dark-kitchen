@@ -172,7 +172,7 @@ export function PrivacyCenterPage() {
             <ul className="divide-y divide-neutral-800/60 text-sm">
               {acceptances.data.map((a, i) => (
                 <li key={`${a.slug}-${a.version}-${i}`} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2.5">
-                  <a href={legalHref(a.slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-100 hover:text-brasa-300">
+                  <a href={legalHref(a.slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-100 hover:text-neutral-50">
                     {a.title} · versión {a.version}
                   </a>
                   <span className="text-xs text-neutral-500">
@@ -182,7 +182,7 @@ export function PrivacyCenterPage() {
               ))}
             </ul>
           )}
-          <a href="/legal" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm text-brasa-400 hover:underline">
+          <a href="/legal" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm text-neutral-50 hover:underline">
             Ver todos los documentos legales
           </a>
         </Card>
@@ -202,7 +202,7 @@ export function PrivacyCenterPage() {
         </Card>
 
         <Card title="Preferencias de privacidad" icon={SlidersHorizontal} description="Qué guarda quanela en este navegador. Hoy no usamos analítica ni publicidad.">
-          <a href="/legal/preferencias" target="_blank" rel="noopener noreferrer" className="text-sm text-brasa-400 hover:underline">
+          <a href="/legal/preferencias" target="_blank" rel="noopener noreferrer" className="text-sm text-neutral-50 hover:underline">
             Abrir preferencias de privacidad
           </a>
         </Card>

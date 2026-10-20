@@ -101,7 +101,7 @@ export function RegisterPaymentModal({ receivables, onClose }: { receivables: Re
 
           <div className="flex items-center justify-between rounded-xl border border-neutral-800/60 bg-neutral-950/60 px-4 py-3">
             <span className="text-sm text-neutral-400">Saldo pendiente</span>
-            <span className="text-lg font-semibold tabular-nums text-brasa-400">{formatMoney(selected.balance)}</span>
+            <span className="text-lg font-semibold tabular-nums text-neutral-50">{formatMoney(selected.balance)}</span>
           </div>
 
           <FormField label="Monto a abonar" required error={amountError} info="Puede ser una parte del saldo: el pedido queda en «Pago parcial» hasta completar el total.">

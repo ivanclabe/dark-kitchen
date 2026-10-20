@@ -105,7 +105,7 @@ export function ConsumerProfile({ state }: { state: StorefrontState }) {
         icon={IdCard}
         description="Es la de tu cuenta: el nombre, el identificador y el tipo de cocina de Configuración → General."
         action={
-          <KitchenLink to="/settings/general" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-brasa-400 hover:text-brasa-300">
+          <KitchenLink to="/settings/general" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-50 hover:text-neutral-50">
             Cambiar en General <ArrowRight size={12} aria-hidden />
           </KitchenLink>
         }

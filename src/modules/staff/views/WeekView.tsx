@@ -21,7 +21,7 @@ function ShiftChip({ shift, roleName, now, onClick, editable }: { shift: Shift; 
       className={clsx(
         'w-full rounded-md border px-1.5 py-1 text-left text-[11px] leading-tight transition-colors',
         working ? 'border-emerald-500/40 bg-emerald-500/10' : late ? 'border-red-500/40 bg-red-500/10' : 'border-neutral-700 bg-neutral-800/70',
-        editable ? 'hover:border-brasa-500/60' : 'cursor-default',
+        editable ? 'hover:border-neutral-50/60' : 'cursor-default',
       )}
     >
       <span className="block font-medium tabular-nums text-neutral-100">{formatShiftRange(shift)}</span>
@@ -84,7 +84,7 @@ export function WeekView({
               const key = toDateInput(d)
               const hours = schedule ? hoursForDate(schedule, key) : null
               return (
-                <th key={key} className={clsx('px-1.5 py-2 text-left align-top text-xs font-medium', key === today ? 'text-brasa-300' : 'text-neutral-300')}>
+                <th key={key} className={clsx('px-1.5 py-2 text-left align-top text-xs font-medium', key === today ? 'text-neutral-50' : 'text-neutral-300')}>
                   {DAY_LABEL[i]} {d.getDate()}
                   {hours && (
                     <span className="block text-[10px] font-normal text-neutral-500">
@@ -110,7 +110,7 @@ export function WeekView({
                 {row.map((dayShifts, i) => {
                   const key = toDateInput(days[i])
                   return (
-                    <td key={key} className={clsx('group min-w-24 px-1 py-1 align-top', key === today && 'bg-brasa-500/[0.03]')}>
+                    <td key={key} className={clsx('group min-w-24 px-1 py-1 align-top', key === today && 'bg-neutral-50/[0.03]')}>
                       <div className="space-y-1">
                         {dayShifts.map((s) => (
                           <ShiftChip key={s.id} shift={s} roleName={roleName.get(s.roleId) ?? '—'} now={now} editable={canManage} onClick={() => onDraft({ shift: s })} />
@@ -121,7 +121,7 @@ export function WeekView({
                             onClick={() => onDraft({ userId: m.userId, day: key })}
                             aria-label={`Agregar turno a ${m.fullName} el ${DAY_LABEL[i]} ${days[i].getDate()}`}
                             className={clsx(
-                              'flex w-full items-center justify-center rounded-md border border-dashed border-neutral-800 py-1 text-neutral-600 transition-opacity hover:border-brasa-500/50 hover:text-brasa-300',
+                              'flex w-full items-center justify-center rounded-md border border-dashed border-neutral-800 py-1 text-neutral-600 transition-opacity hover:border-neutral-50/50 hover:text-neutral-50',
                               dayShifts.length > 0 ? // On a touch screen there is no hover: the add button is always shown.
                               'opacity-0 group-hover:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-60' : 'opacity-60',
                             )}

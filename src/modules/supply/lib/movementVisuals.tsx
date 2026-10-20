@@ -8,7 +8,7 @@ export const MOVEMENT: Record<MovementType, { label: string; icon: LucideIcon; c
   COMPRA: { label: 'Compra', icon: ShoppingBag, color: 'text-emerald-400' },
   MERMA: { label: 'Merma', icon: Trash2, color: 'text-red-400' },
   AJUSTE: { label: 'Ajuste', icon: SlidersHorizontal, color: 'text-neutral-300' },
-  CONSUMO: { label: 'Consumo', icon: ArrowDownCircle, color: 'text-brasa-400' },
+  CONSUMO: { label: 'Consumo', icon: ArrowDownCircle, color: 'text-neutral-50' },
   DEVOLUCION: { label: 'Devolución', icon: Undo2, color: 'text-emerald-400' },
   // ADR 0057: a batch takes its components out and puts the preparation in.
   PRODUCCION: { label: 'Producción', icon: CookingPot, color: 'text-sky-400' },

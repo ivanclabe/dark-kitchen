@@ -39,7 +39,7 @@ export function AdminLayout() {
         >
           {({ isActive }) => (
             <>
-              <Icon size={16} className={isActive ? 'text-brasa-400' : undefined} aria-hidden /> {label}
+              <Icon size={16} className={isActive ? 'text-neutral-50' : undefined} aria-hidden /> {label}
             </>
           )}
         </NavLink>

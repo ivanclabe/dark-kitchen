@@ -330,7 +330,7 @@ export function RecipeForm({
       )}
 
       {product?.masterProductId && (
-        <p role="status" className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm text-neutral-300">
+        <p role="status" className="rounded-xl border border-neutral-50/30 bg-neutral-50/5 px-4 py-2.5 text-sm text-neutral-300">
           Este plato viene de un menú maestro: su receta la define el maestro y se actualiza sola. Aquí puedes consultarla y ver su costo.
         </p>
       )}

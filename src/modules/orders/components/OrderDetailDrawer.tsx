@@ -95,7 +95,7 @@ function ItemRow({ item, orderNumber }: { item: OrderItem; orderNumber: number }
         <p className="text-sm font-medium text-neutral-100">
           <span className="tabular-nums text-neutral-400">{item.quantity}×</span>{' '}
           {can('recipes.view') ? (
-            <KitchenLink to={`/recipes/${item.productId}`} state={{ from: here }} className="hover:text-brasa-300 hover:underline" title="Ver la receta">
+            <KitchenLink to={`/recipes/${item.productId}`} state={{ from: here }} className="hover:text-neutral-50 hover:underline" title="Ver la receta">
               {item.productName}
             </KitchenLink>
           ) : (
@@ -157,7 +157,7 @@ function CustomerCard({ order }: { order: Order }) {
             <CustomerMarks customer={{ type: order.customerType, preferred: order.customerPreferred, preferredNote: order.customerPreferredNote }} />
           </span>
           {can('customers.view') && (
-            <KitchenLink to={`/customers/${order.customerId}`} state={{ from: here }} className="inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline">
+            <KitchenLink to={`/customers/${order.customerId}`} state={{ from: here }} className="inline-flex items-center gap-1 text-xs text-neutral-50 hover:underline">
               Saldo e historial <ExternalLink size={11} aria-hidden />
             </KitchenLink>
           )}
@@ -212,7 +212,7 @@ function StockCard({ order }: { order: Order }) {
             <li key={`${r.ingredientId}-${i}`} className="flex items-center justify-between gap-3 py-1.5">
               <span className="min-w-0 truncate">
                 {can('inventory.view') ? (
-                  <KitchenLink to={`/supply/stock/${r.ingredientId}`} className="text-neutral-200 hover:text-brasa-300 hover:underline">
+                  <KitchenLink to={`/supply/stock/${r.ingredientId}`} className="text-neutral-200 hover:text-neutral-50 hover:underline">
                     {r.ingredientName}
                   </KitchenLink>
                 ) : (

@@ -135,7 +135,7 @@ export function PlanItemRulesDrawer({ item, onClose }: { item: MenuPlanItem | nu
             type="checkbox"
             checked={whileSuppliesLast}
             onChange={(e) => setWhileSuppliesLast(e.target.checked)}
-            className="size-4 rounded border-neutral-700 bg-neutral-900 text-brasa-500 focus-visible:ring-2 focus-visible:ring-focus"
+            className="size-4 rounded border-neutral-700 bg-neutral-900 text-neutral-50 focus-visible:ring-2 focus-visible:ring-focus"
           />
           Disponible hasta agotar existencias
         </label>

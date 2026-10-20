@@ -198,7 +198,7 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
             </Button>
           </div>
         ) : (
-          <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-brasa-400 hover:underline">
+          <button type="button" onClick={() => setShowNewCategory(true)} className="text-xs text-neutral-50 hover:underline">
             + Crear categoría nueva
           </button>
         )}
@@ -238,7 +238,7 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
         </div>
 
         <label className="flex items-center gap-2 text-sm text-neutral-300">
-          <input type="checkbox" {...register('perishable')} className="size-4 accent-brasa-500" />
+          <input type="checkbox" {...register('perishable')} className="size-4 accent-neutral-50" />
           Perecedero
         </label>
         {perishable && (

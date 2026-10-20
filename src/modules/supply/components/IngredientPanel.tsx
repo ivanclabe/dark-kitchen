@@ -131,7 +131,7 @@ export function IngredientPanel({
                 onClick={() => onSelect(ing)}
                 className={clsx(
                   'w-full rounded-xl border px-3 py-2.5 text-left transition-colors',
-                  selected ? 'border-brasa-500/60 bg-brasa-500/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
+                  selected ? 'border-neutral-50/60 bg-neutral-50/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
                   !ing.active && 'opacity-50',
                 )}
               >

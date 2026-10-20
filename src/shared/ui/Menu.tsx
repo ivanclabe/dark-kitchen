@@ -100,7 +100,7 @@ export function Menu({
                 >
                   {Icon && <Icon size={15} className="shrink-0 text-neutral-500" />}
                   <span className="flex-1">{item.label}</span>
-                  {item.checked && <span className="size-1.5 rounded-full bg-brasa-400" aria-hidden />}
+                  {item.checked && <span className="size-1.5 rounded-full bg-neutral-50" aria-hidden />}
                 </button>
               </div>
             )

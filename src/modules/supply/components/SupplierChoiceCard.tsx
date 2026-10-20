@@ -50,7 +50,7 @@ export function SupplierChoiceCard({
         </p>
 
         {value?.kind === 'new' ? (
-          <div className="space-y-3 rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3">
+          <div className="space-y-3 rounded-xl border border-neutral-50/30 bg-neutral-50/5 p-3">
             <p className="text-sm font-medium text-neutral-100">Proveedor nuevo</p>
             <FormGrid>
               <FormField label="Nombre" required>
@@ -71,7 +71,7 @@ export function SupplierChoiceCard({
             </FormGrid>
             <p className="text-xs text-neutral-400">
               Se crea al guardar. Si ya tienes un proveedor con ese NIT, se usa ese.{' '}
-              <button type="button" onClick={() => onChange(null)} className="font-medium text-brasa-400 hover:underline">
+              <button type="button" onClick={() => onChange(null)} className="font-medium text-neutral-50 hover:underline">
                 Elegir uno existente
               </button>
             </p>
@@ -83,7 +83,7 @@ export function SupplierChoiceCard({
               <p className="text-xs text-neutral-500">{chosen.taxId ? `NIT ${chosen.taxId}` : 'Sin NIT registrado'}</p>
               {candidate && (
                 <p className="mt-1 flex items-center gap-1 text-xs text-neutral-400">
-                  <Sparkles size={12} className="text-brasa-400" aria-hidden /> Sugerido: {reasonLabel(candidate.reason, candidate.score)}
+                  <Sparkles size={12} className="text-neutral-50" aria-hidden /> Sugerido: {reasonLabel(candidate.reason, candidate.score)}
                 </p>
               )}
             </div>
@@ -114,7 +114,7 @@ export function SupplierChoiceCard({
                       setPicking(false)
                       onChange({ kind: 'existing', id: c.id })
                     }}
-                    className="rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-200 hover:border-brasa-500/60 hover:bg-brasa-500/5"
+                    className="rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-200 hover:border-neutral-50/60 hover:bg-neutral-50/5"
                   >
                     {c.name} <span className="text-neutral-500">· {reasonLabel(c.reason, c.score)}</span>
                     {c.taxIdDiffers && <span className="text-amber-400"> · otro NIT</span>}

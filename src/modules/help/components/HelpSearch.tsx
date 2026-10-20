@@ -109,7 +109,7 @@ export function HelpSearch({ size = 'md', autoFocus = false, onNavigate }: { siz
                   className={clsx('block w-full rounded-xl px-3 py-2.5 text-left', i === active ? 'bg-neutral-800' : 'hover:bg-neutral-800/60')}
                 >
                   <span className="block text-sm font-medium text-neutral-100">{hit.article.title}</span>
-                  <span className="block text-[11px] text-brasa-300">{HELP_SECTIONS.find((s) => s.id === hit.article.section)?.title}</span>
+                  <span className="block text-[11px] text-neutral-50">{HELP_SECTIONS.find((s) => s.id === hit.article.section)?.title}</span>
                   <span className="mt-0.5 line-clamp-2 block text-xs text-neutral-400">{hit.snippet}</span>
                 </button>
               </li>

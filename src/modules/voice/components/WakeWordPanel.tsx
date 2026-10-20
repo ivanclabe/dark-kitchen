@@ -68,7 +68,7 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
             Descargando «Oye quanela»: {mb(status.loaded)} de {mb(status.total)} MB (solo la primera vez)
           </p>
           <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-            <div className="h-full rounded-full bg-brasa-500" style={{ width: `${Math.round((status.loaded / status.total) * 100)}%` }} />
+            <div className="h-full rounded-full bg-neutral-50" style={{ width: `${Math.round((status.loaded / status.total) * 100)}%` }} />
           </div>
         </div>
       )}
@@ -78,7 +78,7 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
         <Button size="sm" variant="secondary" icon={testing ? Square : Ear} onClick={toggleTest} disabled={!supported}>
           {testing ? 'Detener' : 'Probar'}
         </Button>
-        <span className={clsx('text-xs', test.state === 'error' ? 'text-red-300' : testing ? 'text-brasa-300' : 'text-neutral-500')}>
+        <span className={clsx('text-xs', test.state === 'error' ? 'text-red-300' : testing ? 'text-neutral-50' : 'text-neutral-500')}>
           {!supported
             ? 'Este navegador no puede usar manos libres.'
             : test.state === 'error'
@@ -100,7 +100,7 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
             <span className={clsx('tabular-nums', flash ? 'font-semibold text-emerald-300' : 'text-neutral-300')}>{flash ? '¡Detectado!' : `${pct} %`}</span>
           </div>
           <div className="relative h-2 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-            <div className={clsx('h-full rounded-full transition-[width] duration-75', flash ? 'bg-emerald-400' : 'bg-brasa-500')} style={{ width: `${flash ? 100 : pct}%` }} />
+            <div className={clsx('h-full rounded-full transition-[width] duration-75', flash ? 'bg-emerald-400' : 'bg-neutral-50')} style={{ width: `${flash ? 100 : pct}%` }} />
             <div className="absolute top-0 h-full w-px bg-neutral-300" style={{ left: `${Math.round(tuning.threshold * 100)}%` }} />
           </div>
           <p className="text-neutral-500">

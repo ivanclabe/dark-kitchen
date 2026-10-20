@@ -69,7 +69,7 @@ export function AccountList({ onDone }: { onDone: () => void }) {
                 }}
                 className={clsx(
                   'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors focus-visible:outline-none',
-                  current ? 'bg-brasa-500/10' : 'hover:bg-neutral-800 focus-visible:bg-neutral-800',
+                  current ? 'bg-neutral-50/10' : 'hover:bg-neutral-800 focus-visible:bg-neutral-800',
                 )}
               >
                 <AccountIcon iconKey={k.iconKey} seed={k.id} size="sm" className={k.active ? undefined : 'opacity-50'} />
@@ -82,7 +82,7 @@ export function AccountList({ onDone }: { onDone: () => void }) {
                     {k.roleOptions.length > 1 ? `${k.roleOptions.length} roles · ${k.roleName}` : k.roleName}
                   </span>
                 </span>
-                {current && <Check size={16} className="shrink-0 text-brasa-400" aria-label="Cuenta actual" />}
+                {current && <Check size={16} className="shrink-0 text-neutral-50" aria-label="Cuenta actual" />}
               </button>
             </li>
           )
@@ -132,14 +132,14 @@ export function RoleList({ onDone }: { onDone: () => void }) {
               }}
               className={clsx(
                 'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors focus-visible:outline-none',
-                current ? 'bg-brasa-500/10' : 'hover:bg-neutral-800 focus-visible:bg-neutral-800',
+                current ? 'bg-neutral-50/10' : 'hover:bg-neutral-800 focus-visible:bg-neutral-800',
               )}
             >
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-neutral-100">{role.name}</span>
                 <span className="block truncate text-xs text-neutral-500">{roleSummary(role.permissions)}</span>
               </span>
-              {current && <Check size={16} className="shrink-0 text-brasa-400" aria-label="Rol activo" />}
+              {current && <Check size={16} className="shrink-0 text-neutral-50" aria-label="Rol activo" />}
             </button>
           </li>
         )

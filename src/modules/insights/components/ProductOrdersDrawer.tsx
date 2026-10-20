@@ -75,7 +75,7 @@ export function ProductOrdersDrawer({
       )}
       {can('recipes.view') && (
         <div className="mt-5 border-t border-neutral-800/60 pt-4">
-          <Link to={`/recipes/${product.id}`} state={{ from: here }} className="inline-flex items-center gap-1.5 text-sm text-brasa-400 hover:underline">
+          <Link to={`/recipes/${product.id}`} state={{ from: here }} className="inline-flex items-center gap-1.5 text-sm text-neutral-50 hover:underline">
             Ver receta y costo <ArrowRight size={14} aria-hidden />
           </Link>
         </div>

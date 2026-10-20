@@ -61,7 +61,7 @@ function Billing({ organizationId }: { organizationId: string }) {
       align: 'right',
       cell: (i) =>
         i.pdfUrl ? (
-          <a href={i.pdfUrl} className="text-sm text-brasa-400 hover:underline" target="_blank" rel="noreferrer">
+          <a href={i.pdfUrl} className="text-sm text-neutral-50 hover:underline" target="_blank" rel="noreferrer">
             PDF
           </a>
         ) : null,

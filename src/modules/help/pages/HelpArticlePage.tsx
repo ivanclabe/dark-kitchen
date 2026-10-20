@@ -75,7 +75,7 @@ function Gallery() {
                     </div>
                   )}
                   <figcaption>
-                    <Link to={helpPath(`${article.url}#captura-${shot.id}`)} className="text-sm font-medium text-brasa-300 hover:underline">
+                    <Link to={helpPath(`${article.url}#captura-${shot.id}`)} className="text-sm font-medium text-neutral-50 hover:underline">
                       {article.title}
                     </Link>
                     {shot.notes.length > 0 && (
@@ -145,7 +145,7 @@ function ArticleView({ article }: { article: HelpArticle }) {
             </span>
           )}
           {article.appPath && (
-            <a href={appHref(article.appPath)} className="ml-auto inline-flex items-center gap-1 rounded-full border border-brasa-500/40 bg-brasa-500/10 px-3 py-1 text-brasa-300 hover:bg-brasa-500/20">
+            <a href={appHref(article.appPath)} className="ml-auto inline-flex items-center gap-1 rounded-full border border-neutral-50/40 bg-neutral-50/10 px-3 py-1 text-neutral-50 hover:bg-neutral-50/20">
               Abrir en quanela <ExternalLink size={12} aria-hidden />
             </a>
           )}
@@ -162,7 +162,7 @@ function ArticleView({ article }: { article: HelpArticle }) {
             <ul className="mt-3 grid gap-2 sm:grid-cols-2">
               {article.related.map((id) => HELP_ARTICLES[id]).filter(Boolean).map((r) => (
                 <li key={r.id}>
-                  <Link to={helpPath(r.url)} className="block rounded-xl border border-neutral-800 p-3 transition-colors hover:border-brasa-500/40 hover:bg-neutral-900">
+                  <Link to={helpPath(r.url)} className="block rounded-xl border border-neutral-800 p-3 transition-colors hover:border-neutral-50/40 hover:bg-neutral-900">
                     <span className="block text-sm font-medium text-neutral-100">{r.title}</span>
                     <span className="mt-0.5 line-clamp-2 block text-xs text-neutral-400">{r.summary}</span>
                   </Link>
@@ -222,7 +222,7 @@ export function HelpArticlePage() {
       <div className="max-w-xl space-y-3">
         <h1 className="text-2xl font-semibold text-neutral-50">No encontramos ese artículo</h1>
         <p className="text-neutral-400">Puede que haya cambiado de lugar. Búscalo arriba o vuelve al inicio de la ayuda.</p>
-        <Link to={helpPath()} className="text-brasa-300 hover:underline">
+        <Link to={helpPath()} className="text-neutral-50 hover:underline">
           Ir al centro de ayuda
         </Link>
       </div>

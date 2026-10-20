@@ -27,7 +27,7 @@ export function LegalLayout({ children }: { children: ReactNode }) {
                 <NavLink
                   to={legalHref(doc.slug)}
                   className={({ isActive }) =>
-                    clsx('block rounded-lg px-3 py-1.5 transition-colors', isActive ? 'bg-brasa-500/10 text-brasa-300' : 'text-neutral-400 hover:text-neutral-100')
+                    clsx('block rounded-lg px-3 py-1.5 transition-colors', isActive ? 'bg-neutral-50/10 text-neutral-50' : 'text-neutral-400 hover:text-neutral-100')
                   }
                 >
                   {doc.title}
@@ -38,7 +38,7 @@ export function LegalLayout({ children }: { children: ReactNode }) {
               <NavLink
                 to="/legal/preferencias"
                 className={({ isActive }) =>
-                  clsx('block rounded-lg px-3 py-1.5 transition-colors', isActive ? 'bg-brasa-500/10 text-brasa-300' : 'text-neutral-400 hover:text-neutral-100')
+                  clsx('block rounded-lg px-3 py-1.5 transition-colors', isActive ? 'bg-neutral-50/10 text-neutral-50' : 'text-neutral-400 hover:text-neutral-100')
                 }
               >
                 Preferencias de privacidad

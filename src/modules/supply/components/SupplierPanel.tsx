@@ -78,7 +78,7 @@ export function SupplierPanel({ selectedId, onSelect, onCreate }: { selectedId: 
               onClick={() => onSelect(s)}
               className={clsx(
                 'w-full rounded-xl border px-3 py-2.5 text-left transition-colors',
-                s.id === selectedId ? 'border-brasa-500/60 bg-brasa-500/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
+                s.id === selectedId ? 'border-neutral-50/60 bg-neutral-50/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
                 !s.active && 'opacity-50',
               )}
             >

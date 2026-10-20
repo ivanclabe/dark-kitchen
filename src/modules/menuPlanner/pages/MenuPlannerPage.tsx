@@ -253,7 +253,7 @@ export function MenuPlannerPage() {
       {/* No animation back to the origin: the dish lands where it is dropped (ADR 0018). */}
       <DragOverlay dropAnimation={null}>
         {activeDish && (
-          <div className="shadow-float flex items-center gap-2 rounded-lg border border-brasa-500/60 bg-neutral-900 py-1 pr-2.5 pl-1 text-xs font-medium text-neutral-100">
+          <div className="shadow-float flex items-center gap-2 rounded-lg border border-neutral-50/60 bg-neutral-900 py-1 pr-2.5 pl-1 text-xs font-medium text-neutral-100">
             <ProductThumb name={activeDish.name} path={activeDish.path} toneSeed={activeDish.category} size="xs" />
             {activeDish.name}
           </div>

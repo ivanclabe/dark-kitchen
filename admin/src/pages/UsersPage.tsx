@@ -68,7 +68,7 @@ export function UsersPage() {
         <span className="block min-w-0">
           <span className="flex items-center gap-1.5 truncate font-medium text-neutral-100">
             {u.name}
-            {u.globalAdmin && <ShieldCheck size={13} className="shrink-0 text-brasa-400" aria-label="Global Admin" />}
+            {u.globalAdmin && <ShieldCheck size={13} className="shrink-0 text-neutral-50" aria-label="Global Admin" />}
           </span>
           <span className="block truncate text-[11px] text-neutral-500">{u.email ?? '—'}</span>
         </span>

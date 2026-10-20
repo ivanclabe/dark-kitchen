@@ -41,7 +41,7 @@ export function TipOfTheDay() {
         description={tip.long}
         className="pr-11"
         action={
-          <a href={helpHref(tip.help)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-brasa-400 hover:text-brasa-300 hover:underline">
+          <a href={helpHref(tip.help)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-neutral-50 hover:text-neutral-50 hover:underline">
             Ver la guía <ArrowUpRight size={14} aria-hidden />
           </a>
         }

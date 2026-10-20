@@ -25,7 +25,7 @@ function Usage({ label, used, limit, singular, plural }: { label: string; used: 
       </p>
       {limit !== null && (
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-          <div className={clsx('h-full rounded-full', full ? 'bg-amber-400' : 'bg-brasa-500')} style={{ width: `${pct}%` }} />
+          <div className={clsx('h-full rounded-full', full ? 'bg-amber-400' : 'bg-neutral-50')} style={{ width: `${pct}%` }} />
         </div>
       )}
       {full && <p className="mt-2 text-xs text-amber-300">Llegaste al límite de tu plan.</p>}
@@ -74,7 +74,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
           )}
         </div>
         {daysLeft !== null && (
-          <p className={clsx('mt-4 rounded-xl px-3 py-2 text-sm', daysLeft > 0 ? 'bg-brasa-500/10 text-brasa-200' : 'bg-amber-500/10 text-amber-300')}>
+          <p className={clsx('mt-4 rounded-xl px-3 py-2 text-sm', daysLeft > 0 ? 'bg-neutral-50/10 text-neutral-50' : 'bg-amber-500/10 text-amber-300')}>
             {daysLeft > 0
               ? `Tu prueba gratis termina en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'} (${formatDate(sub.trialEndsAt!)}).`
               : 'Tu prueba gratis terminó. Todo sigue funcionando; escríbenos para continuar con tu plan.'}
@@ -113,7 +113,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
           <ul className="mt-3 space-y-2 text-sm text-neutral-300">
             {sub.plan.highlights.map((h) => (
               <li key={h} className="flex gap-2">
-                <Check size={16} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden /> {h}
+                <Check size={16} className="mt-0.5 shrink-0 text-neutral-50" aria-hidden /> {h}
               </li>
             ))}
           </ul>
@@ -124,7 +124,7 @@ export function PlanPanel({ organizationId }: { organizationId: string }) {
           <ul className="mt-3 space-y-2 text-sm text-neutral-300">
             {sub.features.map((key) => (
               <li key={key} className="flex gap-2">
-                <Check size={16} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden /> {featureLabel(key)}
+                <Check size={16} className="mt-0.5 shrink-0 text-neutral-50" aria-hidden /> {featureLabel(key)}
               </li>
             ))}
           </ul>

@@ -138,7 +138,7 @@ function Thread({ conversation: c, canReply, orderingMode }: { conversation: WaC
             {c.last_order && (
               <>
                 {' · '}
-                <KitchenLink to={`/orders/${c.last_order_id}`} className="text-brasa-400 hover:underline">
+                <KitchenLink to={`/orders/${c.last_order_id}`} className="text-neutral-50 hover:underline">
                   pedido #{c.last_order.order_number}
                 </KitchenLink>
               </>

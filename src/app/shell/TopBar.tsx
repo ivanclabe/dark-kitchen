@@ -76,7 +76,7 @@ function CreateButton({ compact }: { compact: boolean }) {
           label="Más para crear"
           placement="bottom-end"
           trigger={(props) => (
-            <button type="button" {...props} aria-label="Más para crear" className={clsx(primary, 'rounded-r-lg border-l border-white/25 px-2')}>
+            <button type="button" {...props} aria-label="Más para crear" className={clsx(primary, 'rounded-r-lg border-l border-on-primary/20 px-2')}>
               <ChevronDown size={15} aria-hidden />
             </button>
           )}

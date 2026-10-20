@@ -278,7 +278,7 @@ export function Combobox({
                     {option.sublabel && <span className="block truncate text-xs text-neutral-500">{option.sublabel}</span>}
                   </span>
                 </span>
-                {option.value === value && <Check size={14} className="shrink-0 text-brasa-500" aria-hidden />}
+                {option.value === value && <Check size={14} className="shrink-0 text-neutral-50" aria-hidden />}
               </div>
             ))}
             {showCreateRow && (
@@ -291,7 +291,7 @@ export function Combobox({
                   handleCreate()
                 }}
                 onMouseEnter={() => setHighlighted(filtered.length)}
-                className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-brasa-400 pointer-coarse:py-3 ${
+                className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-neutral-800 px-3 py-2 text-left text-sm text-neutral-50 pointer-coarse:py-3 ${
                   highlighted === filtered.length ? 'bg-neutral-800' : ''
                 }`}
               >

@@ -235,7 +235,7 @@ function OpenCount({ countId, scope, createdAt }: { countId: string; scope: stri
       >
         <div className="space-y-3">
           <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-            <div className="h-full rounded-full bg-brasa-500 transition-[width]" style={{ width: `${rows.length ? (counted.length / rows.length) * 100 : 0}%` }} />
+            <div className="h-full rounded-full bg-neutral-50 transition-[width]" style={{ width: `${rows.length ? (counted.length / rows.length) * 100 : 0}%` }} />
           </div>
           <p className={typography.small}>
             {counted.length} de {rows.length} contados

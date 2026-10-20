@@ -31,7 +31,7 @@ export function PageTitle({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2.5 text-xl font-semibold tracking-tight text-neutral-50 sm:text-2xl">
-            {Icon && <Icon size={20} className="text-brasa-400" />} {title}
+            {Icon && <Icon size={20} className="text-neutral-50" />} {title}
           </h1>
           {description && <p className="mt-1 text-sm text-neutral-400">{description}</p>}
         </div>
@@ -67,7 +67,7 @@ export function Metric({ label, value, hint, tone = 'neutral', icon: Icon }: { l
           <span
             className={clsx(
               'inline-flex size-7 items-center justify-center rounded-lg',
-              tone === 'brand' ? 'bg-brasa-500/10 text-brasa-400' : tone === 'good' ? 'bg-emerald-500/10 text-emerald-400' : tone === 'warn' ? 'bg-amber-500/10 text-amber-400' : 'bg-console-800 text-neutral-400',
+              tone === 'brand' ? 'bg-neutral-50/10 text-neutral-50' : tone === 'good' ? 'bg-emerald-500/10 text-emerald-400' : tone === 'warn' ? 'bg-amber-500/10 text-amber-400' : 'bg-console-800 text-neutral-400',
             )}
           >
             <Icon size={14} />
@@ -109,7 +109,7 @@ const STATUS_TONE = {
   warn: 'bg-amber-500/10 text-amber-300 ring-amber-500/20',
   bad: 'bg-red-500/10 text-red-300 ring-red-500/20',
   neutral: 'bg-console-800 text-neutral-300 ring-console-700',
-  brand: 'bg-brasa-500/10 text-brasa-300 ring-brasa-500/20',
+  brand: 'bg-neutral-50/10 text-neutral-50 ring-neutral-50/20',
 } as const
 
 export function StatusPill({ tone, children }: { tone: keyof typeof STATUS_TONE; children: ReactNode }) {
@@ -134,7 +134,7 @@ export function ActivityFeed({ items, empty = 'Sin actividad en este rango.' }: 
         const actor = typeof item.actor === 'string' ? item.actor : item.actor?.name
         return (
           <li key={item.id ?? `${item.at}-${i}`} className="flex items-start gap-3 py-2.5">
-            <span className={clsx('mt-1.5 size-1.5 shrink-0 rounded-full', item.result === 'failure' ? 'bg-red-400' : item.category === 'global_admin' ? 'bg-brasa-400' : 'bg-neutral-500')} aria-hidden />
+            <span className={clsx('mt-1.5 size-1.5 shrink-0 rounded-full', item.result === 'failure' ? 'bg-red-400' : item.category === 'global_admin' ? 'bg-neutral-50' : 'bg-neutral-500')} aria-hidden />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-neutral-200">{item.summary ?? item.type}</p>
               <p className="mt-0.5 truncate text-[11px] text-neutral-500">

@@ -9,7 +9,7 @@ export const adminPickerStyle = {
   '--pm-surface': 'var(--color-neutral-900)',
   '--pm-text': 'var(--color-neutral-100)',
   '--pm-muted': 'var(--color-neutral-400)',
-  '--pm-primary': 'var(--color-brasa-500)',
+  '--pm-primary': 'var(--color-neutral-50)',
   '--pm-on-primary': '#FFFFFF',
   '--pm-price': 'var(--color-neutral-50)',
   '--pm-border': 'color-mix(in srgb, var(--color-neutral-100) 10%, transparent)',

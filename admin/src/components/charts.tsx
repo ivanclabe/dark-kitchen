@@ -51,7 +51,7 @@ export function ShareBars({ rows, valueLabel }: { rows: { label: string; value: 
             </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-console-800" aria-hidden>
-            <div className="h-full rounded-full bg-brasa-500" style={{ width: `${(r.value / max) * 100}%` }} />
+            <div className="h-full rounded-full bg-neutral-50" style={{ width: `${(r.value / max) * 100}%` }} />
           </div>
         </li>
       ))}

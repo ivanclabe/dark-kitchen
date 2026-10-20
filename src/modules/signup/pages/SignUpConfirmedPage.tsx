@@ -107,7 +107,7 @@ export function SignUpConfirmedPage() {
           </p>
           <p className="text-xs text-neutral-500">Tu espacio quanela:</p>
           <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2.5">
-            <span className="truncate font-mono text-sm text-brasa-300">{tenantHostLabel(created.orgCode)}</span>
+            <span className="truncate font-mono text-sm text-neutral-50">{tenantHostLabel(created.orgCode)}</span>
             <button
               type="button"
               onClick={() => void navigator.clipboard.writeText(`https://${tenantHostLabel(created.orgCode)}`).then(() => setCopied(true))}
@@ -156,7 +156,7 @@ export function SignUpConfirmedPage() {
               ))}
             </div>
           ) : (
-            <Loader2 size={24} className="mx-auto animate-spin text-brasa-400" aria-hidden />
+            <Loader2 size={24} className="mx-auto animate-spin text-neutral-50" aria-hidden />
           )}
         </div>
       </div>
@@ -181,7 +181,7 @@ export function SignUpConfirmedPage() {
           </>
         ) : (
           <>
-            <Loader2 size={24} className="mx-auto animate-spin text-brasa-400" aria-hidden />
+            <Loader2 size={24} className="mx-auto animate-spin text-neutral-50" aria-hidden />
             <p className="font-medium">Preparando {pending.accountName ?? pending.name}…</p>
             <p className={typography.small}>Estamos creando tu espacio, tu plan y tu primera cuenta.</p>
           </>

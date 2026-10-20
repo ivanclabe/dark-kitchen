@@ -20,7 +20,7 @@ function Column({ title, icon: Icon, count, children }: { title: string; icon: t
     // Phone: each column as tall as its orders (the page scrolls). From md: side by side, each with its own scroll.
     <section className="flex min-w-0 flex-col rounded-xl border border-neutral-800/60 md:min-h-0 md:flex-1">
       <h2 className="flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-wide text-neutral-300 uppercase">
-        <Icon size={12} className="text-brasa-400" aria-hidden /> {title}
+        <Icon size={12} className="text-neutral-50" aria-hidden /> {title}
         <span className="ml-auto tabular-nums text-neutral-500">{count}</span>
       </h2>
       <div className="flex flex-col gap-2 rounded-b-xl bg-neutral-900/40 p-2 md:min-h-0 md:flex-1 md:overflow-y-auto">{children}</div>
@@ -116,7 +116,7 @@ export function DispatchView({ orders, isLoading, now }: { orders: Order[] | und
     <div className="flex flex-col gap-3 md:h-full md:min-h-0">
       {canDispatch && (
         <p className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
-          <Bike size={12} className="text-brasa-400" aria-hidden />
+          <Bike size={12} className="text-neutral-50" aria-hidden />
           {ridersOnShift.length > 0 ? `De turno ahora: ${ridersOnShift.map((r) => r.fullName).join(', ')}` : 'Ningún domiciliario con turno ahora.'}
         </p>
       )}

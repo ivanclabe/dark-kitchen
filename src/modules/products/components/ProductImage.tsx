@@ -4,7 +4,7 @@ import { productImageUrl } from '../lib/productImages'
 
 /** Calm, warm tones for dishes without a photo; the same dish always gets the same one. */
 const PLACEHOLDER_TONES = [
-  'bg-brasa-500/15 text-brasa-200',
+  'bg-neutral-50/15 text-neutral-50',
   'bg-amber-500/15 text-amber-200',
   'bg-emerald-500/12 text-emerald-200',
   'bg-sky-500/12 text-sky-200',

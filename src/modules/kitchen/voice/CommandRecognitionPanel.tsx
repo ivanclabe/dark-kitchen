@@ -135,7 +135,7 @@ export function CommandRecognitionPanel() {
                 Descargando modelo de voz: {mb(status.loaded)} de {mb(status.total)} MB (solo la primera vez)
               </p>
               <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-                <div className="h-full rounded-full bg-brasa-500" style={{ width: `${Math.round((status.loaded / status.total) * 100)}%` }} />
+                <div className="h-full rounded-full bg-neutral-50" style={{ width: `${Math.round((status.loaded / status.total) * 100)}%` }} />
               </div>
             </div>
           )}
@@ -163,7 +163,7 @@ export function CommandRecognitionPanel() {
             Probar
           </Button>
         )}
-        <span className={clsx('text-xs', testing ? 'text-brasa-300' : 'text-neutral-500')}>
+        <span className={clsx('text-xs', testing ? 'text-neutral-50' : 'text-neutral-500')}>
           {testing ? 'Escuchando… di por ejemplo «pedido dos mil cuarenta listo».' : !engine.supported() ? 'Este navegador no puede usar este reconocimiento.' : 'No cambia ningún pedido.'}
         </span>
       </div>

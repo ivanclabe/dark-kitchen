@@ -66,7 +66,7 @@ export function CustomerOrderHints({ customerId }: { customerId: string }) {
         </Line>
       )}
       {favorites.length > 0 && (
-        <Line icon={Heart} label="Sus favoritos" tone="text-brasa-400">
+        <Line icon={Heart} label="Sus favoritos" tone="text-neutral-50">
           {favorites.map((p) => (
             <Badge key={p.id} size="sm" tone="brand">
               {p.name}

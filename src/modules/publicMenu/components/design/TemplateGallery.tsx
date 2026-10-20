@@ -39,7 +39,7 @@ export function TemplateGallery({ menu, value, onPick }: { menu: PublicMenu; val
             aria-pressed={active}
             className={clsx(
               'group relative overflow-hidden rounded-xl border text-left transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
-              active ? 'border-brasa-500 ring-2 ring-brasa-500/40' : 'border-neutral-800 hover:border-neutral-600',
+              active ? 'border-neutral-50 ring-2 ring-neutral-50/40' : 'border-neutral-800 hover:border-neutral-600',
             )}
           >
             <ThemeThumbnail theme={def.theme} menu={mini} />

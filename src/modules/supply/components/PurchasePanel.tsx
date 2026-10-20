@@ -68,7 +68,7 @@ export function PurchasePanel({
 
   return (
     <div
-      className={clsx('relative flex h-full min-h-0 flex-col gap-3', dragging && 'rounded-xl ring-2 ring-brasa-500/60')}
+      className={clsx('relative flex h-full min-h-0 flex-col gap-3', dragging && 'rounded-xl ring-2 ring-neutral-50/60')}
       onDragOver={(e) => {
         if (!canImport || !e.dataTransfer.types.includes('Files')) return
         e.preventDefault()
@@ -90,7 +90,7 @@ export function PurchasePanel({
     >
       {dragging && (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-xl bg-neutral-950/90 text-sm text-neutral-100">
-          <FileUp size={22} className="text-brasa-400" aria-hidden /> Suelta la factura para importarla
+          <FileUp size={22} className="text-neutral-50" aria-hidden /> Suelta la factura para importarla
         </div>
       )}
       <div className="flex items-center justify-between gap-2">
@@ -188,7 +188,7 @@ export function PurchasePanel({
               onClick={() => onSelect(p)}
               className={clsx(
                 'w-full rounded-xl border px-3 py-2.5 text-left transition-colors',
-                p.id === selectedId ? 'border-brasa-500/60 bg-brasa-500/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
+                p.id === selectedId ? 'border-neutral-50/60 bg-neutral-50/5' : 'border-neutral-800/60 bg-neutral-900 hover:border-neutral-700/80',
               )}
             >
               <div className="flex items-start justify-between gap-2">

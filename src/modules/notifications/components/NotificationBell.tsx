@@ -31,18 +31,18 @@ function NotificationRow({ n, onOpen }: { n: AppNotification; onOpen: (n: AppNot
           n.read && 'opacity-60',
         )}
       >
-        <span className={clsx('mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1', ai ? 'bg-brasa-500/12 text-brasa-300 ring-brasa-500/25' : SEVERITY_CHIP[n.severity])}>
+        <span className={clsx('mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1', ai ? 'bg-neutral-50/12 text-neutral-50 ring-neutral-50/25' : SEVERITY_CHIP[n.severity])}>
           <Icon size={15} aria-hidden />
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-start gap-2">
             <span className="min-w-0 flex-1 text-sm font-medium text-neutral-100">{n.title}</span>
-            {!n.read && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-brasa-400" aria-label="Sin leer" />}
+            {!n.read && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-neutral-50" aria-label="Sin leer" />}
           </span>
           {n.detail && <span className="mt-0.5 line-clamp-2 block text-xs text-neutral-400">{n.detail}</span>}
           <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-neutral-500">
             {ai && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-brasa-500/10 px-1.5 py-0.5 font-medium text-brasa-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-neutral-50/10 px-1.5 py-0.5 font-medium text-neutral-50">
                 <Sparkles size={10} aria-hidden /> IA{n.source ? ` · ${n.source}` : ''}
               </span>
             )}
@@ -109,7 +109,7 @@ function Panel({ close }: { close: () => void }) {
             >
               {t.value === 'ai' && <Sparkles size={12} aria-hidden />}
               {t.label}
-              {count > 0 && <span className="rounded-full bg-brasa-500/20 px-1.5 text-2xs text-brasa-200 tabular-nums">{count}</span>}
+              {count > 0 && <span className="rounded-full bg-neutral-50/20 px-1.5 text-2xs text-neutral-50 tabular-nums">{count}</span>}
             </button>
           )
         })}
@@ -120,7 +120,7 @@ function Panel({ close }: { close: () => void }) {
       ) : isError ? (
         <div className="space-y-2 px-3 py-8 text-center text-sm text-neutral-400">
           <p>No pudimos cargar las notificaciones.</p>
-          <button type="button" onClick={() => void refetch()} className="text-brasa-300 hover:underline">
+          <button type="button" onClick={() => void refetch()} className="text-neutral-50 hover:underline">
             Reintentar
           </button>
         </div>

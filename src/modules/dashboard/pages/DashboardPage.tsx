@@ -365,11 +365,11 @@ function NeedsAttention() {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new Event(OPEN_NOTIFICATIONS_EVENT))}
-          className="inline-flex items-center gap-2 rounded-full border border-brasa-500/25 bg-brasa-500/5 px-3.5 py-1.5 text-sm text-brasa-200 transition-colors hover:bg-brasa-500/10"
+          className="inline-flex items-center gap-2 rounded-full border border-neutral-50/25 bg-neutral-50/5 px-3.5 py-1.5 text-sm text-neutral-50 transition-colors hover:bg-neutral-50/10"
         >
-          <Sparkles size={14} className="text-brasa-300" aria-hidden />
+          <Sparkles size={14} className="text-neutral-50" aria-hidden />
           {ai === 1 ? '1 sugerencia de IA nueva' : `${ai} sugerencias de IA nuevas`}
-          <span className="text-brasa-300/80">· Ver en notificaciones</span>
+          <span className="text-neutral-50/80">· Ver en notificaciones</span>
         </button>
       )}
     </section>

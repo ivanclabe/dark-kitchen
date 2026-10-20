@@ -139,7 +139,7 @@ export function RoleEditorDrawer({
                     <button
                       type="button"
                       onClick={() => toggleGroup(g.permissions.map((p) => p.key), !allOn)}
-                      className="text-xs text-neutral-500 hover:text-brasa-300 sm:block"
+                      className="text-xs text-neutral-500 hover:text-neutral-50 sm:block"
                     >
                       {allOn ? 'Quitar todo' : 'Todo'}
                     </button>
@@ -154,7 +154,7 @@ export function RoleEditorDrawer({
                         title={p.description ?? p.label}
                         className={clsx(
                           'inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs transition-colors',
-                          on ? 'border-brasa-500/50 bg-brasa-500/10 text-brasa-200' : 'border-neutral-800 text-neutral-400',
+                          on ? 'border-neutral-50/50 bg-neutral-50/10 text-neutral-50' : 'border-neutral-800 text-neutral-400',
                           readOnly ? 'cursor-default' : 'cursor-pointer hover:border-neutral-600',
                         )}
                       >
@@ -164,7 +164,7 @@ export function RoleEditorDrawer({
                           onChange={() => toggle(p.key)}
                           disabled={readOnly}
                           aria-label={`${g.label}: ${p.label}`}
-                          className="size-3.5 accent-[var(--color-brasa-500)] disabled:opacity-60"
+                          className="size-3.5 accent-[var(--color-neutral-50)] disabled:opacity-60"
                         />
                         {actionLabel(p)}
                       </label>

@@ -38,11 +38,11 @@ export function InvoiceDropzone({ onFile, disabled }: { onFile: (file: File) => 
         onDrop={handleDrop}
         className={clsx(
           'flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors',
-          dragging ? 'border-brasa-500 bg-brasa-500/5' : 'border-neutral-800 bg-neutral-900/40',
+          dragging ? 'border-neutral-50 bg-neutral-50/5' : 'border-neutral-800 bg-neutral-900/40',
           disabled && 'opacity-60',
         )}
       >
-        <span className="flex size-12 items-center justify-center rounded-2xl border border-brasa-500/20 bg-brasa-500/10 text-brasa-400">
+        <span className="flex size-12 items-center justify-center rounded-2xl border border-neutral-50/20 bg-neutral-50/10 text-neutral-50">
           <FileUp size={22} aria-hidden />
         </span>
         <div className="space-y-1">

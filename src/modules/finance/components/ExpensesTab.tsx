@@ -150,7 +150,7 @@ function CategorySelect({ value, onChange }: { value: string; onChange: (id: str
           </Button>
         </div>
       ) : (
-        <button type="button" onClick={() => setAdding(true)} className="text-xs text-brasa-400 hover:underline">
+        <button type="button" onClick={() => setAdding(true)} className="text-xs text-neutral-50 hover:underline">
           + Nueva categoría
         </button>
       )}

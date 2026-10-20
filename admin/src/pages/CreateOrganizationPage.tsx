@@ -117,7 +117,7 @@ export function CreateOrganizationPage() {
                 <span
                   className={clsx(
                     'inline-flex size-6 items-center justify-center rounded-full font-semibold',
-                    state === 'done' ? 'bg-emerald-500/15 text-emerald-300' : state === 'current' ? 'bg-brasa-500 text-white' : 'bg-console-800 text-neutral-500',
+                    state === 'done' ? 'bg-emerald-500/15 text-emerald-300' : state === 'current' ? 'bg-neutral-50 text-neutral-950' : 'bg-console-800 text-neutral-500',
                   )}
                 >
                   {state === 'done' ? <Check size={12} aria-hidden /> : i + 1}
@@ -265,7 +265,7 @@ export function CreateOrganizationPage() {
                 ))}
               </ul>
               <label className="mt-2 flex items-center gap-2 text-neutral-200">
-                <input type="checkbox" checked={confirmSimilar} onChange={(e) => setConfirmSimilar(e.target.checked)} className="accent-brasa-500" />
+                <input type="checkbox" checked={confirmSimilar} onChange={(e) => setConfirmSimilar(e.target.checked)} className="accent-neutral-50" />
                 Es otra organización: crearla de todas formas
               </label>
             </Notice>

@@ -14,7 +14,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
  *   link      — acciones inline en tablas ("Ver", "Editar")
  */
 const VARIANT: Record<ButtonVariant, string> = {
-  // ADR 0065: brasa-700 with white text (5.2:1); hover and press go darker, never lighter (lighter lost contrast).
+  // ADR 0073: one range. The theme's ink (white on dark, near-black on light) with the page color as text; hover steps one shade.
   primary: 'bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-active disabled:hover:bg-primary',
   secondary:
     'border border-neutral-800 bg-neutral-900 text-neutral-200 hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-50',
@@ -22,7 +22,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   // Translucent tints of red (ADR 0061): the same soft red button on the dark, light and neutral themes.
   danger:
     'border border-red-500/40 bg-red-500/10 text-red-400 hover:border-red-500/60 hover:bg-red-500/15 hover:text-red-300',
-  link: 'text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4 !h-auto !px-0 !py-0 !rounded-none',
+  link: 'text-neutral-50 hover:text-neutral-50 hover:underline underline-offset-4 !h-auto !px-0 !py-0 !rounded-none',
 }
 
 // pointer-coarse: on touch screens the small sizes grow to a finger-sized target (40-44 px); the mouse keeps them compact.
@@ -102,7 +102,7 @@ export function IconButton({ icon: Icon, variant = 'secondary', size = 'md', act
         VARIANT[variant],
         ICON_SIZE[size],
         'p-0',
-        active && (variant === 'ghost' ? 'bg-brasa-500/15 text-brasa-400' : 'border-brasa-500/50 text-brasa-400'),
+        active && (variant === 'ghost' ? 'bg-neutral-50/15 text-neutral-50' : 'border-neutral-50/50 text-neutral-50'),
         className,
       )}
       title={rest.title ?? rest['aria-label']}

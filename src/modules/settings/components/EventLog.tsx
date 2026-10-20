@@ -46,7 +46,7 @@ function EventRow({ event }: { event: AuditEvent }) {
           )}
           <span title="Origen del registro">{SOURCE_LABEL[event.source]}</span>
           {changes.length > 0 && (
-            <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="inline-flex items-center gap-0.5 text-brasa-400 hover:underline">
+            <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="inline-flex items-center gap-0.5 text-neutral-50 hover:underline">
               Ver cambios <ChevronDown size={12} className={clsx('transition-transform', open && 'rotate-180')} aria-hidden />
             </button>
           )}

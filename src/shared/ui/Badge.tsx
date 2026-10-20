@@ -6,7 +6,7 @@ export type BadgeTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger' |
 // ADR 0065: the states are semantic tokens (they follow the theme; ≥ 4.5:1 on their tint in all three).
 const TONE: Record<BadgeTone, string> = {
   neutral: 'bg-neutral-800 text-neutral-300',
-  brand: 'bg-brasa-500/15 text-brasa-400',
+  brand: 'bg-neutral-50/15 text-neutral-50',
   success: 'bg-success/15 text-success',
   warning: 'bg-warning/15 text-warning',
   danger: 'bg-danger/15 text-danger',
@@ -16,7 +16,7 @@ const TONE: Record<BadgeTone, string> = {
 
 const DOT: Record<BadgeTone, string> = {
   neutral: 'bg-neutral-400',
-  brand: 'bg-brasa-400',
+  brand: 'bg-neutral-50',
   success: 'bg-success',
   warning: 'bg-warning',
   danger: 'bg-danger',

@@ -188,7 +188,7 @@ export function SignUpPage() {
         <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
         <div className="flex flex-col gap-2 text-sm">
           {salesUrl && (
-            <a href={salesUrl} className="text-brasa-400 hover:underline">
+            <a href={salesUrl} className="text-neutral-50 hover:underline">
               Hablar con ventas
             </a>
           )}
@@ -332,7 +332,7 @@ export function SignUpPage() {
       {onboarding && signedInAs && (
         <p className={typography.caption}>
           Entraste como <span className="text-neutral-300">{signedInAs}</span>.{' '}
-          <button type="button" className="text-brasa-400 hover:underline" onClick={() => void signOut()}>
+          <button type="button" className="text-neutral-50 hover:underline" onClick={() => void signOut()}>
             Usar otra cuenta
           </button>
         </p>
@@ -506,7 +506,7 @@ export function SignUpPage() {
               <AccountIcon iconKey={effectiveIcon} size="lg" />
               <div className="min-w-0">
                 <p className="text-sm font-medium text-neutral-200">Icono de la cuenta</p>
-                <button type="button" onClick={() => setPickingIcon((v) => !v)} className="text-xs text-brasa-400 hover:underline" aria-expanded={pickingIcon}>
+                <button type="button" onClick={() => setPickingIcon((v) => !v)} className="text-xs text-neutral-50 hover:underline" aria-expanded={pickingIcon}>
                   {pickingIcon ? 'Listo' : 'Cambiar icono'}
                 </button>
               </div>
@@ -541,7 +541,7 @@ export function SignUpPage() {
       {!onboarding && (
       <p className="text-center text-sm text-neutral-500">
         ¿Ya tienes usuario?{' '}
-        <Link to="/login" className="text-brasa-400 hover:underline">
+        <Link to="/login" className="text-neutral-50 hover:underline">
           Inicia sesión
         </Link>
       </p>

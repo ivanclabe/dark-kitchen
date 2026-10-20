@@ -110,7 +110,7 @@ export function AiMonthCost() {
                   {integer(l.used24h)} <span className="font-normal text-neutral-500">de {integer(l.perDay)}</span>
                 </p>
                 <div className="mt-2 h-1 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
-                  <div className={clsx('h-full rounded-full', pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-amber-400' : 'bg-brasa-500')} style={{ width: `${pct}%` }} />
+                  <div className={clsx('h-full rounded-full', pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-amber-400' : 'bg-neutral-50')} style={{ width: `${pct}%` }} />
                 </div>
               </li>
             )

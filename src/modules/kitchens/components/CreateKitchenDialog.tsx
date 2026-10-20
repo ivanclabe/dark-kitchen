@@ -112,7 +112,7 @@ export function CreateKitchenDialog({
             <AccountIcon iconKey={effectiveIcon} size="lg" />
             <div className="min-w-0">
               <p className="text-sm font-medium text-neutral-200">Icono de la cuenta</p>
-              <button type="button" onClick={() => setPickingIcon((v) => !v)} className="text-xs text-brasa-400 hover:underline" aria-expanded={pickingIcon}>
+              <button type="button" onClick={() => setPickingIcon((v) => !v)} className="text-xs text-neutral-50 hover:underline" aria-expanded={pickingIcon}>
                 {pickingIcon ? 'Listo' : 'Cambiar icono'}
               </button>
             </div>

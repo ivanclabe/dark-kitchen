@@ -232,7 +232,7 @@ function Editor({ composition }: { composition: Composition }) {
       />
 
       {composition.masterCopy && (
-        <p role="status" className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm text-neutral-300">
+        <p role="status" className="rounded-xl border border-neutral-50/30 bg-neutral-50/5 px-4 py-2.5 text-sm text-neutral-300">
           Este plato viene de un menú maestro: su composición no se edita aquí.
         </p>
       )}
@@ -355,11 +355,11 @@ function Editor({ composition }: { composition: Composition }) {
                         </div>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                           <label className="flex items-center gap-1.5 text-neutral-300">
-                            <input type="checkbox" checked={o.isDefault} onChange={(e) => updateOption(g.key, o.key, { isDefault: e.target.checked })} disabled={readOnly} className="accent-brasa-500" />
+                            <input type="checkbox" checked={o.isDefault} onChange={(e) => updateOption(g.key, o.key, { isDefault: e.target.checked })} disabled={readOnly} className="accent-neutral-50" />
                             Predeterminada
                           </label>
                           <label className="flex items-center gap-1.5 text-neutral-300">
-                            <input type="checkbox" checked={o.active} onChange={(e) => updateOption(g.key, o.key, { active: e.target.checked })} disabled={readOnly} className="accent-brasa-500" />
+                            <input type="checkbox" checked={o.active} onChange={(e) => updateOption(g.key, o.key, { active: e.target.checked })} disabled={readOnly} className="accent-neutral-50" />
                             Activa
                           </label>
                           <span className="text-neutral-500 tabular-nums">Costo {formatMoney(cost, { decimals: 'auto' })}</span>

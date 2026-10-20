@@ -108,7 +108,7 @@ export function IngredientDetail({
       <div className={`${cardClass} space-y-4`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
-            <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl border border-brasa-500/20 bg-brasa-500/10 text-brasa-400">
+            <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl border border-neutral-50/20 bg-neutral-50/10 text-neutral-50">
               <Package size={19} aria-hidden />
             </span>
             <div className="min-w-0">

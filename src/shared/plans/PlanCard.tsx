@@ -30,9 +30,9 @@ export function PlanCard({
       className={clsx(
         'relative flex h-full flex-col rounded-2xl border p-6 transition-colors',
         selected
-          ? 'border-brasa-500 bg-brasa-500/[0.06] ring-1 ring-brasa-500'
+          ? 'border-neutral-50 bg-neutral-50/[0.06] ring-1 ring-neutral-50'
           : featured
-            ? 'border-brasa-500/50 bg-neutral-900/70 shadow-[0_24px_60px_-30px_var(--color-brasa-500)]'
+            ? 'border-neutral-50/50 bg-neutral-900/70 shadow-[0_24px_60px_-30px_var(--color-neutral-600)]'
             : 'border-neutral-800/60 bg-neutral-900/50',
       )}
     >
@@ -63,7 +63,7 @@ export function PlanCard({
       <ul className="mt-6 space-y-2.5 text-sm text-neutral-300">
         {plan.highlights.map((h) => (
           <li key={h} className="flex gap-2.5">
-            <Check size={16} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden />
+            <Check size={16} className="mt-0.5 shrink-0 text-neutral-50" aria-hidden />
             <span>{h}</span>
           </li>
         ))}

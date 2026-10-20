@@ -230,7 +230,7 @@ function DetailView({ preparation }: { preparation: Detail }) {
           <p className={typography.caption}>
             Todavía no tiene receta.{' '}
             {can('recipes.edit') && (
-              <Link to={recipeLink} state={{ from: here }} className="text-brasa-400 hover:underline">
+              <Link to={recipeLink} state={{ from: here }} className="text-neutral-50 hover:underline">
                 Crear receta
               </Link>
             )}

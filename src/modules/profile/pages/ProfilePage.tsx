@@ -225,8 +225,8 @@ function AccessCard() {
       <ul className="divide-y divide-neutral-800/60">
         {(kitchens ?? []).map((k) => (
           <li key={k.id} className="flex items-center gap-3 px-5 py-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brasa-500/15 text-[11px] font-bold text-brasa-300">{initials(k.name)}</span>
-            <Link to={kitchenPath(k.slug, '/')} className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-100 hover:text-brasa-300">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50/15 text-[11px] font-bold text-neutral-50">{initials(k.name)}</span>
+            <Link to={kitchenPath(k.slug, '/')} className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-100 hover:text-neutral-50">
               {k.name}
             </Link>
             {k.id === kitchen.id && (

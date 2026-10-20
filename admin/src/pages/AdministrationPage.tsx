@@ -57,7 +57,7 @@ export function AdministrationPage() {
             <p>Cada organización configura lo suyo desde quanela: funciones de IA, voz, roles, usuarios y cuentas. El portal no lo cambia, para no mezclar la plataforma con las decisiones de cada negocio.</p>
             <p>
               Desde aquí puedes consultarlo en el detalle de cada organización (pestaña Configuración), y crear, desactivar o reactivar organizaciones en{' '}
-              <Link to="/organizations" className="text-brasa-400 hover:underline">
+              <Link to="/organizations" className="text-neutral-50 hover:underline">
                 Organizations
               </Link>
               .
@@ -126,8 +126,8 @@ function Accounts() {
   const columns: DataTableColumn<PlatformKitchen>[] = [
     {
       key: 'select',
-      header: <input type="checkbox" aria-label="Seleccionar todas" checked={allSelected} onChange={() => setSelected(allSelected ? new Set() : new Set(allIds))} className="size-4 accent-[var(--color-brasa-500)]" />,
-      cell: (k) => <input type="checkbox" aria-label={`Seleccionar ${k.name}`} checked={selected.has(k.id)} onChange={() => flip(k.id)} className="size-4 accent-[var(--color-brasa-500)]" />,
+      header: <input type="checkbox" aria-label="Seleccionar todas" checked={allSelected} onChange={() => setSelected(allSelected ? new Set() : new Set(allIds))} className="size-4 accent-[var(--color-neutral-50)]" />,
+      cell: (k) => <input type="checkbox" aria-label={`Seleccionar ${k.name}`} checked={selected.has(k.id)} onChange={() => flip(k.id)} className="size-4 accent-[var(--color-neutral-50)]" />,
     },
     { key: 'name', header: 'Cuenta', cell: (k) => <span className="font-medium text-neutral-100">{k.name}</span> },
     { key: 'organization', header: 'Organización', hideBelow: 'md', cell: (k) => <span className="text-neutral-300">{k.organizationName}</span> },
@@ -154,7 +154,7 @@ function Accounts() {
   return (
     <Panel title="Cuentas" subtitle="Todas las cuentas (locales o marcas) de todas las organizaciones.">
       {ids.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm">
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-50/30 bg-neutral-50/5 px-4 py-2.5 text-sm">
           <span className="mr-auto text-neutral-200">{ids.length} seleccionadas</span>
           <Button size="sm" variant="secondary" icon={Play} onClick={() => setConfirm({ active: true, ids })}>
             Activar

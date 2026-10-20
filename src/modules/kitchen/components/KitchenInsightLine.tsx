@@ -71,9 +71,9 @@ export function KitchenInsightLine({
   const shown = expanded ? insight.items : [top]
 
   return (
-    <div role="status" className="rounded-xl border border-brasa-500/20 bg-brasa-500/[0.05] px-3 py-2 text-sm">
+    <div role="status" className="rounded-xl border border-neutral-50/20 bg-neutral-50/[0.05] px-3 py-2 text-sm">
       <div className="flex items-start gap-2">
-        <Sparkles size={14} className="mt-0.5 shrink-0 text-brasa-400" aria-hidden />
+        <Sparkles size={14} className="mt-0.5 shrink-0 text-neutral-50" aria-hidden />
         <ul className="min-w-0 flex-1 space-y-1.5">
           {shown.map((item, i) => {
             const orderNumber = item.refId ? orderNumberOf(item.refId) : undefined
@@ -83,11 +83,11 @@ export function KitchenInsightLine({
                 <span className="font-medium text-neutral-100">{item.title}</span>
                 <span className={clsx('text-xs text-neutral-400', !expanded && 'line-clamp-1')}>{item.explanation}</span>
                 {item.refId && orderNumber !== undefined ? (
-                  <button type="button" onClick={() => onOpenOrder(item.refId as string)} className="text-xs text-brasa-400 hover:text-brasa-300 hover:underline underline-offset-4">
+                  <button type="button" onClick={() => onOpenOrder(item.refId as string)} className="text-xs text-neutral-50 hover:text-neutral-50 hover:underline underline-offset-4">
                     {ACTION_LABEL[item.action] ?? 'Ver'} · #{orderNumber}
                   </button>
                 ) : (
-                  <span className="text-[11px] text-brasa-300/80">{ACTION_LABEL[item.action]}</span>
+                  <span className="text-[11px] text-neutral-50/80">{ACTION_LABEL[item.action]}</span>
                 )}
               </li>
             )

@@ -142,7 +142,7 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
                 href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-brasa-400 hover:underline"
+                className="inline-flex items-center gap-1 text-xs text-neutral-50 hover:underline"
               >
                 Guía de Meta <ExternalLink size={12} aria-hidden />
               </a>
@@ -266,11 +266,11 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
             <div className="space-y-3">
               <div className="space-y-2" role="radiogroup" aria-label="Modo de envío">
                 {MODES.filter((m) => m.value !== 'simulator' || account.mode === 'simulator' || import.meta.env.DEV).map((m) => (
-                  <label key={m.value} className={clsx('flex cursor-pointer gap-3 rounded-xl border px-3 py-2.5', account.mode === m.value ? 'border-brasa-500/60 bg-brasa-500/5' : 'border-neutral-800')}>
+                  <label key={m.value} className={clsx('flex cursor-pointer gap-3 rounded-xl border px-3 py-2.5', account.mode === m.value ? 'border-neutral-50/60 bg-neutral-50/5' : 'border-neutral-800')}>
                     <input
                       type="radio"
                       name="mode"
-                      className="mt-1 accent-brasa-500"
+                      className="mt-1 accent-neutral-50"
                       checked={account.mode === m.value}
                       disabled={!canManage}
                       onChange={() => void save({ mode: m.value }, m.value === 'live' ? 'Modo producción: los avisos llegan a todos los clientes que aceptaron.' : 'Modo guardado.')}

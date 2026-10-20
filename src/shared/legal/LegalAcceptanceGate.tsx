@@ -111,7 +111,7 @@ export function LegalAcceptanceGate({ children }: { children: ReactNode }) {
                   />
                   <span>
                     {(LABEL[doc.slug] ?? ((t: string) => `Acepto: ${t}`))(doc.title)}{' '}
-                    <a href={legalHref(doc.slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-brasa-400 underline underline-offset-2">
+                    <a href={legalHref(doc.slug)} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-50 underline underline-offset-2">
                       (leer)
                     </a>
                     <span className="mt-0.5 block text-xs text-neutral-500">

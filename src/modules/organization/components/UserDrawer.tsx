@@ -231,7 +231,7 @@ export function UserDrawer({
         )}
 
         {user?.isSuperAdmin && (
-          <p className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm text-neutral-300">
+          <p className="rounded-xl border border-neutral-50/30 bg-neutral-50/5 p-3 text-sm text-neutral-300">
             <span className="font-semibold text-neutral-100">SUPER_ADMIN</span> es quien creó el negocio en quanela: tiene acceso a todas tus cuentas. Es
             intransferible y no se asigna a otros usuarios.
           </p>
@@ -257,14 +257,14 @@ export function UserDrawer({
             {accounts.map((account) => {
               const a = assignments.get(account.id)
               return (
-                <li key={account.id} className={clsx('rounded-xl border p-3', a ? 'border-brasa-500/40 bg-brasa-500/5' : 'border-neutral-800/60')}>
+                <li key={account.id} className={clsx('rounded-xl border p-3', a ? 'border-neutral-50/40 bg-neutral-50/5' : 'border-neutral-800/60')}>
                   <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-neutral-100">
                     <input
                       type="checkbox"
                       checked={Boolean(a)}
                       onChange={(e) => toggleAccount(account.id, e.target.checked)}
                       disabled={lockedRoles}
-                      className="size-4 accent-[var(--color-brasa-500)]"
+                      className="size-4 accent-[var(--color-neutral-50)]"
                     />
                     {account.name}
                     {!account.active && <Badge size="sm" tone="warning">Desactivada</Badge>}
@@ -285,7 +285,7 @@ export function UserDrawer({
                               onClick={() => toggleRole(account.id, role.id)}
                               className={clsx(
                                 'rounded-lg border px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-                                on ? 'border-brasa-500/60 bg-brasa-500/15 text-brasa-200' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600',
+                                on ? 'border-neutral-50/60 bg-neutral-50/15 text-neutral-50' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600',
                               )}
                             >
                               {role.name}

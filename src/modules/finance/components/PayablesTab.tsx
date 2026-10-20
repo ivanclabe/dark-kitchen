@@ -109,7 +109,7 @@ export function PayablesTab() {
       </div>
 
       {selectedRows.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brasa-500/30 bg-brasa-500/5 px-4 py-2.5 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-50/30 bg-neutral-50/5 px-4 py-2.5 text-sm">
           <span className="text-neutral-200">
             {selectedRows.length} de <strong>{selectedRows[0].payee ?? selectedRows[0].description}</strong> ·{' '}
             <span className="tabular-nums">{formatMoney(selectedRows.reduce((sum, o) => sum + o.balance, 0))}</span>
@@ -143,7 +143,7 @@ export function PayablesTab() {
                     checked={selected.has(o.id)}
                     onChange={() => toggle(o)}
                     aria-label={`Seleccionar ${o.description} para pagar en lote`}
-                    className="size-4 accent-brasa-500"
+                    className="size-4 accent-neutral-50"
                   />
                 )}
                 <div className="min-w-[9rem] flex-1">
@@ -267,7 +267,7 @@ function PreviousPurchasesModal({ onClose }: { onClose: () => void }) {
           {(purchases.data ?? []).map((p) => (
             <li key={p.id}>
               <label className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-neutral-900">
-                <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggle(p.id)} className="accent-brasa-500" />
+                <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggle(p.id)} className="accent-neutral-50" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-neutral-100">{p.supplierName}</span>
                   <span className="text-xs text-neutral-500">

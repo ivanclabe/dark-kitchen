@@ -26,12 +26,12 @@
   font-weight: 600;
 }
 .help-prose a {
-  color: var(--color-brasa-400);
+  color: var(--color-neutral-50);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .help-prose a:hover {
-  color: var(--color-brasa-300);
+  color: var(--color-neutral-50);
 }
 .help-prose ul {
   list-style: disc;
@@ -64,8 +64,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: color-mix(in oklab, var(--color-brasa-500) 18%, transparent);
-  color: var(--color-brasa-300);
+  background: color-mix(in oklab, var(--color-neutral-50) 18%, transparent);
+  color: var(--color-neutral-50);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -168,7 +168,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--color-brasa-500);
+  background: var(--color-neutral-50);
   color: white;
   font-size: 0.7rem;
   font-weight: 700;

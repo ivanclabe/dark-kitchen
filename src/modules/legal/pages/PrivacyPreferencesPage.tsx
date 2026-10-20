@@ -43,7 +43,7 @@ export function PrivacyPreferencesPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Preferencias de privacidad</h1>
         <p className="mt-2 text-neutral-400">
           Qué guarda quanela en este navegador y para qué. El detalle de cada cookie está en la{' '}
-          <Link to={legalHref('cookies')} className="text-brasa-400 underline underline-offset-2">
+          <Link to={legalHref('cookies')} className="text-neutral-50 underline underline-offset-2">
             Política de Cookies
           </Link>
           .

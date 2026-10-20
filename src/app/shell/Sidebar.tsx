@@ -51,7 +51,7 @@ export function Sidebar({ collapsed, onNavigate, inDrawer = false }: { collapsed
           isActive ? 'bg-neutral-900 font-medium text-neutral-50 shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-neutral-800' : 'text-neutral-400 hover:bg-neutral-900/70 hover:text-neutral-100',
         )}
       >
-        <Icon size={17} strokeWidth={1.9} className={clsx('shrink-0', isActive ? 'text-brasa-400' : 'text-neutral-500 group-hover/nav:text-neutral-300')} aria-hidden />
+        <Icon size={17} strokeWidth={1.9} className={clsx('shrink-0', isActive ? 'text-neutral-50' : 'text-neutral-500 group-hover/nav:text-neutral-300')} aria-hidden />
         {!collapsed && <span className="min-w-0 truncate">{item.label}</span>}
       </Link>
     )

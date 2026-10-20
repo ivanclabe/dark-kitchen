@@ -203,7 +203,7 @@ export function LoginPage() {
                     href={helpHref('/help/getting-started/switch-account#si-olvidaste-tu-contrasena')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="-mt-2 inline-block text-sm text-brasa-400 underline-offset-4 hover:text-brasa-300 hover:underline"
+                    className="-mt-2 inline-block text-sm text-neutral-50 underline-offset-4 hover:text-neutral-50 hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
                   </a>

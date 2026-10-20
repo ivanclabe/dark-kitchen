@@ -7,8 +7,8 @@ import { RobotThinking } from '@/shared/robot/RobotThinking'
 
 const PHASE_CONTENT: Record<VoicePhase, { icon: ComponentType<{ size?: number; className?: string }>; label: string; className: string; iconClassName?: string }> = {
   idle: { icon: Mic, label: 'Dar un comando por voz', className: 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800' },
-  listening: { icon: Mic, label: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-400', iconClassName: 'animate-pulse' },
-  processing: { icon: Loader2, label: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-300' },
+  listening: { icon: Mic, label: 'Escuchando…', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' },
+  processing: { icon: Loader2, label: 'Pensando…', className: 'border-neutral-50/40 bg-neutral-900 text-neutral-300' },
   success: { icon: CheckCircle2, label: 'Actualizado', className: 'border-emerald-700 bg-emerald-500/10 text-emerald-400' },
   error: { icon: AlertTriangle, label: 'No entendí', className: 'border-red-500/50 bg-red-500/10 text-red-400' },
 }

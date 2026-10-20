@@ -70,7 +70,7 @@ function SliderField({
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 w-full accent-brasa-500 disabled:opacity-50"
+        className="mt-2 w-full accent-neutral-50 disabled:opacity-50"
       />
       <div className="flex justify-between text-2xs text-neutral-500">
         <span>{left}</span>
@@ -138,14 +138,14 @@ export function VoiceSettingsForm({
                 key={p.key}
                 className={clsx(
                   'flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors',
-                  selected ? 'border-brasa-500/60 bg-brasa-500/10' : 'border-neutral-800/60 hover:border-neutral-700',
+                  selected ? 'border-neutral-50/60 bg-neutral-50/10' : 'border-neutral-800/60 hover:border-neutral-700',
                   disabled && 'cursor-not-allowed opacity-60',
                 )}
               >
                 <input
                   type="radio"
                   name="voice-profile"
-                  className="mt-1 accent-brasa-500"
+                  className="mt-1 accent-neutral-50"
                   checked={selected}
                   onChange={() => onChange({ ...value, profile: p.key, style: p.defaultStyle })}
                 />
@@ -175,7 +175,7 @@ export function VoiceSettingsForm({
               onClick={() => set('style', style)}
               className={clsx(
                 'rounded-full border px-3 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-                value.style === style ? 'border-brasa-500/60 bg-brasa-500/15 text-brasa-200' : 'border-neutral-800 text-neutral-300 hover:border-neutral-600',
+                value.style === style ? 'border-neutral-50/60 bg-neutral-50/15 text-neutral-50' : 'border-neutral-800 text-neutral-300 hover:border-neutral-600',
               )}
             >
               {VOICE_STYLE_META[style].label}

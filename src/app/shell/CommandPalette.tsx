@@ -228,7 +228,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                       i === current ? 'bg-neutral-800 text-neutral-50' : 'text-neutral-200',
                     )}
                   >
-                    <Icon size={16} className={clsx('shrink-0', i === current ? 'text-brasa-400' : 'text-neutral-500')} aria-hidden />
+                    <Icon size={16} className={clsx('shrink-0', i === current ? 'text-neutral-50' : 'text-neutral-500')} aria-hidden />
                     <span className="min-w-0 flex-1 truncate">{entry.label}</span>
                     {entry.hint && <span className="hidden max-w-[45%] truncate text-xs text-neutral-500 sm:block">{entry.hint}</span>}
                     {i === current && <CornerDownLeft size={14} className="shrink-0 text-neutral-500" aria-hidden />}

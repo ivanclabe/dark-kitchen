@@ -172,14 +172,14 @@ export function FullScreenLoading({ stage = 'session' }: { stage?: LoadingStage 
             aria-valuemax={100}
             aria-valuenow={progress}
           >
-            <div className="h-full rounded-full bg-brasa-500 transition-[width] duration-300 ease-out" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-neutral-50 transition-[width] duration-300 ease-out" style={{ width: `${progress}%` }} />
           </div>
 
           {/* A tip only when there is time to read it: one short line. */}
           <div className="mt-8 flex min-h-9 max-w-md items-center text-sm text-neutral-300">
             {elapsed >= TIP_AFTER_MS && (
               <p className="inline-flex items-center gap-2 rounded-2xl border border-neutral-800 bg-neutral-900/60 px-3.5 py-2 text-left text-balance motion-safe:animate-fade-in">
-                <Lightbulb size={14} className="shrink-0 text-brasa-400" aria-hidden />
+                <Lightbulb size={14} className="shrink-0 text-neutral-50" aria-hidden />
                 {tip.short}
               </p>
             )}

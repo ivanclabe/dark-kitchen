@@ -79,7 +79,7 @@ function KanbanColumn({
         ref={setNodeRef}
         className={clsx(
           'flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto rounded-b-xl p-1.5 transition-colors',
-          isOver ? 'bg-brasa-500/10 ring-1 ring-brasa-500/40 ring-inset' : dropState === 'valid' ? 'bg-brasa-500/[0.04]' : 'bg-neutral-900/40',
+          isOver ? 'bg-neutral-50/10 ring-1 ring-neutral-50/40 ring-inset' : dropState === 'valid' ? 'bg-neutral-50/[0.04]' : 'bg-neutral-900/40',
         )}
       >
         {tickets.map((ticket) => (
@@ -181,7 +181,7 @@ export function OrderBoard({
 
         <DragOverlay>
           {activeTicket && (
-            <div className="shadow-float w-64 rounded-lg border border-brasa-500/60 bg-neutral-900 px-3 py-2">
+            <div className="shadow-float w-64 rounded-lg border border-neutral-50/60 bg-neutral-900 px-3 py-2">
               <OrderCardBody ticket={activeTicket} now={now} density={board.density} kitchen={board.kitchen} />
             </div>
           )}

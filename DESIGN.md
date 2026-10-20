@@ -3,12 +3,12 @@ name: Quanela
 description: The operation of a food business in one calm, fast-reading place — the kitchen pass, as software.
 colors:
   ember: "#f97316"
-  ember-deep: "#c2410c"
-  ember-deeper: "#9a3412"
-  ember-darkest: "#7c2d12"
-  on-ember: "#ffffff"
-  focus-dark: "#f97316"
-  focus-light: "#c2410c"
+  action: "#fafafa"
+  action-hover: "#e5e5e5"
+  action-active: "#d4d4d4"
+  on-action: "#0a0a0a"
+  focus-dark: "#fafafa"
+  focus-light: "#252525"
   night-canvas: "#0a0a0a"
   night-surface: "#171717"
   night-raised: "#262626"
@@ -80,15 +80,15 @@ spacing:
   xl: "32px"
 components:
   button-primary:
-    backgroundColor: "{colors.ember-deep}"
-    textColor: "{colors.on-ember}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.on-action}"
     rounded: "{rounded.pill}"
     padding: "0 16px"
     height: "40px"
   button-primary-hover:
-    backgroundColor: "{colors.ember-deeper}"
+    backgroundColor: "{colors.action-hover}"
   button-primary-active:
-    backgroundColor: "{colors.ember-darkest}"
+    backgroundColor: "{colors.action-active}"
   button-secondary:
     backgroundColor: "{colors.night-surface}"
     textColor: "{colors.smoke-text}"
@@ -122,7 +122,7 @@ components:
 
 **Creative North Star: "The Kitchen Pass"**
 
-The pass is the counter between the kitchen and the dining room: dark, ordered, lit only where something is ready to go. Quanela reads the same way. Most of the screen is a quiet night surface; information sits in hairline-bordered cards and tables; the ember orange appears only where the person has to act or where something needs them. An owner glances and knows the state of the day; a cook glances and knows the next plate.
+The pass is the counter between the kitchen and the dining room: dark, ordered, lit only where something is ready to go. Quanela reads the same way. Most of the screen is a quiet night surface; information sits in hairline-bordered cards and tables; the brightest ink appears only where the person has to act or where something needs them. An owner glances and knows the state of the day; a cook glances and knows the next plate.
 
 The system is dense but never cramped, and calm by default. Hierarchy comes from type weight, a strict text-color ladder and spacing, not from color or decoration. Three themes (dark by default, light and a warm neutral) are the same system: the neutral scale is remapped per theme and every semantic token follows it. The mascot, the Quanela robot chef, carries personality in messages and empty states so the working surfaces do not have to.
 
@@ -130,19 +130,18 @@ The operational screens (the Centro de operaciones) are the strictest part of th
 
 **Key Characteristics:**
 - Night surfaces with hairline borders; depth by tone, shadow only on what floats.
-- One accent: ember orange, rationed to action, focus and live state; selection is ink.
+- One range: the theme's ink for action, focus, live state and selection; ember orange only for the brand (ADR 0073).
 - Inter with tabular figures; small type set with uppercase micro-labels.
 - Pills for actions and filters, softly rounded cards, gently rounded fields.
 - Light, dark and neutral themes from one token set; AA contrast in all three.
 
 ## Colors
 
-A near-monochrome night palette with a single warm accent and four quiet state colors.
+A monochrome night palette: actions in the theme's ink, four quiet state colors, and the warm ember kept for the brand.
 
 ### Primary
-- **Ember** (#f97316): the brand's own orange. Keyboard focus on dark themes, the live accent of the brand (logo, caret, the active tab underline). Never as a fill under white text: it fails contrast.
-- **Deep Ember** (#c2410c): the action color. The primary button, the switch when on, unread counters. White on it reads at 5.2:1. On light themes it is also the focus ring.
-- **Deeper / Darkest Ember** (#9a3412 / #7c2d12): hover and press of the primary action. Pressed actions go darker, never lighter.
+- **Action** (#fafafa on dark, the inverted neutral-50 on the light themes): the action color (ADR 0073). The primary button, the switch when on, unread counters, links, active states and the focus ring, with the page color as text (Night Canvas on white reads at 19:1). Hover and press step one neutral shade (200 / 300).
+- **Ember** (#f97316): the brand's own orange, for the brand only: the «q» of the wordmark, the login panel, the landing and the welcome. Never in the app's controls.
 
 ### Neutral
 - **Night Canvas** (#0a0a0a): the page ground on the dark theme.
@@ -159,7 +158,7 @@ A near-monochrome night palette with a single warm accent and four quiet state c
 - **Success** (#34d399), **Warning** (#fbbf24), **Danger** (#f87171), **Info** (#38bdf8): badges, notices and figure tones, always as text on a 15 % tint of themselves. Light themes swap them for their 800-tone equivalents.
 
 ### Named Rules
-**The One Ember Rule.** Orange means «act here» or «this is live». If something orange is not an action, the focus or a live state, it should be neutral: data series and bars use ink, metric icons are neutral, tips and the Copilot trigger sit on the night surface, and selection is Ink.
+**The One Range Rule** (ADR 0073, it replaces The One Ember Rule). The app speaks in one range: the neutral scale of its theme. Action, focus, live state and selection use the theme's ink; the four state colors keep their meaning; orange belongs to the brand, never to a control.
 
 **The Honest Zero Rule.** A figure that is not known yet is «—» in a muted tone, never a 0 and never a green «all good».
 
@@ -209,8 +208,8 @@ Precise and calm: thin borders, quiet fills, the accent reserved for the one act
 
 ### Buttons
 - **Shape:** pill (9999px); 32 / 40 / 44 px tall (sm / md / lg), growing to 40 / 44 px on touch screens.
-- **Primary:** Deep Ember with white text; hover and press step darker; one per view.
-- **Secondary:** night surface with a hairline border; **Ghost:** text only, a raised fill on hover; **Danger:** a translucent red tint with red text; **Link:** ember text with an underline on hover.
+- **Primary:** the theme's ink (white on dark, near-black on light) with the page color as text; hover and press step one shade; one per view.
+- **Secondary:** night surface with a hairline border; **Ghost:** text only, a raised fill on hover; **Danger:** a translucent red tint with red text; **Link:** ink text with an underline on hover.
 - **Feedback:** 150 ms color transitions; pressing scales to 0.97. Focus is a 2 px ring in the focus token with a 2 px offset.
 
 ### Chips
@@ -229,7 +228,7 @@ Precise and calm: thin borders, quiet fills, the accent reserved for the one act
 - **Error / Disabled:** a red border and a red ring on `aria-invalid`; disabled at 50 % opacity.
 
 ### Navigation
-- **Style:** the desktop rail shows icons only with a tooltip and an ember tile for the active section; sections inside a module use an underlined tab bar anchored left; on phones the rail becomes a drawer and the user, notification and account menus become bottom sheets.
+- **Style:** the desktop rail shows icons only with a tooltip and an ink tile for the active section; sections inside a module use an underlined tab bar anchored left; on phones the rail becomes a drawer and the user, notification and account menus become bottom sheets.
 
 ### Order card (signature component)
 The card of the operation board: the dishes first (one per line in the Cocina view), notes in warning tone, then «#number · time» with the time colored by its SLA tier, and the next step as a labelled pill button. A 2 px left stripe carries the time or priority state and never changes on hover.
@@ -237,8 +236,8 @@ The card of the operation board: the dishes first (one per line in the Cocina vi
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep orange to action, focus and live state; selection is ink (The One Ember Rule).
-- **Do** use Deep Ember (#c2410c) under white text; the bright Ember (#f97316) only as text, ring or accent.
+- **Do** keep the app in one range: actions, focus and live state in the theme's ink (The One Range Rule).
+- **Do** keep orange for the brand (logo, landing, welcome); never as a button, link or active state.
 - **Do** show unknown figures as «—» and empty or failed states with what happened and what to do next.
 - **Do** use the shared components in `src/shared/ui` (Button, Card, DataTable, Badge, Modal, Drawer, StatCard, EmptyState) instead of hand-made variants.
 - **Do** honor reduced motion: transitions keep only a short fade, nothing moves.

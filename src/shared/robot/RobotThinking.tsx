@@ -42,12 +42,12 @@ export function RobotThinking({
         <span
           className="absolute inset-0 rounded-full motion-safe:animate-think-orbit"
           style={{
-            background: 'conic-gradient(from 0deg, transparent 0deg, transparent 220deg, var(--color-brasa-400) 320deg, var(--color-brasa-200) 360deg)',
+            background: 'conic-gradient(from 0deg, transparent 0deg, transparent 220deg, var(--color-neutral-50) 320deg, var(--color-neutral-50) 360deg)',
             mask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px))',
             WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px))',
           }}
         />
-        <span className="absolute inset-[3px] rounded-full bg-brasa-500/10 ring-1 ring-brasa-500/20" />
+        <span className="absolute inset-[3px] rounded-full bg-neutral-50/10 ring-1 ring-neutral-50/20" />
         <RobotFace mood="ai" size={size - 4} animated className="relative" />
       </span>
       {showText && (
@@ -57,7 +57,7 @@ export function RobotThinking({
           </span>
           <span className="inline-flex items-center gap-0.5" aria-hidden>
             {[0, 1, 2].map((i) => (
-              <span key={i} className="size-1 rounded-full bg-brasa-400 motion-safe:animate-think-spark" style={{ animationDelay: `${i * 0.18}s` }} />
+              <span key={i} className="size-1 rounded-full bg-neutral-50 motion-safe:animate-think-spark" style={{ animationDelay: `${i * 0.18}s` }} />
             ))}
           </span>
         </span>

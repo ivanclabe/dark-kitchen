@@ -193,7 +193,7 @@ export function ActivationPage() {
       <Shell>
         <p className="flex items-center gap-2 font-medium text-neutral-100"><AlertTriangle size={16} className="text-amber-400" /> Enlace no válido</p>
         <p className={typography.small}>Revisa que el enlace esté completo o pide uno nuevo a tu administrador.</p>
-        <Link to="/login" className="block text-sm text-brasa-400 hover:underline">Ir a iniciar sesión</Link>
+        <Link to="/login" className="block text-sm text-neutral-50 hover:underline">Ir a iniciar sesión</Link>
       </Shell>
     )
   }
@@ -218,7 +218,7 @@ export function ActivationPage() {
       <Shell>
         {header}
         <p role="alert" className="text-sm text-amber-300">{STATUS_MESSAGE[preview.status]}</p>
-        <Link to="/login" className="block text-sm text-brasa-400 hover:underline">Ir a iniciar sesión</Link>
+        <Link to="/login" className="block text-sm text-neutral-50 hover:underline">Ir a iniciar sesión</Link>
       </Shell>
     )
   }

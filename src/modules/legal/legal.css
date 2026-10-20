@@ -27,12 +27,12 @@
   font-weight: 600;
 }
 .legal-prose a {
-  color: var(--color-brasa-400);
+  color: var(--color-neutral-50);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .legal-prose a:hover {
-  color: var(--color-brasa-300);
+  color: var(--color-neutral-50);
 }
 .legal-prose ul,
 .legal-prose ol {

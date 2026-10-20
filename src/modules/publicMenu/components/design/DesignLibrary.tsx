@@ -126,7 +126,7 @@ export function DesignLibrary({
               return (
                 <li
                   key={d.id}
-                  className={clsx('overflow-hidden rounded-xl border bg-neutral-950', selected?.id === d.id ? 'border-brasa-500 ring-2 ring-brasa-500/30' : 'border-neutral-800')}
+                  className={clsx('overflow-hidden rounded-xl border bg-neutral-950', selected?.id === d.id ? 'border-neutral-50 ring-2 ring-neutral-50/30' : 'border-neutral-800')}
                 >
                   <button type="button" onClick={() => setSelectedId(d.id)} className="block w-full text-left" aria-label={`Ver ${d.name}`}>
                     <ThemeThumbnail theme={resolveTheme(d.design)} menu={mini} height={170} />

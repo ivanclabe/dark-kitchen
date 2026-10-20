@@ -31,14 +31,14 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
   const conversing = routed && voice.conversation.active
   const view = conversing
     ? voice.state === 'listening'
-      ? { icon: Mic, text: 'Conversación · te escucho', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
+      ? { icon: Mic, text: 'Conversación · te escucho', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
       : voice.state === 'processing'
-        ? { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
-        : { icon: MessagesSquare, text: 'Conversación · respondiendo', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
+        ? { icon: Loader2, text: 'Pensando…', className: 'border-neutral-50/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
+        : { icon: MessagesSquare, text: 'Conversación · respondiendo', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
     : active
     ? voice.state === 'listening'
-      ? { icon: Mic, text: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
-      : { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
+      ? { icon: Mic, text: 'Escuchando…', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
+      : { icon: Loader2, text: 'Pensando…', className: 'border-neutral-50/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
     : !listeningForPhrase
       ? { icon: Mic, text: 'Oye quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
       : handsFree.paused
@@ -47,7 +47,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
           ? { icon: AlertTriangle, text: 'Oye quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
           : handsFree.state === 'loading'
             ? { icon: Loader2, text: 'Despertando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-300', thinking: 'wake' as const }
-            : { icon: Ear, text: 'Oye quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
+            : { icon: Ear, text: 'Oye quanela', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
   const Icon = view.icon
   // ADR 0060: while it thinks (or wakes up), the robot itself shows it instead of a spinner.
   const thinking = 'thinking' in view ? view.thinking : null
@@ -99,7 +99,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
                 <span className="relative inline-flex">
                   <Icon size={compact ? 16 : 13} className={'iconClassName' in view ? view.iconClassName : undefined} aria-hidden />
                   {listeningForPhrase && !handsFree.paused && handsFree.state === 'listening' && !active && (
-                    <span className="absolute -top-0.5 -right-0.5 size-1.5 animate-pulse rounded-full bg-brasa-400" aria-hidden />
+                    <span className="absolute -top-0.5 -right-0.5 size-1.5 animate-pulse rounded-full bg-neutral-50" aria-hidden />
                   )}
                 </span>
                 {!compact && view.text}
@@ -125,7 +125,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
                 <p className={clsx(voice.state === 'error' ? 'text-red-400' : voice.lastReply.tone === 'info' ? 'text-neutral-300' : 'text-emerald-400')}>{voice.lastReply.message}</p>
               )}
               {voice.lastReply?.link && voice.state !== 'processing' && (
-                <a href={voice.lastReply.link.href} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-brasa-300 hover:underline">
+                <a href={voice.lastReply.link.href} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-neutral-50 hover:underline">
                   <BookOpen size={12} aria-hidden /> Abrir guía: {voice.lastReply.link.label}
                 </a>
               )}

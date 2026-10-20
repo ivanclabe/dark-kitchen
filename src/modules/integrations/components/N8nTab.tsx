@@ -69,7 +69,7 @@ export function N8nTab({ settings }: { settings: WaSettings }) {
                 <label key={e.key} className="flex items-start gap-2.5 text-sm text-neutral-300">
                   <input
                     type="checkbox"
-                    className="mt-1 accent-brasa-500"
+                    className="mt-1 accent-neutral-50"
                     checked={events.includes(e.key)}
                     disabled={!canManage}
                     onChange={(x) => setEvents((list) => (x.target.checked ? [...list, e.key] : list.filter((k) => k !== e.key)))}

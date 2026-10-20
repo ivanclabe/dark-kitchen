@@ -30,7 +30,7 @@ export function GlobalAdminLogo({ compact = false, className }: { compact?: bool
       <GlobalAdminMark size={compact ? 28 : 34} />
       <span className="leading-none">
         <BrandWordmark className="block h-[15px]" />
-        <span className="mt-1 block font-mono text-[10px] font-medium tracking-[0.2em] text-brasa-400">GLOBAL ADMIN</span>
+        <span className="mt-1 block font-mono text-[10px] font-medium tracking-[0.2em] text-neutral-50">GLOBAL ADMIN</span>
       </span>
     </span>
   )

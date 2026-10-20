@@ -141,16 +141,16 @@ function AccountCard({ kitchen: k, elsewhere, canActivate, last }: { kitchen: My
       <Link
         to={kitchenPath(k.slug, '/')}
         className={clsx(
-          'group flex h-full flex-col gap-4 rounded-2xl border bg-neutral-900/60 p-5 transition-colors hover:border-brasa-500/50 hover:bg-neutral-900',
+          'group flex h-full flex-col gap-4 rounded-2xl border bg-neutral-900/60 p-5 transition-colors hover:border-neutral-50/50 hover:bg-neutral-900',
           k.active ? 'border-neutral-800/60' : 'border-neutral-800/60 opacity-70',
         )}
       >
         <div className="flex items-start justify-between gap-3">
           <AccountIcon iconKey={k.iconKey} seed={k.id} size="lg" />
           {elsewhere ? (
-            <ExternalLink size={15} className="mt-1 text-neutral-600 transition-colors group-hover:text-brasa-400" aria-label="Se abre en su propio espacio" />
+            <ExternalLink size={15} className="mt-1 text-neutral-600 transition-colors group-hover:text-neutral-50" aria-label="Se abre en su propio espacio" />
           ) : (
-            <ArrowRight size={16} className="mt-1 text-neutral-600 transition-colors group-hover:text-brasa-400" aria-hidden />
+            <ArrowRight size={16} className="mt-1 text-neutral-600 transition-colors group-hover:text-neutral-50" aria-hidden />
           )}
         </div>
         <div className="min-w-0">

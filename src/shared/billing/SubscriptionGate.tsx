@@ -53,7 +53,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
   if (paymentReturn.phase === 'checking' || paymentReturn.phase === 'pending') {
     body = (
       <div className="space-y-3 text-center" role="status">
-        <Loader2 size={26} className="mx-auto animate-spin text-brasa-400" aria-hidden />
+        <Loader2 size={26} className="mx-auto animate-spin text-neutral-50" aria-hidden />
         <p className="font-medium text-neutral-100">Confirmando tu pago con Wompi…</p>
         {paymentReturn.phase === 'pending' && <p className={typography.small}>Con PSE puede tardar unos minutos. Te avisamos aquí apenas Wompi lo confirme.</p>}
       </div>
@@ -150,7 +150,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
             {sales?.contactUrl && (
               <p className={typography.small}>
                 ¿Varias sedes o una cadena?{' '}
-                <a href={sales.contactUrl} className="text-brasa-400 underline-offset-4 hover:underline">
+                <a href={sales.contactUrl} className="text-neutral-50 underline-offset-4 hover:underline">
                   {sales.name}: {sales.ctaLabel.toLowerCase()}
                 </a>
               </p>
