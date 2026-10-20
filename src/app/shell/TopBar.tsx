@@ -11,6 +11,7 @@ import { ChevronDown, ChevronRight, ExternalLink, Menu, PanelLeft, Plus } from '
 import { Link, useLocation } from 'react-router-dom'
 import { ADMIN_NAV_ITEMS, isNavItemActive, NAV_ITEMS } from '../navigation'
 import { OnlineIndicator } from '../OnlineIndicator'
+import { UserMenu } from '../UserMenu'
 import { useShellActions } from './shellActionsContext'
 import { setSidebarCollapsed } from './shellPrefs'
 import { isSubsectionActive, navSubsections } from './subsections'
@@ -146,7 +147,7 @@ export function TopBar({ collapsed, onOpenMenu }: { collapsed: boolean; onOpenMe
             const last = i === crumbs.length - 1
             return (
               <li key={`${c.to}-${i}`} className={clsx('flex min-w-0 items-center gap-1', !last && 'max-sm:hidden')}>
-                {i > 0 && <ChevronRight size={14} className="shrink-0 text-neutral-600" aria-hidden />}
+                {i > 0 && <ChevronRight size={14} className="shrink-0 text-neutral-600 max-sm:hidden" aria-hidden />}
                 {last ? (
                   <span aria-current="page" className="truncate font-medium text-neutral-50">
                     {c.label}
@@ -179,6 +180,10 @@ export function TopBar({ collapsed, onOpenMenu }: { collapsed: boolean; onOpenMe
         </span>
         <span className="sm:hidden">
           <CreateButton compact />
+        </span>
+        {/* Your menu, at the top right as in most consoles (ADR 0072). */}
+        <span className="ml-0.5 flex items-center border-l border-neutral-800 pl-2 sm:ml-1 sm:pl-3">
+          <UserMenu placement="bottom-end" />
         </span>
       </div>
     </header>

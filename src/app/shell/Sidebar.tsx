@@ -9,14 +9,13 @@ import { Fragment, useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ContextIndicator } from '../AccountSwitcher'
 import { ADMIN_NAV_ITEMS, isNavItemActive, NAV_GROUP_LABELS, NAV_ITEMS, type NavGroup, type NavItem } from '../navigation'
-import { UserMenu } from '../UserMenu'
 import { useShellActions } from './shellActionsContext'
 import { isSubsectionActive, navSubsections } from './subsections'
 
 /**
  * The account's sidebar (ADR 0072): search and create, the account, the modules with their names in four
- * titled groups, the sections of the module on screen nested under it, and the bell, the team and you at the
- * foot. `collapsed` leaves the icons (names in tooltips); the phone drawer uses it open.
+ * titled groups, the sections of the module on screen nested under it, and the bell and the team at the foot
+ * (your menu is at the top right). `collapsed` leaves the icons (names in tooltips); the phone drawer uses it open.
  */
 export function Sidebar({ collapsed, onNavigate, inDrawer = false }: { collapsed: boolean; onNavigate?: () => void; inDrawer?: boolean }) {
   const active = useActiveKitchen()
@@ -165,8 +164,8 @@ export function Sidebar({ collapsed, onNavigate, inDrawer = false }: { collapsed
               Invitar a tu equipo
             </Link>
           ))}
-        <div className={clsx('flex items-center', collapsed ? 'flex-col gap-2' : 'justify-between gap-2 px-0.5')}>
-          <UserMenu placement={inDrawer ? 'bottom-end' : 'right-end'} />
+        {/* Your menu lives at the top right of the top bar (ADR 0072); the bell stays here. */}
+        <div className={clsx('flex items-center', collapsed ? 'flex-col gap-2' : 'gap-2 px-0.5')}>
           <NotificationBell placement={inDrawer ? 'bottom-end' : 'right-end'} />
         </div>
       </div>
