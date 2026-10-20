@@ -3,6 +3,7 @@ import { FullScreenLoading } from './FullScreenLoading'
 import { NoProfilePage } from '@/modules/auth/pages/NoProfilePage'
 import { LandingPage } from '@/modules/landing/pages/LandingPage'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { LegalAcceptanceGate } from '@/shared/legal/LegalAcceptanceGate'
 import { useTenant } from '@/shared/tenant/tenantContext'
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
@@ -34,5 +35,6 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (!profile.active) return <AccountDisabledPage />
 
-  return children
+  // ADR 0071: the documents in force are accepted (and re-accepted when they change) before using the app.
+  return <LegalAcceptanceGate>{children}</LegalAcceptanceGate>
 }

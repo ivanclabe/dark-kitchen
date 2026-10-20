@@ -39,7 +39,7 @@ function readCookie(): string | null {
  * account (sign-up, activating an invitation, setting a password) and the help center. Keep in sync with the
  * same regular expression in index.html (first paint).
  */
-export const LIGHT_DEFAULT_PATH = /^\/(login|registro|activar|set-password|signup-admin|help)(\/|$)/
+export const LIGHT_DEFAULT_PATH = /^\/(login|registro|activar|set-password|signup-admin|help|legal)(\/|$)/
 
 /** The theme this device chose, or null when it never chose one (then each page has its default). */
 export function savedTheme(): ThemePreference | null {

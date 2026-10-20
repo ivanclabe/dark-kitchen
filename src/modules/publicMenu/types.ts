@@ -82,6 +82,8 @@ export interface PlaceOrderInput {
   items: CartLine[]
   /** ADR 0055: the customer accepts order notices by WhatsApp. */
   whatsappOptIn?: boolean
+  /** ADR 0071: the customer authorized the business's data policy (the database requires it). */
+  privacyAccepted: boolean
   /** Honeypot: people never fill it. */
   website: string
 }

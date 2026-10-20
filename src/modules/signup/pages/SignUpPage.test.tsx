@@ -38,6 +38,9 @@ async function fillUser(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(/Tu nombre/), 'Ana Prueba')
   await user.type(screen.getByLabelText(/Correo/), 'ana@prueba.test')
   await user.type(screen.getByLabelText(/Contraseña/), 'solo-una-prueba')
+  // ADR 0071: two separate boxes, never pre-ticked.
+  await user.click(screen.getByRole('checkbox', { name: /Términos y Condiciones/ }))
+  await user.click(screen.getByRole('checkbox', { name: /Política de Tratamiento de Datos/ }))
   await user.click(screen.getByRole('button', { name: /Continuar/ }))
 }
 
@@ -97,8 +100,10 @@ describe('registro con plan', () => {
     await user.selectOptions(screen.getByLabelText(/Categoría/), 'pizza')
     await user.click(screen.getByRole('button', { name: 'Crear mi negocio' }))
     expect(signUpBusiness).toHaveBeenCalledTimes(1)
-    const input = signUpBusiness.mock.calls[0][0] as unknown as { plan: string; organization: { accountName: string; accountIcon: string } }
+    const input = signUpBusiness.mock.calls[0][0] as unknown as { plan: string; organization: { accountName: string; accountIcon: string }; legalConsent: { documents: { slug: string }[] } }
     expect(input.plan).toBe('business')
+    // What was ticked travels with the sign-up, to be recorded when the e-mail is confirmed.
+    expect(input.legalConsent.documents.map((d) => d.slug)).toEqual(['terminos', 'privacidad'])
     expect(input.organization.accountName).toBe('Pizzería Norte')
     expect(input.organization.accountIcon).toBe('pizza')
     expect(await screen.findByText('Revisa tu correo')).toBeTruthy()

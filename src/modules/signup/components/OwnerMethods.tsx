@@ -25,23 +25,13 @@ function GoogleIcon() {
   )
 }
 
-function InstagramIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden>
-      <defs>
-        <linearGradient id="ig-gradient" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#FEDA75" />
-          <stop offset="0.35" stopColor="#FA7E1E" />
-          <stop offset="0.6" stopColor="#D62976" />
-          <stop offset="1" stopColor="#4F5BD5" />
-        </linearGradient>
-      </defs>
-      <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-gradient)" />
-      <circle cx="12" cy="12" r="4.2" fill="none" stroke="#fff" strokeWidth="1.8" />
-      <circle cx="17.3" cy="6.7" r="1.2" fill="#fff" />
-    </svg>
-  )
-}
+/**
+ * Instagram goes text only (ADR 0071, F6): a hand-drawn copy of the glyph would
+ * be a modified Meta trademark. The official glyph from Meta's brand resources
+ * (https://about.meta.com/brand/resources/instagram/) may be added here, unmodified,
+ * once it is downloaded and its usage rules are checked.
+ */
+const INSTAGRAM_ICON: ReactNode = null
 
 const methodButtonClass =
   'flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
@@ -58,6 +48,7 @@ export function OwnerMethodButtons({
   onEmail,
   onError,
   compact = false,
+  beforeContinue,
 }: {
   methods: OwnerMethod[]
   returnPath?: string
@@ -66,7 +57,13 @@ export function OwnerMethodButtons({
   onError: (message: string) => void
   /** One row of short buttons (the login, where the page must fit without scrolling); the name stays complete. */
   compact?: boolean
+  /** ADR 0071: sign-up asks for the Terms and the Data Policy before any method; false stops here (it shows why). */
+  beforeContinue?: () => boolean
 }) {
+  const go = (action: () => void) => () => {
+    if (beforeContinue && !beforeContinue()) return
+    action()
+  }
   const [leaving, setLeaving] = useState<OwnerMethod | null>(null)
 
   async function oauth(method: 'google' | 'instagram') {
@@ -85,7 +82,7 @@ export function OwnerMethodButtons({
 
   const button = (key: string, icon: ReactNode, label: string, onClick: () => void, hint?: string) => (
     <div key={key}>
-      <button type="button" className={methodButtonClass} onClick={onClick} disabled={leaving !== null}>
+      <button type="button" className={methodButtonClass} onClick={go(onClick)} disabled={leaving !== null}>
         {icon}
         {leaving === key ? 'Abriendo…' : label}
       </button>
@@ -95,7 +92,7 @@ export function OwnerMethodButtons({
 
   if (compact) {
     const short = (key: string, icon: ReactNode, label: string, name: string, onClick: () => void) => (
-      <button key={key} type="button" aria-label={leaving === key ? undefined : name} className={clsx(methodButtonClass, 'gap-2 px-3 [&_svg]:shrink-0 max-[359px]:gap-1.5 max-[359px]:px-2 max-[359px]:text-[13px]')} onClick={onClick} disabled={leaving !== null}>
+      <button key={key} type="button" aria-label={leaving === key ? undefined : name} className={clsx(methodButtonClass, 'gap-2 px-3 [&_svg]:shrink-0 max-[359px]:gap-1.5 max-[359px]:px-2 max-[359px]:text-[13px]')} onClick={go(onClick)} disabled={leaving !== null}>
         {icon}
         {/* 320 px phones: three of these share the row; the label truncates instead of touching the border. */}
         <span className="min-w-0 truncate">{leaving === key ? 'Abriendo…' : label}</span>
@@ -103,7 +100,7 @@ export function OwnerMethodButtons({
     )
     const items = [
       methods.includes('google') && short('google', <GoogleIcon />, 'Google', 'Continuar con Google', () => void oauth('google')),
-      methods.includes('instagram') && short('instagram', <InstagramIcon />, 'Instagram', 'Continuar con Instagram', () => void oauth('instagram')),
+      methods.includes('instagram') && short('instagram', INSTAGRAM_ICON, 'Instagram', 'Continuar con Instagram', () => void oauth('instagram')),
       methods.includes('phone') && short('phone', <Smartphone size={18} className="text-neutral-300" aria-hidden />, 'Teléfono', 'Continuar con teléfono', onPhone),
       onEmail && short('email', <Mail size={18} className="text-neutral-300" aria-hidden />, 'Email', 'Continuar con email', onEmail),
     ].filter(Boolean)
@@ -121,7 +118,7 @@ export function OwnerMethodButtons({
     <div className="space-y-2.5">
       {methods.includes('google') && button('google', <GoogleIcon />, 'Continuar con Google', () => void oauth('google'))}
       {methods.includes('instagram') &&
-        button('instagram', <InstagramIcon />, 'Continuar con Instagram', () => void oauth('instagram'), 'Necesitas una cuenta profesional de Instagram (beta).')}
+        button('instagram', INSTAGRAM_ICON, 'Continuar con Instagram', () => void oauth('instagram'), 'Necesitas una cuenta profesional de Instagram (beta).')}
       {methods.includes('phone') && button('phone', <Smartphone size={18} className="text-neutral-300" aria-hidden />, 'Continuar con teléfono', onPhone)}
       {onEmail && button('email', <Mail size={18} className="text-neutral-300" aria-hidden />, 'Continuar con email', onEmail)}
     </div>

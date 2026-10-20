@@ -12,6 +12,10 @@ import { AlertTriangle, LogIn, LogOut, Mail, UserCheck } from 'lucide-react'
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { acceptActivation, loginNeedsPassword, previewActivation, type ActivationStatus } from '../api'
+import { LEGAL_PENDING_KEY, recordLegalAcceptance } from '@/shared/legal/api'
+import { SIGNUP_DOCUMENTS } from '@/shared/legal/documents'
+import { allChecked, NO_CHECKS, type LegalChecks } from '@/shared/legal/checks'
+import { LegalConsentChecks } from '@/shared/legal/LegalConsentChecks'
 
 const STATUS_MESSAGE: Record<Exclude<ActivationStatus, 'valid'>, string> = {
   expired: 'Este enlace venció. Pide a tu administrador uno nuevo.',
@@ -76,6 +80,11 @@ export function ActivationPage() {
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // ADR 0071: invited staff accept the Terms and the Data Policy (two boxes) when activating.
+  const [legal, setLegal] = useState<LegalChecks>(NO_CHECKS)
+  const [legalTried, setLegalTried] = useState(false)
+  const legalOk = allChecked(legal)
+  const legalChecks = <LegalConsentChecks value={legal} onChange={setLegal} showErrors={legalTried} />
   const [params] = useSearchParams()
   const tokenHash = params.get('token_hash')
   const linkType = params.get('type')
@@ -101,10 +110,19 @@ export function ActivationPage() {
   })
 
   async function activate() {
+    if (!legalOk) {
+      setLegalTried(true)
+      setBusy(false)
+      return
+    }
     setBusy(true)
     setError(null)
     try {
       const slug = await acceptActivation(token)
+      // If it fails, the app asks for the acceptance before entering (LegalAcceptanceGate).
+      await recordLegalAcceptance({ documents: SIGNUP_DOCUMENTS, context: 'activation' })
+        .then(() => queryClient.invalidateQueries({ queryKey: LEGAL_PENDING_KEY }))
+        .catch(() => undefined)
       await refreshProfile()
       await queryClient.invalidateQueries({ queryKey: MY_KITCHENS_KEY })
       navigate(slug ? kitchenPath(slug, '/') : '/cuentas', { replace: true })
@@ -117,6 +135,7 @@ export function ActivationPage() {
   async function createPasswordAndActivate(e: FormEvent) {
     e.preventDefault()
     if (!preview) return
+    if (!legalOk) return setLegalTried(true)
     setBusy(true)
     setError(null)
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -139,6 +158,7 @@ export function ActivationPage() {
 
   async function setPasswordAndActivate(e: FormEvent) {
     e.preventDefault()
+    if (!legalOk) return setLegalTried(true)
     setBusy(true)
     setError(null)
     const { error: updateError } = await supabase.auth.updateUser({ password })
@@ -220,14 +240,18 @@ export function ActivationPage() {
           <form onSubmit={(e) => void setPasswordAndActivate(e)} className="space-y-4" noValidate>
             <p className={typography.small}>Crea tu contraseña para entrar a Quanela de ahora en adelante.</p>
             {passwordField}
+            {legalChecks}
             <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={password.length < 8}>
               Crear contraseña y entrar
             </Button>
           </form>
         ) : sessionEmail === preview.email ? (
-          <Button variant="primary" size="lg" icon={UserCheck} className="w-full" loading={busy} onClick={() => void activate()}>
-            Activar y entrar a {preview.organizationName}
-          </Button>
+          <div className="space-y-4">
+            {legalChecks}
+            <Button variant="primary" size="lg" icon={UserCheck} className="w-full" loading={busy} onClick={() => void activate()}>
+              Activar y entrar a {preview.organizationName}
+            </Button>
+          </div>
         ) : (
           <>
             <p role="alert" className="text-sm text-amber-300">
@@ -274,6 +298,7 @@ export function ActivationPage() {
             {(a11y) => <Input {...a11y} value={preview.email} readOnly disabled />}
           </FormField>
           {passwordField}
+          {legalChecks}
           <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={password.length < 8}>
             Activar mi usuario
           </Button>

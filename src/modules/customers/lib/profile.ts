@@ -26,8 +26,11 @@ export const PREFERENCE_KIND: Record<PreferenceKind, { title: string; empty: str
   dietary: { title: 'Preferencias alimentarias', empty: 'Sin preferencias alimentarias.', tone: 'info' },
 }
 
-/** Quick picks for what the customer says about their diet (free text is also allowed). */
-export const DIETARY_SUGGESTIONS = ['Vegetariano', 'Vegano', 'Sin gluten', 'Sin lactosa', 'Sin cerdo', 'Bajo en sal', 'Sin azúcar', 'Picante', 'Sin picante']
+/**
+ * Quick picks for what the customer says about their diet (free text is also allowed). ADR 0071: none hints at
+ * health or religion (sensitive data); anything of that kind is written only with the customer's express authorization.
+ */
+export const DIETARY_SUGGESTIONS = ['Vegetariano', 'Vegano', 'Picante', 'Sin picante', 'Poca sal']
 
 export function preferencesOf(list: CustomerPreference[], kind: PreferenceKind): CustomerPreference[] {
   return list.filter((p) => p.kind === kind)

@@ -29,6 +29,10 @@ import { TurnstileWidget } from '../components/TurnstileWidget'
 import { enabledOwnerMethods, oauthErrorFromUrl } from '../ownerAuth'
 import { hasOwnerSignInMark, NOT_AN_OWNER_NOTICE, ownsABusiness, takeOwnerSignInMark } from '../ownerSession'
 import { selectedFillClass } from '@/shared/ui/formClasses'
+import { SIGNUP_DOCUMENTS } from '@/shared/legal/documents'
+import { allChecked, NO_CHECKS, type LegalChecks } from '@/shared/legal/checks'
+import { LegalConsentChecks } from '@/shared/legal/LegalConsentChecks'
+import { clearPreConsent, readPreConsent, savePreConsent, type PreConsent } from '@/shared/legal/preConsent'
 
 /** Espera entre reenvíos del correo de confirmación. */
 const RESEND_WAIT_MS = 60_000
@@ -112,6 +116,21 @@ export function SignUpPage() {
   const [busy, setBusy] = useState(false)
   const [resent, setResent] = useState(false)
   const [resendLocked, setResendLocked] = useState(false)
+  // ADR 0071: Terms and Data Policy, two separate boxes ticked before any sign-up method.
+  const [legal, setLegal] = useState<LegalChecks>(() => (readPreConsent() ? { terms: true, privacy: true } : NO_CHECKS))
+  const [legalTried, setLegalTried] = useState(false)
+  // Back from Google, Instagram or the phone code in another tab (or after a while): asked again on the business step.
+  const [legalAtBusiness] = useState(() => !readPreConsent())
+  const legalOk = allChecked(legal)
+  const changeLegal = (next: LegalChecks) => {
+    setLegal(next)
+    if (allChecked(next)) savePreConsent(SIGNUP_DOCUMENTS)
+    else clearPreConsent()
+  }
+  const requireLegal = () => {
+    setLegalTried(true)
+    return legalOk
+  }
   const set = (patch: Partial<PendingOrganization>) => setOrg((o) => ({ ...o, ...patch }))
   const onCaptcha = useCallback((token: string | null) => setCaptchaToken(token), [])
 
@@ -202,6 +221,7 @@ export function SignUpPage() {
     Boolean(org.sector) &&
     Boolean(org.category) &&
     !phoneError(org.phone ?? '') &&
+    legalOk &&
     (onboarding ? ownerName.trim().length >= 2 : !TURNSTILE_SITE_KEY || Boolean(captchaToken))
   // With a session the user step is done: straight to the plan (or the business, with a plan).
   // ("sent" has its own screen below.)
@@ -216,6 +236,7 @@ export function SignUpPage() {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (!legalOk) setLegalTried(true)
     if (!stepBusinessValid || !selectedPlan) return
     setBusy(true)
     setError(null)
@@ -231,13 +252,15 @@ export function SignUpPage() {
         accountName: effectiveAccountName,
         accountIcon: effectiveIcon,
       }
+      // What the person ticked, in their metadata: /registro/confirmado records it as evidence.
+      const legalConsent: PreConsent = readPreConsent() ?? savePreConsent(SIGNUP_DOCUMENTS)
       if (onboarding) {
         // Already signed in (Google, Instagram, phone): the business is created right away.
-        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key, billingPeriod: period })
+        await savePendingBusiness({ fullName: ownerName.trim(), organization, plan: selectedPlan.key, billingPeriod: period, legalConsent })
         navigate(CONFIRMED_PATH, { replace: true })
         return
       }
-      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, billingPeriod: period, captchaToken: captchaToken ?? undefined })
+      const { hasSession } = await signUpBusiness({ fullName, email, password, organization, plan: selectedPlan.key, billingPeriod: period, captchaToken: captchaToken ?? undefined, legalConsent })
       // Si el proyecto no exige confirmar el correo, ya hay sesión: se crea el negocio de una vez.
       if (hasSession) navigate(CONFIRMED_PATH, { replace: true })
       else setStep('sent')
@@ -316,9 +339,11 @@ export function SignUpPage() {
         </p>
       )}
 
+      {current === 'user' && entry !== 'phone' && <LegalConsentChecks value={legal} onChange={changeLegal} showErrors={legalTried} />}
+
       {current === 'user' && entry === 'choose' && (
         <>
-          <OwnerMethodButtons methods={methods} onPhone={() => { setError(null); setEntry('phone') }} onEmail={() => { setError(null); setEntry('email') }} onError={setError} />
+          <OwnerMethodButtons methods={methods} beforeContinue={requireLegal} onPhone={() => { setError(null); setEntry('phone') }} onEmail={() => { setError(null); setEntry('email') }} onError={setError} />
           {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
         </>
       )}
@@ -329,7 +354,7 @@ export function SignUpPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            if (stepUserValid) afterUser()
+            if (stepUserValid && requireLegal()) afterUser()
           }}
           className="space-y-4"
           noValidate
@@ -498,6 +523,7 @@ export function SignUpPage() {
               </button>
             </p>
           )}
+          {onboarding && legalAtBusiness && <LegalConsentChecks value={legal} onChange={changeLegal} showErrors={legalTried} />}
           {TURNSTILE_SITE_KEY && !onboarding && <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={onCaptcha} />}
           {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-2">

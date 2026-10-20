@@ -5,21 +5,11 @@ import { whatsappLink } from '@/shared/utils/whatsapp'
 import clsx from 'clsx'
 import { Bike, Clock, Minus, Plus, Share2, Store, Wallet } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { addLine, availabilityLabel, byCategory, cartStorageKey, cartTotals, maxQuantity, openLabel, publicMenuUrl, quantityOf, setQuantity, shareText } from '../lib/cart'
+import { addLine, availabilityLabel, byCategory, cartTotals, maxQuantity, openLabel, publicMenuUrl, quantityOf, readCart, setQuantity, shareText, writeCart } from '../lib/cart'
 import type { ResolvedTheme } from '../lib/themes'
 import type { CartLine, PublicMenu, PublicMenuItem } from '../types'
 import { CartSheet } from './CartSheet'
 import { DishSheet } from './DishSheet'
-
-function readCart(key: string): CartLine[] {
-  try {
-    const raw = localStorage.getItem(key)
-    const parsed = raw ? (JSON.parse(raw) as CartLine[]) : []
-    return Array.isArray(parsed) ? parsed.filter((l) => typeof l.productId === 'string' && l.quantity > 0) : []
-  } catch {
-    return []
-  }
-}
 
 const heading: CSSProperties = { fontFamily: 'var(--pm-font-heading)' }
 const btnRadius: CSSProperties = { borderRadius: 'var(--pm-btn-radius)' }
@@ -55,8 +45,8 @@ export function PublicMenuView({
   onPlaced?: (token: string) => void
   onRefreshMenu?: () => void
 }) {
-  const key = cartStorageKey(slug, menu.today)
-  const [lines, setLines] = useState<CartLine[]>(() => (mode === 'live' ? readCart(key) : []))
+  const today = menu.today
+  const [lines, setLines] = useState<CartLine[]>(() => (mode === 'live' ? readCart(slug, today) : []))
   const [cartOpen, setCartOpen] = useState(false)
   // ADR 0059: the dish whose options are being chosen.
   const [configuring, setConfiguring] = useState<PublicMenuItem | null>(null)
@@ -80,13 +70,8 @@ export function PublicMenuView({
 
   useEffect(() => {
     if (mode !== 'live') return
-    try {
-      if (lines.length) localStorage.setItem(key, JSON.stringify(lines))
-      else localStorage.removeItem(key)
-    } catch {
-      // A private window may block storage: the cart still works in memory.
-    }
-  }, [key, lines, mode])
+    writeCart(slug, today, lines)
+  }, [slug, today, lines, mode])
 
   const totals = cartTotals(lines, menu, null)
   const url = publicMenuUrl(slug)
@@ -158,7 +143,13 @@ export function PublicMenuView({
         </>
       )}
 
-      <footer className="px-4 pt-14 text-center text-xs text-(--pm-muted)">
+      <footer className="flex flex-wrap justify-center gap-x-4 gap-y-1 px-4 pt-14 text-center text-xs text-(--pm-muted)">
+        {/* ADR 0071: the business's data policy, reachable before ordering. */}
+        {mode === 'live' && (
+          <a href={`/menu/${slug}/privacidad`} className="opacity-70 hover:opacity-100">
+            Tratamiento de datos
+          </a>
+        )}
         <a href="https://quanela.com" className="opacity-70 hover:opacity-100">
           Hecho con Quanela
         </a>

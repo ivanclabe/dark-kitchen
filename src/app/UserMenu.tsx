@@ -7,25 +7,7 @@ import { settingsSections } from '@/modules/settings/sections'
 import { tenantHostLabel } from '@/shared/tenant/host'
 import { MenuPanel, type MenuNode } from '@/shared/ui/MenuPanel'
 import { useToast } from '@/shared/ui/Toast'
-import {
-  BadgeCheck,
-  CalendarClock,
-  CircleHelp,
-  Clock3,
-  Contrast,
-  FileWarning,
-  Info,
-  Keyboard,
-  LayoutList,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageCircle,
-  Settings,
-  Sparkles,
-  Store,
-  UserRound,
-} from 'lucide-react'
+import { BadgeCheck, CalendarClock, CircleHelp, Clock3, Contrast, FileWarning, Info, Keyboard, LayoutList, LifeBuoy, LogOut, Mail, MessageCircle, Settings, ShieldCheck, Sparkles, Store, UserRound } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSwitchAccount } from './AccountSwitcher'
@@ -237,6 +219,8 @@ export function UserMenu({ placement }: { placement: 'right-end' | 'bottom-end' 
     },
     { kind: 'separator', id: 'sep-account' },
     { kind: 'item', id: 'profile', label: 'Mi perfil', icon: UserRound, onSelect: go('/perfil') },
+    // ADR 0071: documents accepted, my data and requests.
+    { kind: 'item', id: 'privacy', label: 'Privacidad y datos', icon: ShieldCheck, onSelect: go('/perfil/privacidad') },
     { kind: 'item', id: 'shifts', label: 'Mis turnos', icon: CalendarClock, onSelect: go('/my-shifts') },
     // One place to configure the account (ADR 0026, D5): its sections live inside Configuración; Usuarios is in the rail.
     ...(sections.length > 0

@@ -15,6 +15,7 @@ const AiMonitoringPage = lazy(() => import('./pages/AiMonitoringPage').then((m) 
 const CreateOrganizationPage = lazy(() => import('./pages/CreateOrganizationPage').then((m) => ({ default: m.CreateOrganizationPage })))
 const OrganizationDetailPage = lazy(() => import('./pages/OrganizationDetailPage').then((m) => ({ default: m.OrganizationDetailPage })))
 const UsersPage = lazy(() => import('./pages/UsersPage').then((m) => ({ default: m.UsersPage })))
+const RequestsPage = lazy(() => import('./pages/RequestsPage').then((m) => ({ default: m.RequestsPage })))
 
 // Its own cache: nothing is shared with Quanela, and nothing is kept per account.
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } })
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: 'users', element: <UsersPage /> },
       { path: 'ai', element: <AiMonitoringPage /> },
       { path: 'activity', element: <ActivityPage /> },
+      { path: 'requests', element: <RequestsPage /> },
       { path: 'administration', element: <AdministrationPage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
