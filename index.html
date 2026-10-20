@@ -21,10 +21,10 @@
         // Cookie of the parent domain first (shared by every organization subdomain), then this origin.
         var c = document.cookie.split('; ').filter(function (x) { return x.indexOf('dk-appearance=') === 0 })[0]
         var a = JSON.parse((c && decodeURIComponent(c.slice(14))) || localStorage.getItem('dk-appearance') || '{}')
-        // ADR 0061: dark, light or neutral; «system» follows the OS (light or dark). Without a chosen theme, the
-        // sign-in, account creation and help center open in light (same list as LIGHT_DEFAULT_PATH) and the app in dark.
+        // ADR 0061: dark, light or neutral; «system» follows the OS (light or dark). Without a chosen theme, light
+        // everywhere (ADR 0072, same as defaultThemeFor).
         var chosen = a.theme === 'dark' || a.theme === 'light' || a.theme === 'neutral' || a.theme === 'system'
-        var byPage = location.hostname.indexOf('doc.') === 0 || /^\/(login|registro|activar|set-password|signup-admin|help|legal)(\/|$)/.test(location.pathname) ? 'light' : 'dark'
+        var byPage = 'light'
         var t = !chosen ? byPage : a.theme === 'light' || a.theme === 'neutral' ? a.theme : a.theme === 'system' && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
         document.documentElement.dataset.theme = t
         // The browser bar (mobile) in the page color of the theme.
