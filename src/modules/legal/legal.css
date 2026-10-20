@@ -48,8 +48,9 @@
   margin-top: 0.4rem;
 }
 .legal-prose blockquote {
-  border-left: 3px solid var(--color-neutral-700);
-  padding-left: 0.9rem;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-neutral-800) 45%, transparent);
+  padding: 0.65rem 0.9rem;
   font-size: 0.875rem;
   color: var(--color-neutral-400);
 }
