@@ -2,11 +2,11 @@ import { canAccessAnyModule, type Can, type ModuleKey } from '@/shared/rbac/role
 import { Activity, BarChart3, CalendarClock, Globe, Landmark, LayoutDashboard, MessageCircle, Settings, Soup, Store, UserCog, Users, Warehouse, type LucideIcon } from 'lucide-react'
 
 /**
- * Módulos de operación del rail (13 -> 6 ítems, ver auditoría de
- * navegación): cada entrada apunta a su ruta "principal" pero se resalta en
- * cualquiera de `matchPrefixes`. Es visible si el rol activo tiene acceso a
- * AL MENOS UNO de `modules`. Usuarios y Configuración van aparte, debajo
- * (ADMIN_NAV_ITEMS); Mi perfil vive en el menú de usuario (ADR 0008).
+ * Módulos de la barra lateral (ADR 0072, antes el riel de íconos): cada
+ * entrada apunta a su ruta "principal" pero se resalta en cualquiera de
+ * `matchPrefixes`. Es visible si el rol activo tiene acceso a AL MENOS UNO de
+ * `modules`. Usuarios y Configuración van aparte, al final (ADMIN_NAV_ITEMS);
+ * Mi perfil vive en el menú de usuario (ADR 0008).
  */
 export interface NavItem {
   to: string
@@ -21,11 +21,12 @@ export interface NavItem {
 
 export type NavGroup = 'daily' | 'sales' | 'business' | 'admin'
 
+/** Titles of the sidebar groups (ADR 0072). */
 export const NAV_GROUP_LABELS: Record<NavGroup, string> = {
-  daily: 'Día a día',
-  sales: 'Clientes y ventas',
-  business: 'Negocio',
-  admin: 'Administración',
+  daily: 'Operar',
+  sales: 'Vender',
+  business: 'Gestionar',
+  admin: 'Administrar',
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -41,7 +42,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/menu-planner',
-    label: 'Planificador de Menús',
+    label: 'Planificador de menús',
     description: 'Platos, menú del día y recetas',
     modules: ['menuPlanner'],
     icon: Soup,
@@ -76,7 +77,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     to: '/integrations',
-    label: 'WhatsApp e Integraciones',
+    label: 'WhatsApp',
     description: 'Tu número oficial, avisos de pedidos y n8n',
     modules: ['integrations'],
     icon: MessageCircle,
@@ -173,27 +174,4 @@ export function homeSection(can: Can): string {
       : null
   if (preferred && isSectionAllowed(preferred, can)) return preferred
   return NAV_ITEMS.find((i) => canAccessAnyModule(can, i.modules))?.to ?? '/perfil'
-}
-
-/**
- * The desktop rail fits the window: modules that do not fit go into «Más»,
- * so the bell and the user menu below never fall off screen. Sizes follow
- * the rail's classes (size-11 items, gap-1.5, my-1.5 dividers).
- */
-export const RAIL_SIZES = { item: 44, gap: 6, divider: 13 }
-
-function railHeight(items: NavItem[], extraItems = 0): number {
-  const dividers = items.filter((item, i) => i > 0 && item.group !== items[i - 1].group).length
-  const children = items.length + extraItems + dividers
-  if (children === 0) return 0
-  return (items.length + extraItems) * RAIL_SIZES.item + dividers * RAIL_SIZES.divider + (children - 1) * RAIL_SIZES.gap
-}
-
-/** `available` null = not measured yet (or no layout, as in tests): everything shows. */
-export function fitRail(items: NavItem[], available: number | null): { visible: NavItem[]; overflow: NavItem[] } {
-  if (available === null || railHeight(items) <= available) return { visible: items, overflow: [] }
-  let count = items.length - 1
-  // The «Más» button takes one more slot.
-  while (count > 0 && railHeight(items.slice(0, count), 1) > available) count--
-  return { visible: items.slice(0, count), overflow: items.slice(count) }
 }

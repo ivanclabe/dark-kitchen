@@ -44,7 +44,12 @@ export function MenuPlannerPage() {
   const linkedDishId = params.get('plato')
   const { data: allProducts } = useProducts(Boolean(linkedDishId))
   const [openedLink, setOpenedLink] = useState<string | null>(null)
-  if (linkedDishId && allProducts && openedLink !== linkedDishId) {
+  // ADR 0072: ?plato=nuevo («Nuevo plato» from Buscar y crear or the top bar) opens an empty dish.
+  if (linkedDishId === 'nuevo' && openedLink !== linkedDishId) {
+    setOpenedLink(linkedDishId)
+    setEditingProduct(null)
+    setDishDrawerOpen(true)
+  } else if (linkedDishId && allProducts && openedLink !== linkedDishId) {
     setOpenedLink(linkedDishId)
     const dish = allProducts.find((p) => p.id === linkedDishId)
     if (dish) {
