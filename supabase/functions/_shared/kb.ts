@@ -711,8 +711,8 @@ export const KB: KbArticle[] = [
     "id": "home-screen",
     "section": "intro",
     "url": "/help/intro/home-screen",
-    "title": "Inicio: la operación de hoy",
-    "summary": "Inicio muestra las ventas de hoy y lo que necesita atención (pedidos atrasados o por confirmar, insumos bajo el mínimo, clientes con saldo vencido); los avisos de IA y del plan están en la campana.",
+    "title": "Inicio: Destacado",
+    "summary": "Inicio (Destacado) muestra lo urgente, cómo va el negocio en el periodo que elijas, por hora o por día, y lo que pasa ahora mismo en la cocina, los turnos y la cartera.",
     "audience": [
       "owner",
       "admin",
@@ -727,26 +727,41 @@ export const KB: KbArticle[] = [
     "questions": [
       "¿Qué muestra Inicio?",
       "¿Qué necesita atención hoy?",
-      "¿Dónde veo las ventas de hoy?"
+      "¿Dónde veo las ventas de hoy?",
+      "¿Cómo veo las ventas de la semana pasada?",
+      "¿Cómo cambio los paneles de Inicio?",
+      "¿Qué es el tiempo en cocina?"
     ],
     "keywords": [
       "inicio",
+      "destacado",
       "dashboard",
       "resumen",
       "hoy",
       "alertas",
-      "necesita atención"
+      "necesita atención",
+      "métricas",
+      "gráficas",
+      "rango",
+      "granularidad",
+      "cada hora",
+      "paneles",
+      "personalizar",
+      "ticket promedio",
+      "cancelados",
+      "tiempo en cocina"
     ],
     "steps": [
-      "Arriba, el saludo, la hora y Ventas de hoy con el número de pedidos. Toca el ojo para ocultar la cifra.",
-      "Necesita atención : tarjetas con la cifra y lo que es — pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo y clientes con saldo vencido. Toca una para ir a la lista ya filtrada. Lo urgente tiene el borde ámbar. Si no hay nada, dice «Todo al día: nada pendiente por ahora.»",
-      "Si la IA tiene sugerencias nuevas, aparece ✨ N sugerencias de IA nuevas : tócala para abrirlas en la campana. Ver Notificaciones.",
-      "Las tarjetas Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora ."
+      "Elige el periodo : Hoy, Últimos 7 días, Últimos 30 días o Este mes. Con ← vas al periodo anterior y con → vuelves. Las fechas son las de la zona horaria de tu cuenta (se ve al lado, por ejemplo «UTC-5»).",
+      "Elige el detalle: Cada hora (hasta 7 días) o Cada día .",
+      "Cada panel muestra la cifra del periodo, cuánto cambió frente al periodo anterior del mismo largo y su gráfica:"
     ],
     "headings": [
-      "Qué hay en Inicio"
+      "Arriba: lo destacado",
+      "Los paneles",
+      "Ahora mismo"
     ],
-    "body": "Inicio responde una pregunta: ¿qué está pasando hoy y qué necesita atención? Qué hay en Inicio Arriba, el saludo, la hora y Ventas de hoy con el número de pedidos. Toca el ojo para ocultar la cifra. Necesita atención : tarjetas con la cifra y lo que es — pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo y clientes con saldo vencido. Toca una para ir a la lista ya filtrada. Lo urgente tiene el borde ámbar. Si no hay nada, dice «Todo al día: nada pendiente por ahora.» Si la IA tiene sugerencias nuevas, aparece ✨ N sugerencias de IA nuevas : tócala para abrirlas en la campana. Ver Notificaciones. Las tarjetas Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora . Bueno saber: las tendencias (semanas, meses, comparaciones) están en Insights. Inicio es solo para el día de hoy. Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla."
+    "body": "Inicio responde dos preguntas: ¿qué necesita atención? y ¿cómo va el negocio? Arriba: lo destacado Hasta tres tarjetas: Lo urgente (por ejemplo, pedidos atrasados), con el botón para resolverlo. No se puede descartar mientras siga pasando. El siguiente paso de tu negocio (por ejemplo, publicar tu menú web) o una guía de la ayuda. Novedades de Quanela. La guía y las novedades se cierran con la × y no vuelven a aparecer en ese equipo. Los paneles Elige el periodo : Hoy, Últimos 7 días, Últimos 30 días o Este mes. Con ← vas al periodo anterior y con → vuelves. Las fechas son las de la zona horaria de tu cuenta (se ve al lado, por ejemplo «UTC-5»). Elige el detalle: Cada hora (hasta 7 días) o Cada día . Cada panel muestra la cifra del periodo, cuánto cambió frente al periodo anterior del mismo largo y su gráfica: Panel Qué mide --- Pedidos Pedidos vendidos (sin los cancelados ni los que siguen por confirmar) Ventas Lo que suman esos pedidos Ticket promedio Ventas ÷ pedidos Tiempo en cocina Minutos promedio de Preparando a Listo Cancelados Cancelados sobre los pedidos confirmados o cancelados Costo de comida Costo de las recetas sobre las ventas (solo si puedes ver la rentabilidad) Platos más vendidos Los cinco con más unidades Canales En el local, Menú web, WhatsApp y Teléfono La variación sale en verde cuando es buena (más ventas, menos cancelados) y en rojo cuando no. Si el periodo anterior no tiene datos, lo dice en vez de inventar una comparación. Con el engranaje muestras, ocultas y ordenas los paneles; se guarda en tu equipo para ti y esta cuenta. Ver análisis abre Análisis para ir más a fondo. Ahora mismo Debajo está la operación de este momento: Necesita atención (toca una tarjeta para ir a la lista ya filtrada), Pedidos recientes , Cocina ahora , Cartera y compras y En turno ahora . Cada rol ve en Inicio solo lo suyo. COCINA y DOMICILIARIO no tienen Inicio: empiezan directo en su pantalla."
   },
   {
     "id": "insights",
@@ -1139,11 +1154,53 @@ export const KB: KbArticle[] = [
     "body": "En la vista Cocina puedes mover pedidos con la voz. Funciona con el botón del micrófono o diciendo «Oye Quanela» si tienes el manos libres encendido (ver Activar «Oye Quanela»). Toca el micrófono de la cocina (o di «Oye Quanela»). Di el número del pedido (4 dígitos) y la acción , por ejemplo: « pedido 1042 listo ». Haz una pausa: Quanela lo ejecuta y responde («Pedido 1042 listo.»). Qué puedes decir Para Di --- Empezar «pedido 1042 iniciar » o «en preparación» Terminar «pedido 1042 listo » o «terminado» Priorizar «pedido 1042 prioritario » o «urgente» Quitar prioridad «pedido 1042 quitar prioridad » Cancelar « cancelar pedido 1042» Si algo no sale « No entendí el comando. »: falta el número o la acción. Dilos los dos. « El pedido 1042 no existe. »: no está en la pantalla de cocina. « El pedido 1042 ya está listo. »: ya estaba en ese estado. Con el reconocimiento sin internet , los pedidos se cancelan desde la pantalla, no con la voz. Bueno saber: si dices una pregunta («¿cuánto vendimos hoy?»), no es un comando: la responde Copilot. Y un comando dicho fuera de la vista Cocina no se ejecuta. Para probar sin hablar: ⋯ → Probar comando de texto y escribe «pedido 2040 listo»."
   },
   {
+    "id": "navigation",
+    "section": "intro",
+    "url": "/help/intro/navigation",
+    "title": "Moverte por Quanela",
+    "summary": "La barra lateral con los módulos en cuatro grupos, Buscar y crear (⌘K o Ctrl+K) para ir a cualquier lugar o crear algo, y la barra de arriba con dónde estás y las acciones.",
+    "audience": [
+      "everyone"
+    ],
+    "permissions": [],
+    "appPath": "/dashboard",
+    "questions": [
+      "¿Dónde está el menú?",
+      "¿Cómo busco un cliente o un pedido rápido?",
+      "¿Cómo creo un pedido desde cualquier pantalla?",
+      "¿Cómo oculto la barra lateral?",
+      "¿Qué es Buscar y crear?"
+    ],
+    "keywords": [
+      "menú",
+      "navegación",
+      "barra lateral",
+      "buscar",
+      "crear",
+      "atajo",
+      "ctrl k",
+      "cmd k",
+      "paleta",
+      "ocultar menú",
+      "plegar",
+      "módulos",
+      "nuevo pedido",
+      "vista previa"
+    ],
+    "steps": [],
+    "headings": [
+      "La barra lateral",
+      "Buscar y crear",
+      "La barra de arriba"
+    ],
+    "body": "La barra lateral A la izquierda están los módulos que tu rol puede abrir, en cuatro grupos: Grupo Módulos --- Operar Inicio, Centro de operaciones, Planificador de menús, Abastecimiento Vender Clientes, Menú público, WhatsApp, App de clientes Gestionar Personal, Análisis, Finanzas Administrar Usuarios, Configuración El módulo abierto muestra debajo sus secciones (por ejemplo, Abastecimiento › Stock, Compras, Proveedores). Arriba están Buscar y crear y tu cuenta: tócala para cambiar de cuenta o de rol. Al pie están Invitar a tu equipo (si puedes gestionar usuarios), tu avatar y la campana. El primer botón de la barra de arriba pliega la barra a íconos (el nombre aparece al pasar el mouse) y la vuelve a abrir. Quanela lo recuerda en ese equipo. En el celular, la barra se abre con el menú ☰. Buscar y crear Ábrelo con ⌘K (Mac) o Ctrl+K (Windows), o con el botón de la barra lateral. Escribe y elige con las flechas y Enter: Crear: nuevo pedido, cliente, compra, plato o insumo, según tu rol. Ir a: cualquier módulo o sección. Buscar: clientes, pedidos (por número o cliente) y platos. La barra de arriba A la izquierda, dónde estás (cuenta › módulo › sección); toca un nivel para volver a él. A la derecha: Solo tú / En vivo : quién más está conectado. Vista previa : abre tu menú web, si está publicado. Oye Quanela y Copilot . El botón principal, Nuevo pedido , con la flecha para crear otras cosas."
+  },
+  {
     "id": "notifications",
     "section": "intro",
     "url": "/help/intro/notifications",
     "title": "Notificaciones (la campana)",
-    "summary": "La campana junto a tu avatar junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.",
+    "summary": "La campana, al pie de la barra lateral junto a tu avatar, junta los avisos de la cuenta — pedidos atrasados, stock bajo, sugerencias de IA, análisis con error y avisos del plan — con las no leídas contadas encima.",
     "audience": [
       "everyone"
     ],
@@ -1167,7 +1224,7 @@ export const KB: KbArticle[] = [
       "marcar todo"
     ],
     "steps": [
-      "Toca la campana (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones sin leer .",
+      "Toca la campana (al pie de la barra lateral, junto a tu avatar; en el celular, abre el menú ☰). El número son las notificaciones sin leer .",
       "Elige Todas o IA .",
       "Toca un aviso para ir a su pantalla: queda como leído.",
       "Para limpiar la lista, toca Marcar todo como leído ."
@@ -1176,7 +1233,7 @@ export const KB: KbArticle[] = [
       "Qué avisa",
       "Bueno saber"
     ],
-    "body": "Toca la campana (en el computador, en el menú de la izquierda sobre tu avatar; en el celular, arriba junto a tu avatar). El número son las notificaciones sin leer . Elige Todas o IA . Toca un aviso para ir a su pantalla: queda como leído. Para limpiar la lista, toca Marcar todo como leído . Qué avisa Grupo Avisos Quién los ve --- --- Operación Pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido Según tu rol: cada quien ve lo de sus pantallas IA ✨ Las sugerencias importantes del último análisis de cada función (por ejemplo, «Despachar pedido 1015»), con su porqué Quien puede usar esa función IA Análisis que fallaron y el cupo de análisis del plan Quien administra la IA Cuenta La prueba gratis por terminar y los límites del plan Quien ve la facturación Bueno saber Las notificaciones son de la cuenta activa y se actualizan cada minuto . Abrir la campana no gasta IA : muestra los análisis que ya se hicieron al usar sus pantallas. Lo que marcas como leído es solo tuyo y te sigue en cualquier equipo. Un aviso vuelve a salir como nuevo cuando cambia : por ejemplo, si pasan de 3 a 5 pedidos atrasados, o al día siguiente. Las preguntas a Copilot no aparecen aquí. Sus límites están en Límites de Copilot."
+    "body": "Toca la campana (al pie de la barra lateral, junto a tu avatar; en el celular, abre el menú ☰). El número son las notificaciones sin leer . Elige Todas o IA . Toca un aviso para ir a su pantalla: queda como leído. Para limpiar la lista, toca Marcar todo como leído . Qué avisa Grupo Avisos Quién los ve --- --- Operación Pedidos atrasados, pedidos por confirmar, insumos bajo el mínimo, clientes con saldo vencido Según tu rol: cada quien ve lo de sus pantallas IA ✨ Las sugerencias importantes del último análisis de cada función (por ejemplo, «Despachar pedido 1015»), con su porqué Quien puede usar esa función IA Análisis que fallaron y el cupo de análisis del plan Quien administra la IA Cuenta La prueba gratis por terminar y los límites del plan Quien ve la facturación Bueno saber Las notificaciones son de la cuenta activa y se actualizan cada minuto . Abrir la campana no gasta IA : muestra los análisis que ya se hicieron al usar sus pantallas. Lo que marcas como leído es solo tuyo y te sigue en cualquier equipo. Un aviso vuelve a salir como nuevo cuando cambia : por ejemplo, si pasan de 3 a 5 pedidos atrasados, o al día siguiente. Las preguntas a Copilot no aparecen aquí. Sus límites están en Límites de Copilot."
   },
   {
     "id": "operations-center",
@@ -1946,6 +2003,7 @@ export const KB: KbArticle[] = [
     ],
     "steps": [],
     "headings": [
+      "20 de octubre de 2026",
       "19 de octubre de 2026",
       "18 de octubre de 2026",
       "15 de octubre de 2026",
@@ -1962,7 +2020,7 @@ export const KB: KbArticle[] = [
       "1 de octubre de 2026",
       "Septiembre de 2026"
     ],
-    "body": "de octubre de 2026 Documentos legales. Términos y Condiciones, Política de Tratamiento de Datos, Política de Cookies, Cancelaciones y Reembolsos, y Suscripciones, siempre a la vista en el pie de la página y descargables. Al crear tu cuenta o activar tu usuario aceptas los Términos y la Política de datos con dos casillas separadas ; si un documento cambia, Quanela te pide aceptar la nueva versión. Privacidad y datos. En el menú de tu avatar ves lo que aceptaste, descargas tus datos y radicas consultas, reclamos o reembolsos con su plazo. Ver Privacidad, tus datos y solicitudes. Tus clientes deciden. Tu menú web muestra la política de datos de tu negocio y el cliente la acepta al pedir. Desde la ficha de un cliente puedes borrar sus datos personales si te lo pide. Renovación automática con autorización expresa. Al guardar la tarjeta marcas una casilla aparte. Ver Suscripción, renovación y reembolsos. Voz local por defecto. El reconocimiento de voz funciona en tu equipo; el reconocimiento en línea (Google) se activa solo si lo aceptas. de octubre de 2026 Recetas sin esperar al inventario. En la receta de un plato o de una preparación, si un insumo no existe, lo creas ahí mismo («Crear el insumo…») y queda en la línea. Entra al inventario con existencia cero y sube cuando confirmas su compra. Quanela no deja crear dos insumos con el mismo nombre. Ver Recetas y costo de un plato. El inventario se descuenta al empezar cada plato. Ya no al marcarlo listo: cuando la cocina toca Iniciar , salen sus insumos. Si algo ya no alcanza, la cocina lo sabe antes de empezar. Devolver un plato a pendiente o cancelar el pedido devuelve lo usado una sola vez . Ver Cómo se descuenta el inventario. de octubre de 2026 IA sin gastos de más. Las sugerencias de IA ya no vuelven a llamar al modelo si los datos no cambiaron, esperan después de un error y Copilot se puede detener de verdad. En Configuración → IA ves Este mes : consultas, costo estimado, llamadas evitadas y un presupuesto mensual opcional que avisa y, al llegar, pausa solo los análisis automáticos. Compras más flexibles. El número de factura puede esperar hasta confirmar, el IVA va en % (con el habitual de cada proveedor) y cada línea avisa si el precio subió o bajó más de lo normal frente a la última compra y al promedio de 90 días. Ver Registrar una compra. Conteo físico. En Stock → Contar inventario cuentas la bodega (toda, una categoría o un proveedor) y las diferencias quedan como un ajuste «Conteo físico». Ver Cont"
+    "body": "de octubre de 2026 Nueva barra lateral. Los módulos con su nombre, en cuatro grupos (Operar, Vender, Gestionar y Administrar), y las secciones del módulo abierto debajo. Se pliega a íconos con el botón de la barra de arriba. Ver Moverte por Quanela. Buscar y crear (⌘K o Ctrl+K). Ve a cualquier sección, crea un pedido, cliente, compra, plato o insumo, o busca un cliente, un pedido o un plato desde cualquier pantalla. Inicio ahora es Destacado. Lo urgente arriba, paneles con gráficas de pedidos, ventas, ticket promedio, tiempo en cocina, cancelados y más, por hora o por día y comparados con el periodo anterior. Lo de hoy sigue en «Ahora mismo». Ver Inicio: Destacado. Tema claro por defecto. Si ya habías elegido Oscuro o Neutro, se mantiene; se cambia en tu avatar → Apariencia. de octubre de 2026 Documentos legales. Términos y Condiciones, Política de Tratamiento de Datos, Política de Cookies, Cancelaciones y Reembolsos, y Suscripciones, siempre a la vista en el pie de la página y descargables. Al crear tu cuenta o activar tu usuario aceptas los Términos y la Política de datos con dos casillas separadas ; si un documento cambia, Quanela te pide aceptar la nueva versión. Privacidad y datos. En el menú de tu avatar ves lo que aceptaste, descargas tus datos y radicas consultas, reclamos o reembolsos con su plazo. Ver Privacidad, tus datos y solicitudes. Tus clientes deciden. Tu menú web muestra la política de datos de tu negocio y el cliente la acepta al pedir. Desde la ficha de un cliente puedes borrar sus datos personales si te lo pide. Renovación automática con autorización expresa. Al guardar la tarjeta marcas una casilla aparte. Ver Suscripción, renovación y reembolsos. Voz local por defecto. El reconocimiento de voz funciona en tu equipo; el reconocimiento en línea (Google) se activa solo si lo aceptas. de octubre de 2026 Recetas sin esperar al inventario. En la receta de un plato o de una preparación, si un insumo no existe, lo creas ahí mismo («Crear el insumo…») y queda en la línea. Entra al inventario con existencia cero y sube cuando confirmas su compra. Quanela no deja crear dos insumos con el mismo nombre. Ver Recetas y costo de un plato. El inventario se descuenta al empezar cada plato. Ya no al marcarlo listo: cuando la cocina toca Iniciar , salen sus insumos. Si algo ya no alcanza, la cocina lo sabe antes de empezar. Devolver un plato a pendiente o cancelar el pedido devuelve lo usado una sola vez . Ver Cómo se descuenta el inventario. de octubre"
   },
   {
     "id": "roles",
@@ -2116,7 +2174,7 @@ export const KB: KbArticle[] = [
     "headings": [
       "Cambiar el nombre o la zona horaria"
     ],
-    "body": "Abre Configuración en el menú de la izquierda (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) , Zona horaria y Tipo de cocina (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado, el costo estimado del mes , las llamadas evitadas, el presupuesto mensual (función Presupuesto de IA ) y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Centro de operaciones → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
+    "body": "Abre Configuración en la barra lateral, en el grupo Administrar (o en el menú de tu avatar → Configuración de la cuenta ). Cada quien ve solo las secciones que su rol permite. Sección Para qué --- General Tu negocio (aplica a todas tus cuentas) y Esta cuenta : Nombre , Identificador (URL) , Zona horaria y Tipo de cocina (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, Datos fiscales y de contacto (opcionales) Facturación Tu Plan , cuánto usas de él (cuentas, usuarios, IA) y tus facturas IA y voz Funciones : activa Copilot, la voz y las sugerencias de IA en esta cuenta. Este dispositivo : la voz de este equipo. Uso y estado : cuánto se ha usado, el costo estimado del mes , las llamadas evitadas, el presupuesto mensual (función Presupuesto de IA ) y cómo responde Copilot Integraciones El ID de la cuenta para conectar sistemas externos, por ejemplo pedidos por WhatsApp Actividad Operación : cómo va hoy y la semana. Bitácora : quién cambió qué y cuándo Cambiar el nombre o la zona horaria En Configuración → General , ve a Esta cuenta . Cambia el Nombre o la Zona horaria . Toca Guardar cambios en la barra que aparece abajo. Cuidado: la zona horaria define el «hoy» de los pedidos, de la cocina y de los reportes. Cámbiala solo si la cuenta opera en otro país. Bueno saber: el horario de la cocina y sus alertas están en Centro de operaciones → Cocina → ⋯ → Configuración de cocina . Ver Horario de la cocina y tiempos objetivo. Los usuarios y roles están en Usuarios : ver Usuarios y roles."
   },
   {
     "id": "setup-account",

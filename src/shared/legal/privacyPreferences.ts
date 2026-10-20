@@ -85,7 +85,7 @@ export function loadScriptWithConsent(category: ConsentCategory, src: string): b
 }
 
 /** Keys of the «preferences» category: removing them only resets choices (theme, voice, views). */
-export const PREFERENCE_STORAGE_PREFIXES = ['dk-appearance', 'dk-last-kitchen', 'dk-active-role:', 'dk-kitchen-', 'dk-tip-dismissed', 'dk-help-feedback', 'dk-voice-']
+export const PREFERENCE_STORAGE_PREFIXES = ['dk-appearance', 'dk-last-kitchen', 'dk-active-role:', 'dk-kitchen-', 'dk-tip-dismissed', 'dk-help-feedback', 'dk-voice-', 'dk-sidebar-', 'dk-home-']
 
 /** Clears the preferences saved on this device (not the session nor this privacy choice). */
 export function clearSavedPreferences(): number {

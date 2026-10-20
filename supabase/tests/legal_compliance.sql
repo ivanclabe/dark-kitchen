@@ -87,11 +87,11 @@ set local role authenticated;
 insert into _t (area, test, expected, got) values
   ('Documentos', 'Sin aceptar nada, pide Términos y Política de datos', 'privacidad:first terminos:first',
     (select string_agg(slug || ':' || reason, ' ' order by slug) from dk_my_pending_legal_documents())),
-  ('Documentos', 'Cualquiera puede leer las versiones publicadas', '6', (select count(*)::text from dk_legal_documents)),
+  ('Documentos', 'Cualquiera puede leer las versiones publicadas (los seis documentos)', '6', (select count(distinct slug)::text from dk_legal_documents)),
   ('Aceptación', 'Una versión vieja no se acepta', 'stale_version',
     pg_temp.hint($q$select dk_record_legal_acceptance('[{"slug": "terminos", "version": "0.9"}]', 'signup')$q$)),
   ('Aceptación', 'Un documento informativo no se acepta', 'invalid',
-    pg_temp.hint($q$select dk_record_legal_acceptance('[{"slug": "cookies", "version": "1.0"}]', 'signup')$q$)),
+    pg_temp.hint(format($q$select dk_record_legal_acceptance('[{"slug": "cookies", "version": %s}]', 'signup')$q$, to_jsonb((dk_current_legal_document('cookies')).version)))),
   ('Aceptación', 'Contexto inventado', 'invalid',
     pg_temp.hint($q$select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.0"}]', 'por_si_acaso')$q$)),
   ('Aceptación', 'Las dos casillas quedan registradas', '2',
@@ -235,7 +235,7 @@ begin
     ('Plataforma', 'Solo se prorroga una vez', 'invalid',
       pg_temp.hint(format($q$select dk_ga_update_pqr(%L, 'en_tramite', 'Otra vez', true)$q$, v_id))),
     ('Plataforma', 'Responde', 'ALLOWED', pg_temp.err(format($q$select dk_ga_update_pqr(%L, 'respondida', 'Tenemos tu nombre, correo y negocio.')$q$, v_id))),
-    ('Plataforma', 'La bandeja ve las tres', '3', (select count(*)::text from dk_ga_pqr_requests()));
+    ('Plataforma', 'La bandeja ve las tres de esta prueba', '3', (select count(*)::text from dk_ga_pqr_requests() where requester_email like '%.legal@prueba.test'));
 end $$;
 insert into _t (area, test, expected, got) values ('Evidencia', 'La historia de las solicitudes está íntegra', '(íntegra)',
   coalesce(dk_verify_evidence_chain('dk_pqr_events')::text, '(íntegra)'));

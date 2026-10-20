@@ -2,8 +2,8 @@
 slug: cookies
 title: Política de Cookies
 summary: Qué cookies y qué almacenamiento del navegador usa Quanela, para qué sirven, cuánto duran y cómo gestionarlos. No usamos analítica ni publicidad.
-version: "1.0"
-effective: 2026-10-19
+version: "1.1"
+effective: 2026-10-20
 order: 5
 ---
 
@@ -44,6 +44,8 @@ Se guardan **solo cuando cambias** una opción, para recordarla. Si las borras, 
 | `dk-kitchen-sound`, `dk-kitchen-view`, `dk-kitchen-density` | localStorage | Hasta que lo borres | Sonido, vista y densidad de la pantalla de cocina | Quanela |
 | `dk-kitchen-insight-dismissed`, `dk-tip-dismissed`, `dk-help-feedback` | localStorage | Hasta que lo borres | No repetir los avisos y consejos que ya cerraste, y recordar si un artículo de ayuda te sirvió | Quanela |
 | `dk-voice-*` | localStorage | Hasta que lo borres | Preferencias de voz de «Oye Quanela» | Quanela |
+| `dk-sidebar-collapsed` | localStorage | Hasta que lo borres | Si dejaste la barra lateral plegada | Quanela |
+| `dk-home-panels:*`, `dk-home-dismissed` | localStorage | Hasta que lo borres | Los paneles de Inicio que elegiste y su orden, y los avisos de Inicio que cerraste | Quanela |
 | `dk-consent` | localStorage | Hasta que lo borres | Tus preferencias de privacidad | Quanela |
 | `dk-copilot-conversation:*` | sessionStorage | 30 minutos | Los últimos 40 mensajes de tu conversación con Copilot; se quedan en tu dispositivo | Quanela |
 

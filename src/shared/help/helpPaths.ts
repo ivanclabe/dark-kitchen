@@ -21,6 +21,7 @@ export const HELP_PATHS: Record<string, string> = {
   "switch-account": "/help/getting-started/switch-account",
   "concepts": "/help/intro/concepts",
   "home-screen": "/help/intro/home-screen",
+  "navigation": "/help/intro/navigation",
   "notifications": "/help/intro/notifications",
   "roles": "/help/intro/roles",
   "what-is-quanela": "/help/intro/what-is-quanela",

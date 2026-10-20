@@ -12,9 +12,16 @@ questions:
   - ¿Dónde quedaron Pedidos y Cocina?
 keywords: [novedades, cambios, versión, actualización, nuevo, release notes, novedades de la app, aplicación, app, lo nuevo]
 related: [operations-center, oye-quanela, insights]
-updated: 2026-10-19
+updated: 2026-10-20
 order: 1
 ---
+
+## 20 de octubre de 2026
+
+- **Nueva barra lateral.** Los módulos con su nombre, en cuatro grupos (Operar, Vender, Gestionar y Administrar), y las secciones del módulo abierto debajo. Se pliega a íconos con el botón de la barra de arriba. Ver [Moverte por Quanela](help:navigation).
+- **Buscar y crear (⌘K o Ctrl+K).** Ve a cualquier sección, crea un pedido, cliente, compra, plato o insumo, o busca un cliente, un pedido o un plato desde cualquier pantalla.
+- **Inicio ahora es Destacado.** Lo urgente arriba, paneles con gráficas de pedidos, ventas, ticket promedio, tiempo en cocina, cancelados y más, por hora o por día y comparados con el periodo anterior. Lo de hoy sigue en «Ahora mismo». Ver [Inicio: Destacado](help:home-screen).
+- **Tema claro por defecto.** Si ya habías elegido Oscuro o Neutro, se mantiene; se cambia en tu avatar → Apariencia.
 
 ## 19 de octubre de 2026
 

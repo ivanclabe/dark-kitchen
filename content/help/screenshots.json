@@ -44,15 +44,15 @@
           "n": 1
         },
         {
-          "selector": "a[href$='/supply/compras']:visible",
+          "text": "Últimos 7 días",
           "n": 2
         },
         {
-          "text": "Necesita atención",
+          "text": "Personalizar paneles",
           "n": 3
         },
         {
-          "text": "Cocina ahora",
+          "text": "Ahora mismo",
           "n": 4
         }
       ]

@@ -19,7 +19,7 @@ updated: 2026-10-15
 order: 1
 ---
 
-Abre **Configuración** en el menú de la izquierda (o en el menú de tu avatar → **Configuración de la cuenta**). Cada quien ve solo las secciones que su rol permite.
+Abre **Configuración** en la barra lateral, en el grupo **Administrar** (o en el menú de tu avatar → **Configuración de la cuenta**). Cada quien ve solo las secciones que su rol permite.
 
 | Sección | Para qué |
 |---|---|

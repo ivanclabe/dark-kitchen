@@ -129,3 +129,52 @@
   - Destacado (rango, granularidad, sin datos, personalizar, descartar avisos).
 - **Navegador:** escritorio, tablet y teléfono, en los tres temas; contraste y foco.
 - **Regresión:** tsc, lint, vitest completo y los dos builds; el contrato de páginas (ADR 0029) se mantiene.
+
+## Implementación (2026-10-20)
+- **Base de datos:** `20261020100000_dk_dashboard_series.sql` (`dk_dashboard_series`) y `20261020110000_dk_legal_cookies_v1_1.sql`.
+  - La Política de Cookies pasa a la versión 1.1, informativa: no pide una nueva aceptación.
+  - Registra tres claves nuevas del navegador: `dk-sidebar-collapsed`, `dk-home-panels:*` y `dk-home-dismissed`.
+- **Marco** (`src/app/shell`):
+  - `Sidebar`, `TopBar`, `CommandPalette`, `ShellActions` (los diálogos de crear que ya existían) y `subsections`.
+  - Las subsecciones salen de las mismas listas y permisos que las pestañas de cada página: `supplyViews`, `financeTabs`, `integrationsTabs`, `operationsViews` y `settingsSections`.
+  - Desaparecen el riel y «Más» (`fitRail`).
+  - `ContextIndicator` gana las variantes `sidebar` e `icon`, y `Popover` la posición `right-start`.
+- **Destacado** (`src/modules/dashboard`):
+  - componentes `HomeHighlights`, `HomeMetrics` y `MetricPanel`;
+  - lógica en `lib/range` (rangos en la zona horaria de la cuenta), `lib/panels` (preferencias por persona y cuenta) y `lib/delta`.
+  - La página queda así: Destacado, luego «Ahora mismo» (lo que era Inicio) y el consejo del día.
+- **Planificador:** `?plato=nuevo` abre un plato vacío, para «Nuevo plato».
+- **Tema:** claro por defecto en toda la app (`defaultThemeFor`, `index.html`). Un tema elegido se respeta.
+- **Ayuda:**
+  - artículo nuevo «Moverte por Quanela»;
+  - «Inicio: Destacado» reescrito;
+  - campana y Configuración ajustadas;
+  - Novedades del 20 de octubre;
+  - base de conocimiento de Copilot regenerada.
+
+## Verificación
+- **SQL:**
+  - `dashboard_series` 20/20: cubos por hora y por día en la hora local (las 23:30 quedan en su día), reglas de venta, tiempo en cocina, cancelados, costo solo con permiso, aislamiento y límites.
+  - `legal_compliance` 81/81, ajustada para no depender de las versiones nuevas.
+- **Vitest:** 979 pruebas. Las nuevas cubren:
+  - la barra lateral: grupos por permiso, secciones y estado plegado;
+  - Buscar y crear: ⌘K, permisos, Enter y crear;
+  - las subsecciones;
+  - el rango, la comparación y los paneles;
+  - el tema claro.
+- **Revisiones:**
+  - tsc limpio;
+  - lint en su línea base (13 advertencias);
+  - `build` y `build:admin` pasan.
+- **Navegador** (stack local):
+  - Destacado en tema claro y oscuro;
+  - cada hora y el periodo anterior;
+  - paneles personalizados;
+  - Buscar y crear: ir a Compras y crear un cliente;
+  - barra plegada;
+  - teléfono: menú completo, sin desplazamiento lateral;
+  - sin errores en consola.
+
+## Pendiente
+- **Capturas de la ayuda:** hay que regenerarlas con `scripts/help-screenshots.ts`. Las de Inicio y la navegación muestran todavía el riel anterior.
+- **Despliegue:** antes del frontend van las dos migraciones y la función que usa `_shared/kb.ts` (la base de conocimiento de Copilot).
