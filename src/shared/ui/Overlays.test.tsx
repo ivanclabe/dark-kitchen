@@ -57,6 +57,14 @@ describe('design system overlays (ADR 0065)', () => {
 
     fireEvent.pointerEnter(button.parentElement!)
     expect(tip.className).not.toContain('invisible')
+    fireEvent.focus(button)
+    fireEvent.pointerDown(button)
+    expect(tip.className).toContain('invisible') // a click opens what it names; the bubble gets out of the way
+    fireEvent.blur(button) // focus moves into the menu it opened
+    expect(tip.className).toContain('invisible')
+    fireEvent.pointerLeave(button.parentElement!)
+    fireEvent.pointerEnter(button.parentElement!)
+    expect(tip.className).not.toContain('invisible')
     fireEvent.pointerLeave(button.parentElement!)
     expect(tip.className).toContain('invisible')
   })

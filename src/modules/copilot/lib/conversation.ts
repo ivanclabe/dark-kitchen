@@ -12,7 +12,7 @@ export interface CopilotMessage {
   links?: CopilotAnswer['links']
   runId?: string
   feedback?: 1 | -1 | null
-  /** Asked by voice: its answer was heard, maybe not seen (the badge on ✦). */
+  /** Asked by voice: its answer was heard, maybe not seen (the badge on the voice button). */
   channel?: 'voice' | 'text'
   /** An error, and the question to ask again (Reintentar). */
   error?: boolean

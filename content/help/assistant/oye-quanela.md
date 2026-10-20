@@ -2,7 +2,7 @@
 id: oye-quanela
 section: assistant
 title: "«Oye quanela»: háblale a quanela"
-summary: Con el micrófono de arriba (o Ctrl/⌘ + Shift + J) le preguntas en voz alta a quanela; con el manos libres dices «Oye quanela» y conversas, sin repetir la frase en cada pregunta.
+summary: Con el ícono de la «q» de arriba (o Ctrl/⌘ + Shift + J) le preguntas en voz alta a quanela; con el manos libres dices «Oye quanela» y conversas, sin repetir la frase en cada pregunta.
 audience: [everyone]
 permissions: [voice.use]
 appPath: /dashboard
@@ -24,16 +24,16 @@ order: 2
 
 ## Hablarle una vez
 
-1. Toca el **micrófono** de la barra de arriba → **Hablar ahora**, o presiona **Ctrl/⌘ + Shift + J**.
+1. Toca el ícono de **«Oye quanela»** (la «q» con una onda de voz) en la barra de arriba → **Hablar ahora**, o presiona **Ctrl/⌘ + Shift + J**.
 2. La primera vez, el navegador pide permiso para el micrófono: toca **Permitir**.
 3. Di tu pregunta («¿cuánto vendimos hoy?») y haz una pausa.
 4. quanela responde en una burbuja y en voz alta. Si es una pregunta de «cómo se hace», trae el enlace **Abrir guía**.
 
-El chat de Copilot **no se abre solo**: la respuesta queda guardada y el botón **✦ Copilot** muestra un número con las respuestas sin ver. Tócalo para leerlas completas.
+El chat de Copilot **no se abre solo**: la respuesta queda guardada y el ícono de **«Oye quanela»** muestra un número con las respuestas sin ver. Tócalo → **Ver en Copilot** para leerlas completas.
 
 ## Manos libres
 
-1. Toca el **micrófono** de arriba → **Manos libres en este equipo**.
+1. Toca el ícono de **«Oye quanela»** de arriba → **Manos libres en este equipo**.
 2. Di **«Oye quanela»** y, sin pausa larga, tu pregunta. Ya te escucha mientras suena el tono: no hace falta esperar a que termine. En la vista Cocina, también tus comandos (ver [Comandos de voz en cocina](help:kitchen-voice)).
 3. Para dejar de escuchar un rato, **Pausar**; luego **Reanudar**.
 
@@ -41,7 +41,7 @@ Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
 
 ## Conversar sin repetir «Oye quanela»
 
-Después de «Oye quanela», quanela **sigue escuchando**: cuando termina de responder suena un tono corto y tienes unos **8 segundos** para la siguiente pregunta, sin repetir la frase. Arriba dice **«Conversación · te escucho»**.
+Después de «Oye quanela», quanela **sigue escuchando**: cuando termina de responder suena un tono corto y tienes unos **8 segundos** para la siguiente pregunta, sin repetir la frase. El ícono de arriba se ilumina y, al pasar el cursor, dice **«Conversación · te escucho»**.
 
 - «¿Cuánto vendimos hoy?» … «¿Y ayer?» … «¿Y cuál plato vendió más?» — entiende que hablas de lo mismo.
 - En la cocina también puedes decir comandos («pedido 1042 listo») dentro de la conversación.
@@ -50,7 +50,7 @@ Para terminar:
 
 - Quédate en **silencio** unos segundos.
 - Di **«gracias»**, **«listo»** o **«eso es todo»** (responde «Con gusto.»), o **«para»**.
-- En el micrófono de arriba → **Terminar conversación**.
+- En el ícono de **«Oye quanela»** de arriba → **Terminar conversación**.
 
 Termina sola si cambias de pestaña, tras 10 preguntas o 3 minutos.
 

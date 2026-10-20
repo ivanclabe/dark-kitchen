@@ -69,10 +69,13 @@ export function Tooltip({ label, side = 'right', children }: { label: string; si
         setHovered(false)
         setDismissed(false)
       }}
+      // A click opens what the control names (a menu, a dialog): the bubble would cover it.
+      onPointerDown={() => setDismissed(true)}
       onFocus={() => setFocused(true)}
       onBlur={() => {
         setFocused(false)
-        setDismissed(false)
+        // Focus moving into what the click opened (a menu's first item) keeps the bubble dismissed while hovered.
+        if (!hovered) setDismissed(false)
       }}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && !dismissed) setDismissed(true)

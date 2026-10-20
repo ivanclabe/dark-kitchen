@@ -59,7 +59,15 @@ vi.mock('./api', async (original) => ({
   rateCopilotAnswer: async (runId: string, value: number) => void state.rated.push([runId, value]),
 }))
 
-const { CopilotProvider, CopilotButton } = await import('./CopilotProvider')
+const { CopilotProvider } = await import('./CopilotProvider')
+const { useCopilot } = await import('./copilotContext')
+
+/** What the voice menu reads from the context (VoiceMenu): open the panel, and the answers waiting there. */
+function CopilotOpener() {
+  const { open, unseen } = useCopilot()
+  const label = unseen > 0 ? `Abrir quanela Copilot: ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver` : 'Abrir quanela Copilot'
+  return <button type="button" onClick={open} aria-label={label} />
+}
 const { CopilotError } = await import('./api')
 
 const TURN: VoiceTurn = { wake: true, followUp: false, listenMs: 320, endpointMs: 510, lastWordAt: Date.now() - 600 }
@@ -83,7 +91,7 @@ function renderCopilot() {
     <ToastProvider>
       <MemoryRouter initialEntries={['/k/centro/operations']}>
         <CopilotProvider>
-          <CopilotButton />
+          <CopilotOpener />
         </CopilotProvider>
       </MemoryRouter>
     </ToastProvider>,

@@ -22,6 +22,8 @@ order: 1
 - **Buscar y crear (⌘K o Ctrl+K).** Ve a cualquier sección, crea un pedido, cliente, compra, plato o insumo, o busca un cliente, un pedido o un plato desde cualquier pantalla.
 - **Inicio ahora es Destacado.** Lo urgente arriba, paneles con gráficas de pedidos, ventas, ticket promedio, tiempo en cocina, cancelados y más, por hora o por día y comparados con el periodo anterior. Lo de hoy sigue en «Ahora mismo». Ver [Inicio: Destacado](help:home-screen).
 - **Tema claro por defecto.** Si ya habías elegido Oscuro o Neutro, se mantiene; se cambia en tu avatar → Apariencia.
+- **Una sola gama de color.** Los botones principales, los enlaces y lo seleccionado van en blanco (o en negro con el tema claro); el naranja queda para la marca.
+- **«Oye quanela» es un ícono.** Arriba a la derecha queda un solo asistente: la «q» con una onda de voz. Desde su menú hablas, activas el manos libres y abres Copilot (también con Ctrl/⌘ + J o desde tu menú); las respuestas por voz sin ver se cuentan en ese ícono.
 
 ## 19 de octubre de 2026
 

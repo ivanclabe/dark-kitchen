@@ -1,25 +1,29 @@
+import { useCopilot } from '@/modules/copilot/copilotContext'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Menu, type MenuItem } from '@/shared/ui/Menu'
+import { Tooltip } from '@/shared/ui/Tooltip'
 import clsx from 'clsx'
-import { AlertTriangle, BookOpen, Ear, EarOff, Loader2, MessagesSquare, Mic, Pause, Play, Settings2, Square } from 'lucide-react'
+import { AlertTriangle, BookOpen, Ear, EarOff, Loader2, Mic, Pause, Play, Settings2, Sparkles, Square } from 'lucide-react'
 import { useState } from 'react'
 import { useVoice } from '../voiceContext'
 import { VoiceDeviceSettings } from './VoiceDeviceSettings'
+import { QuanelaVoiceIcon } from './VoiceIcon'
 import { RobotThinking } from '@/shared/robot/RobotThinking'
 
 /** While it wakes up (the phrase detector loading): one phrase, the same robot. */
 const WAKING_STEPS = ['Despertando'] as const
-/** The top bar keeps one word (its width does not jump); the bubble tells the steps. */
+/** The bubble tells the steps; the button only shows the robot. */
 const PILL_STEPS = ['Pensando'] as const
 
 /**
- * «Oye Quanela» in the top bar (ADR 0033), next to Copilot: its state at a
- * glance (waiting for the phrase, listening, answering, paused), a menu to
- * speak now, switch hands-free on this device or pause it, and this device's
- * voice settings. Under it, what was heard and the answer.
+ * «Oye quanela» in the top bar (ADR 0033), the only assistant button there: an icon whose look tells its state
+ * (waiting for the phrase, listening, answering, paused), a menu to speak now, switch hands-free on this device
+ * or pause it, open Copilot, and this device's voice settings. Under it, what was heard and the answer. Answers
+ * to voice questions wait in Copilot (ADR 0038): their count shows on this button.
  */
-export function VoiceMenu({ compact = false }: { compact?: boolean }) {
+export function VoiceMenu() {
   const voice = useVoice()
+  const copilot = useCopilot()
   const [settingsOpen, setSettingsOpen] = useState(false)
   if (!voice.available) return null
 
@@ -31,28 +35,28 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
   const conversing = routed && voice.conversation.active
   const view = conversing
     ? voice.state === 'listening'
-      ? { icon: Mic, text: 'Conversación · te escucho', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
+      ? { icon: QuanelaVoiceIcon, text: 'Conversación · te escucho', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
       : voice.state === 'processing'
         ? { icon: Loader2, text: 'Pensando…', className: 'border-neutral-50/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
-        : { icon: MessagesSquare, text: 'Conversación · respondiendo', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
+        : { icon: QuanelaVoiceIcon, text: 'Conversación · respondiendo', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
     : active
     ? voice.state === 'listening'
-      ? { icon: Mic, text: 'Escuchando…', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
+      ? { icon: QuanelaVoiceIcon, text: 'Escuchando…', className: 'border-neutral-50 bg-neutral-50/15 text-neutral-50', iconClassName: 'animate-pulse' }
       : { icon: Loader2, text: 'Pensando…', className: 'border-neutral-50/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
     : !listeningForPhrase
-      ? { icon: Mic, text: 'Oye quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
+      ? { icon: QuanelaVoiceIcon, text: 'Oye quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
       : handsFree.paused
         ? { icon: EarOff, text: 'En pausa', className: 'border-neutral-800 bg-neutral-900 text-neutral-500' }
         : handsFree.state === 'error'
           ? { icon: AlertTriangle, text: 'Oye quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
           : handsFree.state === 'loading'
             ? { icon: Loader2, text: 'Despertando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-300', thinking: 'wake' as const }
-            : { icon: Ear, text: 'Oye quanela', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
+            : { icon: QuanelaVoiceIcon, text: 'Oye quanela', className: 'border-neutral-50/40 bg-neutral-50/10 text-neutral-50' }
   const Icon = view.icon
   // ADR 0060: while it thinks (or wakes up), the robot itself shows it instead of a spinner.
   const thinking = 'thinking' in view ? view.thinking : null
 
-  const label = conversing
+  const stateLabel = conversing
     ? `${view.text}. Di tu siguiente pregunta o «gracias» para terminar.`
     : active
     ? view.text
@@ -65,13 +69,18 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
             : 'No se pudo iniciar «Oye quanela»'
           : 'Escuchando «Oye quanela» en este equipo'
       : 'Oye quanela: háblale a quanela'
+  const unseen = copilot.available ? copilot.unseen : 0
+  const label = unseen > 0 ? `${stateLabel}. ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver en Copilot` : stateLabel
 
   const items: MenuItem[] = [
     ...(conversing ? [{ label: 'Terminar conversación', icon: Square, onSelect: voice.conversation.end }] : []),
     { label: 'Hablar ahora (Ctrl/⌘ + Shift + J)', icon: Mic, onSelect: voice.listen },
     ...(handsFree.allowed ? [{ label: 'Manos libres en este equipo', icon: Ear, checked: handsFree.on, onSelect: () => handsFree.setOn(!handsFree.on) }] : []),
     ...(listeningForPhrase ? [{ label: handsFree.paused ? 'Reanudar' : 'Pausar', icon: handsFree.paused ? Play : Pause, onSelect: handsFree.togglePause }] : []),
-    { label: 'Voz en este equipo', icon: Settings2, onSelect: () => setSettingsOpen(true), separated: true },
+    ...(copilot.available
+      ? [{ label: unseen > 0 ? `Ver en Copilot (${unseen} sin ver)` : 'Abrir Copilot (Ctrl/⌘ + J)', icon: Sparkles, onSelect: copilot.open, separated: true }]
+      : []),
+    { label: 'Voz en este equipo', icon: Settings2, onSelect: () => setSettingsOpen(true), separated: !copilot.available },
   ]
 
   const showBubble = routed && voice.state !== 'idle' && (voice.state === 'listening' || voice.lastTranscript || voice.lastReply)
@@ -81,31 +90,37 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
       <Menu
         items={items}
         trigger={(props) => (
-          <button
-            type="button"
-            {...props}
-            aria-label={label}
-            title={label}
-            className={clsx(
-              'inline-flex shrink-0 items-center gap-1.5 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-              compact ? 'size-10 justify-center' : 'h-8 px-3 text-xs font-medium',
-              view.className,
-            )}
-          >
-            {thinking ? (
-              <RobotThinking size={compact ? 22 : 16} steps={thinking === 'wake' ? WAKING_STEPS : PILL_STEPS} showText={!compact} className={compact ? undefined : '-ml-1.5 gap-1.5'} />
-            ) : (
-              <>
+          <Tooltip label={label} side="bottom">
+            <button
+              type="button"
+              {...props}
+              aria-label={label}
+              className={clsx(
+                'relative inline-flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                view.className,
+              )}
+            >
+              {thinking ? (
+                <RobotThinking size={22} steps={thinking === 'wake' ? WAKING_STEPS : PILL_STEPS} showText={false} />
+              ) : (
                 <span className="relative inline-flex">
-                  <Icon size={compact ? 16 : 13} className={'iconClassName' in view ? view.iconClassName : undefined} aria-hidden />
+                  <Icon size={18} className={'iconClassName' in view ? view.iconClassName : undefined} aria-hidden />
                   {listeningForPhrase && !handsFree.paused && handsFree.state === 'listening' && !active && (
                     <span className="absolute -top-0.5 -right-0.5 size-1.5 animate-pulse rounded-full bg-neutral-50" aria-hidden />
                   )}
                 </span>
-                {!compact && view.text}
-              </>
-            )}
-          </button>
+              )}
+              {unseen > 0 ? (
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-2xs font-semibold text-on-primary tabular-nums ring-2 ring-neutral-950" aria-hidden>
+                  {unseen > 9 ? '9+' : unseen}
+                </span>
+              ) : (
+                copilot.available && copilot.pending && !thinking && (
+                  <span className="absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full bg-neutral-50 ring-2 ring-neutral-950" aria-hidden />
+                )
+              )}
+            </button>
+          </Tooltip>
         )}
       />
 

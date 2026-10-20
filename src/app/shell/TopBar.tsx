@@ -1,4 +1,3 @@
-import { CopilotButton } from '@/modules/copilot/CopilotProvider'
 import { publicMenuUrl } from '@/modules/publicMenu/lib/cart'
 import { usePublicMenuSettings } from '@/modules/publicMenu/hooks'
 import { VoiceMenu } from '@/modules/voice/components/VoiceMenu'
@@ -103,8 +102,8 @@ function CreateButton({ compact }: { compact: boolean }) {
 
 /**
  * The bar above the content (ADR 0072): fold the sidebar (or open it on a phone), where you are
- * (Cuenta › Módulo › Sección), and the actions of the moment — live, preview of the menu, voice, Copilot and
- * the primary «create».
+ * (Cuenta › Módulo › Sección), and the actions of the moment — live, preview of the menu, the voice assistant
+ * (Copilot opens from its menu, ⌘J and your menu) and the primary «create».
  */
 export function TopBar({ collapsed, onOpenMenu }: { collapsed: boolean; onOpenMenu: () => void }) {
   const active = useActiveKitchen()
@@ -167,14 +166,7 @@ export function TopBar({ collapsed, onOpenMenu }: { collapsed: boolean; onOpenMe
           <OnlineIndicator />
         </span>
         <PreviewButton />
-        <span className="max-lg:hidden flex items-center gap-2">
-          <VoiceMenu />
-          <CopilotButton />
-        </span>
-        <span className="flex items-center gap-1.5 lg:hidden">
-          <VoiceMenu compact />
-          <CopilotButton compact />
-        </span>
+        <VoiceMenu />
         <span className="max-sm:hidden">
           <CreateButton compact={false} />
         </span>

@@ -6,7 +6,7 @@ import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { Drawer } from '@/shared/ui/Drawer'
 import { useToast } from '@/shared/ui/Toast'
 import clsx from 'clsx'
-import { ArrowUp, BookOpen, Check, Copy, ExternalLink, Loader2, Mic, RotateCcw, Sparkles, Square, ThumbsDown, ThumbsUp, Volume2, VolumeX } from 'lucide-react'
+import { ArrowUp, BookOpen, Check, Copy, ExternalLink, Loader2, Mic, RotateCcw, Square, ThumbsDown, ThumbsUp, Volume2, VolumeX } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import { whenSpoken } from '@/shared/voice/speechQueue'
@@ -22,7 +22,7 @@ import {
   type CopilotScope,
   type CopilotTurn,
 } from './api'
-import { CopilotContext, useCopilot } from './copilotContext'
+import { CopilotContext } from './copilotContext'
 import { historyFor, loadConversation, saveConversation, type CopilotMessage } from './lib/conversation'
 import { CopilotMarkdown } from './lib/markdown'
 import { suggestionsFor } from './lib/suggestions'
@@ -59,8 +59,8 @@ const SCOPE_LABEL: Partial<Record<CopilotScope, string>> = {
 const newRequestId = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`)
 
 /**
- * Quanela Copilot (ADR 0020, ADR 0033) for the whole account: the ✦ button in
- * the top bar and Ctrl/⌘ + J open it; «Oye Quanela» sends it every question
+ * quanela Copilot (ADR 0020, ADR 0033) for the whole account: the voice menu of
+ * the top bar, your menu and Ctrl/⌘ + J open it; «Oye Quanela» sends it every question
  * no screen took, and reads the spoken summary aloud. The conversation lives
  * here (in the browser only, while the account is open) so it survives moving
  * between screens. Shown only where the feature is usable.
@@ -145,7 +145,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
             channel,
           },
         ])
-        // Answered while the panel is closed (by voice): one more to see on ✦.
+        // Answered while the panel is closed (by voice): one more to see on the voice button.
         if (!isOpenRef.current) setUnseen((n) => n + 1)
         setRemaining(result.remainingToday)
         return result
@@ -197,7 +197,7 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
           // ADR 0041 (D4): wake the function while the person is still speaking.
           prepare: () => warmCopilot(),
           handle: async (text, { signal, turn }) => {
-            // ADR 0038: the voice does not open the panel; the answer is heard and ✦ shows it is there.
+            // ADR 0038: the voice does not open the panel; the answer is heard and the voice button shows it is there.
             const askedAt = Date.now()
             let spokenAt: number | null = null
             let early: string | null = null
@@ -558,35 +558,5 @@ function CopilotPanel({
         <div ref={endRef} />
       </div>
     </Drawer>
-  )
-}
-
-/** The ✦ button of the top bar. */
-export function CopilotButton({ compact = false }: { compact?: boolean }) {
-  const { available, open, unseen, pending } = useCopilot()
-  if (!available) return null
-  const label = unseen > 0 ? `Abrir quanela Copilot: ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver` : pending ? 'Abrir quanela Copilot: consultando' : 'Abrir quanela Copilot'
-  return (
-    <button
-      type="button"
-      onClick={open}
-      title={`${label} (Ctrl/⌘ + J)`}
-      aria-label={label}
-      className={clsx(
-        'relative inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900 text-neutral-200 transition-colors hover:border-neutral-700 hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none',
-        compact ? 'size-10 justify-center' : 'h-8 px-3 text-xs font-medium',
-      )}
-    >
-      <Sparkles size={compact ? 16 : 13} aria-hidden />
-      {!compact && 'Copilot'}
-      {/* ADR 0038: answers by voice wait here (the voice never opens the panel). */}
-      {unseen > 0 ? (
-        <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-2xs font-semibold text-on-primary tabular-nums ring-2 ring-neutral-950" aria-hidden>
-          {unseen > 9 ? '9+' : unseen}
-        </span>
-      ) : (
-        pending && <span className="absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full bg-neutral-50 ring-2 ring-neutral-950" aria-hidden />
-      )}
-    </button>
   )
 }

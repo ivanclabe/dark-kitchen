@@ -25,7 +25,7 @@ screenshots:
       - 👍 / 👎 para calificar la respuesta.
 ---
 
-1. Toca el ícono de **Copilot** arriba a la derecha (o **Ctrl/⌘ + J**).
+1. Toca el ícono de **«Oye quanela»** arriba a la derecha → **Abrir Copilot**, o tu menú → **Preguntar a Copilot**, o presiona **Ctrl/⌘ + J**.
 2. Escribe tu pregunta y presiona **Enter**, o toca una de las sugerencias. También puedes tocar el micrófono para **dictarla**.
 3. Lee la respuesta. Si preguntaste cómo hacer algo, aparece la tarjeta **Centro de ayuda** con la guía paso a paso.
 4. Califica con 👍 o 👎: así sabemos qué mejorar.
@@ -50,7 +50,7 @@ screenshots:
 - Responde con los datos de **la cuenta activa** y **solo lo que tu rol puede ver**. Si algo no lo puedes ver, te lo dice.
 - Si una respuesta queda incompleta, lo indica. Para cifras exactas de un periodo, revisa [Insights](help:insights).
 - Recuerda **la conversación**: en «¿cuánto vendimos hoy?» … «¿y ayer?», entiende que hablas de las ventas. Se mantiene si recargas la página (30 minutos, solo en esa pestaña).
-- Lo que preguntas por voz no abre el chat: el botón **✦ Copilot** muestra cuántas respuestas tienes **sin ver**.
+- Lo que preguntas por voz no abre el chat: el ícono de **«Oye quanela»** muestra cuántas respuestas tienes **sin ver**.
 - **Nueva conversación** empieza de cero.
 
 > **Bueno saber:** también puedes preguntar con la voz desde cualquier pantalla. Ver [«Oye quanela»: háblale a quanela](help:oye-quanela).
