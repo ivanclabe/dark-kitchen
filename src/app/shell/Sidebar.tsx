@@ -1,5 +1,5 @@
 import { NotificationBell } from '@/modules/notifications/components/NotificationBell'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandMark, BrandWordmark } from '@/shared/brand/BrandMark'
 import { useActiveKitchen } from '@/shared/kitchen/activeKitchenContext'
 import { canAccessAnyModule } from '@/shared/rbac/roles'
 import { Tooltip } from '@/shared/ui/Tooltip'
@@ -113,14 +113,17 @@ export function Sidebar({ collapsed, onNavigate, inDrawer = false }: { collapsed
     // In the phone drawer the whole drawer scrolls; on the desktop only the modules do (search, account and you stay).
     <div className={clsx('flex flex-col', !inDrawer && 'h-full min-h-0', collapsed && 'items-center')}>
       {!inDrawer && (
+        // ADR 0072: open, the words-only logo; folded, the app icon.
         <Link
           to={path('/')}
           onClick={onNavigate}
-          aria-label={`Inicio de ${kitchen.name}`}
-          className={clsx('flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus', collapsed ? 'mb-3' : 'mb-3 px-1.5')}
+          aria-label={`Quanela · inicio de ${kitchen.name}`}
+          className={clsx(
+            'flex shrink-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+            collapsed ? 'mb-3' : 'mb-4 h-8 px-2',
+          )}
         >
-          <BrandMark className="size-8" />
-          {!collapsed && <span className="text-[15px] font-semibold tracking-tight text-neutral-50">Quanela</span>}
+          {collapsed ? <BrandMark className="size-9" /> : <BrandWordmark className="h-[22px]" />}
         </Link>
       )}
 
