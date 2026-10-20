@@ -171,7 +171,7 @@ function startEnrollment(): Promise<Enrollment> {
     // Unfinished enrollments from earlier attempts are cleared first.
     const { data: existing } = await supabase.auth.mfa.listFactors()
     for (const f of existing?.all ?? []) if (f.factor_type === 'totp' && f.status === 'unverified') await supabase.auth.mfa.unenroll({ factorId: f.id })
-    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: `Quanela Global Admin ${new Date().toISOString().slice(0, 16)}` })
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: `quanela Global Admin ${new Date().toISOString().slice(0, 16)}` })
     if (error || !data) throw error ?? new Error('No se pudo preparar el autenticador.')
     return { id: data.id, qr: data.totp.qr_code, secret: data.totp.secret }
   })().finally(() => {
@@ -260,7 +260,7 @@ function RestrictedStep() {
   return (
     <div className="space-y-4">
       <Heading icon={ShieldAlert} title="Acceso restringido">
-        {restrictedEmail ? `${restrictedEmail} no` : 'Esta cuenta no'} tiene acceso a Quanela Global Admin. Tu sesión en Quanela no cambia.
+        {restrictedEmail ? `${restrictedEmail} no` : 'Esta cuenta no'} tiene acceso a quanela Global Admin. Tu sesión en quanela no cambia.
       </Heading>
       <Button variant="secondary" className="w-full" onClick={() => void signOut()}>
         Volver

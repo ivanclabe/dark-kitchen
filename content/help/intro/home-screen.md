@@ -37,7 +37,7 @@ Hasta tres tarjetas:
 
 - **Lo urgente** (por ejemplo, pedidos atrasados), con el botón para resolverlo. No se puede descartar mientras siga pasando.
 - **El siguiente paso** de tu negocio (por ejemplo, publicar tu menú web) o una guía de la ayuda.
-- **Novedades** de Quanela.
+- **Novedades** de quanela.
 
 La guía y las novedades se cierran con la **×** y no vuelven a aparecer en ese equipo.
 

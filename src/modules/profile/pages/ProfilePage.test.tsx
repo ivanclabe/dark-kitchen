@@ -84,7 +84,7 @@ describe('Mi perfil', () => {
   it('who signs in with Google is told so, without a password form', () => {
     state.user = { email: 'laura@negocio.co', app_metadata: { providers: ['google'] } }
     renderPage()
-    expect(screen.getByText(/Entras con Google: no usas una contraseña de Quanela/)).toBeTruthy()
+    expect(screen.getByText(/Entras con Google: no usas una contraseña de quanela/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Cambiar contraseña' })).toBeNull()
   })
 })

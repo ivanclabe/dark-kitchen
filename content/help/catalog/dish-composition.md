@@ -42,11 +42,11 @@ A la derecha ves **Así lo ve el cliente** y **Precio y costo**: el costo de lo 
 ## Lo que pasa con un pedido
 
 - **Menú público:** el cliente toca el plato y elige. Ve el precio de cada opción y un **resumen** con el total antes de agregarlo. «Agregar» no se activa hasta que elige lo obligatorio.
-- **Caja:** al elegir un plato configurable en el pedido, aparecen sus opciones con el total por unidad. El precio base lo puedes cambiar; los extras los calcula Quanela.
+- **Caja:** al elegir un plato configurable en el pedido, aparecen sus opciones con el total por unidad. El precio base lo puedes cambiar; los extras los calcula quanela.
 - **Cocina:** el tablero y el detalle del pedido muestran lo elegido («Sancocho · Res · Patacones ×2»).
 - **Inventario:** al confirmar se reserva lo que lleva el plato **y** lo que se eligió, en la unidad correcta. Se descuenta cuando la cocina empieza a prepararlo, y si se cancela, todo vuelve. Una preparación (por ejemplo, los patacones) sale de su stock: el plátano ya salió cuando se preparó el lote.
 - **Costos:** Insights y Finanzas usan el costo de lo que el cliente eligió.
 
 > **Bueno saber:** si una opción no tiene stock para una porción, el menú público la muestra **Agotada**. Si al pedir falta algo, el pedido no se confirma y dice qué falta.
 
-> **Bueno saber:** el precio siempre lo calcula Quanela con tu menú de hoy y la composición: lo que ve el cliente en su celular es solo una vista previa.
+> **Bueno saber:** el precio siempre lo calcula quanela con tu menú de hoy y la composición: lo que ve el cliente en su celular es solo una vista previa.

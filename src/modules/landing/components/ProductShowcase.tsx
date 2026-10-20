@@ -92,7 +92,7 @@ export function ProductShowcase() {
             src={screen.src}
             width={screen.width}
             height={screen.height}
-            alt={`Pantalla ${screen.name} de Quanela con datos de ejemplo`}
+            alt={`Pantalla ${screen.name} de quanela con datos de ejemplo`}
             loading="lazy"
             className={clsx(
               'landing-shutter absolute top-4 left-4 max-w-none rounded-xl lg:top-[72px] lg:left-16',

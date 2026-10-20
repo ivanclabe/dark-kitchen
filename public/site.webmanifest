@@ -1,6 +1,6 @@
 {
-  "name": "Quanela",
-  "short_name": "Quanela",
+  "name": "quanela",
+  "short_name": "quanela",
   "icons": [
     { "src": "/icons/quanela-app-icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/quanela-app-icon-512.png", "sizes": "512x512", "type": "image/png" }

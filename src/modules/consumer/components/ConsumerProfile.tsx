@@ -72,7 +72,7 @@ export function ConsumerProfile({ state }: { state: StorefrontState }) {
       {
         onSuccess: () => {
           setSavedAt(Date.now())
-          show(form.published ? 'Guardado: los cambios ya se ven en Quanela Consumer.' : 'Perfil guardado.')
+          show(form.published ? 'Guardado: los cambios ya se ven en quanela Consumer.' : 'Perfil guardado.')
         },
       },
     )
@@ -116,7 +116,7 @@ export function ConsumerProfile({ state }: { state: StorefrontState }) {
           <Inherited label="Tipo de cocina" value={cuisine ?? 'Sin definir'} muted={account.cuisine === null && cuisine ? '(como el negocio)' : undefined} />
         </dl>
         <div className="mt-5 border-t border-neutral-800/60 pt-5">
-          <FormField label="Frase corta" hint={`Solo para Quanela Consumer · ${(form.tagline ?? '').length} de 140`}>
+          <FormField label="Frase corta" hint={`Solo para quanela Consumer · ${(form.tagline ?? '').length} de 140`}>
             {(a11y) => <Input {...a11y} value={form.tagline ?? ''} maxLength={140} placeholder="Smash burgers a la plancha" onChange={(e) => set('tagline', e.target.value)} className="sm:max-w-md" />}
           </FormField>
         </div>
@@ -124,10 +124,10 @@ export function ConsumerProfile({ state }: { state: StorefrontState }) {
 
       <Card title="Contacto y ubicación" icon={MapPin} description="Para que el cliente te pida y sepa a qué distancia estás.">
         <FormGrid>
-          <FormField label="WhatsApp para pedidos" hint="Opcional. El cliente te envía su pedido por WhatsApp desde Quanela." error={waError}>
+          <FormField label="WhatsApp para pedidos" hint="Opcional. El cliente te envía su pedido por WhatsApp desde quanela." error={waError}>
             {(a11y) => <PhoneInput {...a11y} value={form.whatsapp_phone ?? ''} onValueChange={(v) => set('whatsapp_phone', v)} />}
           </FormField>
-          <FormField label="Ubicación" hint={form.latitude != null ? `${form.latitude}, ${form.longitude}` : 'Sin ubicación, Quanela no puede decir a qué distancia estás.'}>
+          <FormField label="Ubicación" hint={form.latitude != null ? `${form.latitude}, ${form.longitude}` : 'Sin ubicación, quanela no puede decir a qué distancia estás.'}>
             {() => (
               <div className="flex flex-wrap gap-2">
                 <Button icon={LocateFixed} loading={locating} onClick={locate}>
@@ -154,7 +154,7 @@ export function ConsumerProfile({ state }: { state: StorefrontState }) {
         </FormGrid>
       </Card>
 
-      <Card title="Datos que compartes" icon={BarChart3} description="Ayudan a que Quanela te recomiende. Nunca ventas, costos ni datos de tus clientes.">
+      <Card title="Datos que compartes" icon={BarChart3} description="Ayudan a que quanela te recomiende. Nunca ventas, costos ni datos de tus clientes.">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm font-medium text-neutral-100">Compartir tiempos y cumplimiento</p>

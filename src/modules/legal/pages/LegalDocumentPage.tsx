@@ -31,7 +31,7 @@ export function LegalDocumentPage() {
   const onClick = useInternalLinks()
 
   useEffect(() => {
-    if (doc) document.title = `${doc.title} · Quanela`
+    if (doc) document.title = `${doc.title} · quanela`
     // A link to a section (#encargados) lands on it once the document is drawn.
     const id = window.location.hash.slice(1)
     if (id) document.getElementById(decodeURIComponent(id))?.scrollIntoView()
@@ -71,7 +71,7 @@ export function LegalDocumentPage() {
 
 export function LegalIndexPage() {
   useEffect(() => {
-    document.title = 'Documentos legales · Quanela'
+    document.title = 'Documentos legales · quanela'
   }, [])
   return (
     <LegalLayout>
@@ -93,7 +93,7 @@ export function LegalIndexPage() {
           <li>
             <Link to="/legal/preferencias" className="block h-full rounded-2xl border border-neutral-800 p-4 transition-colors hover:border-brasa-500/40 hover:bg-neutral-900">
               <span className="block font-medium text-neutral-100">Preferencias de privacidad</span>
-              <span className="mt-1 block text-sm text-neutral-400">Qué guarda Quanela en tu navegador y qué puedes apagar.</span>
+              <span className="mt-1 block text-sm text-neutral-400">Qué guarda quanela en tu navegador y qué puedes apagar.</span>
             </Link>
           </li>
         </ul>

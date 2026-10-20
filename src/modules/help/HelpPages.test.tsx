@@ -47,7 +47,7 @@ describe('public help center (ADR 0034)', () => {
     renderAt('/help/orders/register-payment')
     expect(screen.getByRole('heading', { level: 1, name: 'Registrar y anular pagos' })).toBeTruthy()
     expect(screen.getByText('Confirmar pago', { selector: 'strong' })).toBeTruthy()
-    expect(screen.getByRole('link', { name: /Abrir en Quanela/ })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Abrir en quanela/ })).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Artículos relacionados' })).toBeTruthy()
     // A screenshot not taken yet shows its placeholder, with its description for screen readers.
     expect(screen.getAllByRole('img').length).toBeGreaterThan(0)
@@ -73,9 +73,9 @@ describe('public help center (ADR 0034)', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Registrar una compra' })).toBeTruthy()
   })
 
-  it('«Volver a Quanela» with a session', () => {
+  it('«Volver a quanela» with a session', () => {
     state.session = {}
     renderAt('/help/faq/faq')
-    expect(screen.getByRole('link', { name: 'Volver a Quanela' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Volver a quanela' })).toBeTruthy()
   })
 })

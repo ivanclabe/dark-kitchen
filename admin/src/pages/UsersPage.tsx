@@ -95,7 +95,7 @@ export function UsersPage() {
 
   return (
     <>
-      <PageTitle title="Users" icon={Users} description={data ? `${data.length} usuarios en todas las organizaciones.` : 'Todos los usuarios de Quanela.'} />
+      <PageTitle title="Users" icon={Users} description={data ? `${data.length} usuarios en todas las organizaciones.` : 'Todos los usuarios de quanela.'} />
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative min-w-56 flex-1">
           <Search size={14} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500" aria-hidden />

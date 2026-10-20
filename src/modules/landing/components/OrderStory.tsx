@@ -177,7 +177,7 @@ function OrderTicket({ index, onAdvance }: { index: number; onAdvance: () => voi
         <div className="mt-4 flex gap-3 rounded-xl bg-neutral-950/60 p-3.5">
           <RobotFace mood="ai" size={36} className="shrink-0" />
           <div className="text-xs leading-relaxed">
-            <p className="font-medium text-neutral-100">Quanela sugiere</p>
+            <p className="font-medium text-neutral-100">quanela sugiere</p>
             <p className="mt-1 text-neutral-300">
               Quedan 11 panes brioche. Al ritmo de esta semana alcanzan hasta el sábado: agrega 30 a tu próxima compra.
             </p>
@@ -258,7 +258,7 @@ export function OrderStory({ hero, steps }: { hero: ReactNode; steps: StoryStep[
           {/* Quanela's robot lives in the stage's top corner and thinks aloud what the app just did with the order. */}
           <div className="flex w-full items-start justify-end gap-2">
             <p key={index} className="landing-thought" aria-live="polite">
-              <span className="landing-thought-name">Quanela</span>
+              <span className="landing-thought-name">quanela</span>
               {state.thought}
             </p>
             <RobotFace key={state.robot + index} mood={state.robot} size={120} className="landing-robot-pop landing-stage-robot" />

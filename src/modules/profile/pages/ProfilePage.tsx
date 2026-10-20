@@ -162,7 +162,7 @@ function SecurityCard({ email, providers }: { email: string; providers: string[]
     const via = providers.map((p) => PROVIDER_LABEL[p]).find(Boolean) ?? 'otro método'
     return (
       <Card title="Seguridad" icon={KeyRound}>
-        <p className={typography.small}>Entras con {via}: no usas una contraseña de Quanela.</p>
+        <p className={typography.small}>Entras con {via}: no usas una contraseña de quanela.</p>
       </Card>
     )
   }

@@ -17,7 +17,7 @@ updated: 2026-10-06
 order: 3
 ---
 
-Quanela trae seis **plantillas de rol**. Tu negocio puede crear roles propios con otros permisos (ver [Usuarios y roles](help:users-and-roles)).
+quanela trae seis **plantillas de rol**. Tu negocio puede crear roles propios con otros permisos (ver [Usuarios y roles](help:users-and-roles)).
 
 | Rol | Para qué es | Empieza en | Ve en el menú |
 |---|---|---|---|
@@ -34,4 +34,4 @@ Quanela trae seis **plantillas de rol**. Tu negocio puede crear roles propios co
 - **CAJA** ve las ventas en Insights, pero **no** los costos ni los márgenes (eso es «Rentabilidad»).
 - El **DOMICILIARIO** solo ve los pedidos que le asignaron.
 - Si tienes **varios roles**, eliges con cuál trabajar en el menú de usuario → «Cambiar de rol», o en el indicador de arriba («Trabajar como»).
-- Todos los roles pueden usar **Copilot** y **«Oye Quanela»**, pero Copilot solo responde con lo que tu rol puede ver.
+- Todos los roles pueden usar **Copilot** y **«Oye quanela»**, pero Copilot solo responde con lo que tu rol puede ver.

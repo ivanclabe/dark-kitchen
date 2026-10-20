@@ -26,7 +26,7 @@ const FEATURES: { title: string; body: string[]; proof: ReactNode }[] = [
     title: 'Inventario y compras',
     body: [
       'Stock, compras y proveedores en un lugar. Te avisa qué insumo quedó por debajo de su mínimo y te sugiere cuánto reponer según lo que de verdad gastas.',
-      'Sube la foto o el PDF de una factura: Quanela la lee y la deja lista para que la revises y la confirmes.',
+      'Sube la foto o el PDF de una factura: quanela la lee y la deja lista para que la revises y la confirmes.',
     ],
     proof: (
       <ul className="space-y-2 tabular-nums">
@@ -109,15 +109,15 @@ const FEATURES: { title: string; body: string[]; proof: ReactNode }[] = [
     ),
   },
   {
-    title: 'Oye Quanela',
+    title: 'Oye quanela',
     body: [
       'Comandos de voz y avisos hablados para la cocina, en español. La línea avanza los pedidos sin soltar la espátula.',
-      'Y Quanela Copilot responde preguntas sobre tu operación con tus datos.',
+      'Y quanela Copilot responde preguntas sobre tu operación con tus datos.',
     ],
     proof: (
       <div className="space-y-2.5">
         <p className="flex items-center gap-2 text-neutral-300">
-          <Mic size={14} className="text-brasa-400" aria-hidden /> «Oye Quanela, pedido 1004 listo»
+          <Mic size={14} className="text-brasa-400" aria-hidden /> «Oye quanela, pedido 1004 listo»
         </p>
         <p className="rounded-lg bg-neutral-900 px-3 py-2 text-neutral-100">Pedido 1004 listo para despachar.</p>
       </div>

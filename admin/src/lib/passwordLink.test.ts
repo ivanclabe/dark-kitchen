@@ -11,6 +11,6 @@ describe('shareMessage', () => {
   })
 
   it('reset links only mention the password', () => {
-    expect(shareMessage({ name: 'Ana', email: 'a@x.co', mode: 'reset', link: 'https://quanela.com/set-password?token_hash=h&type=recovery' })).toContain('para crear tu contraseña en Quanela')
+    expect(shareMessage({ name: 'Ana', email: 'a@x.co', mode: 'reset', link: 'https://quanela.com/set-password?token_hash=h&type=recovery' })).toContain('para crear tu contraseña en quanela')
   })
 })

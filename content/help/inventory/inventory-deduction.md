@@ -20,7 +20,7 @@ updated: 2026-10-18
 order: 5
 ---
 
-Quanela mueve el inventario solo, siguiendo al pedido:
+quanela mueve el inventario solo, siguiendo al pedido:
 
 | Momento | Qué pasa con los insumos |
 |---|---|

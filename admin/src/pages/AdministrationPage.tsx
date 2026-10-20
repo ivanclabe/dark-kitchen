@@ -38,7 +38,7 @@ export function AdministrationPage() {
 
   return (
     <>
-      <PageTitle title="Administration" icon={Settings} description="Configuración de la plataforma. Lo de cada organización se configura en Quanela." />
+      <PageTitle title="Administration" icon={Settings} description="Configuración de la plataforma. Lo de cada organización se configura en quanela." />
       <div className="mb-5">
         <Tabs value={section} onChange={(s) => setParams(s === 'platform' ? {} : { section: s }, { replace: true })} items={SECTIONS} />
       </div>
@@ -54,7 +54,7 @@ export function AdministrationPage() {
       {section === 'organizations' && (
         <Panel title="Configuración de las organizaciones">
           <div className="space-y-2 text-sm text-neutral-300">
-            <p>Cada organización configura lo suyo desde Quanela: funciones de IA, voz, roles, usuarios y cuentas. El portal no lo cambia, para no mezclar la plataforma con las decisiones de cada negocio.</p>
+            <p>Cada organización configura lo suyo desde quanela: funciones de IA, voz, roles, usuarios y cuentas. El portal no lo cambia, para no mezclar la plataforma con las decisiones de cada negocio.</p>
             <p>
               Desde aquí puedes consultarlo en el detalle de cada organización (pestaña Configuración), y crear, desactivar o reactivar organizaciones en{' '}
               <Link to="/organizations" className="text-brasa-400 hover:underline">

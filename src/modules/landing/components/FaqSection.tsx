@@ -17,7 +17,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: '¿Puedo cancelar?',
-    a: 'Sí, cuando quieras, desde Facturación. No hay permanencia: sigues usando Quanela hasta el final del período que pagaste y no se vuelve a cobrar.',
+    a: 'Sí, cuando quieras, desde Facturación. No hay permanencia: sigues usando quanela hasta el final del período que pagaste y no se vuelve a cobrar.',
   },
   {
     q: '¿Qué pasa si llego al límite de mi plan?',

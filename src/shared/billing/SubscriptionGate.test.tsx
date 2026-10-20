@@ -58,9 +58,9 @@ describe('the subscription gate (ADR 0066)', () => {
     expect(screen.queryByRole('button', { name: 'Pagar con tarjeta' })).toBeNull()
   })
 
-  it('payments not open yet: talk to Quanela', () => {
+  it('payments not open yet: talk to quanela', () => {
     show(access({ paymentsActive: false }))
-    expect(screen.getByRole('link', { name: 'Escribir a Quanela' }).getAttribute('href')).toBe('mailto:ventas@quanela.test')
+    expect(screen.getByRole('link', { name: 'Escribir a quanela' }).getAttribute('href')).toBe('mailto:ventas@quanela.test')
   })
 
   it('an expired renewal is paid as it is (no plan picker)', () => {

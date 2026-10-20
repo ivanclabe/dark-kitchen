@@ -124,7 +124,7 @@ export function ConnectionTab({ settings }: { settings: WaSettings }) {
           />
         )}
 
-        <Card title="Conecta tu número oficial" icon={Plug} description="WhatsApp Business Platform (API de Meta). Tu número, tu cuenta de Meta: Quanela solo envía en tu nombre.">
+        <Card title="Conecta tu número oficial" icon={Plug} description="WhatsApp Business Platform (API de Meta). Tu número, tu cuenta de Meta: quanela solo envía en tu nombre.">
           <ol className="space-y-5">
             <Step n={1} title="En Meta, prepara tu app y tu número">
               <ul className="list-disc space-y-1 pl-4 break-words text-neutral-400">

@@ -1,4 +1,4 @@
-# Documentos legales de Quanela
+# Documentos legales de quanela
 
 Aquí viven los textos legales que se publican en `/legal/<slug>` y que los usuarios aceptan. La decisión y el contexto están en `docs/adr/0071-cumplimiento-legal-colombia.md`.
 

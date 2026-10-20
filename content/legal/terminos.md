@@ -1,17 +1,17 @@
 ---
 slug: terminos
 title: Términos y Condiciones
-summary: Las reglas para usar Quanela, la plataforma para restaurantes y cocinas, y cómo tratamos por encargo los datos de los clientes de tu negocio.
-version: "1.0"
-effective: 2026-10-19
+summary: Las reglas para usar quanela, la plataforma para restaurantes y cocinas, y cómo tratamos por encargo los datos de los clientes de tu negocio.
+version: "1.1"
+effective: 2026-10-20
 order: 1
 ---
 
-Estos Términos y Condiciones regulan el uso de Quanela. Léelos con calma: al marcar la casilla «Acepto los Términos y Condiciones» celebras un contrato con nosotros. Si algo no te queda claro, escríbenos antes de aceptar.
+Estos Términos y Condiciones regulan el uso de quanela. Léelos con calma: al marcar la casilla «Acepto los Términos y Condiciones» celebras un contrato con nosotros. Si algo no te queda claro, escríbenos antes de aceptar.
 
 ## 1. Quiénes somos
 
-Quanela es un servicio de {{empresa.razonSocial}} (en adelante, «Quanela» o «nosotros»).
+quanela es un servicio de {{empresa.razonSocial}} (en adelante, «quanela» o «nosotros»).
 
 | Dato | Valor |
 | --- | --- |
@@ -25,26 +25,26 @@ Quanela es un servicio de {{empresa.razonSocial}} (en adelante, «Quanela» o «
 | Ventas | {{empresa.correoComercial}} |
 | Sitio web | {{empresa.sitioWeb}} |
 
-## 2. Qué es Quanela
+## 2. Qué es quanela
 
-Quanela es una plataforma web (software como servicio) para restaurantes y cocinas ocultas (*dark kitchens*) en Colombia. Incluye, según el plan:
+quanela es una plataforma web (software como servicio) para restaurantes y cocinas ocultas (*dark kitchens*) en Colombia. Incluye, según el plan:
 
 - pedidos, pantalla de cocina e inventario;
 - recetas, planeación de menú y finanzas;
 - menú web público y pedidos por WhatsApp;
-- un asistente con inteligencia artificial: Copilot, análisis (*insights*), lectura de facturas, diseñador de menú y el modo de voz «Oye Quanela».
+- un asistente con inteligencia artificial: Copilot, análisis (*insights*), lectura de facturas, diseñador de menú y el modo de voz «Oye quanela».
 
 El servicio se presta a través de internet. No incluye equipos, conexión ni instalación en tu local.
 
 ## 3. Definiciones
 
-- **Organización:** tu negocio dentro de Quanela. La crea quien se registra.
+- **Organización:** tu negocio dentro de quanela. La crea quien se registra.
 - **Cuenta:** cada cocina, sede o local de la organización.
 - **Propietario:** la persona que registra la organización y la administra.
 - **Personal:** las personas que el propietario invita, con un nombre, un correo y unos roles.
 - **Usuario:** el propietario y el personal.
 - **Clientes finales:** las personas que compran a tu negocio, por ejemplo desde el menú web o por WhatsApp.
-- **Contenido del negocio:** lo que tú o tu personal cargan en Quanela: menú, fotos, logos, recetas, facturas, datos de clientes y proveedores, entre otros.
+- **Contenido del negocio:** lo que tú o tu personal cargan en quanela: menú, fotos, logos, recetas, facturas, datos de clientes y proveedores, entre otros.
 - **Plan y periodo:** la modalidad contratada y el lapso (mensual o anual) que cubre cada pago.
 - **Responsable y Encargado del Tratamiento:** los términos de la Ley 1581 de 2012. El Responsable decide sobre los datos personales; el Encargado los trata por cuenta del Responsable.
 
@@ -54,9 +54,9 @@ El servicio se presta a través de internet. No incluye equipos, conexión ni in
 - La aceptación electrónica tiene validez según la Ley 527 de 1999. Guardamos prueba de ella: la versión y la huella del documento, la fecha y hora, la dirección IP y el navegador. Puedes ver los documentos que aceptaste en [Privacidad y datos](/perfil/privacidad).
 - La Política de Tratamiento de Datos Personales se acepta con una casilla aparte. La renovación automática con tarjeta también se autoriza por separado (ver la sección 8).
 
-## 5. Quién puede usar Quanela
+## 5. Quién puede usar quanela
 
-- Quanela es solo para **mayores de 18 años** que actúan en nombre de un negocio. Al registrarte declaras ser mayor de edad.
+- quanela es solo para **mayores de 18 años** que actúan en nombre de un negocio. Al registrarte declaras ser mayor de edad.
 - Si registras una organización a nombre de una empresa, declaras que tienes facultades para obligarla. En ese caso, «tú» se refiere también a la empresa.
 - No está dirigido a menores de edad ni a uso personal o doméstico.
 
@@ -72,7 +72,7 @@ El servicio se presta a través de internet. No incluye equipos, conexión ni in
 
 Te comprometes a no:
 
-- usar Quanela para actividades ilegales, fraudulentas o que vulneren derechos de otras personas;
+- usar quanela para actividades ilegales, fraudulentas o que vulneren derechos de otras personas;
 - cargar datos personales sin tener la autorización que exige la ley;
 - enviar mensajes no solicitados o publicidad sin consentimiento a través de las integraciones con WhatsApp;
 - intentar acceder a datos de otras organizaciones, saltar controles de seguridad o de permisos, o probar vulnerabilidades sin nuestra autorización escrita;
@@ -93,31 +93,31 @@ Te comprometes a no:
 
 ## 10. Los datos de los clientes de tu negocio
 
-Tu negocio es el **Responsable** de los datos de sus clientes finales, proveedores y personal que carga en Quanela. Quanela es su **Encargado**. Por eso:
+Tu negocio es el **Responsable** de los datos de sus clientes finales, proveedores y personal que carga en quanela. quanela es su **Encargado**. Por eso:
 
-- Debes contar con la autorización de los titulares cuando la ley la exige (Ley 1581 de 2012, art. 9) y con una política de tratamiento de datos. Quanela te da una política lista, generada con los datos de tu negocio, y una casilla de aceptación en el menú web público y un enlace en el saludo de WhatsApp. Revisa que esos datos estén completos y correctos en Configuración: el contenido de esa política es responsabilidad de tu negocio.
+- Debes contar con la autorización de los titulares cuando la ley la exige (Ley 1581 de 2012, art. 9) y con una política de tratamiento de datos. quanela te da una política lista, generada con los datos de tu negocio, y una casilla de aceptación en el menú web público y un enlace en el saludo de WhatsApp. Revisa que esos datos estén completos y correctos en Configuración: el contenido de esa política es responsabilidad de tu negocio.
 - **No cargues datos sensibles** (por ejemplo, de salud, religión u orientación) sin la autorización expresa del titular (Ley 1581 de 2012, arts. 5 y 6). Las preferencias alimentarias de un cliente son opcionales y solo deben registrarse si el cliente lo autoriza expresamente.
-- Debes atender las consultas y reclamos de tus clientes. Quanela te ayuda con herramientas como anonimizar un cliente.
+- Debes atender las consultas y reclamos de tus clientes. quanela te ayuda con herramientas como anonimizar un cliente.
 - Las integraciones que configures (por ejemplo, webhooks hacia n8n u otros servicios) envían datos a destinos que tú eliges, bajo tu responsabilidad.
 
-Las obligaciones de Quanela como Encargado están en el **Anexo de tratamiento de datos por encargo** (sección 20), que hace parte de estos términos. Los datos de los usuarios de Quanela se rigen por la [Política de Tratamiento de Datos Personales](/legal/privacidad).
+Las obligaciones de quanela como Encargado están en el **Anexo de tratamiento de datos por encargo** (sección 20), que hace parte de estos términos. Los datos de los usuarios de quanela se rigen por la [Política de Tratamiento de Datos Personales](/legal/privacidad).
 
 ## 11. Propiedad intelectual
 
-- **Lo nuestro:** el software, el diseño, la marca Quanela, sus logos y la documentación son de {{empresa.razonSocial}} o de sus licenciantes. Te damos una licencia de uso limitada, no exclusiva e intransferible, mientras tu suscripción esté vigente y solo para tu negocio.
+- **Lo nuestro:** el software, el diseño, la marca quanela, sus logos y la documentación son de {{empresa.razonSocial}} o de sus licenciantes. Te damos una licencia de uso limitada, no exclusiva e intransferible, mientras tu suscripción esté vigente y solo para tu negocio.
 - **Lo tuyo:** el contenido del negocio sigue siendo tuyo. Nos das una licencia limitada, gratuita y no exclusiva para alojarlo, copiarlo técnicamente, adaptarlo de formato y mostrarlo, solo para prestarte el servicio; por ejemplo, para publicar las fotos de tus platos y tu logo en tu menú web público. Esta licencia termina cuando se borra el contenido, salvo las copias que la ley nos obligue a conservar.
-- Garantizas que tienes los derechos sobre lo que cargas (fotos, logos, textos) y que su uso en Quanela no infringe derechos de terceros.
+- Garantizas que tienes los derechos sobre lo que cargas (fotos, logos, textos) y que su uso en quanela no infringe derechos de terceros.
 
 ## 12. Funciones de inteligencia artificial
 
-- Copilot, los análisis, la lectura de facturas, el diseñador de menú, el asistente de WhatsApp y «Oye Quanela» usan modelos de un proveedor de IA (ver la sección 20.6).
+- Copilot, los análisis, la lectura de facturas, el diseñador de menú, el asistente de WhatsApp y «Oye quanela» usan modelos de un proveedor de IA (ver la sección 20.6).
 - Para responder, enviamos al proveedor tu pregunta o el texto, y los datos del negocio necesarios, que pueden incluir nombres de clientes.
 - **Los resultados pueden tener errores.** Revísalos antes de usarlos, sobre todo en cantidades, precios, costos, inventario y datos de facturas. Las decisiones son de tu negocio.
 - El reconocimiento de voz funciona por defecto en tu dispositivo: el audio no sale de él. Si eliges el reconocimiento en línea del navegador, el audio se envía a Google; la app te lo advierte antes de activarlo.
 
 ## 13. Disponibilidad y soporte
 
-- Trabajamos para que Quanela esté disponible de forma continua, pero puede haber interrupciones por mantenimiento, fallas de proveedores o de internet, o causas fuera de nuestro control. Cuando podamos, avisaremos con anticipación los mantenimientos programados.
+- Trabajamos para que quanela esté disponible de forma continua, pero puede haber interrupciones por mantenimiento, fallas de proveedores o de internet, o causas fuera de nuestro control. Cuando podamos, avisaremos con anticipación los mantenimientos programados.
 - Podemos mejorar, cambiar o retirar funciones. Si retiramos una función esencial de tu plan, te avisaremos y podrás cancelar.
 - El soporte se presta por los canales de la sección 1 y dentro de la app.
 
@@ -162,7 +162,7 @@ Este anexo es el contrato de transmisión de datos personales entre tu negocio (
 
 ### 20.1 Alcance
 
-Aplica a los datos personales que tu negocio carga o recibe en Quanela sobre terceros:
+Aplica a los datos personales que tu negocio carga o recibe en quanela sobre terceros:
 
 - clientes finales: nombre, teléfono, direcciones de entrega, quién recibe, notas, historial de pedidos, quejas y preferencias opcionales;
 - conversaciones de WhatsApp con tus clientes;
@@ -172,11 +172,11 @@ Aplica a los datos personales que tu negocio carga o recibe en Quanela sobre ter
 
 ### 20.2 Actividades por cuenta del negocio
 
-Quanela trata estos datos solo para prestarte el servicio: almacenarlos, mostrarlos, organizarlos y procesar pedidos; enviar los mensajes que tu negocio dispone (por ejemplo, avisos de pedidos por WhatsApp a quien los autorizó); generar reportes, y procesarlos con IA cuando usas esas funciones.
+quanela trata estos datos solo para prestarte el servicio: almacenarlos, mostrarlos, organizarlos y procesar pedidos; enviar los mensajes que tu negocio dispone (por ejemplo, avisos de pedidos por WhatsApp a quien los autorizó); generar reportes, y procesarlos con IA cuando usas esas funciones.
 
-### 20.3 Obligaciones de Quanela
+### 20.3 Obligaciones de quanela
 
-Quanela se obliga a (Ley 1581 de 2012, art. 18):
+quanela se obliga a (Ley 1581 de 2012, art. 18):
 
 1. Tratar los datos solo según tus instrucciones, tu política de tratamiento y las finalidades que los titulares autorizaron.
 2. **No usarlos para fines propios**, no venderlos ni cederlos y no mezclarlos con los de otros negocios.
@@ -189,15 +189,15 @@ Quanela se obliga a (Ley 1581 de 2012, art. 18):
 
 ### 20.4 Obligaciones del negocio
 
-Tu negocio se obliga a contar con las autorizaciones de los titulares, a informarles sobre el tratamiento (con la política que Quanela te ofrece o con la tuya), a no cargar datos sensibles sin autorización expresa y a atender sus derechos.
+Tu negocio se obliga a contar con las autorizaciones de los titulares, a informarles sobre el tratamiento (con la política que quanela te ofrece o con la tuya), a no cargar datos sensibles sin autorización expresa y a atender sus derechos.
 
 ### 20.5 Al terminar
 
-Cuando termine el contrato, puedes pedir una copia de los datos. Después, Quanela los suprime o anonimiza, salvo los que la ley le obligue a conservar, que mantendrá bloqueados y solo para ese fin.
+Cuando termine el contrato, puedes pedir una copia de los datos. Después, quanela los suprime o anonimiza, salvo los que la ley le obligue a conservar, que mantendrá bloqueados y solo para ese fin.
 
 ### 20.6 Subencargados
 
-Aceptas que Quanela se apoye en estos proveedores, que tratan los datos por cuenta de Quanela y bajo obligaciones de seguridad y confidencialidad:
+Aceptas que quanela se apoye en estos proveedores, que tratan los datos por cuenta de quanela y bajo obligaciones de seguridad y confidencialidad:
 
 | Proveedor | Para qué | País |
 | --- | --- | --- |

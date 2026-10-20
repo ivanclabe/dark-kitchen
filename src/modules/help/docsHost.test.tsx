@@ -33,7 +33,7 @@ describe('the help center on doc.quanela.com', () => {
     expect(screen.getByRole('link', { name: 'Entrar' }).getAttribute('href')).toBe('https://quanela.com/login')
   })
 
-  it('an article: links between articles without /help, «Abrir en Quanela» through the sign-in, its canonical address', async () => {
+  it('an article: links between articles without /help, «Abrir en quanela» through the sign-in, its canonical address', async () => {
     open('/faq/faq')
     expect(await screen.findByRole('heading', { level: 1, name: 'Preguntas frecuentes' })).toBeTruthy()
     const inText = [...document.querySelectorAll<HTMLAnchorElement>('.help-prose a[data-help-link]')].map((a) => a.getAttribute('href'))
@@ -42,7 +42,7 @@ describe('the help center on doc.quanela.com', () => {
     cleanup()
     open('/orders/register-payment')
     expect(await screen.findByRole('heading', { level: 1, name: 'Registrar y anular pagos' })).toBeTruthy()
-    expect(screen.getByRole('link', { name: /Abrir en Quanela/ }).getAttribute('href')).toBe('https://quanela.com/login?next=%2Foperations')
+    expect(screen.getByRole('link', { name: /Abrir en quanela/ }).getAttribute('href')).toBe('https://quanela.com/login?next=%2Foperations')
     expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe('https://doc.quanela.com/orders/register-payment')
   })
 

@@ -21,7 +21,7 @@ order: 4
 
 1. En **Abastecimiento → Stock**, abre el insumo.
 2. Toca **Merma**.
-3. Escribe la **Cantidad** que se perdió y su **unidad** (por ejemplo, 0,1 **kg** de un insumo en gramos: Quanela te muestra «0,1 kg = 100 g»). Elige el **Motivo**: Vencimiento, Daño, Error de preparación u Otro. Agrega una **Observación** si ayuda.
+3. Escribe la **Cantidad** que se perdió y su **unidad** (por ejemplo, 0,1 **kg** de un insumo en gramos: quanela te muestra «0,1 kg = 100 g»). Elige el **Motivo**: Vencimiento, Daño, Error de preparación u Otro. Agrega una **Observación** si ayuda.
 4. Toca **Registrar merma**. Sale del inventario automáticamente.
 
 ## Corregir el stock (ajuste)

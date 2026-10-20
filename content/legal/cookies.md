@@ -1,8 +1,8 @@
 ---
 slug: cookies
 title: Política de Cookies
-summary: Qué cookies y qué almacenamiento del navegador usa Quanela, para qué sirven, cuánto duran y cómo gestionarlos. No usamos analítica ni publicidad.
-version: "1.1"
+summary: Qué cookies y qué almacenamiento del navegador usa quanela, para qué sirven, cuánto duran y cómo gestionarlos. No usamos analítica ni publicidad.
+version: "1.2"
 effective: 2026-10-20
 order: 5
 ---
@@ -21,33 +21,33 @@ Cuando permiten identificarte, su uso es tratamiento de datos personales y se ri
 
 ## 3. Estrictamente necesarias
 
-Sin ellas no puedes iniciar sesión ni usar el servicio. No se pueden desactivar desde Quanela.
+Sin ellas no puedes iniciar sesión ni usar el servicio. No se pueden desactivar desde quanela.
 
 | Nombre | Tipo | Duración | Para qué | Quién la pone |
 | --- | --- | --- | --- | --- |
-| `sb-<proyecto>-auth-token` (y sus partes `.0`, `.1`) | Cookie, dominio `.quanela.com` | Hasta 400 días | Mantener tu sesión abierta en los subdominios de tu organización | Quanela (Supabase) |
-| `dk-wait` | Cookie | 15 segundos | Continuidad de la barra de carga al iniciar sesión | Quanela |
-| `dk-choose-account`, `dk-owner-sign-in` | sessionStorage | Hasta cerrar la pestaña | Recordar el paso del inicio de sesión | Quanela |
-| `dk-signup-plan`, `dk-signup-period` | sessionStorage | Hasta cerrar la pestaña | Recordar el plan y el periodo elegidos al registrarte | Quanela |
-| `dk-legal-consent` | sessionStorage | Hasta cerrar la pestaña | Recordar que marcaste las casillas de aceptación mientras terminas el registro | Quanela |
-| Sesión de respaldo | localStorage | Hasta cerrar sesión | Guardar la sesión solo en entornos de prueba y vista previa | Quanela (Supabase) |
-| `quanela:cart:*` | localStorage | El día del pedido; los carritos viejos se borran | Guardar tu carrito en el menú web público | Quanela |
+| `sb-<proyecto>-auth-token` (y sus partes `.0`, `.1`) | Cookie, dominio `.quanela.com` | Hasta 400 días | Mantener tu sesión abierta en los subdominios de tu organización | quanela (Supabase) |
+| `dk-wait` | Cookie | 15 segundos | Continuidad de la barra de carga al iniciar sesión | quanela |
+| `dk-choose-account`, `dk-owner-sign-in` | sessionStorage | Hasta cerrar la pestaña | Recordar el paso del inicio de sesión | quanela |
+| `dk-signup-plan`, `dk-signup-period` | sessionStorage | Hasta cerrar la pestaña | Recordar el plan y el periodo elegidos al registrarte | quanela |
+| `dk-legal-consent` | sessionStorage | Hasta cerrar la pestaña | Recordar que marcaste las casillas de aceptación mientras terminas el registro | quanela |
+| Sesión de respaldo | localStorage | Hasta cerrar sesión | Guardar la sesión solo en entornos de prueba y vista previa | quanela (Supabase) |
+| `quanela:cart:*` | localStorage | El día del pedido; los carritos viejos se borran | Guardar tu carrito en el menú web público | quanela |
 
 ## 4. Preferencias
 
-Se guardan **solo cuando cambias** una opción, para recordarla. Si las borras, Quanela vuelve a los valores por defecto.
+Se guardan **solo cuando cambias** una opción, para recordarla. Si las borras, quanela vuelve a los valores por defecto.
 
 | Nombre | Tipo | Duración | Para qué | Quién la pone |
 | --- | --- | --- | --- | --- |
-| `dk-appearance` | Cookie y localStorage | 400 días | Tema y tamaño del texto | Quanela |
-| `dk-last-kitchen`, `dk-active-role:*` | localStorage | Hasta que lo borres | Última cocina y rol que usaste | Quanela |
-| `dk-kitchen-sound`, `dk-kitchen-view`, `dk-kitchen-density` | localStorage | Hasta que lo borres | Sonido, vista y densidad de la pantalla de cocina | Quanela |
-| `dk-kitchen-insight-dismissed`, `dk-tip-dismissed`, `dk-help-feedback` | localStorage | Hasta que lo borres | No repetir los avisos y consejos que ya cerraste, y recordar si un artículo de ayuda te sirvió | Quanela |
-| `dk-voice-*` | localStorage | Hasta que lo borres | Preferencias de voz de «Oye Quanela» | Quanela |
-| `dk-sidebar-collapsed` | localStorage | Hasta que lo borres | Si dejaste la barra lateral plegada | Quanela |
-| `dk-home-panels:*`, `dk-home-dismissed` | localStorage | Hasta que lo borres | Los paneles de Inicio que elegiste y su orden, y los avisos de Inicio que cerraste | Quanela |
-| `dk-consent` | localStorage | Hasta que lo borres | Tus preferencias de privacidad | Quanela |
-| `dk-copilot-conversation:*` | sessionStorage | 30 minutos | Los últimos 40 mensajes de tu conversación con Copilot; se quedan en tu dispositivo | Quanela |
+| `dk-appearance` | Cookie y localStorage | 400 días | Tema y tamaño del texto | quanela |
+| `dk-last-kitchen`, `dk-active-role:*` | localStorage | Hasta que lo borres | Última cocina y rol que usaste | quanela |
+| `dk-kitchen-sound`, `dk-kitchen-view`, `dk-kitchen-density` | localStorage | Hasta que lo borres | Sonido, vista y densidad de la pantalla de cocina | quanela |
+| `dk-kitchen-insight-dismissed`, `dk-tip-dismissed`, `dk-help-feedback` | localStorage | Hasta que lo borres | No repetir los avisos y consejos que ya cerraste, y recordar si un artículo de ayuda te sirvió | quanela |
+| `dk-voice-*` | localStorage | Hasta que lo borres | Preferencias de voz de «Oye quanela» | quanela |
+| `dk-sidebar-collapsed` | localStorage | Hasta que lo borres | Si dejaste la barra lateral plegada | quanela |
+| `dk-home-panels:*`, `dk-home-dismissed` | localStorage | Hasta que lo borres | Los paneles de Inicio que elegiste y su orden, y los avisos de Inicio que cerraste | quanela |
+| `dk-consent` | localStorage | Hasta que lo borres | Tus preferencias de privacidad | quanela |
+| `dk-copilot-conversation:*` | sessionStorage | 30 minutos | Los últimos 40 mensajes de tu conversación con Copilot; se quedan en tu dispositivo | quanela |
 
 ## 5. Terceros
 

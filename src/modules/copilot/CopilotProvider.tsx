@@ -50,7 +50,7 @@ const SCOPE_LABEL: Partial<Record<CopilotScope, string>> = {
   partial: 'Respuesta parcial',
   no_data: 'Sin datos',
   not_allowed: 'Tu rol no lo permite',
-  unsupported: 'Quanela no guarda ese dato',
+  unsupported: 'quanela no guarda ese dato',
   out_of_scope: 'Fuera del negocio',
   action: 'Solo consulto',
   clarify: 'Necesito precisar',
@@ -383,7 +383,7 @@ function CopilotPanel({
     <Drawer
       open
       onClose={onClose}
-      title="Quanela Copilot"
+      title="quanela Copilot"
       subtitle={`Responde con los datos de ${accountName} y lo que tu rol puede ver.`}
       size="md"
       footer={
@@ -454,7 +454,7 @@ function CopilotPanel({
             <div className="flex items-center gap-3">
               <RobotFace mood="ai" size={72} className="h-16 w-auto" />
               <p className="text-sm text-neutral-300">
-                Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, cobros, entregas o turnos, o dónde se hace algo en Quanela.
+                Pregunta sobre ventas, pedidos, cocina, platos, insumos, clientes, cobros, entregas o turnos, o dónde se hace algo en quanela.
               </p>
             </div>
             <div className="flex flex-col gap-2">
@@ -565,7 +565,7 @@ function CopilotPanel({
 export function CopilotButton({ compact = false }: { compact?: boolean }) {
   const { available, open, unseen, pending } = useCopilot()
   if (!available) return null
-  const label = unseen > 0 ? `Abrir Quanela Copilot: ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver` : pending ? 'Abrir Quanela Copilot: consultando' : 'Abrir Quanela Copilot'
+  const label = unseen > 0 ? `Abrir quanela Copilot: ${unseen} ${unseen === 1 ? 'respuesta' : 'respuestas'} sin ver` : pending ? 'Abrir quanela Copilot: consultando' : 'Abrir quanela Copilot'
   return (
     <button
       type="button"

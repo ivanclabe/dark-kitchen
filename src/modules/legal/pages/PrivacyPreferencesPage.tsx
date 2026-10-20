@@ -34,7 +34,7 @@ export function PrivacyPreferencesPage() {
   const changed = choice.analytics !== saved.analytics || choice.marketing !== saved.marketing
 
   useEffect(() => {
-    document.title = 'Preferencias de privacidad · Quanela'
+    document.title = 'Preferencias de privacidad · quanela'
   }, [])
 
   return (
@@ -42,7 +42,7 @@ export function PrivacyPreferencesPage() {
       <div className="max-w-3xl">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Preferencias de privacidad</h1>
         <p className="mt-2 text-neutral-400">
-          Qué guarda Quanela en este navegador y para qué. El detalle de cada cookie está en la{' '}
+          Qué guarda quanela en este navegador y para qué. El detalle de cada cookie está en la{' '}
           <Link to={legalHref('cookies')} className="text-brasa-400 underline underline-offset-2">
             Política de Cookies
           </Link>
@@ -51,7 +51,7 @@ export function PrivacyPreferencesPage() {
 
         <div className="mt-8 space-y-4">
           <Category title="Necesarias" state="Siempre activas">
-            <p>Mantienen tu sesión abierta, protegen el registro contra robots y conservan el carrito de un pedido mientras lo armas. Sin ellas Quanela no funciona, por eso no se pueden apagar.</p>
+            <p>Mantienen tu sesión abierta, protegen el registro contra robots y conservan el carrito de un pedido mientras lo armas. Sin ellas quanela no funciona, por eso no se pueden apagar.</p>
           </Category>
           <Category
             title="Preferencias"
@@ -70,21 +70,21 @@ export function PrivacyPreferencesPage() {
               </Button>
             }
           >
-            <p>Recuerdan lo que configuraste: el tema y el tamaño del texto, la última cuenta que abriste, la vista de la cocina, el sonido de pedidos nuevos y las opciones de voz. Si las borras, Quanela vuelve a sus valores iniciales.</p>
+            <p>Recuerdan lo que configuraste: el tema y el tamaño del texto, la última cuenta que abriste, la vista de la cocina, el sonido de pedidos nuevos y las opciones de voz. Si las borras, quanela vuelve a sus valores iniciales.</p>
           </Category>
           <Category
             title="Analítica"
             state={choice.analytics ? 'Permitida' : 'Apagada'}
             control={<Switch checked={choice.analytics} onChange={(v) => setChoice((c) => ({ ...c, analytics: v }))} label="Permitir analítica" />}
           >
-            <p>Hoy Quanela <strong className="text-neutral-100">no usa</strong> herramientas de analítica. Si algún día las usamos, solo se activarán si las permites aquí.</p>
+            <p>Hoy quanela <strong className="text-neutral-100">no usa</strong> herramientas de analítica. Si algún día las usamos, solo se activarán si las permites aquí.</p>
           </Category>
           <Category
             title="Publicidad"
             state={choice.marketing ? 'Permitida' : 'Apagada'}
             control={<Switch checked={choice.marketing} onChange={(v) => setChoice((c) => ({ ...c, marketing: v }))} label="Permitir publicidad" />}
           >
-            <p>Hoy Quanela <strong className="text-neutral-100">no usa</strong> píxeles ni cookies de publicidad. Si algún día los usamos, solo se activarán si los permites aquí.</p>
+            <p>Hoy quanela <strong className="text-neutral-100">no usa</strong> píxeles ni cookies de publicidad. Si algún día los usamos, solo se activarán si los permites aquí.</p>
           </Category>
         </div>
 

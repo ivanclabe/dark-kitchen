@@ -2,7 +2,7 @@
 id: recipes-and-cost
 section: catalog
 title: Recetas y costo de un plato
-summary: La receta dice qué insumos lleva un plato y cuánto; con ella Quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio es una versión nueva. Si el plato no usa inventario, no la necesita.
+summary: La receta dice qué insumos lleva un plato y cuánto; con ella quanela calcula su costo y su margen, y descuenta el inventario. Cada cambio es una versión nueva. Si el plato no usa inventario, no la necesita.
 audience: [owner, admin, manager, inventory]
 permissions: [recipes.edit]
 appPath: /menu-planner
@@ -35,7 +35,7 @@ screenshots:
 
 {{screenshot:recipe}}
 
-> **Bueno saber:** la receta **no depende del inventario**. Puedes guardarla aunque sus insumos estén en cero; un insumo nuevo entra al inventario con **existencia cero** y sube cuando confirmas su compra. Si el nombre ya existe (aunque cambien mayúsculas o tildes), Quanela te ofrece el que ya tienes en vez de duplicarlo.
+> **Bueno saber:** la receta **no depende del inventario**. Puedes guardarla aunque sus insumos estén en cero; un insumo nuevo entra al inventario con **existencia cero** y sube cuando confirmas su compra. Si el nombre ya existe (aunque cambien mayúsculas o tildes), quanela te ofrece el que ya tienes en vez de duplicarlo.
 
 ## Cómo se calcula el costo
 
@@ -43,7 +43,7 @@ Cada línea vale *cantidad × costo promedio del insumo*. El costo promedio se a
 
 ## Unidades: compra en kilos, cocina en gramos
 
-Cada insumo lleva su inventario en una **unidad base** (g, ml o unidad). En la receta puedes escribir la cantidad en **cualquier unidad compatible**: g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. Quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base.
+Cada insumo lleva su inventario en una **unidad base** (g, ml o unidad). En la receta puedes escribir la cantidad en **cualquier unidad compatible**: g o kg, ml o l, unidad o docena, o un empaque que hayas definido para ese insumo. quanela convierte sola y te muestra la equivalencia debajo («5 g = 0,005 kg»). Al guardar, la receta recuerda la unidad que usaste, y el costo, la reserva y el descuento de inventario se calculan en la unidad base.
 
 > **Bueno saber:** solo aparecen las unidades que se pueden convertir. Los gramos no pasan a unidades (un huevo no tiene un peso fijo).
 

@@ -1,13 +1,13 @@
 ---
 id: switch-account
 section: getting-started
-title: Entrar a Quanela y cambiar de cuenta o de rol
+title: Entrar a quanela y cambiar de cuenta o de rol
 summary: Entras por la dirección de tu negocio con tu correo y contraseña (o tu método); si tienes varias cuentas o roles, los cambias desde el indicador de arriba.
 audience: [everyone]
 permissions: []
 appPath: /login
 questions:
-  - ¿Cómo entro a Quanela?
+  - ¿Cómo entro a quanela?
   - ¿Cómo cambio de cuenta?
   - ¿Cómo cambio de rol?
   - Olvidé mi contraseña
@@ -19,7 +19,7 @@ updated: 2026-10-08
 order: 2
 screenshots:
   - id: login
-    alt: Pantalla de inicio de sesión de Quanela con correo, contraseña y los otros métodos para dueños
+    alt: Pantalla de inicio de sesión de quanela con correo, contraseña y los otros métodos para dueños
     notes:
       - Tu correo y tu contraseña.
       - Si creaste el negocio con Google, Instagram o teléfono, entra por aquí.
@@ -40,7 +40,7 @@ Solo te pregunta al iniciar sesión: si recargas la página o vuelves con la ses
 
 ### Si olvidaste tu contraseña
 
-Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace para crear una contraseña nueva (tú la eliges; nadie más la ve). Si ya estás dentro en otro equipo, puedes cambiarla en **Mi perfil**.
+Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de quanela: te envía un enlace para crear una contraseña nueva (tú la eliges; nadie más la ve). Si ya estás dentro en otro equipo, puedes cambiarla en **Mi perfil**.
 
 ## Cambiar de cuenta o de rol
 
@@ -51,6 +51,6 @@ También lo tienes en el menú de tu avatar: **Cambiar de rol** y **Cuenta → T
 
 ## Tu perfil y tu contraseña
 
-En el menú de tu avatar → **Mi perfil** cambias tu nombre y tu avatar. Para la contraseña, en **Seguridad** toca **Cambiar contraseña**: escribe la actual, la nueva (mínimo 8 caracteres) y repítela. Si entras con Google o con tu teléfono, no tienes contraseña de Quanela. Ahí también ves **Dónde tengo acceso**: tus cuentas y tu rol en cada una.
+En el menú de tu avatar → **Mi perfil** cambias tu nombre y tu avatar. Para la contraseña, en **Seguridad** toca **Cambiar contraseña**: escribe la actual, la nueva (mínimo 8 caracteres) y repítela. Si entras con Google o con tu teléfono, no tienes contraseña de quanela. Ahí también ves **Dónde tengo acceso**: tus cuentas y tu rol en cada una.
 
 El menú del avatar tiene además **Apariencia** (tema oscuro, claro o según el sistema, y texto grande) y **Ayuda y soporte** (atajos de teclado, preguntar a Copilot, reportar un problema).

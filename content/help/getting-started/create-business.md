@@ -1,16 +1,16 @@
 ---
 id: create-business
 section: getting-started
-title: Crear tu negocio en Quanela
+title: Crear tu negocio en quanela
 summary: En quanela.com/registro creas tu usuario (con correo, Google, Instagram o teléfono), eliges el plan y das los datos de tu negocio y tu primera cuenta.
 audience: [owner]
 permissions: []
 appPath: /registro
 questions:
-  - ¿Cómo creo mi negocio en Quanela?
+  - ¿Cómo creo mi negocio en quanela?
   - ¿Cómo me registro?
   - ¿Puedo registrarme con Google?
-  - ¿Cómo empiezo a usar Quanela?
+  - ¿Cómo empiezo a usar quanela?
 keywords: [registro, crear cuenta, empezar, plan, Google, Instagram, teléfono, SMS]
 related: [switch-account, setup-account, invite-team]
 updated: 2026-10-06
@@ -20,7 +20,7 @@ screenshots:
     alt: Primer paso del registro con los botones para continuar con Google, Instagram, teléfono o email
     notes:
       - El paso en el que vas (de 3).
-      - Elige cómo vas a entrar a Quanela. Solo aparecen los métodos activos.
+      - Elige cómo vas a entrar a quanela. Solo aparecen los métodos activos.
 ---
 
 Crear el negocio lo hace **una sola vez** quien es dueño. El resto del equipo entra por invitación (ver [Invitar a tu equipo](help:invite-team)).

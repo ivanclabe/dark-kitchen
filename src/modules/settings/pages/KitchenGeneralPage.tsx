@@ -155,7 +155,7 @@ function AccountDetailsForm() {
               error={edited ? slugProblem : null}
               hint={
                 <span className="inline-flex items-center gap-1">
-                  <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta y, si publicas en Quanela Consumer, tu dirección pública.
+                  <Link2 size={11} aria-hidden /> /k/{form.slug || '…'} — cambiarlo cambia los enlaces de esta cuenta y, si publicas en quanela Consumer, tu dirección pública.
                 </span>
               }
             >
@@ -173,7 +173,7 @@ function AccountDetailsForm() {
                 </Select>
               )}
             </FormField>
-            <FormField label="Tipo de cocina" info="Cómo te encuentran en Quanela Consumer («quiero hamburguesas»). Si es igual a la del negocio, déjalo así.">
+            <FormField label="Tipo de cocina" info="Cómo te encuentran en quanela Consumer («quiero hamburguesas»). Si es igual a la del negocio, déjalo así.">
               {(a11y) => (
                 <Select {...a11y} value={form.cuisine ?? ''} onChange={(e) => set({ cuisine: e.target.value || null })}>
                   <option value="">{orgCuisine ? `Como el negocio (${orgCuisine})` : 'Como el negocio (sin definir)'}</option>

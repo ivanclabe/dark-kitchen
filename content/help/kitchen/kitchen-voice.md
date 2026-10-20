@@ -8,7 +8,7 @@ permissions: [kitchen.prepare]
 appPath: /operations?view=kitchen
 questions:
   - ¿Cómo uso los comandos de voz en cocina?
-  - ¿Qué puedo decirle a Quanela en cocina?
+  - ¿Qué puedo decirle a quanela en cocina?
   - ¿Cómo marco un pedido listo con la voz?
   - No me entiende los comandos de voz
 keywords: [voz, comandos, dictar, micrófono, pedido listo, iniciar, prioridad, manos libres, cocina]
@@ -17,11 +17,11 @@ updated: 2026-10-06
 order: 3
 ---
 
-En la vista **Cocina** puedes mover pedidos con la voz. Funciona con el botón del micrófono o diciendo **«Oye Quanela»** si tienes el manos libres encendido (ver [Activar «Oye Quanela»](help:oye-quanela)).
+En la vista **Cocina** puedes mover pedidos con la voz. Funciona con el botón del micrófono o diciendo **«Oye quanela»** si tienes el manos libres encendido (ver [Activar «Oye quanela»](help:oye-quanela)).
 
-1. Toca el **micrófono** de la cocina (o di «Oye Quanela»).
+1. Toca el **micrófono** de la cocina (o di «Oye quanela»).
 2. Di el **número del pedido** (4 dígitos) y **la acción**, por ejemplo: «**pedido 1042 listo**».
-3. Haz una pausa: Quanela lo ejecuta y responde («Pedido 1042 listo.»).
+3. Haz una pausa: quanela lo ejecuta y responde («Pedido 1042 listo.»).
 
 ## Qué puedes decir
 

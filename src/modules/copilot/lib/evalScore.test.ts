@@ -13,7 +13,7 @@ describe('Copilot evaluation scoring', () => {
   })
 
   it('flags an invented amount', () => {
-    expect(inventsMoney('Quanela no registra la nómina.')).toBe(false)
+    expect(inventsMoney('quanela no registra la nómina.')).toBe(false)
     expect(inventsMoney('La nómina fue de $2.000.000.')).toBe(true)
   })
 

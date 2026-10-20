@@ -7,7 +7,7 @@ audience: [everyone]
 permissions: []
 appPath: null
 questions:
-  - ¿Cómo se ve Quanela?
+  - ¿Cómo se ve quanela?
   - ¿Dónde está cada botón?
 keywords: [capturas, pantallazos, imágenes, recorrido, tour, pantallas]
 related: [what-is-quanela, home-screen]

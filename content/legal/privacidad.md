@@ -1,19 +1,19 @@
 ---
 slug: privacidad
 title: Política de Tratamiento de Datos Personales y Privacidad
-summary: Qué datos tratamos de quienes usan Quanela, para qué, con quién los compartimos, cuánto los guardamos y cómo ejercer tus derechos.
-version: "1.0"
-effective: 2026-10-19
+summary: Qué datos tratamos de quienes usan quanela, para qué, con quién los compartimos, cuánto los guardamos y cómo ejercer tus derechos.
+version: "1.1"
+effective: 2026-10-20
 order: 2
 ---
 
-Esta política explica cómo {{empresa.razonSocial}} trata los datos personales de quienes usan Quanela, según la Ley 1581 de 2012 y el Decreto 1074 de 2015 (arts. 2.2.2.25.1.1 y siguientes). Al registrarte, la aceptas con una casilla independiente de los Términos y Condiciones.
+Esta política explica cómo {{empresa.razonSocial}} trata los datos personales de quienes usan quanela, según la Ley 1581 de 2012 y el Decreto 1074 de 2015 (arts. 2.2.2.25.1.1 y siguientes). Al registrarte, la aceptas con una casilla independiente de los Términos y Condiciones.
 
 ## 1. Responsable del tratamiento
 
 | Dato | Valor |
 | --- | --- |
-| Responsable | {{empresa.razonSocial}} («Quanela») |
+| Responsable | {{empresa.razonSocial}} («quanela») |
 | NIT | {{empresa.nit}} |
 | Domicilio | {{empresa.domicilio}} |
 | Dirección | {{empresa.direccion}}, {{empresa.ciudad}} |
@@ -24,12 +24,12 @@ Esta política explica cómo {{empresa.razonSocial}} trata los datos personales 
 
 ## 2. A quién aplica esta política
 
-Quanela trata datos en dos papeles distintos:
+quanela trata datos en dos papeles distintos:
 
 - **Como Responsable**, de sus usuarios: el propietario que registra el negocio y el personal que invita. Esta política se ocupa de ellos.
-- **Como Encargado**, de los datos que cada negocio carga sobre sus clientes, proveedores y personal. Ahí el **Responsable es el negocio**, y Quanela los trata solo por su cuenta (ver la sección 9).
+- **Como Encargado**, de los datos que cada negocio carga sobre sus clientes, proveedores y personal. Ahí el **Responsable es el negocio**, y quanela los trata solo por su cuenta (ver la sección 9).
 
-Si eres cliente de una cocina que usa Quanela (por ejemplo, pediste por su menú web o por WhatsApp), la política que te aplica es la de esa cocina, enlazada en su menú.
+Si eres cliente de una cocina que usa quanela (por ejemplo, pediste por su menú web o por WhatsApp), la política que te aplica es la de esa cocina, enlazada en su menú.
 
 ## 3. Qué datos tratamos
 
@@ -60,8 +60,8 @@ Si eres cliente de una cocina que usa Quanela (por ejemplo, pediste por su menú
 
 ## 5. Datos sensibles y de menores
 
-- Quanela no te pide datos sensibles (Ley 1581 de 2012, art. 5). No tienes que darlos y el servicio no depende de ellos.
-- Quanela es solo para mayores de 18 años y no trata a sabiendas datos de menores (art. 7). Si crees que un menor nos dio sus datos, escríbenos para suprimirlos.
+- quanela no te pide datos sensibles (Ley 1581 de 2012, art. 5). No tienes que darlos y el servicio no depende de ellos.
+- quanela es solo para mayores de 18 años y no trata a sabiendas datos de menores (art. 7). Si crees que un menor nos dio sus datos, escríbenos para suprimirlos.
 
 ## 6. Tus derechos
 
@@ -104,7 +104,7 @@ Sobre los reclamos (art. 15):
 
 ## 8. Encargados y transmisiones internacionales
 
-Para prestar el servicio usamos proveedores que tratan datos **por cuenta de Quanela** (encargados). Algunos están fuera de Colombia, por lo que hay transmisión internacional de datos.
+Para prestar el servicio usamos proveedores que tratan datos **por cuenta de quanela** (encargados). Algunos están fuera de Colombia, por lo que hay transmisión internacional de datos.
 
 | Proveedor | Para qué | Datos | País |
 | --- | --- | --- | --- |
@@ -117,7 +117,7 @@ Para prestar el servicio usamos proveedores que tratan datos **por cuenta de Qua
 | Wompi (Bancolombia S.A.) | Procesamiento de pagos | Datos de pago y de la tarjeta | Colombia |
 | {{pendiente: proveedor de SMS}} | Envío de códigos de verificación | Número de celular | {{pendiente: país del proveedor de SMS}} |
 
-- Quanela exige a sus encargados, mediante contratos, tratar los datos solo para la finalidad encargada, con medidas de seguridad y confidencialidad (Decreto 1074 de 2015, art. 2.2.2.25.5.2). {{pendiente: confirmar contratos de transmisión firmados con cada encargado}}
+- quanela exige a sus encargados, mediante contratos, tratar los datos solo para la finalidad encargada, con medidas de seguridad y confidencialidad (Decreto 1074 de 2015, art. 2.2.2.25.5.2). {{pendiente: confirmar contratos de transmisión firmados con cada encargado}}
 - EE. UU. figura en la lista de países con nivel adecuado de protección de la SIC (Circular Externa 005 de 2017).
 - El reconocimiento de voz funciona por defecto **en tu dispositivo**: el audio no sale de él. Solo se envía a Google si eliges la opción en línea, y la app te lo advierte antes.
 - Sobre la IA: {{pendiente: confirmar las condiciones del proveedor de IA sobre retención de datos y no uso para entrenar modelos}}
@@ -127,12 +127,12 @@ Para prestar el servicio usamos proveedores que tratan datos **por cuenta de Qua
 
 Cada negocio es Responsable de los datos que carga sobre:
 
-- sus **clientes**: nombre, teléfono, direcciones de entrega, quién recibe, notas, historial de pedidos, quejas y preferencias opcionales (las alimentarias, solo con autorización expresa del cliente; Quanela no sugiere preferencias de salud ni de religión);
+- sus **clientes**: nombre, teléfono, direcciones de entrega, quién recibe, notas, historial de pedidos, quejas y preferencias opcionales (las alimentarias, solo con autorización expresa del cliente; quanela no sugiere preferencias de salud ni de religión);
 - sus **conversaciones de WhatsApp** con clientes;
 - sus **proveedores** y su **personal**;
 - las **facturas** que carga.
 
-Quanela usa esos datos **solo para prestar el servicio a ese negocio**. No los usa para fines propios, no los vende y no los mezcla entre negocios. Las condiciones están en el Anexo de tratamiento de datos por encargo de los [Términos y Condiciones](/legal/terminos).
+quanela usa esos datos **solo para prestar el servicio a ese negocio**. No los usa para fines propios, no los vende y no los mezcla entre negocios. Las condiciones están en el Anexo de tratamiento de datos por encargo de los [Términos y Condiciones](/legal/terminos).
 
 Si eres cliente de una cocina y quieres ejercer tus derechos, dirígete a la cocina. Si nos escribes a nosotros, le trasladaremos tu solicitud y la ayudaremos a responderte; por ejemplo, la app le permite anonimizar a un cliente conservando sus pedidos.
 
@@ -170,4 +170,4 @@ Ninguna medida es infalible. Si ocurre un incidente que afecte tus datos, lo not
 ## 14. Vigencia
 
 - Esta política rige desde la fecha de vigencia que aparece al inicio de este documento.
-- Las bases de datos estarán vigentes mientras Quanela preste el servicio y existan las finalidades descritas, sin perjuicio de los plazos de conservación de la sección 10.
+- Las bases de datos estarán vigentes mientras quanela preste el servicio y existan las finalidades descritas, sin perjuicio de los plazos de conservación de la sección 10.

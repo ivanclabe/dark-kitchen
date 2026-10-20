@@ -39,4 +39,4 @@ La cifra **Atrasados** (arriba, en rojo) cuenta los pedidos fuera de tiempo ahor
 
 ## Pedidos detenidos
 
-Si tu cuenta tiene activadas las **Alertas de pedidos detenidos**, Quanela marca en rojo los platos que llevan demasiado sin avanzar («Hamburguesa · 13 min sin empezar») y puede decirlo en voz alta.
+Si tu cuenta tiene activadas las **Alertas de pedidos detenidos**, quanela marca en rojo los platos que llevan demasiado sin avanzar («Hamburguesa · 13 min sin empezar») y puede decirlo en voz alta.

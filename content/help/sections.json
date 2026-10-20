@@ -1,6 +1,6 @@
 {
   "sections": [
-    { "id": "intro", "title": "Introducción", "description": "Qué es Quanela y cómo está organizado." },
+    { "id": "intro", "title": "Introducción", "description": "Qué es quanela y cómo está organizado." },
     { "id": "getting-started", "title": "Primeros pasos", "description": "De crear tu negocio a tu primer pedido." },
     { "id": "orders", "title": "Pedidos (Centro de operaciones)", "description": "Crear, confirmar, despachar, entregar y cobrar." },
     { "id": "kitchen", "title": "Cocina", "description": "La pantalla de la línea, los tiempos y la voz." },
@@ -10,10 +10,10 @@
     { "id": "reports", "title": "Reportes (Insights)", "description": "Cómo va el negocio y qué es rentable." },
     { "id": "finance", "title": "Finanzas", "description": "Lo que se debe, los pagos, la nómina y la rentabilidad real." },
     { "id": "team", "title": "Equipo", "description": "Usuarios, roles y turnos." },
-    { "id": "assistant", "title": "Copilot y «Oye Quanela»", "description": "Pregúntale a Quanela, escribiendo o con la voz." },
+    { "id": "assistant", "title": "Copilot y «Oye quanela»", "description": "Pregúntale a quanela, escribiendo o con la voz." },
     { "id": "settings", "title": "Configuración", "description": "Ajustes de la cuenta." },
     { "id": "screenshots", "title": "Capturas anotadas", "description": "Cada pantalla, con sus partes señaladas." },
     { "id": "faq", "title": "Preguntas frecuentes", "description": "Respuestas cortas a las dudas de siempre." },
-    { "id": "release-notes", "title": "Notas de versión", "description": "Lo nuevo en Quanela." }
+    { "id": "release-notes", "title": "Notas de versión", "description": "Lo nuevo en quanela." }
   ]
 }

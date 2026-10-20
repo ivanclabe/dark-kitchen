@@ -209,7 +209,7 @@ export function InvoiceReview({
         )}
 
         {extraction.warnings.length > 0 && (
-          <Feedback tone="warning" role={null} title="Al leerla, Quanela notó:">
+          <Feedback tone="warning" role={null} title="Al leerla, quanela notó:">
             <ul className="mt-1 list-disc pl-5 text-neutral-300">
               {extraction.warnings.map((w) => (
                 <li key={w}>{w}</li>
@@ -245,7 +245,7 @@ export function InvoiceReview({
               required
               hint={
                 draft.numberProposed
-                  ? 'El documento no tiene número: Quanela propone esta referencia (fecha y hora). Cámbiala si quieres.'
+                  ? 'El documento no tiene número: quanela propone esta referencia (fecha y hora). Cámbiala si quieres.'
                   : extraction.confidence.number !== 'alta'
                     ? 'Leído con dudas: revísalo'
                     : undefined

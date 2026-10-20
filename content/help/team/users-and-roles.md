@@ -40,7 +40,7 @@ Su historial (pedidos, movimientos) se conserva siempre.
 ## Roles y permisos
 
 1. Abre **Usuarios → Roles y permisos**.
-2. **Plantillas del sistema**: los roles de Quanela (ADMIN, CAJERO, COCINA…). No se editan; toca **Ver permisos** o **Duplicar** para crear uno propio a partir de ellos.
+2. **Plantillas del sistema**: los roles de quanela (ADMIN, CAJERO, COCINA…). No se editan; toca **Ver permisos** o **Duplicar** para crear uno propio a partir de ellos.
 3. **Roles propios**: toca **Nuevo rol**, ponle **Nombre**, usa **Copiar permisos de** para partir de otro rol, marca los permisos y toca **Crear rol**.
 
 > **Cuidado:** los roles propios aplican a **todas tus cuentas**: un cambio afecta a todas las que usan ese rol. Para eliminar un rol, primero cámbiale el rol a quien lo tenga.
@@ -51,5 +51,5 @@ Su historial (pedidos, movimientos) se conserva siempre.
 
 Arriba, junto a Voz y Copilot, el punto verde dice cuántas personas tienen **esta cuenta** abierta ahora, por ejemplo **3 en línea** (en el celular, solo el número). Tócalo para ver quiénes son: su nombre y su rol, contigo primero. Quien tiene la pantalla oculta o sin usar hace más de 5 minutos aparece **ausente**.
 
-> **Bueno saber:** solo se ve quién está en línea, **nunca** qué pantalla tiene abierta, qué hace ni desde dónde se conecta. Lo ve el equipo de esta cuenta: alguien de otra cuenta, o del soporte de Quanela que no es del negocio, no aparece ni ve la lista. Si el punto se pone gris (**Sin conexión en vivo**), la conexión se recupera sola.
+> **Bueno saber:** solo se ve quién está en línea, **nunca** qué pantalla tiene abierta, qué hace ni desde dónde se conecta. Lo ve el equipo de esta cuenta: alguien de otra cuenta, o del soporte de quanela que no es del negocio, no aparece ni ve la lista. Si el punto se pone gris (**Sin conexión en vivo**), la conexión se recupera sola.
 

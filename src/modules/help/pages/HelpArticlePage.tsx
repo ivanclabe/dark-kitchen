@@ -104,7 +104,7 @@ function ArticleView({ article }: { article: HelpArticle }) {
   const html = useMemo(() => article.html.replaceAll('href="/help/', `href="${helpPath('/help/')}`), [article.html])
 
   useEffect(() => {
-    document.title = `${article.title} · Centro de ayuda de Quanela`
+    document.title = `${article.title} · Centro de ayuda de quanela`
     document.querySelector('meta[name="description"]')?.setAttribute('content', article.summary)
     setCanonical(article.url)
   }, [article])
@@ -146,7 +146,7 @@ function ArticleView({ article }: { article: HelpArticle }) {
           )}
           {article.appPath && (
             <a href={appHref(article.appPath)} className="ml-auto inline-flex items-center gap-1 rounded-full border border-brasa-500/40 bg-brasa-500/10 px-3 py-1 text-brasa-300 hover:bg-brasa-500/20">
-              Abrir en Quanela <ExternalLink size={12} aria-hidden />
+              Abrir en quanela <ExternalLink size={12} aria-hidden />
             </a>
           )}
         </div>

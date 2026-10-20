@@ -7,7 +7,7 @@ audience: [everyone]
 permissions: []
 appPath: null
 questions:
-  - ¿Qué es una cuenta en Quanela?
+  - ¿Qué es una cuenta en quanela?
   - ¿Cuál es la diferencia entre negocio y cuenta?
   - ¿Qué es un rol?
 keywords: [cuenta, negocio, organización, rol, permisos, local, glosario]
@@ -18,9 +18,9 @@ order: 2
 
 ## El negocio y sus cuentas
 
-- **Negocio**: tu empresa en Quanela. Tiene su propia dirección web, con un código de 6 caracteres (por ejemplo `fr3rk6.quanela.com`). Por ahí entra todo tu equipo.
+- **Negocio**: tu empresa en quanela. Tiene su propia dirección web, con un código de 6 caracteres (por ejemplo `fr3rk6.quanela.com`). Por ahí entra todo tu equipo.
 - **Cuenta**: cada establecimiento del negocio (un local, una cocina). Los pedidos, el inventario, los clientes y los reportes son **de cada cuenta**: lo de una no se mezcla con lo de otra.
-- Si tienes varias cuentas, cambias entre ellas desde el indicador de arriba («Cuenta · ROL ▾»). Ver [Entrar a Quanela y cambiar de cuenta](help:switch-account).
+- Si tienes varias cuentas, cambias entre ellas desde el indicador de arriba («Cuenta · ROL ▾»). Ver [Entrar a quanela y cambiar de cuenta](help:switch-account).
 
 ## Personas y roles
 
@@ -32,7 +32,7 @@ order: 2
 
 Un pedido pasa por estos estados: **Por confirmar → En cola → Preparando → Listo → En ruta → Entregado**, o **Cancelado**. Ver [Estados del pedido](help:order-states).
 
-Al **confirmar**, Quanela reserva los insumos de las recetas; cuando cada plato **empieza a prepararse**, los descuenta del inventario. Los platos con **Descuenta inventario** apagado se venden sin receta y no mueven el inventario. El pago es aparte: un pedido puede estar *Preparando* y *Pagado*, o *Preparando* y *Pago pendiente*.
+Al **confirmar**, quanela reserva los insumos de las recetas; cuando cada plato **empieza a prepararse**, los descuenta del inventario. Los platos con **Descuenta inventario** apagado se venden sin receta y no mueven el inventario. El pago es aparte: un pedido puede estar *Preparando* y *Pagado*, o *Preparando* y *Pago pendiente*.
 
 ## Glosario rápido
 

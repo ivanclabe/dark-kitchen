@@ -53,11 +53,11 @@ export function SubscriptionCard({ sub, organizationId }: { sub: Subscription; o
   }
 
   let line: string
-  if (sub.mode === 'exempt') line = 'Tu plan está acordado con Quanela: no se cobra en línea.'
+  if (sub.mode === 'exempt') line = 'Tu plan está acordado con quanela: no se cobra en línea.'
   else if (sub.mode === 'manual') line = 'Pagas por transferencia: nuestro equipo registra cada pago.'
   else if (sub.status === 'incomplete') line = 'Tu suscripción todavía no está activa: paga para empezar.'
   else if (sub.status === 'past_due') line = `No pudimos cobrar la renovación. Paga antes del ${formatDate(sub.graceEndsAt ?? sub.currentPeriodEnd ?? new Date().toISOString())} para no perder el acceso.`
-  else if (sub.status === 'expired' || (sub.status === 'canceled' && !sub.isCurrent)) line = 'Tu suscripción terminó. Paga para volver a usar Quanela con tus datos intactos.'
+  else if (sub.status === 'expired' || (sub.status === 'canceled' && !sub.isCurrent)) line = 'Tu suscripción terminó. Paga para volver a usar quanela con tus datos intactos.'
   else if (sub.cancelAtPeriodEnd) line = `Cancelada: sigue activa hasta el ${formatDate(sub.currentPeriodEnd!)}.`
   else if (sub.paymentMethod) line = `Se renueva sola el ${formatDate(sub.currentPeriodEnd!)} con ${sub.paymentMethod}.`
   else if (sub.currentPeriodEnd) line = `Se renueva el ${formatDate(sub.currentPeriodEnd)}. Te avisamos unos días antes para que la pagues.`
@@ -213,7 +213,7 @@ export function SubscriptionCard({ sub, organizationId }: { sub: Subscription; o
           void run(() => cancelSubscription(organizationId), 'Suscripción cancelada al final del período')
         }}
         title="Cancelar la suscripción"
-        description={`Sigues usando Quanela hasta el ${sub.currentPeriodEnd ? formatDate(sub.currentPeriodEnd) : 'fin del período'}. Después no se cobra más y el acceso se detiene; tus datos quedan guardados por si vuelves.`}
+        description={`Sigues usando quanela hasta el ${sub.currentPeriodEnd ? formatDate(sub.currentPeriodEnd) : 'fin del período'}. Después no se cobra más y el acceso se detiene; tus datos quedan guardados por si vuelves.`}
         confirmLabel="Cancelar suscripción"
         danger
       />

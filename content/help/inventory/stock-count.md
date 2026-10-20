@@ -18,7 +18,7 @@ order: 4
 ---
 
 1. Abre **Abastecimiento → Stock** y toca **Contar inventario**.
-2. Elige qué contar: **Todo el inventario**, **Una categoría** o **Un proveedor**, y toca **Empezar conteo**. Quanela guarda lo que dice el sistema en ese momento.
+2. Elige qué contar: **Todo el inventario**, **Una categoría** o **Un proveedor**, y toca **Empezar conteo**. quanela guarda lo que dice el sistema en ese momento.
 3. Escribe lo que hay de cada insumo. Puedes contar en **kg** o **l** (vienen propuestos) o en cualquier unidad del insumo, incluidas sus cajas. Se guarda al salir del campo y al lado ves la diferencia y lo que vale.
 4. Usa **Por contar**, **Contados** y el buscador para no perderte. Puedes cerrar y volver después: el conteo queda abierto.
 5. Toca **Aplicar ajustes** y confirma.

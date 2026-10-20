@@ -155,7 +155,7 @@ export function FullScreenLoading({ stage = 'session' }: { stage?: LoadingStage 
           <button
             type="button"
             onClick={() => setFace((f) => (f + 1) % FACES.length)}
-            aria-label="Saludar a Quanela"
+            aria-label="Saludar a quanela"
             className="rounded-3xl p-2 transition-transform hover:-translate-y-0.5 active:scale-95"
           >
             <RobotFace mood={FACES[face]} size={112} animated className="h-24 w-auto sm:h-28" />

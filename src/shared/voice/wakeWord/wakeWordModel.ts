@@ -55,7 +55,7 @@ export function isWakeWordSupported(): boolean {
 async function download(base: string, onProgress: (loaded: number, total: number) => void): Promise<Uint8Array[]> {
   const responses = await Promise.all(FILES.map((f) => fetch(`${base}/${f}`)))
   const bad = responses.find((r) => !r.ok || !r.body)
-  if (bad) throw new Error(`No se pudo descargar el modelo de «Oye Quanela» (${bad.status})`)
+  if (bad) throw new Error(`No se pudo descargar el modelo de «Oye quanela» (${bad.status})`)
   const total = responses.reduce((sum, r) => sum + (Number(r.headers.get('content-length')) || 0), 0)
   let loaded = 0
   return Promise.all(

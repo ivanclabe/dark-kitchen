@@ -179,7 +179,7 @@ function LiquidateCard() {
   const total = selected.reduce((sum, l) => sum + (amounts[l.userId] ?? 0), 0)
 
   return (
-    <Card title="Liquidar nómina" icon={Calculator} description="Quanela propone con las horas reales de los turnos (entrada a salida, menos el descanso) o el salario proporcional. Ajusta lo que haga falta.">
+    <Card title="Liquidar nómina" icon={Calculator} description="quanela propone con las horas reales de los turnos (entrada a salida, menos el descanso) o el salario proporcional. Ajusta lo que haga falta.">
       <div className="flex flex-wrap items-end gap-2">
         <FormField label="Desde">{(a11y) => <Input {...a11y} type="date" value={from} max={to} onChange={(e) => setFrom(e.target.value)} />}</FormField>
         <FormField label="Hasta">{(a11y) => <Input {...a11y} type="date" value={to} min={from} onChange={(e) => setTo(e.target.value)} />}</FormField>

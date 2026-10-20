@@ -47,7 +47,7 @@ Toca la tarjeta para abrir el pedido. En la sección **Cocina** cada plato tiene
 
 En el detalle del pedido: **Prioritario** lo pone de primero (y **Quitar prioridad** lo regresa). **Cancelar pedido** está si tu rol lo permite.
 
-> **Bueno saber:** desde Cocina no se confirman ni se despachan pedidos; eso es de caja. Si un pedido se queda quieto mucho tiempo, Quanela puede avisar en la tarjeta y en voz alta. Ver [Tiempos y pedidos atrasados](help:kitchen-times).
+> **Bueno saber:** desde Cocina no se confirman ni se despachan pedidos; eso es de caja. Si un pedido se queda quieto mucho tiempo, quanela puede avisar en la tarjeta y en voz alta. Ver [Tiempos y pedidos atrasados](help:kitchen-times).
 
 ## Menú ⋯ de Cocina
 

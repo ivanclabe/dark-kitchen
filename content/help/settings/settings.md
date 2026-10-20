@@ -23,7 +23,7 @@ Abre **Configuración** en la barra lateral, en el grupo **Administrar** (o en e
 
 | Sección | Para qué |
 |---|---|
-| **General** | **Tu negocio** (aplica a todas tus cuentas) y **Esta cuenta**: **Nombre**, **Identificador (URL)**, **Zona horaria** y **Tipo de cocina** (el que ven los clientes en Quanela Consumer; si no eliges, el del negocio). Además, **Datos fiscales y de contacto** (opcionales) |
+| **General** | **Tu negocio** (aplica a todas tus cuentas) y **Esta cuenta**: **Nombre**, **Identificador (URL)**, **Zona horaria** y **Tipo de cocina** (el que ven los clientes en quanela Consumer; si no eliges, el del negocio). Además, **Datos fiscales y de contacto** (opcionales) |
 | **Facturación** | Tu **Plan**, cuánto usas de él (cuentas, usuarios, IA) y tus facturas |
 | **IA y voz** | **Funciones**: activa Copilot, la voz y las sugerencias de IA en esta cuenta. **Este dispositivo**: la voz de este equipo. **Uso y estado**: cuánto se ha usado, el **costo estimado del mes**, las llamadas evitadas, el **presupuesto mensual** (función **Presupuesto de IA**) y cómo responde Copilot |
 | **Integraciones** | El **ID de la cuenta** para conectar sistemas externos, por ejemplo pedidos por WhatsApp |

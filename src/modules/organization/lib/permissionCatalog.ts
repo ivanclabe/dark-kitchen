@@ -21,8 +21,8 @@ export const MODULE_LABEL: Record<string, string> = {
   team: 'Equipo de la cuenta',
   staff: 'Personal y turnos',
   finance: 'Finanzas',
-  copilot: 'Quanela Copilot',
-  voice: 'Oye Quanela',
+  copilot: 'quanela Copilot',
+  voice: 'Oye quanela',
   audit: 'Auditoría',
 }
 

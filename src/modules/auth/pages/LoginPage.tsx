@@ -146,7 +146,7 @@ export function LoginPage() {
                       Entra a {orgName} en <span className="font-mono text-neutral-300">{tenantHostLabel(tenant.code)}</span>.
                     </>
                   ) : (
-                    'Usa el correo y la contraseña de tu cuenta de Quanela.'
+                    'Usa el correo y la contraseña de tu cuenta de quanela.'
                   )}
                 </p>
               </div>
@@ -246,7 +246,7 @@ export function LoginPage() {
           {/* On a subdomain "/" is this same login: the start is quanela.com (ADR 0021). */}
           {orgName && rootUrl('/') ? (
             <a href={rootUrl('/')!} className={backLinkClass}>
-              <ArrowLeft size={14} aria-hidden /> Ir a Quanela
+              <ArrowLeft size={14} aria-hidden /> Ir a quanela
             </a>
           ) : (
             <Link to="/" className={backLinkClass}>

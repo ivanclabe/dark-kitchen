@@ -46,7 +46,7 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
   return (
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className={clsx('w-full', { sm: 'max-w-sm', md: 'max-w-xl', xl: 'max-w-5xl' }[width])}>
-        <Link to="/" aria-label="Quanela" className="mb-6 flex items-center justify-center">
+        <Link to="/" aria-label="quanela" className="mb-6 flex items-center justify-center">
           <BrandWordmark className="h-9" />
         </Link>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>
@@ -185,7 +185,7 @@ export function SignUpPage() {
       <Shell>
         <h1 className={typography.h2}>El registro abre pronto</h1>
         {selectedPlan && <PlanSummary plan={selectedPlan} period={period} />}
-        <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de Quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
+        <p className={typography.small}>Por ahora los negocios nuevos se crean con el equipo de quanela. Escríbenos y te ayudamos a empezar; si ya tienes usuario, inicia sesión.</p>
         <div className="flex flex-col gap-2 text-sm">
           {salesUrl && (
             <a href={salesUrl} className="text-brasa-400 hover:underline">
@@ -265,7 +265,7 @@ export function SignUpPage() {
       else setStep('sent')
     } catch (err) {
       const message = getErrorMessage(err, 'No se pudo crear tu usuario')
-      setError(/already registered|already exists/i.test(message) ? 'Ese correo ya tiene usuario en Quanela. Inicia sesión.' : message)
+      setError(/already registered|already exists/i.test(message) ? 'Ese correo ya tiene usuario en quanela. Inicia sesión.' : message)
     } finally {
       setBusy(false)
     }
@@ -313,7 +313,7 @@ export function SignUpPage() {
   }
 
   const titles = {
-    user: ['Crea tu usuario', entry === 'phone' ? 'Te enviaremos un código por SMS.' : entry === 'choose' ? 'Elige cómo vas a entrar a Quanela.' : 'Con él entrarás a Quanela.'],
+    user: ['Crea tu usuario', entry === 'phone' ? 'Te enviaremos un código por SMS.' : entry === 'choose' ? 'Elige cómo vas a entrar a quanela.' : 'Con él entrarás a quanela.'],
     plan: ['Elige el plan para tu negocio', 'Lo pagas al terminar de crear tu negocio. Puedes cambiar de plan cuando quieras.'],
     business: ['Tu negocio y tu primera cuenta', 'Con esto preparamos tu espacio y tu primera cuenta.'],
   }[current]

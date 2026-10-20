@@ -49,7 +49,7 @@ En **Pedidos**:
 
 Toca **Guardar opciones**.
 
-Quanela revisa **todo** en el momento de pedir:
+quanela revisa **todo** en el momento de pedir:
 - los precios (los calcula ella, no el navegador);
 - que el plato siga disponible a esa hora;
 - el límite de unidades;
@@ -94,7 +94,7 @@ En la pestaña **Diseño** decides cómo se ve tu página, de tres formas: el **
 
 > **Bueno saber:** lo que cambias se guarda solo como **borrador**; puedes salir y seguir después. **Descartar cambios** vuelve al diseño publicado, y **Volver al anterior** recupera el diseño que tenías antes de la última publicación. **Restablecer a la plantilla** deshace tus ajustes, pero conserva tu logo, tu imagen de cabecera y tu imagen de fondo. Cambiar de plantilla también las conserva.
 
-> **Cuidado:** si un color de texto se lee con dificultad sobre el fondo o las tarjetas, Quanela te avisa; toca **Corregir** para ajustarlo. El **código QR** toma tu color principal cuando se escanea bien; si no, sale negro.
+> **Cuidado:** si un color de texto se lee con dificultad sobre el fondo o las tarjetas, quanela te avisa; toca **Corregir** para ajustarlo. El **código QR** toma tu color principal cuando se escanea bien; si no, sale negro.
 
 ### Diseñador con IA
 

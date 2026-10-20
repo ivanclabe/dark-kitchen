@@ -6,7 +6,7 @@ const kitchen: VoiceHandler = { id: 'kitchen', grammar: '["pedido"]', matches: (
 const copilot: VoiceHandler = { id: 'copilot', fallback: true, handle: async () => null }
 const id = (r: ReturnType<typeof routeUtterance>) => (r.kind === 'handler' ? r.handler.id : r.kind === 'none' ? `none:${r.reason}` : r.kind)
 
-describe('«Oye Quanela» routes each phrase (ADR 0033)', () => {
+describe('«Oye quanela» routes each phrase (ADR 0033)', () => {
   it('in Cocina: a command to the kitchen, a question to Copilot', () => {
     expect(id(routeUtterance('pedido 1042 listo', [kitchen, copilot], 'browser'))).toBe('kitchen')
     expect(id(routeUtterance('¿cuánto vendimos hoy?', [kitchen, copilot], 'browser'))).toBe('copilot')

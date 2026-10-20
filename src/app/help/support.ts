@@ -83,7 +83,7 @@ export function diagnosticsText(rows: [string, string][]): string {
 
 /** mailto: for "Reportar un problema" — the person's words plus the diagnostics. */
 export function reportMailto(email: string, description: string, rows: [string, string][]): string {
-  const subject = `Problema en Quanela${rows.find(([k]) => k === 'Código')?.[1] ? ` · ${rows.find(([k]) => k === 'Código')![1]}` : ''}`
+  const subject = `Problema en quanela${rows.find(([k]) => k === 'Código')?.[1] ? ` · ${rows.find(([k]) => k === 'Código')![1]}` : ''}`
   const body = `${description.trim()}\n\n— Datos para soporte —\n${diagnosticsText(rows)}`
   return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

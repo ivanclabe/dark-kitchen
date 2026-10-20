@@ -30,6 +30,6 @@ order: 3
 
 ## Gastos fijos
 
-Para lo que se repite cada mes (arriendo, internet), toca **Nuevo gasto fijo**: categoría, descripción, valor y el **día** en que vence. Quanela crea la obligación de cada mes **una sola vez**, sola, cada día (no hace falta abrir Finanzas). Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente).
+Para lo que se repite cada mes (arriendo, internet), toca **Nuevo gasto fijo**: categoría, descripción, valor y el **día** en que vence. quanela crea la obligación de cada mes **una sola vez**, sola, cada día (no hace falta abrir Finanzas). Puedes pausarlo o cambiar el valor (aplica desde el mes siguiente).
 
 Si el valor cambia cada mes (luz, gas, agua), activa **Monto variable**: cada mes nace con el valor de referencia y la etiqueta **Monto por confirmar**, y no se puede pagar hasta que escribas el valor real en **Por pagar → Confirmar monto**. La campana avisa cuando hay montos por confirmar.

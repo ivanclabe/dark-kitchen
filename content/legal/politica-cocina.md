@@ -2,12 +2,12 @@
 slug: politica-cocina
 title: Política de tratamiento de datos de {{cocina.nombre}}
 summary: Cómo trata tus datos {{cocina.nombre}} cuando pides por su menú web o por WhatsApp, y cómo ejercer tus derechos.
-version: "1.0"
-effective: 2026-10-19
+version: "1.1"
+effective: 2026-10-20
 order: 6
 ---
 
-> Esta política la publica {{cocina.nombre}} en Quanela con base en una plantilla; la cocina es responsable de su contenido.
+> Esta política la publica {{cocina.nombre}} en quanela con base en una plantilla; la cocina es responsable de su contenido.
 
 ## 1. Quién es el responsable de tus datos
 
@@ -20,7 +20,7 @@ El responsable del tratamiento de tus datos es **{{cocina.nombre}}** («la cocin
 | Dirección | {{cocina.direccion}}, {{cocina.ciudad}} |
 | Teléfono | {{cocina.telefono}} |
 
-La cocina usa **Quanela**, una plataforma tecnológica, para recibir y gestionar sus pedidos. Quanela trata tus datos solo por cuenta de la cocina (ver la sección 5).
+La cocina usa **quanela**, una plataforma tecnológica, para recibir y gestionar sus pedidos. quanela trata tus datos solo por cuenta de la cocina (ver la sección 5).
 
 ## 2. Qué datos tratamos
 
@@ -55,8 +55,8 @@ Al marcar la casilla de aceptación en el menú web, o al continuar la conversac
 
 ## 5. Quién más trata tus datos
 
-- **Quanela**, de {{empresa.razonSocial}}, es el **Encargado**: provee la plataforma y trata tus datos solo para prestar el servicio a la cocina. No los usa para fines propios ni los vende.
-- Quanela se apoya en proveedores tecnológicos (alojamiento, base de datos, WhatsApp e inteligencia artificial), algunos fuera de Colombia, por ejemplo en EE. UU. y Brasil. La lista con su país está en la [Política de Tratamiento de Datos de Quanela](/legal/privacidad#encargados).
+- **quanela**, de {{empresa.razonSocial}}, es el **Encargado**: provee la plataforma y trata tus datos solo para prestar el servicio a la cocina. No los usa para fines propios ni los vende.
+- quanela se apoya en proveedores tecnológicos (alojamiento, base de datos, WhatsApp e inteligencia artificial), algunos fuera de Colombia, por ejemplo en EE. UU. y Brasil. La lista con su país está en la [Política de Tratamiento de Datos de quanela](/legal/privacidad#encargados).
 - Si la entrega la hace un tercero (por ejemplo, una empresa de domicilios), recibe solo los datos necesarios para entregarte el pedido.
 
 ## 6. Tus derechos

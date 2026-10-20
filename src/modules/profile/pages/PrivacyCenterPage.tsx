@@ -40,7 +40,7 @@ const STATUS: Record<PqrRequest['status'], { label: string; tone: BadgeTone }> =
 const CONTEXT: Record<string, string> = {
   signup: 'Al crear tu cuenta',
   activation: 'Al activar tu usuario',
-  app_gate: 'Al entrar a Quanela',
+  app_gate: 'Al entrar a quanela',
   reacceptance: 'Nueva versión',
   billing_renewal: 'Al guardar la tarjeta',
 }
@@ -201,7 +201,7 @@ export function PrivacyCenterPage() {
           <Requests />
         </Card>
 
-        <Card title="Preferencias de privacidad" icon={SlidersHorizontal} description="Qué guarda Quanela en este navegador. Hoy no usamos analítica ni publicidad.">
+        <Card title="Preferencias de privacidad" icon={SlidersHorizontal} description="Qué guarda quanela en este navegador. Hoy no usamos analítica ni publicidad.">
           <a href="/legal/preferencias" target="_blank" rel="noopener noreferrer" className="text-sm text-brasa-400 hover:underline">
             Abrir preferencias de privacidad
           </a>

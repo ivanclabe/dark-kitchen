@@ -130,7 +130,7 @@ export function OrganizationsPage() {
       <PageTitle
         title="Organizations"
         icon={Building2}
-        description={data ? `${data.length} organizaciones en Quanela.` : 'Todas las organizaciones de Quanela.'}
+        description={data ? `${data.length} organizaciones en quanela.` : 'Todas las organizaciones de quanela.'}
         actions={
           <Button variant="primary" icon={Plus} onClick={() => navigate('/organizations/new')}>
             Crear organización

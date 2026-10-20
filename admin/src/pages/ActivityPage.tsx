@@ -47,7 +47,7 @@ export function ActivityPage() {
 
   return (
     <>
-      <PageTitle title="Activity" icon={Activity} description="Lo que pasa en Quanela: altas, accesos, cambios, IA y acciones del portal." actions={<RangePicker value={range.key} onChange={range.setKey} />} />
+      <PageTitle title="Activity" icon={Activity} description="Lo que pasa en quanela: altas, accesos, cambios, IA y acciones del portal." actions={<RangePicker value={range.key} onChange={range.setKey} />} />
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <form
           className="relative min-w-56 flex-1"

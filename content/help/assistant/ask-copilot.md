@@ -2,13 +2,13 @@
 id: ask-copilot
 section: assistant
 title: Preguntarle a Copilot
-summary: Copilot responde preguntas sobre tu negocio con tus datos reales (ventas, pedidos, cocina, inventario, clientes, turnos) y te dice dónde se hace algo en Quanela, con el enlace a la guía.
+summary: Copilot responde preguntas sobre tu negocio con tus datos reales (ventas, pedidos, cocina, inventario, clientes, turnos) y te dice dónde se hace algo en quanela, con el enlace a la guía.
 audience: [everyone]
 permissions: [copilot.use]
 appPath: /dashboard
 questions:
   - ¿Cómo uso Copilot?
-  - ¿Qué le puedo preguntar a Quanela?
+  - ¿Qué le puedo preguntar a quanela?
   - ¿Copilot puede hacer cambios?
   - ¿De dónde saca Copilot los datos?
 keywords: [copilot, asistente, IA, inteligencia artificial, preguntar, chat, consultar, ayuda, conversación, historial, respuestas sin ver]
@@ -17,7 +17,7 @@ updated: 2026-10-06
 order: 1
 screenshots:
   - id: copilot
-    alt: Panel de Quanela Copilot con una pregunta, la respuesta y el enlace a una guía del centro de ayuda
+    alt: Panel de quanela Copilot con una pregunta, la respuesta y el enlace a una guía del centro de ayuda
     notes:
       - Tu pregunta.
       - La respuesta, con los datos de la cuenta activa.
@@ -42,7 +42,7 @@ screenshots:
 | Inventario | «¿Qué insumos están bajo el mínimo?» |
 | Clientes y cobros | «¿Quién me debe?», «¿Cuánto se ha cobrado hoy?» |
 | Equipo | «¿Quién trabaja hoy?» |
-| Cómo usar Quanela | «¿Cómo registro una compra?», «¿Dónde cambio el horario de la cocina?» |
+| Cómo usar quanela | «¿Cómo registro una compra?», «¿Dónde cambio el horario de la cocina?» |
 
 ## Lo que debes saber
 
@@ -53,4 +53,4 @@ screenshots:
 - Lo que preguntas por voz no abre el chat: el botón **✦ Copilot** muestra cuántas respuestas tienes **sin ver**.
 - **Nueva conversación** empieza de cero.
 
-> **Bueno saber:** también puedes preguntar con la voz desde cualquier pantalla. Ver [«Oye Quanela»: háblale a Quanela](help:oye-quanela).
+> **Bueno saber:** también puedes preguntar con la voz desde cualquier pantalla. Ver [«Oye quanela»: háblale a quanela](help:oye-quanela).

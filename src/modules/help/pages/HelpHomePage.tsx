@@ -11,7 +11,7 @@ const POPULAR = ['create-order', 'kitchen-view', 'register-payment', 'stock', 'i
 /** /help — the start of the public help center (ADR 0034). */
 export function HelpHomePage() {
   useEffect(() => {
-    document.title = 'Centro de ayuda de Quanela'
+    document.title = 'Centro de ayuda de quanela'
     setCanonical('/help')
   }, [])
   const popular = POPULAR.map((id) => HELP_ARTICLES[id]).filter(Boolean)
@@ -20,12 +20,12 @@ export function HelpHomePage() {
     <div className="max-w-5xl">
       <section className="rounded-3xl border border-neutral-800/60 bg-gradient-to-b from-brasa-500/10 to-transparent px-6 py-10 sm:px-10">
         <h1 className="text-3xl font-semibold tracking-tight text-neutral-50 sm:text-4xl">¿En qué te ayudamos?</h1>
-        <p className="mt-2 max-w-2xl text-neutral-300">Guías cortas y paso a paso para operar tu negocio en Quanela: pedidos, cocina, inventario, clientes y reportes.</p>
+        <p className="mt-2 max-w-2xl text-neutral-300">Guías cortas y paso a paso para operar tu negocio en quanela: pedidos, cocina, inventario, clientes y reportes.</p>
         <div className="mt-6 max-w-2xl">
           <HelpSearch size="lg" />
         </div>
         <p className="mt-4 flex items-center gap-1.5 text-sm text-neutral-400">
-          <Sparkles size={14} className="text-brasa-400" aria-hidden /> Dentro de Quanela también puedes preguntar: «Oye Quanela, ¿cómo registro un pago?»
+          <Sparkles size={14} className="text-brasa-400" aria-hidden /> Dentro de quanela también puedes preguntar: «Oye quanela, ¿cómo registro un pago?»
         </p>
       </section>
 

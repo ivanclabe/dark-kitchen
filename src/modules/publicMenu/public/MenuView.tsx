@@ -151,7 +151,7 @@ export function PublicMenuView({
           </a>
         )}
         <a href="https://quanela.com" className="opacity-70 hover:opacity-100">
-          Hecho con Quanela
+          Hecho con quanela
         </a>
       </footer>
 

@@ -84,7 +84,7 @@ export function HomeHighlights() {
           id: 'guide:help',
           tone: 'guide',
           badge: 'Documentación',
-          title: 'Saca más de Quanela',
+          title: 'Saca más de quanela',
           body: 'Guías cortas para pedidos, inventario, recetas, finanzas y la voz, con capturas de cada pantalla.',
           action: { label: 'Ver la ayuda', href: helpHref() },
         }

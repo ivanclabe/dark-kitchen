@@ -79,7 +79,7 @@ export function AppLayout() {
       </div>
 
       {/* Phone: the same sidebar, as a drawer from the left. */}
-      <Drawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title="Quanela" side="left" size="sm">
+      <Drawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title="quanela" side="left" size="sm">
         <div className="mb-3 md:hidden">
           <OnlineIndicator placement="bottom-start" />
         </div>

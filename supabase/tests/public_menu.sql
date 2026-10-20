@@ -191,7 +191,7 @@ reset role;
 select pg_temp.as_owner();
 
 insert into _t (area, test, expected, got) values
-  ('Datos', 'La autorización queda como evidencia (casilla, política de la cocina, datos del negocio)', '1 · checkbox · politica-cocina 1.0 · Menú A',
+  ('Datos', 'La autorización queda como evidencia (casilla, política de la cocina, datos del negocio)', '1 · checkbox · politica-cocina ' || (dk_current_legal_document('politica-cocina')).version || ' · Menú A',
     (select count(*)::text || ' · ' || min(c.method) || ' · ' || min(c.document_slug) || ' ' || min(c.document_version) || ' · ' || min(c.kitchen_snapshot ->> 'name')
      from dk_customer_consents c join dk_orders o on o.id = c.order_id
      where o.public_token = (pg_temp.v('o1') ->> 'token')::uuid and c.purpose = 'order_processing' and c.channel = 'public_menu')),

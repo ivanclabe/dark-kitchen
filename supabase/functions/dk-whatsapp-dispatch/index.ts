@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
             method: "POST",
             headers: {
               "content-type": "application/json",
-              "user-agent": "Quanela-Webhooks/1",
+              "user-agent": "quanela-Webhooks/1",
               "x-quanela-event": String((m.payload.body as { event?: string })?.event ?? m.event),
               "x-quanela-delivery": m.id,
               "x-quanela-signature": await signEvent(raw, m.secret),

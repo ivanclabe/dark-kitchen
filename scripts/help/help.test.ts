@@ -21,7 +21,7 @@ describe('help center content (ADR 0034)', () => {
     }
   })
 
-  it('every article has the questions «Oye Quanela» answers with it', () => {
+  it('every article has the questions «Oye quanela» answers with it', () => {
     for (const a of build.kb) expect(a.questions.length, a.id).toBeGreaterThan(0)
   })
 })
@@ -73,7 +73,7 @@ const EVAL: [string, string][] = [
   ['qué hay de nuevo en la app', 'release-notes'],
 ]
 
-describe('help search (the knowledge base of «Oye Quanela»)', () => {
+describe('help search (the knowledge base of «Oye quanela»)', () => {
   const ranks = EVAL.map(([q, id]) => ({ q, id, got: searchKb(q, KB, { limit: 3 }).map((h) => h.article.id) }))
 
   it('finds the right article first for most questions (top-1 ≥ 85 %)', () => {

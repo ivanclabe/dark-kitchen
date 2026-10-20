@@ -69,7 +69,7 @@ describe('the wait after signing in', () => {
     act(() => vi.advanceTimersByTime(400))
     const face = () => document.querySelector('[data-loading-screen] img[data-robot]')!.getAttribute('data-robot')
     expect(face()).toBe('idea')
-    fireEvent.click(screen.getByRole('button', { name: 'Saludar a Quanela' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Saludar a quanela' }))
     expect(face()).toBe('wink')
     expect(screen.queryByRole('button', { name: /Recargar/ })).toBeNull()
     act(() => vi.advanceTimersByTime(10_500))

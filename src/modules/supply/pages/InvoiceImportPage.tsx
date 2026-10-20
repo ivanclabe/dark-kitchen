@@ -83,7 +83,7 @@ export function InvoiceImportPage() {
       <PageHeader
         help="invoice-import"
         title="Importar compra desde factura"
-        description="Quanela lee la factura con IA; tú revisas todo antes de guardar."
+        description="quanela lee la factura con IA; tú revisas todo antes de guardar."
         icon={ScanText}
         backTo="/supply/compras"
         backLabel="Volver a Compras"
@@ -144,9 +144,9 @@ export function InvoiceImportPage() {
             <InvoiceDropzone onFile={(file) => (readOnDrop ? void read(file) : setStage({ kind: 'ready', file }))} />
           )}
           <ul className="space-y-1.5 text-sm text-neutral-400">
-            <li>• Quanela lee el proveedor, el NIT, el número, la fecha, las líneas y los totales, y busca tus proveedores e insumos.</li>
+            <li>• quanela lee el proveedor, el NIT, el número, la fecha, las líneas y los totales, y busca tus proveedores e insumos.</li>
             <li>• Tú revisas y corriges todo. La compra queda en borrador, o confirmada si lo eliges; el inventario solo se mueve al confirmar.</li>
-            <li>• La factura se envía al proveedor de IA de Quanela para leerla y queda guardada, privada, como adjunto de la compra.</li>
+            <li>• La factura se envía al proveedor de IA de quanela para leerla y queda guardada, privada, como adjunto de la compra.</li>
           </ul>
         </div>
       )}
@@ -299,7 +299,7 @@ function ImportReview({ importId }: { importId: string }) {
             </p>
             <p className="text-sm text-neutral-400">{rereadError ?? invoice.error ?? 'La lectura se interrumpió.'}</p>
             {(invoice.extraction?.lines.length ?? 0) > 0 && (
-              <p className="text-sm text-neutral-300">Quanela alcanzó a leer {invoice.extraction!.lines.length} producto(s): puedes revisarlos y completar lo que falte.</p>
+              <p className="text-sm text-neutral-300">quanela alcanzó a leer {invoice.extraction!.lines.length} producto(s): puedes revisarlos y completar lo que falte.</p>
             )}
             <div className="flex flex-wrap gap-2">
               {(invoice.extraction?.lines.length ?? 0) > 0 && (

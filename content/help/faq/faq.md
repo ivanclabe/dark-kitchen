@@ -2,7 +2,7 @@
 id: faq
 section: faq
 title: Preguntas frecuentes
-summary: Respuestas cortas a lo que más se pregunta en Quanela, con el enlace a la guía completa.
+summary: Respuestas cortas a lo que más se pregunta en quanela, con el enlace a la guía completa.
 audience: [everyone]
 permissions: []
 appPath: null
@@ -42,7 +42,7 @@ La compra debe estar **confirmada**: en borrador no suma. Ver [Registrar una com
 ## Acceso y cuenta
 
 ### Olvidé mi contraseña
-Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de Quanela: te envía un enlace (por WhatsApp o correo) para que crees una contraseña nueva; nadie más la ve. Si entraste con Google, Instagram o tu teléfono, no necesitas contraseña: usa ese mismo botón. Ver [Entrar a Quanela y cambiar de cuenta o de rol](help:switch-account).
+Todavía no hay un botón para recuperarla tú mismo. Escríbele al soporte de quanela: te envía un enlace (por WhatsApp o correo) para que crees una contraseña nueva; nadie más la ve. Si entraste con Google, Instagram o tu teléfono, no necesitas contraseña: usa ese mismo botón. Ver [Entrar a quanela y cambiar de cuenta o de rol](help:switch-account).
 
 ### Mi enlace de activación venció
 Pídele a quien administra la cuenta que abra tu usuario y toque **Generar enlace nuevo**. Ver [Invitar a tu equipo](help:invite-team).
@@ -50,7 +50,7 @@ Pídele a quien administra la cuenta que abra tu usuario y toque **Generar enlac
 ### No veo un módulo en el menú
 Cada rol ve solo lo que puede usar. Si tienes varios roles, cambia de rol en el menú de tu avatar. Si te falta algo, pídele a quien administra que revise tu rol. Ver [Qué ve cada rol](help:roles).
 
-### ¿Puedo usar Quanela en el celular o la tableta?
+### ¿Puedo usar quanela en el celular o la tableta?
 Sí, desde el navegador. En el celular, el menú se abre con ☰. Para la cocina, una tableta con la vista **Cocina** funciona muy bien.
 
 ## Copilot y voz
@@ -58,7 +58,7 @@ Sí, desde el navegador. En el celular, el menú se abre con ☰. Para la cocina
 ### Copilot dice que llegué al límite
 Cada cuenta tiene un cupo de preguntas por día según su plan. Ver [Límites de Copilot](help:copilot-limits).
 
-### No veo «Oye Quanela»
-La voz debe estar activa en tu cuenta y en tu rol. Ver [«Oye Quanela»](help:oye-quanela).
+### No veo «Oye quanela»
+La voz debe estar activa en tu cuenta y en tu rol. Ver [«Oye quanela»](help:oye-quanela).
 
-¿No encontraste tu respuesta? Usa el buscador de arriba o, dentro de Quanela, pregúntale a Copilot.
+¿No encontraste tu respuesta? Usa el buscador de arriba o, dentro de quanela, pregúntale a Copilot.

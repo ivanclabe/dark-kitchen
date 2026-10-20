@@ -1,9 +1,9 @@
 ---
 slug: reembolsos
 title: Política de Cancelaciones y Reembolsos
-summary: Cuándo te devolvemos el dinero en Quanela (retracto y cobros errados), qué pasa al cancelar y cómo pedir un reembolso.
-version: "1.0"
-effective: 2026-10-19
+summary: Cuándo te devolvemos el dinero en quanela (retracto y cobros errados), qué pasa al cancelar y cómo pedir un reembolso.
+version: "1.1"
+effective: 2026-10-20
 order: 4
 ---
 
@@ -20,7 +20,7 @@ Esta política hace parte de los [Términos y Condiciones](/legal/terminos) y co
 ## 2. Retracto
 
 - Puedes retractarte y recibir el **reembolso total** si lo pides dentro de los **5 días hábiles** siguientes al **primer pago** de tu suscripción (Ley 1480 de 2011, art. 47, modificado por la Ley 2439 de 2024).
-- Quanela concede este retracto de forma voluntaria, incluso en casos en que la ley podría no exigirlo, por ejemplo si contratas como empresa o si ya empezaste a usar el servicio.
+- quanela concede este retracto de forma voluntaria, incluso en casos en que la ley podría no exigirlo, por ejemplo si contratas como empresa o si ya empezaste a usar el servicio.
 - No aplica a las renovaciones de periodos posteriores.
 - Al retractarte, la suscripción se termina y el acceso se suspende.
 

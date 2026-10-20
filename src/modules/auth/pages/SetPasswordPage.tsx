@@ -95,9 +95,9 @@ export function SetPasswordPage() {
         <p className="flex items-center gap-2 font-medium text-neutral-100">
           <CheckCircle2 size={16} className="text-emerald-400" aria-hidden /> Contraseña guardada
         </p>
-        <p className={typography.small}>Desde ahora entras a Quanela con tu correo y esta contraseña.</p>
+        <p className={typography.small}>Desde ahora entras a quanela con tu correo y esta contraseña.</p>
         <Button variant="primary" size="lg" className="w-full" onClick={() => navigate(APP_ENTRY, { replace: true })}>
-          Entrar a Quanela
+          Entrar a quanela
         </Button>
       </Shell>
     )

@@ -367,7 +367,7 @@
       "id": "copilot",
       "path": "/dashboard",
       "click": [
-        "css=button[aria-label='Abrir Quanela Copilot']"
+        "css=button[aria-label='Abrir quanela Copilot']"
       ],
       "fill": [
         {

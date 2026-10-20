@@ -41,4 +41,4 @@ export async function ownsABusiness(): Promise<boolean> {
   return ctx?.organizations.some((o) => o.isOwner) ?? false
 }
 
-export const NOT_AN_OWNER_NOTICE = 'Esa forma de entrar es para quien creó su negocio en Quanela. Entra con tu correo y tu contraseña.'
+export const NOT_AN_OWNER_NOTICE = 'Esa forma de entrar es para quien creó su negocio en quanela. Entra con tu correo y tu contraseña.'

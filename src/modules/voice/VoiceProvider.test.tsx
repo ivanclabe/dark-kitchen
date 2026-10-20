@@ -126,7 +126,7 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('«Oye Quanela» (ADR 0033)', () => {
+describe('«Oye quanela» (ADR 0033)', () => {
   it('a kitchen command goes to the kitchen and is answered aloud as a command', async () => {
     renderVoice()
     await act(async () => api!.listen())
@@ -194,7 +194,7 @@ describe('«Oye Quanela» (ADR 0033)', () => {
     expect(typed).toEqual(['qué plato deja más margen'])
   })
 
-  it('«Oye Quanela» outside Cocina with the local recognizer asks for the online one, without listening', async () => {
+  it('«Oye quanela» outside Cocina with the local recognizer asks for the online one, without listening', async () => {
     state.engine = 'vosk'
     renderVoice(false)
     await act(async () => {
@@ -230,7 +230,7 @@ describe('«Oye Quanela» (ADR 0033)', () => {
     expect(calls).toEqual([])
   })
 
-  it('«Oye Quanela» opens a short window; nobody speaks: back to waiting', async () => {
+  it('«Oye quanela» opens a short window; nobody speaks: back to waiting', async () => {
     renderVoice()
     await act(async () => {
       state.onDetect!()
@@ -274,7 +274,7 @@ async function wakeAndAsk(text: string) {
 }
 
 describe('conversation by voice (ADR 0038)', () => {
-  it('after «Oye Quanela» and an answer, it listens again without the wake phrase', async () => {
+  it('after «Oye quanela» and an answer, it listens again without the wake phrase', async () => {
     renderVoice()
     await wakeAndAsk('¿cuánto vendimos hoy?')
     expect(calls).toEqual(['copilot:¿cuánto vendimos hoy?'])
@@ -439,7 +439,7 @@ describe('latency (ADR 0041)', () => {
     expect(state.started).toBe(1)
   })
 
-  it('«Oye Quanela» gets the answerers ready; the offline recognizer does not (it cannot ask Copilot)', async () => {
+  it('«Oye quanela» gets the answerers ready; the offline recognizer does not (it cannot ask Copilot)', async () => {
     renderVoice()
     await act(async () => {
       state.onDetect!()

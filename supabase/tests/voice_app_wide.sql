@@ -29,7 +29,7 @@ select pg_temp.k('A'), m.user_id, (select id from dk_roles where is_system and k
 from (values ('10000000-0000-0000-0000-000000033b01'::uuid, 'INVENTORY'), ('10000000-0000-0000-0000-000000033b02'::uuid, 'KITCHEN')) m(user_id, role_key);
 
 insert into _t (area, test, expected, got) values
-  ('Catalog', 'voice.use exists, for the account', 'account · Usar Oye Quanela', (select scope || ' · ' || label from dk_permissions where key = 'voice.use')),
+  ('Catalog', 'voice.use exists, for the account', 'account · Usar Oye quanela', (select scope || ' · ' || label from dk_permissions where key = 'voice.use')),
   ('Catalog', 'Every system role has voice.use', 'true',
     ((select count(*) from dk_roles where is_system) = (select count(*) from dk_role_permissions rp join dk_roles r on r.id = rp.role_id where r.is_system and rp.permission_key = 'voice.use'))::text),
   ('Catalog', 'No custom role with kitchen.view lost the voice', '0',

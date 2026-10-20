@@ -13,7 +13,7 @@ questions:
   - ¿Cómo hago un reclamo sobre mis datos?
   - ¿Cuánto tardan en responder una solicitud?
   - ¿Qué es el radicado?
-  - ¿Quanela usa cookies?
+  - ¿quanela usa cookies?
   - ¿Cómo borro los datos de un cliente que me lo pidió?
 keywords: [privacidad, datos personales, habeas data, términos, política de datos, cookies, preferencias, radicado, PQR, consulta, reclamo, supresión, borrar datos, descargar datos, autorización, Ley 1581]
 related: [subscription-billing, customers, settings]
@@ -27,7 +27,7 @@ En el menú de tu avatar → **Privacidad y datos** (también desde **Mi perfil*
 
 Al crear tu cuenta aceptas, cada uno con su propia casilla, los [Términos y Condiciones](/legal/terminos) y la [Política de Tratamiento de Datos Personales](/legal/privacidad). Cada aceptación queda guardada con la **versión del documento**, la **fecha y hora**, y desde qué navegador, y **nunca se borra ni se modifica**.
 
-Si un documento cambia y la nueva versión necesita tu aceptación, Quanela te la pide antes de seguir. Lo que aceptaste antes se conserva en tu historial.
+Si un documento cambia y la nueva versión necesita tu aceptación, quanela te la pide antes de seguir. Lo que aceptaste antes se conserva en tu historial.
 
 ## Descargar tus datos
 
@@ -49,11 +49,11 @@ Los días hábiles no cuentan sábados, domingos ni festivos de Colombia. La res
 
 ## Cookies y preferencias
 
-Quanela **no usa analítica ni publicidad**. Solo guarda en tu navegador lo necesario para tu sesión y lo que tú eliges (tema, voz, vista de la cocina). En [Preferencias de privacidad](/legal/preferencias) lo ves por categoría y puedes borrar tus preferencias guardadas.
+quanela **no usa analítica ni publicidad**. Solo guarda en tu navegador lo necesario para tu sesión y lo que tú eliges (tema, voz, vista de la cocina). En [Preferencias de privacidad](/legal/preferencias) lo ves por categoría y puedes borrar tus preferencias guardadas.
 
 ## Los datos de tus clientes
 
-De los clientes que te compran, el **responsable es tu negocio**; Quanela los guarda por encargo tuyo.
+De los clientes que te compran, el **responsable es tu negocio**; quanela los guarda por encargo tuyo.
 
 - Tu **menú web** muestra la política de datos de tu negocio, hecha con los datos de **Configuración → General** (razón social, NIT, dirección y teléfono). Complétalos para que aparezcan. El cliente acepta esa política con una casilla al pedir.
 - Si un cliente te pide **borrar sus datos**, abre su ficha → **Borrar datos personales**. Se borran su nombre, celular, direcciones, notas, preferencias y conversaciones; sus pedidos se conservan sin identificarlo.

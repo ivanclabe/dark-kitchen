@@ -91,7 +91,7 @@ function renderCopilot() {
 }
 
 async function ask(text: string) {
-  fireEvent.click(screen.getByRole('button', { name: 'Abrir Quanela Copilot' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Abrir quanela Copilot' }))
   fireEvent.change(screen.getByLabelText('Pregunta para Copilot'), { target: { value: text } })
   fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
   await screen.findByText(/preguntas hoy|Reintentar|Consulta/)
@@ -131,7 +131,7 @@ describe('Copilot (ADR 0033)', () => {
   })
 
   it('out of scope is labelled as such', async () => {
-    state.next = [answer({ scope: 'out_of_scope', answer: 'Solo puedo ayudarte con tu negocio en Quanela.' })]
+    state.next = [answer({ scope: 'out_of_scope', answer: 'Solo puedo ayudarte con tu negocio en quanela.' })]
     renderCopilot()
     await ask('¿va a llover mañana?')
     expect(screen.getByText('Fuera del negocio')).toBeTruthy()
@@ -160,7 +160,7 @@ describe('Copilot (ADR 0033)', () => {
     expect(state.said).toEqual([{ text: 'Hoy vendiste veinte mil pesos.', priority: 'answer' }])
   })
 
-  it('by voice: «Oye Quanela» hands it the question; the panel stays closed, ✦ says there is an answer to see', async () => {
+  it('by voice: «Oye quanela» hands it the question; the panel stays closed, ✦ says there is an answer to see', async () => {
     state.next = [answer()]
     renderCopilot()
     expect(state.handler).toMatchObject({ id: 'copilot', fallback: true })
@@ -171,9 +171,9 @@ describe('Copilot (ADR 0033)', () => {
     expect(state.asked).toEqual([{ question: 'cuánto vendimos hoy', channel: 'voice' }])
     expect(reply).toMatchObject({ spoken: 'Hoy vendiste veinte mil pesos.', priority: 'answer' })
     expect(screen.queryByLabelText('Pregunta para Copilot')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Abrir Quanela Copilot: 1 respuesta sin ver' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir quanela Copilot: 1 respuesta sin ver' }))
     expect(screen.getByText('Consultando ventas')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Abrir Quanela Copilot' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Abrir quanela Copilot' })).toBeTruthy()
   })
 
   it('ADR 0041: says the sentence as soon as it arrives, not again at the end, and reports how long it took', async () => {
@@ -207,7 +207,7 @@ describe('Copilot (ADR 0033)', () => {
     await waitFor(() => expect(state.reported[0]?.[1]).toMatchObject({ streamed: false }))
   })
 
-  it('ADR 0041: hearing «Oye Quanela» wakes the function', () => {
+  it('ADR 0041: hearing «Oye quanela» wakes the function', () => {
     renderCopilot()
     state.handler!.prepare!()
     expect(state.warmed).toBe(1)
@@ -236,11 +236,11 @@ describe('Copilot (ADR 0033)', () => {
     })
     cleanup()
     renderCopilot()
-    fireEvent.click(screen.getByRole('button', { name: 'Abrir Quanela Copilot' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir quanela Copilot' }))
     expect(screen.getByText('cuánto vendimos hoy')).toBeTruthy()
   })
 
-  it('Ctrl/⌘ + J opens Copilot; with Shift it is «Oye Quanela», not this', () => {
+  it('Ctrl/⌘ + J opens Copilot; with Shift it is «Oye quanela», not this', () => {
     renderCopilot()
     fireEvent.keyDown(window, { key: 'J', ctrlKey: true, shiftKey: true })
     expect(screen.queryByLabelText('Pregunta para Copilot')).toBeNull()

@@ -101,7 +101,7 @@ function BrandIntroOverlay() {
       onPointerDown={() => setLeaving(true)}
     >
       <p role="status" className="sr-only">
-        Entrando a Quanela
+        Entrando a quanela
       </p>
       <div className="brand-intro-stage relative grid size-full place-items-center" aria-hidden>
         <div ref={followBlobRef} className="pointer-events-none absolute inset-0 grid place-items-center">

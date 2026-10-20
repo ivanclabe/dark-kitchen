@@ -96,7 +96,7 @@ export function HelpSearch({ size = 'md', autoFocus = false, onNavigate }: { siz
         <ul id={listId} role="listbox" aria-label="Resultados" className="shadow-float absolute top-full right-0 left-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-1.5">
           {hits.length === 0 ? (
             <li className="px-3 py-3 text-sm text-neutral-400">
-              Sin resultados para «{query}». Prueba con otras palabras, o pregúntale a Copilot dentro de Quanela.
+              Sin resultados para «{query}». Prueba con otras palabras, o pregúntale a Copilot dentro de quanela.
             </li>
           ) : (
             hits.map((hit, i) => (

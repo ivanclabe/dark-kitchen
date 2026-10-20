@@ -112,7 +112,7 @@ export function HelpLayout() {
             href={appHomeHref(Boolean(session))}
             className="ml-auto shrink-0 rounded-full border border-neutral-800 px-3.5 py-1.5 text-sm text-neutral-200 transition-colors hover:border-neutral-700 hover:bg-neutral-900 md:ml-0"
           >
-            {session ? 'Volver a Quanela' : 'Entrar'}
+            {session ? 'Volver a quanela' : 'Entrar'}
           </a>
         </div>
         <div className="px-4 pb-3 md:hidden">

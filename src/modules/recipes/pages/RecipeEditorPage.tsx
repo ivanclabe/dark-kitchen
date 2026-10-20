@@ -455,7 +455,7 @@ export function RecipeForm({
         </p>
       )}
       <p className={typography.caption}>
-        Escribe cada insumo en la unidad que te sea cómoda (por ejemplo 150 g aunque lo compres en kilos): Quanela lo convierte a la unidad del inventario para descontar y costear.
+        Escribe cada insumo en la unidad que te sea cómoda (por ejemplo 150 g aunque lo compres en kilos): quanela lo convierte a la unidad del inventario para descontar y costear.
         {prep
           ? ' Los insumos salen del inventario una sola vez, cuando preparas un lote; los platos que llevan esta preparación descuentan solo la preparación.'
           : ' Una preparación (una salsa, una ensalada base) se agrega como cualquier insumo y lleva su costo real.'}

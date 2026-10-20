@@ -356,7 +356,7 @@ export function PurchaseDetail({ purchaseId }: { purchaseId: string }) {
               <FormField label="Cantidad" required>
                 {(a11y) => <NumberInput {...a11y} value={quantity || null} onValueChange={(v) => setQuantity(v ?? 0)} decimals={3} min={0} required />}
               </FormField>
-              <FormField label="Unidad de compra" required info="Compra en la unidad de la factura (kg, l, caja…): Quanela la convierte a la unidad del inventario al confirmar.">
+              <FormField label="Unidad de compra" required info="Compra en la unidad de la factura (kg, l, caja…): quanela la convierte a la unidad del inventario al confirmar.">
                 {(a11y) => (
                   <Select
                     {...a11y}

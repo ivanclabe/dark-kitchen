@@ -19,7 +19,7 @@ export type EditableField = SettingField | ChoiceField
 const WAKE_WORD_FIELDS: EditableField[] = [
   {
     key: 'threshold',
-    label: 'Sensibilidad de «Oye Quanela»',
+    label: 'Sensibilidad de «Oye quanela»',
     type: 'choice',
     options: [
       { value: 0.8, label: 'Alta: responde más fácil' },
@@ -36,8 +36,8 @@ const WAKE_WORD_FIELDS: EditableField[] = [
  */
 export const EXTRA_FIELDS: Partial<Record<FeatureKey, EditableField[]>> = {
   copilot: [
-    { key: 'voice_fallback', label: 'Responder por voz lo que ninguna pantalla entiende', type: 'boolean', hint: 'Apagado, «Oye Quanela» solo ejecuta comandos de pantalla: no hace preguntas a Copilot.' },
-    { key: 'follow_up', label: 'Seguir escuchando después de responder', type: 'boolean', hint: 'Apagado, cada pregunta empieza con «Oye Quanela» (menos consultas por ruido).' },
+    { key: 'voice_fallback', label: 'Responder por voz lo que ninguna pantalla entiende', type: 'boolean', hint: 'Apagado, «Oye quanela» solo ejecuta comandos de pantalla: no hace preguntas a Copilot.' },
+    { key: 'follow_up', label: 'Seguir escuchando después de responder', type: 'boolean', hint: 'Apagado, cada pregunta empieza con «Oye quanela» (menos consultas por ruido).' },
   ],
   invoice_import: [
     { key: 'read_on_drop', label: 'Leer la factura apenas se sube', type: 'boolean', hint: 'Apagado, se pide confirmar antes de leer. Cada lectura es una consulta a la IA.' },

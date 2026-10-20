@@ -20,7 +20,7 @@ export function PublicMenuPage() {
 
   useEffect(() => {
     const name = menu.data?.business.name
-    document.title = name ? `${name} · Menú de hoy` : 'Menú · Quanela'
+    document.title = name ? `${name} · Menú de hoy` : 'Menú · quanela'
   }, [menu.data?.business.name])
 
   if (menu.data) {
@@ -70,7 +70,7 @@ function Message({ title, text, action }: { title: string; text: string; action?
       <p className="text-sm text-(--pm-muted)">{text}</p>
       {action}
       <a href="https://quanela.com" className="mt-6 text-xs text-(--pm-muted)">
-        Hecho con Quanela
+        Hecho con quanela
       </a>
     </div>
   )

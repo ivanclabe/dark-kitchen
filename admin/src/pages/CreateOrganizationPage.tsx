@@ -247,10 +247,10 @@ export function CreateOrganizationPage() {
               {check.user.ownsOrganization}. Una persona solo puede ser dueña de una organización; usa otro correo.
             </Notice>
           )}
-          {check.user.exists && !check.user.active && <Notice tone="bad" title="Ese usuario está desactivado en Quanela">Usa otro correo.</Notice>}
+          {check.user.exists && !check.user.active && <Notice tone="bad" title="Ese usuario está desactivado en quanela">Usa otro correo.</Notice>}
           {!check.emailValid && <Notice tone="bad" title="El correo no es válido">Revísalo en el paso anterior.</Notice>}
           {check.user.exists && check.user.active && !check.user.ownsOrganization && (
-            <Notice tone="info" title="Ya tiene usuario en Quanela">
+            <Notice tone="info" title="Ya tiene usuario en quanela">
               {check.user.fullName ?? form.adminEmail} {check.user.hasLogin ? 'ya puede iniciar sesión: recibirá un enlace para entrar y activar la organización.' : 'todavía no activa su acceso: recibirá la invitación.'}
             </Notice>
           )}

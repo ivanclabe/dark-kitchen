@@ -86,7 +86,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: '/consumer',
     label: 'App de clientes',
-    description: 'Lo que ven tus clientes en la app de Quanela',
+    description: 'Lo que ven tus clientes en la app de quanela',
     modules: ['consumer'],
     icon: Store,
     group: 'sales',

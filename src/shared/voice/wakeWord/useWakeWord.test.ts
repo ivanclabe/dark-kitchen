@@ -74,7 +74,7 @@ beforeEach(() => {
 })
 afterEach(() => vi.clearAllMocks())
 
-describe('«Oye Quanela» detector between uses (ADR 0041, D6)', () => {
+describe('«Oye quanela» detector between uses (ADR 0041, D6)', () => {
   it('keeps the microphone after detecting and while suspended, fed silence; hears the phrase again at once', async () => {
     const { rerender, onDetect, result } = mount()
     await act(async () => undefined)
@@ -97,7 +97,7 @@ describe('«Oye Quanela» detector between uses (ADR 0041, D6)', () => {
     expect(state.stops).toBe(0)
   })
 
-  it('while Quanela speaks it gets silence, not her voice, and needs no reset after', async () => {
+  it('while quanela speaks it gets silence, not her voice, and needs no reset after', async () => {
     mount()
     await act(async () => undefined)
     state.speaking = true

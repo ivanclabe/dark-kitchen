@@ -15,11 +15,11 @@ const MODES: { value: OrderingMode; title: string; text: string; icon: typeof Bo
   { value: 'off', title: 'Las atiende tu equipo', text: 'Los mensajes llegan a la bandeja (Mensajes) y tu equipo responde.', icon: Hand },
   {
     value: 'ai',
-    title: 'Asistente de Quanela',
+    title: 'Asistente de quanela',
     text: 'Entiende el pedido, lo busca en el menú de hoy, muestra el total real y lo crea cuando el cliente confirma. Si duda o el cliente lo pide, pasa a tu equipo.',
     icon: Bot,
   },
-  { value: 'n8n', title: 'Tu flujo de n8n', text: 'Los mensajes van a tu n8n; tu flujo responde y crea los pedidos con las reglas de Quanela.', icon: Workflow },
+  { value: 'n8n', title: 'Tu flujo de n8n', text: 'Los mensajes van a tu n8n; tu flujo responde y crea los pedidos con las reglas de quanela.', icon: Workflow },
 ]
 
 /**
@@ -108,7 +108,7 @@ export function OrderingTab({ settings }: { settings: WaSettings }) {
       <Card title="Cómo cuida tus pedidos" icon={ShieldCheck}>
         <ul className="list-disc space-y-1.5 pl-4 text-sm text-neutral-300">
           <li>Solo ofrece los platos del menú de hoy, con su disponibilidad, horario y límite.</li>
-          <li>Los precios, el domicilio, el mínimo y el total los calcula Quanela; la IA nunca los ve ni los inventa.</li>
+          <li>Los precios, el domicilio, el mínimo y el total los calcula quanela; la IA nunca los ve ni los inventa.</li>
           <li>Antes de crear el pedido muestra el resumen con el total real y espera un «sí».</li>
           <li>El pedido entra como cualquier otro (canal WhatsApp), con las reglas de tu menú público y su confirmación automática.</li>
           <li>Si no entiende dos veces, si el cliente pide una persona o si hay una pregunta, la conversación pasa a la bandeja.</li>

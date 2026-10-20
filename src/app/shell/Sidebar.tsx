@@ -117,7 +117,7 @@ export function Sidebar({ collapsed, onNavigate, inDrawer = false }: { collapsed
         <Link
           to={path('/')}
           onClick={onNavigate}
-          aria-label={`Quanela · inicio de ${kitchen.name}`}
+          aria-label={`quanela · inicio de ${kitchen.name}`}
           className={clsx(
             'flex shrink-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
             collapsed ? 'mb-3' : 'mb-4 h-8 px-2',

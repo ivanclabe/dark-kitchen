@@ -90,7 +90,7 @@ export function readinessOf(state: StorefrontState): Readiness {
       label: 'Ubicación',
       done: s?.latitude != null,
       required: false,
-      detail: s?.latitude != null ? 'Quanela puede decir a qué distancia estás.' : 'Sin ella, Quanela no puede decir a qué distancia estás.',
+      detail: s?.latitude != null ? 'quanela puede decir a qué distancia estás.' : 'Sin ella, quanela no puede decir a qué distancia estás.',
       fix: { section: 'perfil' },
     },
     {
@@ -103,7 +103,7 @@ export function readinessOf(state: StorefrontState): Readiness {
           ? state.open_state.state === 'open'
             ? 'Ahora se ve «Abierto».'
             : 'Ahora se ve «Cerrado».'
-          : 'Sin horario, Quanela no puede decir si estás abierto. Se configura en Cocina.',
+          : 'Sin horario, quanela no puede decir si estás abierto. Se configura en Cocina.',
       fix: { path: '/operations?view=kitchen' },
     },
     {
@@ -111,7 +111,7 @@ export function readinessOf(state: StorefrontState): Readiness {
       label: 'WhatsApp para pedidos',
       done: Boolean(s?.whatsapp_phone),
       required: false,
-      detail: s?.whatsapp_phone ? 'El cliente puede enviarte su pedido.' : 'Sin él, el cliente no puede enviarte el pedido desde Quanela.',
+      detail: s?.whatsapp_phone ? 'El cliente puede enviarte su pedido.' : 'Sin él, el cliente no puede enviarte el pedido desde quanela.',
       fix: { section: 'perfil' },
     },
     {

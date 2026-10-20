@@ -42,7 +42,7 @@ export function BrandWordmark({
 }) {
   const mask = { maskImage: `url(${BRAND_WORDMARK})`, WebkitMaskImage: `url(${BRAND_WORDMARK})`, maskSize: '100% 100%', WebkitMaskSize: '100% 100%' }
   return (
-    <span role="img" aria-label="Quanela" className={clsx('relative inline-block aspect-[1431/353] h-5 shrink-0 select-none', className)}>
+    <span role="img" aria-label="quanela" className={clsx('relative inline-block aspect-[1431/353] h-5 shrink-0 select-none', className)}>
       <span className={clsx('absolute inset-0', color)} style={mask} aria-hidden />
       {accent && <span className="absolute inset-0 bg-brasa-500" style={{ ...mask, clipPath: `inset(0 ${100 - Q_END}% 0 0)` }} aria-hidden />}
     </span>

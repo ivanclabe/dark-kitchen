@@ -207,7 +207,7 @@ export function ConsumerDishes({ state }: { state: StorefrontState }) {
             {
               onSuccess: () => {
                 setSavedAt(Date.now())
-                show(state.storefront?.published ? 'Platos guardados: ya se ven en Quanela Consumer.' : 'Platos guardados.')
+                show(state.storefront?.published ? 'Platos guardados: ya se ven en quanela Consumer.' : 'Platos guardados.')
               },
               onError: (e) => show(getErrorMessage(e, 'No se pudieron guardar los platos'), 'error'),
             },

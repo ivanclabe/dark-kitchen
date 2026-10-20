@@ -9,7 +9,7 @@ appPath: /users
 questions:
   - ¿Cómo agrego a alguien nuevo al equipo?
   - ¿Cómo agrego a un empleado?
-  - ¿Cómo invito a alguien a Quanela?
+  - ¿Cómo invito a alguien a quanela?
   - ¿Cómo creo un usuario?
   - Se venció el enlace de activación
 keywords: [usuario, empleado, invitar, equipo, activación, enlace, contraseña, empleado nuevo, agregar empleado, dar acceso, nuevo usuario]

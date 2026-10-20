@@ -158,7 +158,7 @@ export function searchReply({ state, ranked, outcome, hasLocation, now }: Search
   let needsLocation = false
 
   if (f.minRating != null) {
-    notes.push('Todavía no hay calificaciones en Quanela, así que no puedo filtrar ni ordenar por estrellas. Ordené por disponibilidad, tiempos y cumplimiento reales.')
+    notes.push('Todavía no hay calificaciones en quanela, así que no puedo filtrar ni ordenar por estrellas. Ordené por disponibilidad, tiempos y cumplimiento reales.')
   }
   if ((state.sort === 'nearest' || f.near) && !hasLocation) {
     needsLocation = true
@@ -168,7 +168,7 @@ export function searchReply({ state, ranked, outcome, hasLocation, now }: Search
   }
 
   if (!ranked.length) {
-    const lead = `Ahora mismo no encontré ${topic}${summary ? ` ${summary}` : ''} en los negocios de Quanela.`
+    const lead = `Ahora mismo no encontré ${topic}${summary ? ` ${summary}` : ''} en los negocios de quanela.`
     const alt = outcome.unavailable.slice(0, 2).map((d) => `**${d.name}** de ${d.storefront.name} ${unavailableWhy(d, now)}`)
     if (f.maxMinutes != null && outcome.fastestMinutes != null) {
       notes.push(`Lo más rápido que encontré tarda ~${outcome.fastestMinutes} min entre preparación y domicilio.`)
@@ -272,5 +272,5 @@ export function answerQuestion(kind: QuestionKind, d: PublicDish, now: Date, ing
   }
 }
 
-export const WELCOME = 'Hola, soy Quanela. Dime qué se te antoja y busco la mejor opción entre los negocios de Quanela. Por ejemplo: «una hamburguesa con queso que no sea muy cara».'
+export const WELCOME = 'Hola, soy quanela. Dime qué se te antoja y busco la mejor opción entre los negocios de quanela. Por ejemplo: «una hamburguesa con queso que no sea muy cara».'
 export const WELCOME_CHIPS = ['Hamburguesas', 'Algo saludable', 'Pizza', '¿Qué me recomiendas?']

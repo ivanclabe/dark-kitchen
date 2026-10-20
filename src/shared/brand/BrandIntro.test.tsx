@@ -21,7 +21,7 @@ describe('BrandIntro', () => {
     expect(intro()).toBeNull()
     act(() => requestBrandIntro())
     expect(intro()).not.toBeNull()
-    expect(screen.getByRole('status').textContent).toBe('Entrando a Quanela')
+    expect(screen.getByRole('status').textContent).toBe('Entrando a quanela')
   })
 
   it('leaves on its own after a few seconds', () => {

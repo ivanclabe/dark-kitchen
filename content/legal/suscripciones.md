@@ -1,13 +1,13 @@
 ---
 slug: suscripciones
 title: Suscripciones, renovación automática y cobros
-summary: Cómo funcionan los planes de Quanela, la renovación automática con tarjeta, los pagos manuales, los avisos, los pagos fallidos y cómo cancelar.
-version: "1.0"
-effective: 2026-10-19
+summary: Cómo funcionan los planes de quanela, la renovación automática con tarjeta, los pagos manuales, los avisos, los pagos fallidos y cómo cancelar.
+version: "1.1"
+effective: 2026-10-20
 order: 3
 ---
 
-Este documento hace parte de los [Términos y Condiciones](/legal/terminos). Explica cómo pagas Quanela y, sobre todo, cómo detener la renovación cuando quieras. Todo se gestiona en la app, en **Organización › Suscripción**.
+Este documento hace parte de los [Términos y Condiciones](/legal/terminos). Explica cómo pagas quanela y, sobre todo, cómo detener la renovación cuando quieras. Todo se gestiona en la app, en **Organización › Suscripción**.
 
 ## 1. Planes y precios
 
@@ -21,7 +21,7 @@ Este documento hace parte de los [Términos y Condiciones](/legal/terminos). Exp
 
 | Medio | Cómo se cobra | Renovación |
 | --- | --- | --- |
-| Tarjeta de crédito o débito | La tarjeta queda guardada como *token* en Wompi; Quanela solo ve una etiqueta como «Visa •••• 4242» | **Automática**, solo si la autorizas expresamente |
+| Tarjeta de crédito o débito | La tarjeta queda guardada como *token* en Wompi; quanela solo ve una etiqueta como «Visa •••• 4242» | **Automática**, solo si la autorizas expresamente |
 | PSE, Nequi o transferencia Bancolombia | Pagas tú cada periodo | **Manual**: no hay cobro automático |
 
 Los pagos los procesa Wompi (Bancolombia S.A.). Al pagar aceptas también los documentos de Wompi.

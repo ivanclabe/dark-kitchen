@@ -227,7 +227,7 @@ function UsersTab({ org }: { org: OrganizationDetail }) {
 
 function ConfigurationTab({ org }: { org: OrganizationDetail }) {
   return (
-    <Panel title="Funciones e IA" subtitle="Lo configura la organización en Quanela (IA y voz). Aquí solo se consulta.">
+    <Panel title="Funciones e IA" subtitle="Lo configura la organización en quanela (IA y voz). Aquí solo se consulta.">
       <ul className="divide-y divide-console-800">
         {org.configuration.map((f) => (
           <li key={f.key} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">

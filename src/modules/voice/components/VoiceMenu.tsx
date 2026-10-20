@@ -40,14 +40,14 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
       ? { icon: Mic, text: 'Escuchando…', className: 'border-brasa-500 bg-brasa-500/15 text-brasa-300', iconClassName: 'animate-pulse' }
       : { icon: Loader2, text: 'Pensando…', className: 'border-brasa-500/40 bg-neutral-900 text-neutral-200', thinking: 'answer' as const }
     : !listeningForPhrase
-      ? { icon: Mic, text: 'Oye Quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
+      ? { icon: Mic, text: 'Oye quanela', className: 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200' }
       : handsFree.paused
         ? { icon: EarOff, text: 'En pausa', className: 'border-neutral-800 bg-neutral-900 text-neutral-500' }
         : handsFree.state === 'error'
-          ? { icon: AlertTriangle, text: 'Oye Quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
+          ? { icon: AlertTriangle, text: 'Oye quanela', className: 'border-red-500/50 bg-red-500/10 text-red-400' }
           : handsFree.state === 'loading'
             ? { icon: Loader2, text: 'Despertando…', className: 'border-neutral-800 bg-neutral-900 text-neutral-300', thinking: 'wake' as const }
-            : { icon: Ear, text: 'Oye Quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
+            : { icon: Ear, text: 'Oye quanela', className: 'border-brasa-500/40 bg-brasa-500/10 text-brasa-300' }
   const Icon = view.icon
   // ADR 0060: while it thinks (or wakes up), the robot itself shows it instead of a spinner.
   const thinking = 'thinking' in view ? view.thinking : null
@@ -62,9 +62,9 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
         : handsFree.state === 'error'
           ? handsFree.error === 'not-allowed'
             ? 'Permiso de micrófono denegado'
-            : 'No se pudo iniciar «Oye Quanela»'
-          : 'Escuchando «Oye Quanela» en este equipo'
-      : 'Oye Quanela: háblale a Quanela'
+            : 'No se pudo iniciar «Oye quanela»'
+          : 'Escuchando «Oye quanela» en este equipo'
+      : 'Oye quanela: háblale a quanela'
 
   const items: MenuItem[] = [
     ...(conversing ? [{ label: 'Terminar conversación', icon: Square, onSelect: voice.conversation.end }] : []),
@@ -135,7 +135,7 @@ export function VoiceMenu({ compact = false }: { compact?: boolean }) {
       )}
 
       {settingsOpen && (
-        <Drawer open onClose={() => setSettingsOpen(false)} title="Voz en este equipo" subtitle="Cómo te oye y te responde «Oye Quanela» aquí." size="md">
+        <Drawer open onClose={() => setSettingsOpen(false)} title="Voz en este equipo" subtitle="Cómo te oye y te responde «Oye quanela» aquí." size="md">
           <div className="space-y-6">
             <VoiceDeviceSettings />
           </div>

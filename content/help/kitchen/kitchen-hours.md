@@ -23,7 +23,7 @@ order: 4
 
 ## Horario
 
-El horario que se repite cada semana. Enciende cada día y pon la hora de **apertura** y de **cierre** (si cierra después de medianoche, Quanela lo entiende). Toca **Guardar horario**.
+El horario que se repite cada semana. Enciende cada día y pon la hora de **apertura** y de **cierre** (si cierra después de medianoche, quanela lo entiende). Toca **Guardar horario**.
 
 ## Calendario
 

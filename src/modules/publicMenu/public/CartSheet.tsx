@@ -308,7 +308,7 @@ export function CartSheet({
                     política de tratamiento de datos
                   </a>
                   .
-                  <span className="block text-xs text-(--pm-muted)">Quanela opera este menú por encargo del negocio.</span>
+                  <span className="block text-xs text-(--pm-muted)">quanela opera este menú por encargo del negocio.</span>
                 </span>
               </label>
               {/* A trap for robots: hidden from people. */}

@@ -238,7 +238,7 @@ export function ActivationPage() {
           <p className={typography.small}>Cargando…</p>
         ) : sessionMatches && needsPassword ? (
           <form onSubmit={(e) => void setPasswordAndActivate(e)} className="space-y-4" noValidate>
-            <p className={typography.small}>Crea tu contraseña para entrar a Quanela de ahora en adelante.</p>
+            <p className={typography.small}>Crea tu contraseña para entrar a quanela de ahora en adelante.</p>
             {passwordField}
             {legalChecks}
             <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={password.length < 8}>
@@ -271,7 +271,7 @@ export function ActivationPage() {
     return (
       <Shell>
         {header}
-        <p className={typography.small}>Ya tienes usuario en Quanela. Inicia sesión con tu correo para unirte a {preview.organizationName}.</p>
+        <p className={typography.small}>Ya tienes usuario en quanela. Inicia sesión con tu correo para unirte a {preview.organizationName}.</p>
         <Button variant="primary" size="lg" icon={LogIn} className="w-full" onClick={() => navigate(`/login?next=${encodeURIComponent(`/activar/${token}`)}`)}>
           Iniciar sesión
         </Button>

@@ -145,7 +145,7 @@ export function ConsumerOverview({ state, onGoTo }: { state: StorefrontState; on
       {
         onSuccess: () => {
           setConfirming(false)
-          show(next ? 'Publicado en Quanela Consumer.' : 'Publicación pausada: ningún cliente ve esta cuenta.')
+          show(next ? 'Publicado en quanela Consumer.' : 'Publicación pausada: ningún cliente ve esta cuenta.')
         },
         onError: (err) => show(getErrorMessage(err, 'No se pudo guardar'), 'error'),
       },
@@ -212,7 +212,7 @@ export function ConsumerOverview({ state, onGoTo }: { state: StorefrontState; on
       <KpiStrip items={kpis} columns={4} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="Lista para publicar" icon={ListChecks} description={`${readiness.done} de ${readiness.items.length} listos. Lo obligatorio permite publicar; lo demás mejora cómo te recomienda Quanela.`}>
+        <Card title="Lista para publicar" icon={ListChecks} description={`${readiness.done} de ${readiness.items.length} listos. Lo obligatorio permite publicar; lo demás mejora cómo te recomienda quanela.`}>
           <ul className="divide-y divide-neutral-800/60">
             {readiness.items.map((item) => (
               <ReadinessRow key={item.id} item={item} onGoTo={onGoTo} />
@@ -227,7 +227,7 @@ export function ConsumerOverview({ state, onGoTo }: { state: StorefrontState; on
         onClose={() => setConfirming(false)}
         onConfirm={() => setPublished(true)}
         pending={save.isPending}
-        title="Publicar en Quanela Consumer"
+        title="Publicar en quanela Consumer"
         confirmLabel="Publicar"
         description={`Los clientes verán «${s?.display_name ?? ''}» con ${dishes.published === 1 ? '1 plato' : `${dishes.published} platos`}. Puedes pausar la publicación cuando quieras.`}
       />

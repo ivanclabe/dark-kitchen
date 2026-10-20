@@ -139,10 +139,10 @@ export function N8nTab({ settings }: { settings: WaSettings }) {
           <p>Cada evento llega con:</p>
           <ul className="list-disc space-y-1 pl-4 text-xs text-neutral-400">
             <li>
-              <code>X-Quanela-Event</code>: el evento; <code>X-Quanela-Delivery</code>: su id.
+              <code>X-quanela-Event</code>: el evento; <code>X-quanela-Delivery</code>: su id.
             </li>
             <li>
-              <code>X-Quanela-Signature</code>: <code>sha256=</code> + HMAC-SHA256 del cuerpo con tu secreto. Verifícala en n8n antes de actuar.
+              <code>X-quanela-Signature</code>: <code>sha256=</code> + HMAC-SHA256 del cuerpo con tu secreto. Verifícala en n8n antes de actuar.
             </li>
           </ul>
           <p>Para responder y crear pedidos, tu flujo entra como un usuario de servicio con rol Caja (Usuarios y permisos) y llama, con el encabezado de la cuenta:</p>
@@ -158,7 +158,7 @@ export function N8nTab({ settings }: { settings: WaSettings }) {
               <code>dk_public_menu(slug)</code>: el menú de hoy con precios y disponibilidad.
             </li>
           </ul>
-          <p className="text-xs text-neutral-500">Hay flujos de ejemplo listos para importar en la guía de n8n de Quanela.</p>
+          <p className="text-xs text-neutral-500">Hay flujos de ejemplo listos para importar en la guía de n8n de quanela.</p>
         </div>
       </Card>
 

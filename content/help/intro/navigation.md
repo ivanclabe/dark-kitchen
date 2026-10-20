@@ -1,7 +1,7 @@
 ---
 id: navigation
 section: intro
-title: Moverte por Quanela
+title: Moverte por quanela
 summary: La barra lateral con los módulos en cuatro grupos, Buscar y crear (⌘K o Ctrl+K) para ir a cualquier lugar o crear algo, y la barra de arriba con dónde estás y las acciones.
 audience: [everyone]
 permissions: []
@@ -32,7 +32,7 @@ A la izquierda están los módulos que tu rol puede abrir, en cuatro grupos:
 - El módulo abierto muestra debajo sus secciones (por ejemplo, Abastecimiento › Stock, Compras, Proveedores).
 - Arriba están **Buscar y crear** y tu cuenta: tócala para cambiar de cuenta o de rol.
 - Al pie están **Invitar a tu equipo** (si puedes gestionar usuarios), tu avatar y la [campana](help:notifications).
-- El primer botón de la barra de arriba **pliega la barra** a íconos (el nombre aparece al pasar el mouse) y la vuelve a abrir. Quanela lo recuerda en ese equipo.
+- El primer botón de la barra de arriba **pliega la barra** a íconos (el nombre aparece al pasar el mouse) y la vuelve a abrir. quanela lo recuerda en ese equipo.
 - En el celular, la barra se abre con el menú ☰.
 
 ## Buscar y crear
@@ -49,5 +49,5 @@ A la izquierda, **dónde estás** (cuenta › módulo › sección); toca un niv
 
 - **Solo tú / En vivo**: quién más está conectado.
 - **Vista previa**: abre tu menú web, si está publicado.
-- **Oye Quanela** y **Copilot**.
+- **Oye quanela** y **Copilot**.
 - El botón principal, **Nuevo pedido**, con la flecha para crear otras cosas.

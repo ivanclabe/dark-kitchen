@@ -26,7 +26,7 @@ const STEPS: StoryStep[] = [
     body: (
       <>
         <p>Un pedido por WhatsApp, por tu menú web, por teléfono o en el mostrador entra a la misma lista, con el cliente, sus platos y su total.</p>
-        <p>Lo confirmas y Quanela aparta los insumos que lleva cada receta.</p>
+        <p>Lo confirmas y quanela aparta los insumos que lleva cada receta.</p>
       </>
     ),
   },
@@ -35,7 +35,7 @@ const STEPS: StoryStep[] = [
     body: (
       <>
         <p>En la vista Cocina cada pedido muestra sus platos enteros y el tiempo desde que entró. Si pasa del tiempo que definiste, se pone en rojo.</p>
-        <p>Con «Oye Quanela», la línea avanza los pedidos por voz, sin tocar la pantalla.</p>
+        <p>Con «Oye quanela», la línea avanza los pedidos por voz, sin tocar la pantalla.</p>
       </>
     ),
   },
@@ -66,7 +66,7 @@ const STEPS: StoryStep[] = [
           quedó quieto.
         </p>
         <p>Recomiendan y te dicen por qué. Tú decides.</p>
-        <img src="/robot/robot-idea-lg.webp" width={368} height={288} alt="El robot de Quanela con una idea" loading="lazy" className="mt-4 h-36 w-auto lg:hidden" />
+        <img src="/robot/robot-idea-lg.webp" width={368} height={288} alt="El robot de quanela con una idea" loading="lazy" className="mt-4 h-36 w-auto lg:hidden" />
       </>
     ),
   },
@@ -200,7 +200,7 @@ export function LandingPage() {
       <footer className="grid gap-2 px-[var(--l-margin)] pt-20 pb-6 text-[length:var(--l-size-small)] sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:pb-[30px]">
         <span className="flex items-center gap-2.5 text-[var(--l-soft)]">
           <RobotFace mood="info" size={32} lazy />
-          Quanela · operación e IA para cocinas
+          quanela · operación e IA para cocinas
         </span>
         <nav aria-label="Pie de página" className="flex flex-wrap gap-x-6 gap-y-1">
           <a href="#precios" className="landing-link">
@@ -216,7 +216,7 @@ export function LandingPage() {
             {session ? 'Ir a mi cuenta' : 'Iniciar sesión'}
           </Link>
         </nav>
-        <span className="text-[var(--l-soft)] sm:text-right">© {new Date().getFullYear()} Quanela</span>
+        <span className="text-[var(--l-soft)] sm:text-right">© {new Date().getFullYear()} quanela</span>
         {/* ADR 0071: the documents, who sells (Ley 1480 art. 50) and the consumer authority. */}
         <nav aria-label="Documentos legales" className="flex flex-wrap gap-x-5 gap-y-1 border-t border-[var(--l-field)] pt-4 sm:col-span-3">
           {QUANELA_DOCUMENTS.map((doc) => (

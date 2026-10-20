@@ -45,7 +45,7 @@ function useTeamData() {
   }
 }
 
-const SUPPORT_NOTE = 'El equipo de soporte de la plataforma Quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.'
+const SUPPORT_NOTE = 'El equipo de soporte de la plataforma quanela puede entrar a todas las cuentas para ayudarte; todo lo que hace queda registrado.'
 
 /**
  * Usuarios of the active account (ADR 0008 §10–11, ADR 0024, ADR 0026): the

@@ -44,7 +44,7 @@ export function VoiceDeviceSettings() {
   return (
     <>
       {listens && (
-        <Section title="Escuchar" description="Cómo te oye Quanela en este equipo." card>
+        <Section title="Escuchar" description="Cómo te oye quanela en este equipo." card>
           <CommandRecognitionPanel />
           {wakeWord?.usable && (
             <div className="mt-5 border-t border-neutral-800/60 pt-5">
@@ -52,7 +52,7 @@ export function VoiceDeviceSettings() {
               <div className="mt-5">
                 <Toggle
                   label="Seguir escuchando después de responder"
-                  hint="Tras «Oye Quanela», puedes hacer otra pregunta sin repetir la frase. Termina si te quedas en silencio unos segundos o dices «gracias»."
+                  hint="Tras «Oye quanela», puedes hacer otra pregunta sin repetir la frase. Termina si te quedas en silencio unos segundos o dices «gracias»."
                   checked={followUp}
                   onChange={setFollowUp}
                 />
@@ -62,7 +62,7 @@ export function VoiceDeviceSettings() {
         </Section>
       )}
       {speech?.usable && (
-        <Section title="Hablar" description="Con qué voz te responde Quanela en este equipo." card>
+        <Section title="Hablar" description="Con qué voz te responde quanela en este equipo." card>
           <div className="space-y-5">
             <DeviceVoicePanel lang={toVoiceSettings(speech.settings).lang} current={voice.params.voice} />
             <div className="space-y-4 border-t border-neutral-800/60 pt-5">

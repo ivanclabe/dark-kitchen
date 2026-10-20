@@ -46,9 +46,9 @@ export function ClosingSection() {
         <div className="flex flex-col justify-between gap-10 lg:col-span-5">
           {/* The robot keeps a top corner, as on the stage, and says what comes next. */}
           <div data-reveal className="flex items-start gap-2">
-            <img src="/robot/robot-happy-lg.webp" width={322} height={288} alt="El robot de Quanela, contento" loading="lazy" className="h-24 w-auto shrink-0 sm:h-36" />
+            <img src="/robot/robot-happy-lg.webp" width={322} height={288} alt="El robot de quanela, contento" loading="lazy" className="h-24 w-auto shrink-0 sm:h-36" />
             <p className="landing-thought landing-thought-left">
-              <span className="landing-thought-name">Quanela</span>
+              <span className="landing-thought-name">quanela</span>
               ¡Te espero adentro! Primero eliges tu plan; luego tu usuario y tu negocio.
             </p>
           </div>

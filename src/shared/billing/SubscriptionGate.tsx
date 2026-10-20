@@ -65,7 +65,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
         <h1 className={typography.h2}>Pago confirmado</h1>
         <p className={typography.small}>La suscripción de {organizationName} está activa. Ya puedes trabajar.</p>
         <Button variant="primary" onClick={done}>
-          Entrar a Quanela
+          Entrar a quanela
         </Button>
       </div>
     )
@@ -88,7 +88,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
         <p className={typography.small}>Los pagos en línea se están activando. Escríbenos y activamos tu plan contigo.</p>
         {sales?.contactUrl && (
           <a href={sales.contactUrl} className={buttonClass({ variant: 'primary' })}>
-            Escribir a Quanela
+            Escribir a quanela
           </a>
         )}
       </div>
@@ -101,7 +101,7 @@ export function SubscriptionGate({ access, organizationName }: { access: Billing
           <p className={clsx('mt-1', typography.small)}>
             {renewal
               ? `Paga la renovación de ${organizationName} y todo vuelve a funcionar, con tus datos intactos.`
-              : `${organizationName} ya está creada. Elige tu plan y paga para empezar a usar Quanela.`}
+              : `${organizationName} ya está creada. Elige tu plan y paga para empezar a usar quanela.`}
           </p>
         </div>
 

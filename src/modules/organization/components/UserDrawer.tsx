@@ -232,7 +232,7 @@ export function UserDrawer({
 
         {user?.isSuperAdmin && (
           <p className="rounded-xl border border-brasa-500/30 bg-brasa-500/5 p-3 text-sm text-neutral-300">
-            <span className="font-semibold text-neutral-100">SUPER_ADMIN</span> es quien creó el negocio en Quanela: tiene acceso a todas tus cuentas. Es
+            <span className="font-semibold text-neutral-100">SUPER_ADMIN</span> es quien creó el negocio en quanela: tiene acceso a todas tus cuentas. Es
             intransferible y no se asigna a otros usuarios.
           </p>
         )}

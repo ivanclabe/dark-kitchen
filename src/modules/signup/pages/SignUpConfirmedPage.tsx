@@ -105,7 +105,7 @@ export function SignUpConfirmedPage() {
           <p className="text-sm text-neutral-400">
             Código: <span className="font-mono text-base font-semibold tracking-widest text-neutral-50">{created.orgCode}</span>
           </p>
-          <p className="text-xs text-neutral-500">Tu espacio Quanela:</p>
+          <p className="text-xs text-neutral-500">Tu espacio quanela:</p>
           <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2.5">
             <span className="truncate font-mono text-sm text-brasa-300">{tenantHostLabel(created.orgCode)}</span>
             <button

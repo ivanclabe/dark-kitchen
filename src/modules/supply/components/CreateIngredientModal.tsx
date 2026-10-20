@@ -66,7 +66,7 @@ function CreateIngredientForm({ initialQuery, onClose, onCreated }: Omit<Props, 
           Usar «{existing.name}»
         </Button>
       )}
-      <FormField label="Código" info="Si lo dejas vacío, Quanela le pone uno (INS-001, INS-002…).">
+      <FormField label="Código" info="Si lo dejas vacío, quanela le pone uno (INS-001, INS-002…).">
         {(a11y) => <Input {...a11y} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Se genera solo" />}
       </FormField>
       <FormField label="Unidad base" required>

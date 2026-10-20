@@ -209,7 +209,7 @@ export function billingNotice(a: BillingAccess): { tone: 'warning' | 'danger'; t
   if (a.status === 'past_due') {
     return { tone: 'danger', text: `No pudimos cobrar tu suscripción. Págala antes del ${formatDate(a.graceEndsAt ?? a.currentPeriodEnd ?? new Date().toISOString())} para no perder el acceso.` }
   }
-  if (a.status === 'incomplete' && !a.blocked) return { tone: 'warning', text: 'Tu suscripción todavía no está activa. Actívala para seguir usando Quanela sin interrupciones.' }
+  if (a.status === 'incomplete' && !a.blocked) return { tone: 'warning', text: 'Tu suscripción todavía no está activa. Actívala para seguir usando quanela sin interrupciones.' }
   if (a.status === 'active' && a.cancelAtPeriodEnd && a.currentPeriodEnd) return { tone: 'warning', text: `Cancelaste tu suscripción: termina el ${formatDate(a.currentPeriodEnd)}.` }
   if (a.status === 'active' && a.renewalNeedsPayment && a.openRenewalDue) {
     return { tone: 'warning', text: `Tu suscripción se renueva el ${formatDate(a.openRenewalDue)}. Págala antes para no perder el acceso.` }

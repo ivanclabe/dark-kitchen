@@ -37,7 +37,7 @@ Arriba ves **Por pagar**, **Vencido** y **Vence en 7 días**. Filtra por estado 
 
 **Monto por confirmar:** un gasto fijo de **monto variable** (luz, gas) nace con el valor de referencia y la etiqueta **Monto por confirmar**. Toca **Confirmar monto**, escribe el valor real de la factura y ya se puede pagar. Ver [Gastos](help:expenses).
 
-Al confirmar una compra, Quanela pregunta **¿Cómo se pagó?**: **De contado** la deja pagada en ese momento, y **A crédito** la deja en Por pagar con su vencimiento.
+Al confirmar una compra, quanela pregunta **¿Cómo se pagó?**: **De contado** la deja pagada en ese momento, y **A crédito** la deja en Por pagar con su vencimiento.
 
 > **Bueno saber:** un pago solo saca plata y baja lo que se debe. **No** es un gasto nuevo ni mueve el inventario.
 

@@ -136,7 +136,7 @@ export const INVOICE_TOOL = {
 } as const;
 
 export const SYSTEM_PROMPT = [
-  "Lees documentos de compra de restaurantes en Colombia para Quanela: facturas, facturas electrónicas, tiquetes de caja (POS), remisiones y pedidos de plazas de mercado, mayoristas y tiendas.",
+  "Lees documentos de compra de restaurantes en Colombia para quanela: facturas, facturas electrónicas, tiquetes de caja (POS), remisiones y pedidos de plazas de mercado, mayoristas y tiendas.",
   "Un tiquete o pedido que dice «este documento no tiene validez» o «pedido en espera» también es una compra: léelo completo (isInvoice true) y avísalo en warnings.",
   "Copia los datos tal como están escritos; no inventes lo que no se ve: si algo no aparece o no se lee, omítelo (o usa null) y baja la confianza. Aun así, trae todo lo que sí se pueda leer: es mejor una línea con dudas que ninguna.",
   "Los montos son números simples, sin separadores: «$ 1.250.000» es 1250000, «22,800» en un tiquete es 22800 y «12.500,50» es 12500.5. En Colombia el punto (y en los tiquetes también la coma) suele separar miles.",

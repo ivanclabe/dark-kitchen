@@ -79,8 +79,8 @@ export function LegalAcceptanceGate({ children }: { children: ReactNode }) {
           <h1 className={typography.h2}>{isNew ? 'Actualizamos nuestros documentos' : 'Antes de seguir'}</h1>
           <p className={`mt-1 ${typography.small}`}>
             {isNew
-              ? 'Revisa los cambios y acéptalos para seguir usando Quanela. Lo que aceptaste antes queda guardado en tu historial.'
-              : 'Para usar Quanela necesitamos que leas y aceptes estos documentos. Cada uno se acepta por separado.'}
+              ? 'Revisa los cambios y acéptalos para seguir usando quanela. Lo que aceptaste antes queda guardado en tu historial.'
+              : 'Para usar quanela necesitamos que leas y aceptes estos documentos. Cada uno se acepta por separado.'}
           </p>
         </div>
         {outdated || staleError ? (

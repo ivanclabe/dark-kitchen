@@ -19,8 +19,8 @@ export const TIPS: readonly Tip[] = [
   },
   {
     id: 'invoice',
-    short: 'Sube la foto de una factura y Quanela la registra.',
-    long: 'Sube la foto o el PDF de una factura de compra: Quanela la lee y la deja lista para que solo la revises y la confirmes.',
+    short: 'Sube la foto de una factura y quanela la registra.',
+    long: 'Sube la foto o el PDF de una factura de compra: quanela la lee y la deja lista para que solo la revises y la confirmes.',
     help: '/help/inventory/invoice-import',
   },
   {
@@ -37,8 +37,8 @@ export const TIPS: readonly Tip[] = [
   },
   {
     id: 'voice',
-    short: 'Di «Oye Quanela» y pídele cosas con la voz.',
-    long: 'Di «Oye Quanela» para pedirle cosas con la voz, sin soltar lo que estás haciendo en la cocina.',
+    short: 'Di «Oye quanela» y pídele cosas con la voz.',
+    long: 'Di «Oye quanela» para pedirle cosas con la voz, sin soltar lo que estás haciendo en la cocina.',
     help: '/help/assistant/oye-quanela',
   },
   {

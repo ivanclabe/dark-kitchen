@@ -26,6 +26,6 @@ Para que el primer pedido funcione de punta a punta, deja lista tu cuenta en est
 6. **Tu equipo.** En **Usuarios → Crear usuario**. Ver [Invitar a tu equipo](help:invite-team).
 7. **Domiciliarios**, si haces envíos: **Centro de operaciones → ⋯ → Domiciliarios**. Ver [Despachar y entregar](help:dispatch-deliver).
 
-> **Cuidado:** al confirmar un pedido, Quanela revisa que haya stock de todos los insumos de las recetas. Si falta algo, la confirmación se rechaza. Por eso los pasos 1 a 4 van primero.
+> **Cuidado:** al confirmar un pedido, quanela revisa que haya stock de todos los insumos de las recetas. Si falta algo, la confirmación se rechaza. Por eso los pasos 1 a 4 van primero.
 
 Cuando todo esté, haz [tu primer pedido de principio a fin](help:first-order).

@@ -103,10 +103,10 @@ export function TenantGate() {
       return (
         <Screen icon={SearchX} title="Esta dirección no existe">
           <p>
-            No hay ningún espacio de Quanela en <span className="font-mono text-neutral-200">{label}</span>. Revisa que la dirección esté bien escrita.
+            No hay ningún espacio de quanela en <span className="font-mono text-neutral-200">{label}</span>. Revisa que la dirección esté bien escrita.
           </p>
           <a href={home} className={linkClass}>
-            Ir a Quanela
+            Ir a quanela
           </a>
         </Screen>
       )
@@ -115,7 +115,7 @@ export function TenantGate() {
         <Screen icon={Building2} title={`${tenant.organization?.name ?? 'Este espacio'} está desactivado`}>
           <p>Por ahora nadie puede entrar. Si crees que es un error, contacta a quien administra tu negocio.</p>
           <a href={home} className={linkClass}>
-            Ir a Quanela
+            Ir a quanela
           </a>
         </Screen>
       )

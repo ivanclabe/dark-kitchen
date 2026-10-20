@@ -19,7 +19,7 @@ order: 3
 
 ## Cuántas preguntas tienes
 
-Abajo del panel de Copilot ves **N preguntas hoy**: las que le quedan a esta cuenta. El cupo depende del plan y es **de toda la cuenta** (lo comparte el equipo). Cuenta las preguntas de las últimas 24 horas: cada una vuelve a estar disponible un día después de hecha. Hablarle a Quanela no gasta nada por sí solo; **cada pregunta** a Copilot (escrita o por voz) cuenta una.
+Abajo del panel de Copilot ves **N preguntas hoy**: las que le quedan a esta cuenta. El cupo depende del plan y es **de toda la cuenta** (lo comparte el equipo). Cuenta las preguntas de las últimas 24 horas: cada una vuelve a estar disponible un día después de hecha. Hablarle a quanela no gasta nada por sí solo; **cada pregunta** a Copilot (escrita o por voz) cuenta una.
 
 ## Qué significa cada mensaje
 

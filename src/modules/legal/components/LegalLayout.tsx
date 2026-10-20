@@ -11,7 +11,7 @@ export function LegalLayout({ children }: { children: ReactNode }) {
     <div className="min-h-dvh bg-neutral-950 text-neutral-100">
       <header className="legal-no-print border-b border-neutral-800/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link to="/" aria-label="Quanela" className="flex items-center">
+          <Link to="/" aria-label="quanela" className="flex items-center">
             <BrandWordmark className="h-6" />
           </Link>
           <Link to="/legal" className="text-sm text-neutral-400 hover:text-neutral-100">
@@ -50,7 +50,7 @@ export function LegalLayout({ children }: { children: ReactNode }) {
       </div>
       <footer className="legal-no-print border-t border-neutral-800/60">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-6 text-xs text-neutral-500 sm:px-6">
-          <span>© {new Date().getFullYear()} Quanela</span>
+          <span>© {new Date().getFullYear()} quanela</span>
           <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300">
             Superintendencia de Industria y Comercio
           </a>

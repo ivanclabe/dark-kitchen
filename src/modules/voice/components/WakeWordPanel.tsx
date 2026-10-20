@@ -53,26 +53,26 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
     <div className="space-y-3">
       <div className="flex max-w-md items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-neutral-200">Manos libres (Oye Quanela)</p>
+          <p className="text-sm text-neutral-200">Manos libres (Oye quanela)</p>
           <p className={typography.caption}>
-            Di «Oye Quanela» en cualquier pantalla y luego tu pregunta (o, en Cocina, el comando), sin tocar la pantalla. La frase se detecta en este equipo y ese audio no se guarda ni se
+            Di «Oye quanela» en cualquier pantalla y luego tu pregunta (o, en Cocina, el comando), sin tocar la pantalla. La frase se detecta en este equipo y ese audio no se guarda ni se
             envía; lo que dices después lo reconoce el reconocimiento de voz elegido arriba (local o en línea). Se pausa sola si cambias de pestaña. En tabletas, deja la pantalla encendida.
           </p>
         </div>
-        <Switch checked={on} onChange={setOn} label="Manos libres (Oye Quanela)" disabled={!supported} />
+        <Switch checked={on} onChange={setOn} label="Manos libres (Oye quanela)" disabled={!supported} />
       </div>
 
       {status.state === 'downloading' && status.total > 0 && (
         <div className="max-w-md space-y-1 text-xs">
           <p className="text-neutral-300">
-            Descargando «Oye Quanela»: {mb(status.loaded)} de {mb(status.total)} MB (solo la primera vez)
+            Descargando «Oye quanela»: {mb(status.loaded)} de {mb(status.total)} MB (solo la primera vez)
           </p>
           <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800" aria-hidden>
             <div className="h-full rounded-full bg-brasa-500" style={{ width: `${Math.round((status.loaded / status.total) * 100)}%` }} />
           </div>
         </div>
       )}
-      {status.state === 'error' && <p className="text-xs text-red-300">No se pudo cargar «Oye Quanela»: {status.message}</p>}
+      {status.state === 'error' && <p className="text-xs text-red-300">No se pudo cargar «Oye quanela»: {status.message}</p>}
 
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" variant="secondary" icon={testing ? Square : Ear} onClick={toggleTest} disabled={!supported}>
@@ -88,7 +88,7 @@ export function WakeWordPanel({ tuning }: { tuning: WakeWordTuning }) {
               : testing
                 ? warming || test.state === 'loading'
                   ? 'Preparando…'
-                  : 'Escuchando… di «Oye Quanela».'
+                  : 'Escuchando… di «Oye quanela».'
                 : 'No abre ningún comando.'}
         </span>
       </div>

@@ -40,9 +40,9 @@ export function ConsumerPage() {
         help="quanela-consumer"
         title="App de clientes"
         icon={Store}
-        description="Lo que ven los clientes en Quanela Consumer, la app donde dicen qué quieren comer y Quanela les recomienda dónde pedir."
+        description="Lo que ven los clientes en quanela Consumer, la app donde dicen qué quieren comer y quanela les recomienda dónde pedir."
       />
-      <SubNav label="Secciones de Quanela Consumer" items={SECTIONS} value={section} onChange={go} />
+      <SubNav label="Secciones de quanela Consumer" items={SECTIONS} value={section} onChange={go} />
       {query.isLoading ? (
         <LoadingState variant="block" />
       ) : query.isError || !query.data ? (

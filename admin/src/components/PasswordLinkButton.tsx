@@ -67,7 +67,7 @@ export function PasswordLinkButton({ userId, variant = 'secondary', size = 'md' 
                 <MessageCircle size={14} aria-hidden /> WhatsApp
               </a>
               {canShare && (
-                <Button size="sm" variant="secondary" icon={Share2} onClick={() => void navigator.share({ title: 'Quanela', text: shareMessage(result) }).catch(() => undefined)}>
+                <Button size="sm" variant="secondary" icon={Share2} onClick={() => void navigator.share({ title: 'quanela', text: shareMessage(result) }).catch(() => undefined)}>
                   Compartir
                 </Button>
               )}

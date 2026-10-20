@@ -104,13 +104,13 @@ export const PERSON_AVATAR_LABELS: Record<PersonAvatarKey, string> = {
   headphones: 'Con audífonos',
   cap: 'Gorra de visera',
   braids: 'Trenzas',
-  robot: 'Robot Quanela feliz',
+  robot: 'Robot quanela feliz',
   'cat-chef': 'Gato chef',
-  'robot-wink': 'Robot Quanela guiñando',
-  'robot-love': 'Robot Quanela enamorado',
-  'robot-idea': 'Robot Quanela con una idea',
-  'robot-surprised': 'Robot Quanela sorprendido',
-  'robot-sleepy': 'Robot Quanela dormido',
+  'robot-wink': 'Robot quanela guiñando',
+  'robot-love': 'Robot quanela enamorado',
+  'robot-idea': 'Robot quanela con una idea',
+  'robot-surprised': 'Robot quanela sorprendido',
+  'robot-sleepy': 'Robot quanela dormido',
 }
 
 export interface Gallery<K extends string> {

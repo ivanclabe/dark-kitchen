@@ -89,7 +89,7 @@ export function LandingNav() {
       {open && <div className="fixed inset-0 bg-[#1C1310]/25 xl:hidden" aria-hidden onClick={() => setOpen(false)} />}
 
       <div className="relative flex h-16 items-center gap-4 rounded-[18px] border border-[#1C1310]/10 bg-white pr-2 pl-4 sm:pl-5">
-        <a href="#producto" className="flex shrink-0 items-center" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
+        <a href="#producto" className="flex shrink-0 items-center" aria-label="quanela — inicio" onClick={() => setOpen(false)}>
           <BrandWordmark className="h-7" color="bg-[var(--l-ink)]" />
         </a>
 

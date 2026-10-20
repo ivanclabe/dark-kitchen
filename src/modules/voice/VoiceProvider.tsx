@@ -41,7 +41,7 @@ function speechErrorMessage(code: string): string {
     case 'audio-capture':
       return 'No hay micrófono disponible.'
     case 'not-allowed':
-      return 'Permiso de micrófono denegado. Actívalo en el navegador para hablarle a Quanela.'
+      return 'Permiso de micrófono denegado. Actívalo en el navegador para hablarle a quanela.'
     case 'engine-error':
       return 'No se pudo iniciar el reconocimiento sin internet.'
     default:

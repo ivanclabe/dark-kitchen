@@ -165,7 +165,7 @@ export function FeatureDrawer({
                   </Button>
                 </div>
                 <p className={typography.caption}>
-                  Solo para lo que se le pregunta a «Oye Quanela»: un modelo más rápido responde antes en voz alta. Mídelo antes con copilot-eval --channel voice.
+                  Solo para lo que se le pregunta a «Oye quanela»: un modelo más rápido responde antes en voz alta. Mídelo antes con copilot-eval --channel voice.
                 </p>
               </div>
             )}

@@ -95,7 +95,7 @@ export async function runTurn(message: string, rawState: unknown, deps: TurnDeps
     case 'history':
       return result(
         { ...state, turn: state.turn + 1 },
-        'Todavía no tienes pedidos hechos desde Quanela, así que no puedo buscar algo parecido a tu último pedido. Cuéntame qué se te antoja y lo busco.',
+        'Todavía no tienes pedidos hechos desde quanela, así que no puedo buscar algo parecido a tu último pedido. Cuéntame qué se te antoja y lo busco.',
         { intentSource: source },
         WELCOME_CHIPS,
       )
@@ -140,7 +140,7 @@ export async function runTurn(message: string, rawState: unknown, deps: TurnDeps
         { ...state, turn: state.turn + 1 },
         state.topic
           ? `No te entendí. Puedes decirme, por ejemplo, «más baratas», «sin cebolla» o preguntarme por un plato.`
-          : 'Solo sé ayudarte a encontrar comida en los negocios de Quanela. ¿Qué se te antoja?',
+          : 'Solo sé ayudarte a encontrar comida en los negocios de quanela. ¿Qué se te antoja?',
         { intentSource: source },
         WELCOME_CHIPS,
       )

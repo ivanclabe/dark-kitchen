@@ -55,7 +55,7 @@ export function NotificationsTab({ settings }: { settings: WaSettings }) {
       <Card
         title="Plantillas en Meta"
         icon={CloudUpload}
-        description="Fuera de una conversación activa, WhatsApp solo deja enviar plantillas aprobadas por Meta. Quanela trae plantillas listas, de tipo «utilidad»."
+        description="Fuera de una conversación activa, WhatsApp solo deja enviar plantillas aprobadas por Meta. quanela trae plantillas listas, de tipo «utilidad»."
         action={
           canManage &&
           connected && (

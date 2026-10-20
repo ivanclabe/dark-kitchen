@@ -187,7 +187,7 @@ function ConsumerAssistantCard({ models }: { models: PlatformModel[] }) {
     <section className="space-y-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className={typography.h3}>Asistente de Quanela Consumer</h2>
+          <h2 className={typography.h3}>Asistente de quanela Consumer</h2>
           <p className={typography.caption}>Entiende lo que piden los comensales cuando las reglas no alcanzan. Cada mensaje así es una consulta al modelo.</p>
         </div>
         <Switch checked={data.active} onChange={(active) => save.mutate({ active })} label="Asistente de Consumer activo" disabled={save.isPending} />

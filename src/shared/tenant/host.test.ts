@@ -4,7 +4,7 @@ import { parseHost, sharedCookieDomain } from './host'
 describe('parseHost (ADR 0021/0022)', () => {
   it('a subdomain of the root domain is an organization code, in uppercase', () => {
     expect(parseHost('a7k92p.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', code: 'A7K92P' })
-    expect(parseHost('A7K92P.Quanela.com.', 'quanela.com')).toEqual({ kind: 'tenant', code: 'A7K92P' })
+    expect(parseHost('A7K92P.quanela.com.', 'quanela.com')).toEqual({ kind: 'tenant', code: 'A7K92P' })
   })
 
   it('a name-like subdomain is read as a label; the database says it does not exist', () => {
@@ -16,7 +16,7 @@ describe('parseHost (ADR 0021/0022)', () => {
     expect(parseHost('www.quanela.com', 'quanela.com')).toEqual({ kind: 'root' })
     // ADR 0035: the help center has its own subdomain; a 6-character code is still an organization.
     expect(parseHost('doc.quanela.com', 'quanela.com')).toEqual({ kind: 'docs' })
-    expect(parseHost('DOC.Quanela.com.', 'quanela.com')).toEqual({ kind: 'docs' })
+    expect(parseHost('DOC.quanela.com.', 'quanela.com')).toEqual({ kind: 'docs' })
     expect(parseHost('doc.localhost', 'localhost')).toEqual({ kind: 'docs' })
     expect(parseHost('docabc.quanela.com', 'quanela.com')).toEqual({ kind: 'tenant', code: 'DOCABC' })
   })

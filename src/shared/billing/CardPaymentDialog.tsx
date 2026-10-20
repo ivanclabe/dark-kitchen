@@ -180,7 +180,7 @@ export function CardPaymentDialog({
             <label className="flex items-start gap-2.5">
               <input type="checkbox" className="mt-1 size-4 accent-[var(--color-primary)]" checked={acceptRenewal} onChange={(e) => setAcceptRenewal(e.target.checked)} />
               <span>
-                Autorizo la <strong className="font-medium text-neutral-100">renovación automática</strong>: Quanela cobrará a esta tarjeta el valor del plan al
+                Autorizo la <strong className="font-medium text-neutral-100">renovación automática</strong>: quanela cobrará a esta tarjeta el valor del plan al
                 empezar cada periodo, hasta que cancele o quite la tarjeta. Leí{' '}
                 <a href={legalHref('suscripciones')} target="_blank" rel="noopener noreferrer" className="text-brasa-400 underline-offset-4 hover:underline">
                   cómo funcionan las suscripciones y los cobros
@@ -198,7 +198,7 @@ export function CardPaymentDialog({
           )}
 
           <p className={`flex items-center gap-1.5 ${typography.caption}`}>
-            <Lock size={12} aria-hidden /> La tarjeta va directo a Wompi (Bancolombia). Quanela no guarda su número.
+            <Lock size={12} aria-hidden /> La tarjeta va directo a Wompi (Bancolombia). quanela no guarda su número.
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" type="button" onClick={onClose} disabled={busy}>

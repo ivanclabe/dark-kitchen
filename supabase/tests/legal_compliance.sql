@@ -29,7 +29,12 @@ begin execute p_sql; return 'ALLOWED';
 exception when others then get stacked diagnostics v_hint = pg_exception_hint, v_state = returned_sqlstate;
   return coalesce(nullif(v_hint, ''), v_state); end;
 $$;
-grant execute on function pg_temp.err(text), pg_temp.hint(text), pg_temp.k(text), pg_temp.v(text) to authenticated;
+-- The versions in force (the suite does not depend on which one is published).
+create or replace function pg_temp.ver(p_slug text) returns text language sql stable as $$ select (dk_current_legal_document(p_slug)).version $$;
+create or replace function pg_temp.docs(variadic p_slugs text[]) returns jsonb language sql stable as $$
+  select jsonb_agg(jsonb_build_object('slug', s, 'version', pg_temp.ver(s))) from unnest(p_slugs) s
+$$;
+grant execute on function pg_temp.err(text), pg_temp.hint(text), pg_temp.k(text), pg_temp.v(text), pg_temp.ver(text), pg_temp.docs(text[]) to authenticated;
 
 -- 1. Business days (Colombia, 2026): holidays from Ley 51 de 1983 and Easter, terms from the next day.
 insert into _t (area, test, expected, got) values
@@ -93,13 +98,13 @@ insert into _t (area, test, expected, got) values
   ('Aceptación', 'Un documento informativo no se acepta', 'invalid',
     pg_temp.hint(format($q$select dk_record_legal_acceptance('[{"slug": "cookies", "version": %s}]', 'signup')$q$, to_jsonb((dk_current_legal_document('cookies')).version)))),
   ('Aceptación', 'Contexto inventado', 'invalid',
-    pg_temp.hint($q$select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.0"}]', 'por_si_acaso')$q$)),
+    pg_temp.hint(format($q$select dk_record_legal_acceptance(%L, 'por_si_acaso')$q$, pg_temp.docs('terminos')))),
   ('Aceptación', 'Las dos casillas quedan registradas', '2',
-    (select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.0"}, {"slug": "privacidad", "version": "1.0"}]', 'signup', '{"method": "email"}')::text));
+    (select dk_record_legal_acceptance(pg_temp.docs('terminos', 'privacidad'), 'signup', '{"method": "email"}')::text));
 -- (A statement does not see the rows it writes itself: the checks go in the next one.)
 insert into _t (area, test, expected, got) values
   ('Aceptación', 'Ya no queda nada pendiente', '0', (select count(*)::text from dk_my_pending_legal_documents())),
-  ('Aceptación', 'Evidencia: versión, hash, contexto, IP (primer salto) y navegador', 'terminos 1.0 · hash ok · signup · checkbox · 181.49.10.20 · Prueba/1.0',
+  ('Aceptación', 'Evidencia: versión, hash, contexto, IP (primer salto) y navegador', 'terminos ' || pg_temp.ver('terminos') || ' · hash ok · signup · checkbox · 181.49.10.20 · Prueba/1.0',
     (select a.document_slug || ' ' || a.document_version || ' · ' || case when a.content_sha256 = d.content_sha256 then 'hash ok' else 'hash distinto' end
             || ' · ' || a.context || ' · ' || a.method || ' · ' || a.client_ip || ' · ' || a.user_agent
      from dk_legal_acceptances a join dk_legal_documents d on d.slug = a.document_slug and d.version = a.document_version
@@ -113,9 +118,9 @@ insert into _t (area, test, expected, got) values
   ('Aceptación', 'Su historial (con título)', 'Política de Tratamiento de Datos Personales y Privacidad · Términos y Condiciones',
     (select string_agg(title, ' · ' order by title) from dk_my_legal_acceptances())),
   ('Renovación', 'Autorizar la renovación automática en un negocio ajeno', '42501',
-    pg_temp.hint(format($q$select dk_record_legal_acceptance('[{"slug": "suscripciones", "version": "1.0"}]', 'billing_renewal', '{}', %L)$q$, pg_temp.k('org2')))),
+    pg_temp.hint(format($q$select dk_record_legal_acceptance(%L, 'billing_renewal', '{}', %L)$q$, pg_temp.docs('suscripciones'), pg_temp.k('org2')))),
   ('Renovación', 'La dueña autoriza la renovación de su negocio', '1',
-    (select dk_record_legal_acceptance('[{"slug": "suscripciones", "version": "1.0"}]', 'billing_renewal', '{"plan": "business"}', pg_temp.k('org'))::text));
+    (select dk_record_legal_acceptance(pg_temp.docs('suscripciones'), 'billing_renewal', '{"plan": "business"}', pg_temp.k('org'))::text));
 reset role;
 
 select pg_temp.act_as(pg_temp.k('other'));
@@ -130,12 +135,12 @@ set local role authenticated;
 -- An existing user asked when entering the app: the time is the acceptance's, never the account's creation.
 insert into _t (area, test, expected, got) values
   ('Aceptación', 'Al entrar a la app (cuenta reciente): registra ambos documentos', '2',
-    (select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.0"}, {"slug": "privacidad", "version": "1.0"}]', 'app_gate')::text));
+    (select dk_record_legal_acceptance(pg_temp.docs('terminos', 'privacidad'), 'app_gate')::text));
 insert into _t (area, test, expected, got) values
   ('Aceptación', 'Al entrar a la app: la hora es la de la aceptación', 'app_gate · igual',
     (select min(context) || ' · ' || case when bool_and(consented_at = recorded_at) then 'igual' else 'distinta' end from dk_legal_acceptances)),
   ('Renovación', 'Quien no factura no autoriza cobros', '42501',
-    pg_temp.hint(format($q$select dk_record_legal_acceptance('[{"slug": "suscripciones", "version": "1.0"}]', 'billing_renewal', '{}', %L)$q$, pg_temp.k('org'))));
+    pg_temp.hint(format($q$select dk_record_legal_acceptance(%L, 'billing_renewal', '{}', %L)$q$, pg_temp.docs('suscripciones'), pg_temp.k('org'))));
 reset role;
 
 -- 3. Immutable evidence: no edit nor delete, not even as the database owner; the chain detects tampering.
@@ -169,21 +174,22 @@ reset role;
 select pg_temp.as_owner();
 
 -- 4. A new version that asks for a new acceptance: pending again; the old acceptances stay.
+insert into _ctx (key, v) values ('terminos-before', to_jsonb(pg_temp.ver('terminos')));
 insert into dk_legal_documents (slug, version, title, effective_date, content_sha256, acceptance, requires_reacceptance)
-  values ('terminos', '1.1', 'Términos y Condiciones', (now() at time zone 'America/Bogota')::date, repeat('a', 64), 'required', true);
+  values ('terminos', '9.1', 'Términos y Condiciones', (now() at time zone 'America/Bogota')::date, repeat('a', 64), 'required', true);
 -- One announced for next month is not in force yet.
 insert into dk_legal_documents (slug, version, title, effective_date, content_sha256, acceptance, requires_reacceptance)
-  values ('privacidad', '2.0', 'Política de Tratamiento de Datos Personales y Privacidad', (now() at time zone 'America/Bogota')::date + 30, repeat('b', 64), 'required', true);
+  values ('privacidad', '9.2', 'Política de Tratamiento de Datos Personales y Privacidad', (now() at time zone 'America/Bogota')::date + 30, repeat('b', 64), 'required', true);
 select pg_temp.act_as(pg_temp.k('owner'));
 set local role authenticated;
 insert into _t (area, test, expected, got) values
-  ('Nueva versión', 'Pide la 1.1 de los Términos (la de privacidad aún no rige)', 'terminos 1.1 new_version',
+  ('Nueva versión', 'Pide la versión nueva de los Términos (la de privacidad aún no rige)', 'terminos 9.1 new_version',
     (select string_agg(slug || ' ' || version || ' ' || reason, ', ') from dk_my_pending_legal_documents())),
-  ('Nueva versión', 'Aceptar la 1.0 otra vez ya no sirve', 'stale_version',
-    pg_temp.hint($q$select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.0"}]', 'reacceptance')$q$)),
-  ('Nueva versión', 'Acepta la 1.1', '1', (select dk_record_legal_acceptance('[{"slug": "terminos", "version": "1.1"}]', 'reacceptance')::text));
+  ('Nueva versión', 'Aceptar la anterior otra vez ya no sirve', 'stale_version',
+    pg_temp.hint(format($q$select dk_record_legal_acceptance('[{"slug": "terminos", "version": %s}]', 'reacceptance')$q$, pg_temp.v('terminos-before')))),
+  ('Nueva versión', 'Acepta la nueva', '1', (select dk_record_legal_acceptance('[{"slug": "terminos", "version": "9.1"}]', 'reacceptance')::text));
 insert into _t (area, test, expected, got) values
-  ('Nueva versión', 'Las aceptaciones anteriores se conservan', 'terminos 1.0, terminos 1.1',
+  ('Nueva versión', 'Las aceptaciones anteriores se conservan', 'terminos ' || (pg_temp.v('terminos-before') #>> '{}') || ', terminos 9.1',
     (select string_agg(document_slug || ' ' || document_version, ', ' order by id) from dk_legal_acceptances where document_slug = 'terminos')),
   ('Nueva versión', 'Nada pendiente', '0', (select count(*)::text from dk_my_pending_legal_documents()));
 reset role;
@@ -217,7 +223,7 @@ set local role authenticated;
 insert into _t (area, test, expected, got) values
   ('PQR', 'Quien no factura no pide reembolsos del negocio', '42501',
     pg_temp.hint(format($q$select dk_create_pqr('reembolso', 'Me cobraron dos veces este mes, por favor.', %L)$q$, pg_temp.k('org')))),
-  ('PQR', 'Pero sí consulta sus propios datos', 'ALLOWED', pg_temp.err($q$select dk_create_pqr('consulta', 'Qué datos míos guarda Quanela, por favor.')$q$));
+  ('PQR', 'Pero sí consulta sus propios datos', 'ALLOWED', pg_temp.err($q$select dk_create_pqr('consulta', 'Qué datos míos guarda quanela, por favor.')$q$));
 insert into _t (area, test, expected, got) values
   ('PQR', 'Y no ve las solicitudes de la dueña', '1', (select count(*)::text from dk_pqr_requests));
 reset role;

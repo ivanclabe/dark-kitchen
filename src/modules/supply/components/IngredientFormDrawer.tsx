@@ -140,7 +140,7 @@ export function IngredientFormDrawer({ ingredient, open, onClose }: { ingredient
             label="Unidad base"
             required
             error={errors.baseUnitId?.message}
-            info="La unidad en que se cuenta el inventario y se calcula el costo. Usa la más pequeña (g, ml o unidad): igual puedes comprar en kg, l o cajas y escribir las recetas en la unidad que quieras; Quanela convierte sola. Si el insumo ya tiene movimientos, compras o recetas, no se puede cambiar."
+            info="La unidad en que se cuenta el inventario y se calcula el costo. Usa la más pequeña (g, ml o unidad): igual puedes comprar en kg, l o cajas y escribir las recetas en la unidad que quieras; quanela convierte sola. Si el insumo ya tiene movimientos, compras o recetas, no se puede cambiar."
           >
             {(a11y) => (
               <Select {...a11y} {...register('baseUnitId')}>

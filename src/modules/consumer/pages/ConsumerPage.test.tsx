@@ -59,14 +59,14 @@ beforeEach(() => {
 })
 afterEach(cleanup)
 
-describe('Quanela Consumer (ADR 0046)', () => {
+describe('quanela Consumer (ADR 0046)', () => {
   it('three sections; Resumen says it is not published, what is missing, and that the app is not out yet', async () => {
     renderAt()
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Resumen', 'Perfil del negocio', 'Platos'])
     expect(await screen.findByRole('heading', { name: 'No publicado' })).toBeTruthy()
     expect(screen.getByRole('note').textContent).toMatch(/La app para clientes todavía no está disponible/)
     expect(screen.getByText('Ubicación')).toBeTruthy()
-    expect(screen.getByText(/Sin ella, Quanela no puede decir a qué distancia estás/)).toBeTruthy()
+    expect(screen.getByText(/Sin ella, quanela no puede decir a qué distancia estás/)).toBeTruthy()
   })
 
   it('publishing asks first, saying how many dishes customers will see, and keeps the profile as it is', async () => {

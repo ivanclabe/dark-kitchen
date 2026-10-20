@@ -45,7 +45,7 @@ const SCOPE_LABEL: Record<string, string> = {
   partial: 'Parciales',
   no_data: 'Sin datos',
   not_allowed: 'Sin permiso',
-  unsupported: 'Dato que Quanela no guarda',
+  unsupported: 'Dato que quanela no guarda',
   out_of_scope: 'Fuera del negocio',
   action: 'Pedían una acción',
   clarify: 'Pidieron precisar',
@@ -142,7 +142,7 @@ function UsageAndState() {
               <p className={typography.caption}>Todavía no hay análisis de IA en esta cuenta.</p>
             )}
             {data.copilot && data.copilot.questions > 0 && <CopilotQuality copilot={data.copilot} />}
-            <p className={typography.caption}>«Oye Quanela» usa la voz de cada equipo: hablar no genera llamadas ni costo; cada pregunta a Copilot cuenta como una consulta de IA.</p>
+            <p className={typography.caption}>«Oye quanela» usa la voz de cada equipo: hablar no genera llamadas ni costo; cada pregunta a Copilot cuenta como una consulta de IA.</p>
           </div>
         )}
       </Section>
