@@ -1,5 +1,5 @@
 import { FullScreenLoading } from '@/app/FullScreenLoading'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { Button } from '@/shared/ui/Button'
 import { typography } from '@/shared/ui/typography'
@@ -74,7 +74,7 @@ export function LegalAcceptanceGate({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className="w-full max-w-lg space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">
-        <BrandMark className="size-10" />
+        <BrandWordmark className="h-7" />
         <div>
           <h1 className={typography.h2}>{isNew ? 'Actualizamos nuestros documentos' : 'Antes de seguir'}</h1>
           <p className={`mt-1 ${typography.small}`}>

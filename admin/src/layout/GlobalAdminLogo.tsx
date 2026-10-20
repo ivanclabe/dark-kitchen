@@ -1,3 +1,4 @@
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import clsx from 'clsx'
 
 /**
@@ -28,7 +29,7 @@ export function GlobalAdminLogo({ compact = false, className }: { compact?: bool
     <span className={clsx('inline-flex items-center gap-2.5', className)}>
       <GlobalAdminMark size={compact ? 28 : 34} />
       <span className="leading-none">
-        <span className="block text-sm font-semibold tracking-tight text-neutral-50">Quanela</span>
+        <BrandWordmark className="block h-[15px]" />
         <span className="mt-1 block font-mono text-[10px] font-medium tracking-[0.2em] text-brasa-400">GLOBAL ADMIN</span>
       </span>
     </span>

@@ -1,5 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
@@ -63,7 +63,7 @@ export function SignUpAdminPage() {
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <BrandMark className="size-14 drop-shadow-[0_8px_18px_rgba(249,115,22,0.35)]" />
+          <BrandWordmark className="h-9" />
           <div>
             <h1 className={typography.h1}>Crear el administrador de la plataforma</h1>
             <p className={`mt-1 ${typography.small}`}>Solo para la primera cuenta de una instalación nueva.</p>

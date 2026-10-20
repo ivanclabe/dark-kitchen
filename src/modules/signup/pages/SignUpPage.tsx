@@ -1,5 +1,5 @@
 import { CATEGORIES, COUNTRIES, SECTORS } from '@/modules/organization/lib/business'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { emailError } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
 import { PhoneInput } from '@/shared/ui/PhoneInput'
@@ -46,9 +46,8 @@ function Shell({ children, width = 'sm' }: { children: ReactNode; width?: 'sm' |
   return (
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10 text-neutral-100">
       <div className={clsx('w-full', { sm: 'max-w-sm', md: 'max-w-xl', xl: 'max-w-5xl' }[width])}>
-        <Link to="/" className="mb-6 flex items-center justify-center gap-2 text-neutral-100">
-          <BrandMark className="size-10" />
-          <span className="text-lg font-semibold">Quanela</span>
+        <Link to="/" aria-label="Quanela" className="mb-6 flex items-center justify-center">
+          <BrandWordmark className="h-9" />
         </Link>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>
       </div>

@@ -1,5 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { appUrl } from '@/shared/lib/appUrl'
 import { kitchenPath, MY_KITCHENS_KEY } from '@/shared/kitchen/activeKitchenContext'
 import { supabase } from '@/shared/lib/supabase'
@@ -54,7 +54,7 @@ function Shell({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh items-center justify-center bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex justify-center">
-          <BrandMark className="size-14 drop-shadow-[0_8px_18px_rgba(249,115,22,0.35)]" />
+          <BrandWordmark className="h-9" />
         </div>
         <div className="space-y-5 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6">{children}</div>
       </div>

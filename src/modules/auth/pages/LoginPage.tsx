@@ -1,7 +1,7 @@
 import { INVALID_CREDENTIALS_MESSAGE } from '@/shared/utils/authErrors'
 import { Feedback } from '@/shared/ui/Feedback'
 import clsx from 'clsx'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { normalizeEmail } from '@/shared/utils/email'
 import { EmailInput } from '@/shared/ui/EmailInput'
@@ -24,13 +24,9 @@ import { clearAccountChoice, markAccountChoice } from '@/shared/kitchen/accountC
 /** The brand panel's scene: the robot of Quanela with the kitchen around it (public/brand). */
 const LOGIN_IMAGE = '/brand/login-hero.webp'
 
-function PanelBrand({ name }: { name: string }) {
-  return (
-    <span className="flex items-center gap-3">
-      <BrandMark className="size-12 rounded-[0.9rem] ring-2 ring-white/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]" />
-      <span className="text-base font-semibold text-white">{name}</span>
-    </span>
-  )
+/** The words-only logo, white on the orange panel (ADR 0072). */
+function PanelBrand() {
+  return <BrandWordmark className="h-9 drop-shadow-[0_2px_12px_rgba(60,18,4,0.45)]" color="bg-white" accent={false} />
 }
 
 /**
@@ -100,7 +96,7 @@ export function LoginPage() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(to_bottom,rgba(60,18,4,0.35),rgba(60,18,4,0))]" aria-hidden />
 
         <div className="relative">
-          <PanelBrand name="Quanela" />
+          <PanelBrand />
         </div>
 
         <div className="relative max-w-xl space-y-4">
@@ -142,7 +138,7 @@ export function LoginPage() {
             ) : (
               <>
               <div className="mb-6 flex flex-col items-center text-center">
-                <BrandMark className="mb-4 size-12 lg:hidden" />
+                <BrandWordmark className="mb-5 h-8 lg:hidden" />
                 <h1 className={typography.h1}>Inicia sesión</h1>
                 <p className={`mt-1.5 ${typography.small}`}>
                   {orgName && tenant.code ? (

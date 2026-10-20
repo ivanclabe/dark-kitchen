@@ -1,4 +1,4 @@
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { QUANELA_DOCUMENTS, legalHref } from '@/shared/legal/documents'
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
@@ -11,9 +11,8 @@ export function LegalLayout({ children }: { children: ReactNode }) {
     <div className="min-h-dvh bg-neutral-950 text-neutral-100">
       <header className="legal-no-print border-b border-neutral-800/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 text-neutral-100">
-            <BrandMark className="size-8" />
-            <span className="font-semibold">Quanela</span>
+          <Link to="/" aria-label="Quanela" className="flex items-center">
+            <BrandWordmark className="h-6" />
           </Link>
           <Link to="/legal" className="text-sm text-neutral-400 hover:text-neutral-100">
             Documentos legales

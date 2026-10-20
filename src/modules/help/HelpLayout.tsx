@@ -1,5 +1,5 @@
 import { useAuth } from '@/shared/hooks/useAuth'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { Drawer } from '@/shared/ui/Drawer'
 import clsx from 'clsx'
 import { ChevronRight, Menu } from 'lucide-react'
@@ -102,10 +102,8 @@ export function HelpLayout() {
             <Menu size={20} aria-hidden />
           </button>
           <Link to={helpPath()} className="flex shrink-0 items-center gap-2">
-            <BrandMark className="size-8" />
-            <span className="text-sm font-semibold">
-              Quanela <span className="hidden font-normal text-neutral-400 sm:inline">· Centro de ayuda</span>
-            </span>
+            <BrandWordmark className="h-6" />
+            <span className="hidden text-sm text-neutral-400 sm:inline">Centro de ayuda</span>
           </Link>
           <div className="mx-auto hidden w-full max-w-md md:block">
             <HelpSearch />

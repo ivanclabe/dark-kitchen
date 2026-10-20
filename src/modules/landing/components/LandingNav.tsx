@@ -1,6 +1,6 @@
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useToast } from '@/shared/ui/Toast'
-import { BrandLogo } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { APP_ENTRY } from '@/shared/tenant/navigation'
 import { helpHref } from '@/shared/help/helpUrl'
 import clsx from 'clsx'
@@ -90,7 +90,7 @@ export function LandingNav() {
 
       <div className="relative flex h-16 items-center gap-4 rounded-[18px] border border-[#1C1310]/10 bg-white pr-2 pl-4 sm:pl-5">
         <a href="#producto" className="flex shrink-0 items-center" aria-label="Quanela — inicio" onClick={() => setOpen(false)}>
-          <BrandLogo className="h-10" />
+          <BrandWordmark className="h-7" color="bg-[var(--l-ink)]" />
         </a>
 
         <nav aria-label="Secciones" className="absolute inset-y-0 left-1/2 hidden -translate-x-1/2 items-stretch gap-1 xl:flex">

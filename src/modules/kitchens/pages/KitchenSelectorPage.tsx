@@ -1,6 +1,6 @@
 import { lastUsedKitchenId } from '@/app/accountEntry'
 import { Feedback } from '@/shared/ui/Feedback'
-import { BrandMark } from '@/shared/brand/BrandMark'
+import { BrandWordmark } from '@/shared/brand/BrandMark'
 import { clearActiveKitchen } from '@/app/kitchenEntry'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { setAccountsActive } from '@/modules/organization/api/organization'
@@ -56,8 +56,8 @@ export function KitchenSelectorPage() {
     <div className="min-h-dvh bg-neutral-950 px-4 py-10 text-neutral-100 sm:px-6">
       <div className="mx-auto max-w-4xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BrandMark className="size-10" />
+          <div className="space-y-4">
+            <BrandWordmark className="h-7" />
             <div>
               <h1 className={typography.h1}>Tus cuentas</h1>
               <p className={typography.small}>Hola, {profile?.fullName?.split(' ')[0] ?? 'de nuevo'}. Elige con qué cuenta vas a trabajar.</p>

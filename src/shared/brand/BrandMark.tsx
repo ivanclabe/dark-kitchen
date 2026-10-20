@@ -3,8 +3,6 @@ import clsx from 'clsx'
 /** The app icon of Quanela (public/icons, from the brand package). */
 export const BRAND_ICON = '/icons/quanela-app-icon-128.png'
 const BRAND_ICON_2X = '/icons/quanela-app-icon-256.png'
-/** The horizontal logo (mascot + wordmark), for light backgrounds. WebP: 28 KB instead of the 123 KB PNG, which stays for other uses. */
-export const BRAND_LOGO = '/brand/quanela-logo-horizontal.webp'
 
 /**
  * The brand mark: the app icon, sized by its className (size-8, size-10…). Decorative next to the name
@@ -32,17 +30,21 @@ const Q_END = 15.9
  * The words-only logo: «quanela» in the brand lettering, taking the theme's text colour, with the «q» in the
  * brand orange like the full logo (ADR 0072). Its height comes from the className (h-5, h-6…).
  */
-export function BrandWordmark({ className, accent = true }: { className?: string; accent?: boolean }) {
+export function BrandWordmark({
+  className,
+  accent = true,
+  color = 'bg-neutral-50',
+}: {
+  className?: string
+  accent?: boolean
+  /** The letters' colour as a background class: the theme's text by default; white on the orange panel. */
+  color?: string
+}) {
   const mask = { maskImage: `url(${BRAND_WORDMARK})`, WebkitMaskImage: `url(${BRAND_WORDMARK})`, maskSize: '100% 100%', WebkitMaskSize: '100% 100%' }
   return (
     <span role="img" aria-label="Quanela" className={clsx('relative inline-block aspect-[1431/353] h-5 shrink-0 select-none', className)}>
-      <span className="absolute inset-0 bg-neutral-50" style={mask} aria-hidden />
+      <span className={clsx('absolute inset-0', color)} style={mask} aria-hidden />
       {accent && <span className="absolute inset-0 bg-brasa-500" style={{ ...mask, clipPath: `inset(0 ${100 - Q_END}% 0 0)` }} aria-hidden />}
     </span>
   )
-}
-
-/** The horizontal logo; its height comes from the className (h-8, h-9…). */
-export function BrandLogo({ className }: { className?: string }) {
-  return <img src={BRAND_LOGO} alt="Quanela" draggable={false} className={clsx('h-9 w-auto select-none', className)} />
 }
