@@ -94,6 +94,14 @@ describe('acceptance gate (ADR 0071)', () => {
     expect(await screen.findByRole('button', { name: 'Recargar' })).toBeTruthy()
     expect(screen.queryByRole('checkbox')).toBeNull()
   })
+
+  it('the page is newer than the server (published before its migration): never a reload loop, it lets the person in', async () => {
+    state.pending = [{ slug: 'terminos', version: '0.9', title: terms.title, effectiveDate: terms.effective, reason: 'first' }]
+    renderGate()
+    expect(await screen.findByText('La app')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Recargar' })).toBeNull()
+    expect(state.record).not.toHaveBeenCalled()
+  })
 })
 
 describe('the business policy and optional scripts (ADR 0071)', () => {

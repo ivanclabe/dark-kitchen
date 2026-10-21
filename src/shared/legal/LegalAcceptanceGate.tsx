@@ -20,6 +20,17 @@ const LABEL: Record<string, (title: string) => string> = {
   privacidad: (t) => `He leído y acepto la ${t}`,
 }
 
+/** Dotted versions compared by number («1.10» is after «1.9»): < 0, 0 or > 0. */
+function compareVersions(a: string, b: string) {
+  const x = a.split('.').map(Number)
+  const y = b.split('.').map(Number)
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    const d = (x[i] ?? 0) - (y[i] ?? 0)
+    if (d !== 0) return d
+  }
+  return 0
+}
+
 function covers(consent: { documents: { slug: string; version: string }[] } | null, pending: PendingLegalDocument[]) {
   return Boolean(consent) && pending.every((p) => consent!.documents.some((d) => d.slug === p.slug && d.version === p.version))
 }
@@ -65,7 +76,16 @@ export function LegalAcceptanceGate({ children }: { children: ReactNode }) {
   if (pending.isError || docs.length === 0) return children
   if (autoRecord && !accept.isError) return <FullScreenLoading stage="session" />
 
-  // The page was built with an older text than the one in force: reload before reading and accepting.
+  // The page carries a newer text than the server has registered (the app was published before its
+  // migration): the server cannot record what the person would read, and reloading does not change it.
+  // Never a dead end: let them in, the gate asks again once the server knows the new version.
+  const ahead = docs.some((d) => {
+    const bundled = legalDocument(d.slug)?.version
+    return bundled !== undefined && compareVersions(bundled, d.version) > 0
+  })
+  if (ahead) return children
+
+  // The page was built with an older text than the one in force: a reload brings the new one.
   const outdated = docs.some((d) => legalDocument(d.slug)?.version !== d.version)
   const isNew = docs.some((d) => d.reason === 'new_version')
   const allChecked = docs.every((d) => checked[d.slug])
